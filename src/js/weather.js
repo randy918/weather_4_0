@@ -9,6 +9,9 @@ import weatherConditions from '../data/weather-conditions.json';
   // Global toggle for Temperature Display Unit ('F' or 'C')
   let displayUnit = 'F';
 
+  // Dynamic NWS radar station identifier (defaults to Tulsa's KINX)
+  let currentRadarStation = 'KINX';
+
   // Track the last fetched city to prevent unnecessary API calls--
   let currentCityLat = null; 
   let currentCityLon = null;
@@ -28,6 +31,17 @@ import weatherConditions from '../data/weather-conditions.json';
 
   // Easily editable animation duration for the alert banner slide (in milliseconds)
   const ALERT_ANIMATION_MS = 1000;
+
+  // --- CONFIG: Doppler Radar Option for Upper Right ---
+  // Set to true to show Tulsa Doppler Radar (with black background).
+  // Set to false to show the original scrolling weather description background with centered date.
+  const SHOW_DOPPLER_RADAR = true;
+
+  // --- Doppler Radar Zoom & Pan Config (Active only when SHOW_DOPPLER_RADAR is true) ---
+  const RADAR_ZOOM = 1.35;        // EDITABLE: Zoom level (e.g. 1.0 for cover, 1.35 to zoom in)
+  const RADAR_OFFSET_X = '10%';   // EDITABLE: Horizontal shift (positive shifts right, e.g. '10%' to center Tulsa)
+  const RADAR_OFFSET_Y = '-5%';   // EDITABLE: Vertical shift (positive shifts down, negative shifts up)
+
 
   // --- Weather Image Config (Upper Right) ---
   const WEATHER_IMAGE_WIDTH = '25vw';   // EDITABLE: Width of the upper right image
@@ -957,17 +971,19 @@ import weatherConditions from '../data/weather-conditions.json';
         top: ${WEATHER_IMAGE_TOP};
         width: ${WEATHER_IMAGE_WIDTH};
         height: ${WEATHER_IMAGE_HEIGHT};
-        background-color: rgba(100, 100, 100, 0.5);
-        background-image: url('img/desc-overcast-clouds.jpg');
-        background-size: auto 100%;
-        background-repeat: repeat-x;
-        animation: scroll-weather-bg ${WEATHER_IMAGE_SCROLL_SPEED_S}s linear infinite !important;
+        background-color: ${SHOW_DOPPLER_RADAR ? 'black' : 'rgba(100, 100, 100, 0.5)'};
+        background-image: url('${SHOW_DOPPLER_RADAR ? `https://radar.weather.gov/ridge/standard/${currentRadarStation}_0.gif` : 'img/desc-overcast-clouds.jpg'}');
+        background-size: ${SHOW_DOPPLER_RADAR ? `calc(${RADAR_ZOOM} * 100%) auto` : 'auto 100%'};
+        background-repeat: ${SHOW_DOPPLER_RADAR ? 'no-repeat' : 'repeat-x'};
+        background-position: ${SHOW_DOPPLER_RADAR ? `calc(50% + ${RADAR_OFFSET_X}) calc(50% + ${RADAR_OFFSET_Y})` : 'center'};
+        ${SHOW_DOPPLER_RADAR ? '' : `animation: scroll-weather-bg ${WEATHER_IMAGE_SCROLL_SPEED_S}s linear infinite !important;`}
         border-radius: ${WEATHER_IMAGE_BORDER_RADIUS};
         transform-origin: top right !important;
         transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw))) !important;
         z-index: 50;
         overflow: hidden;
         opacity: 0; /* Hide initially to prevent page load flash */
+        ${SHOW_DOPPLER_RADAR ? 'filter: invert(1) hue-rotate(180deg);' : ''}
       }
       body.transitions-ready #moon-phase-img {
         transition: transform ${ALERT_ANIMATION_MS}ms ease, filter 0.3s ease !important;
@@ -1070,17 +1086,34 @@ import weatherConditions from '../data/weather-conditions.json';
     if (!document.getElementById('weather-desc-image')) {
       const descImg = document.createElement('div');
       descImg.id = 'weather-desc-image';
-      // Random animation delay to start at different scroll position
-      const randomDelay = -Math.random() * WEATHER_IMAGE_SCROLL_SPEED_S;
-      descImg.style.setProperty('animation-delay', `${randomDelay}s`, 'important');
+      if (!SHOW_DOPPLER_RADAR) {
+        // Random animation delay to start at different scroll position
+        const randomDelay = -Math.random() * WEATHER_IMAGE_SCROLL_SPEED_S;
+        descImg.style.setProperty('animation-delay', `${randomDelay}s`, 'important');
+      }
       document.body.appendChild(descImg);
       
       // If simple-month was already created, move it inside the scrolling banner
+      const simpleMonth = document.getElementById('simple-month');
+      if (simpleMonth && !SHOW_DOPPLER_RADAR) {
+        descImg.appendChild(simpleMonth);
+      }
+    }
+
+    // DUPLICATE CELL CODE (For backtracking/reference)
+    /*
+    if (!document.getElementById('weather-desc-image')) {
+      const descImg = document.createElement('div');
+      descImg.id = 'weather-desc-image';
+      const randomDelay = -Math.random() * WEATHER_IMAGE_SCROLL_SPEED_S;
+      descImg.style.setProperty('animation-delay', `${randomDelay}s`, 'important');
+      document.body.appendChild(descImg);
       const simpleMonth = document.getElementById('simple-month');
       if (simpleMonth) {
         descImg.appendChild(simpleMonth);
       }
     }
+    */
   }
   if (document.body) {
     initAlertsContainer();
@@ -2002,39 +2035,44 @@ import weatherConditions from '../data/weather-conditions.json';
       // Update the side-scrolling image based on the description
       const descImageEl = document.getElementById('weather-desc-image');
       if (descImageEl) {
-        // Determine if it is currently night time
-        const now = Math.floor(Date.now() / 1000);
-        const sunrise = data?.current?.sunrise || data?.daily?.[0]?.sunrise;
-        const sunset = data?.current?.sunset || data?.daily?.[0]?.sunset;
-        let isNight = false;
-        if (sunrise && sunset) {
-          isNight = now < sunrise || now >= sunset;
-        }
-
-        const baseFileName = 'desc-' + description.toLowerCase().replace(/\s+/g, '-') + '.jpg';
-        const dayImgPath = 'img/' + baseFileName;
-        const nightImgPath = 'img/dark-' + baseFileName;
-        const fallbackPath = 'img/desc-rem.jpg';
-        
-        const primaryImgPath = isNight ? nightImgPath : dayImgPath;
-        
-        const imgPreload = new Image();
-        imgPreload.onload = () => {
-          descImageEl.style.backgroundImage = `url('${primaryImgPath}')`;
-        };
-        imgPreload.onerror = () => {
-          if (isNight) {
-            // If the dark image is missing, gracefully fall back to the standard day image
-            const dayPreload = new Image();
-            dayPreload.onload = () => { descImageEl.style.backgroundImage = `url('${dayImgPath}')`; };
-            dayPreload.onerror = () => { descImageEl.style.backgroundImage = `url('${fallbackPath}')`; recordMissingAsset(dayImgPath); };
-            dayPreload.src = dayImgPath;
-          } else {
-            descImageEl.style.backgroundImage = `url('${fallbackPath}')`;
-            recordMissingAsset(primaryImgPath);
+        if (SHOW_DOPPLER_RADAR) {
+          // Keep the Doppler Radar image loaded for the current station
+          descImageEl.style.backgroundImage = `url('https://radar.weather.gov/ridge/standard/${currentRadarStation}_0.gif')`;
+        } else {
+          // Determine if it is currently night time
+          const now = Math.floor(Date.now() / 1000);
+          const sunrise = data?.current?.sunrise || data?.daily?.[0]?.sunrise;
+          const sunset = data?.current?.sunset || data?.daily?.[0]?.sunset;
+          let isNight = false;
+          if (sunrise && sunset) {
+            isNight = now < sunrise || now >= sunset;
           }
-        };
-        imgPreload.src = primaryImgPath;
+
+          const baseFileName = 'desc-' + description.toLowerCase().replace(/\s+/g, '-') + '.jpg';
+          const dayImgPath = 'img/' + baseFileName;
+          const nightImgPath = 'img/dark-' + baseFileName;
+          const fallbackPath = 'img/desc-rem.jpg';
+          
+          const primaryImgPath = isNight ? nightImgPath : dayImgPath;
+          
+          const imgPreload = new Image();
+          imgPreload.onload = () => {
+            descImageEl.style.backgroundImage = `url('${primaryImgPath}')`;
+          };
+          imgPreload.onerror = () => {
+            if (isNight) {
+              // If the dark image is missing, gracefully fall back to the standard day image
+              const dayPreload = new Image();
+              dayPreload.onload = () => { descImageEl.style.backgroundImage = `url('${dayImgPath}')`; };
+              dayPreload.onerror = () => { descImageEl.style.backgroundImage = `url('${fallbackPath}')`; recordMissingAsset(dayImgPath); };
+              dayPreload.src = dayImgPath;
+            } else {
+              descImageEl.style.backgroundImage = `url('${fallbackPath}')`;
+              recordMissingAsset(primaryImgPath);
+            }
+          };
+          imgPreload.src = primaryImgPath;
+        }
       }
       
       // Toggle drop shadow on the white date text ONLY for "overcast clouds"
@@ -3430,6 +3468,7 @@ import weatherConditions from '../data/weather-conditions.json';
     Inserts a 3-letter lowercase month above the high box and colors it using tempToColor
   */
   function createSimpleMonthIfMissing() {
+    if (SHOW_DOPPLER_RADAR) return;
     if (document.getElementById('simple-month')) return;
     const el = document.createElement('div');
     el.id = 'simple-month';
@@ -3491,6 +3530,7 @@ import weatherConditions from '../data/weather-conditions.json';
   let lastSimpleMonthStr = '';
 
   function updateSimpleMonthContent() {
+    if (SHOW_DOPPLER_RADAR) return;
     try {
       const months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
       const days = ['sun','mon','tue','wed','thu','fri','sat'];
@@ -4732,6 +4772,29 @@ import weatherConditions from '../data/weather-conditions.json';
     }
   }
 
+  // Fetch nearest NWS radar station ID based on coordinates from the NWS Points API
+  async function updateRadarStation(lat, lon) {
+    if (!SHOW_DOPPLER_RADAR) return;
+    try {
+      const res = await fetch(`https://api.weather.gov/points/${lat.toFixed(4)},${lon.toFixed(4)}`);
+      if (!res.ok) throw new Error(`NWS API error: ${res.status}`);
+      const data = await res.json();
+      
+      const stationUrl = data.properties?.radarStation;
+      if (stationUrl) {
+        const parts = stationUrl.split('/');
+        const stationId = parts[parts.length - 1]; // e.g. "KINX"
+        if (stationId && stationId.length === 4) {
+          currentRadarStation = stationId.toUpperCase();
+          console.log(`📡 Dynamic Radar Station resolved: ${currentRadarStation}`);
+        }
+      }
+    } catch (e) {
+      console.warn('Unable to resolve NWS radar station for coordinates, falling back to KINX:', e);
+    }
+  }
+
+
 
   async function getLocalWeather() {
 
@@ -4752,6 +4815,9 @@ import weatherConditions from '../data/weather-conditions.json';
     setLoading(true);
 
     try {
+      // Resolve the local NWS radar station ID dynamically for coordinates
+      await updateRadarStation(LAT, LON);
+
       // We removed the double-fetch block! The OneCall API fetches what it needs directly.
       const url = getUrl();
       console.log(`Fetching weather for LAT: ${LAT}, LON: ${LON}`);
