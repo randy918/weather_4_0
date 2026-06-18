@@ -1,0 +1,701 @@
+//>  ████████████████████████████████████  1
+
+
+
+body {
+    margin: 0;
+    
+    // Hide scrollbar while keeping scroll functionality
+    &::-webkit-scrollbar {
+        display: none; // Chrome, Safari, Opera
+    }
+    -ms-overflow-style: none;  // IE and Edge
+    scrollbar-width: none;  // Firefox
+}
+
+html {
+    // Hide scrollbar while keeping scroll functionality
+    &::-webkit-scrollbar {
+        display: none; // Chrome, Safari, Opera
+    }
+    -ms-overflow-style: none;  // IE and Edge
+    scrollbar-width: none;  // Firefox
+}
+
+//>  ████████████████████████████████████  SCROLLING GRADIENT OVERLAY
+
+.scrolling-gradient-overlay {
+    position: absolute;
+    top: var(--gradient-top, 0vw); // DOM SCSS variable for JS manipulation
+    left: 0;
+    width: 100vw;
+    height: var(--gradient-height, 25vw); // DOM SCSS variable for JS manipulation
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);
+    pointer-events: none; // Don't interfere with clicks
+    z-index: 0; // Behind other UI elements but over the background
+    transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw)));
+    transition: transform 1000ms ease;
+}
+
+.scrolling-gradient-overlay-lower {
+    position: absolute;
+    top: var(--gradient-lower-top, 100vw); // DOM SCSS variable for JS manipulation
+    left: 0;
+    width: 100vw;
+    height: var(--gradient-lower-height, 25vw); // DOM SCSS variable for JS manipulation
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);
+    pointer-events: none; // Don't interfere with clicks
+    z-index: 0; // Behind other UI elements but over the background
+    transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw)));
+    transition: transform 1000ms ease;
+}
+
+//>  ████████████████████████████████████  STARTUP LOADER
+
+// EDITABLE: Startup Logo Vertical Offset (increase to move UP)
+$loader-logo-offset-y: 25vw;
+
+#startup-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: var(--gradient, #000); // Perfectly mirrors your background gradient
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999; // Stays above everything
+    pointer-events: none; // Allows clicks to pass through once transparent
+    opacity: 1; // Explicit starting state
+    
+    img {
+        margin-bottom: $loader-logo-offset-y;
+        width: 25vw;
+        height: 25vw;
+        border-radius: 5vw;
+        animation: startup-pulse-simple 1.5s ease-in-out infinite alternate !important;
+    }
+}
+
+@keyframes startup-pulse-simple {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+// Moon Phase Display - Upper Left Corner
+.moon-phase-display {
+    position: absolute;
+    top: -.25vw;
+    left: 2vw;
+    width: 20vw;
+    height: 20vw;
+    z-index: 1000;
+    pointer-events: none; // Don't interfere with clicks
+    opacity: 0.9;
+    
+    // Mask color settings to match current temp
+    background-color: var(--clock-hands-color, #FFF); // Fallback to clock hands color just in case temp-color is uninherited
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+
+    &.moon-down {
+        // We now rely on the color shift (White -> Temp) to indicate the moon is down,
+        // so we preserve the standard opacity so the color is easily visible.
+        opacity: 0.9;
+    }
+}
+
+// EDITABLE: Analog Clock
+.clock-hands-container {
+    position: absolute;
+    top: 13.25vw; // Set to whatever fits your top-right layout best!
+    right: 85.75vw; 
+    width: 12vw;
+    height: 12vw;
+    z-index: 999;
+    pointer-events: none;
+    opacity: 0.9;
+
+    .clock-timer-svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+        overflow: visible;
+        z-index: 1;
+
+        .countdown-track {
+            stroke: rgba(255, 255, 255, 0.2); // Faded background track like the barometer
+            stroke-width: 4; // Matches progress thickness
+        }
+
+        .countdown-progress {
+            stroke: var(--clock-hands-color, rgba(255, 255, 255, 0.4));
+            stroke-width: 4; // roughly matching 0.445vw border in a 100 viewbox
+            stroke-dasharray: 289; /* 2 * PI * r(46) */
+            stroke-dashoffset: 0;
+            stroke-linecap: round;
+            // Removed transition so it counts down perfectly smoothly without jitter as Date.now() updates
+            // transition: stroke-dashoffset 0.1s linear; 
+        }
+    }
+    
+    .clock-face {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 0.445vw solid transparent; // Keeps sizing consistent while SVG does the ring
+        background: rgba(0, 0, 0, 0.0); 
+        box-shadow: inset 0 0 1vw rgba(0,0,0,0.5);
+
+        // Hour Hand
+        .clock-hour-hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            width: 0.5vw; // Thickness of the hour hand (responsive)
+            height: 30%; // Length
+            background-color: var(--clock-hands-color, rgba(255, 255, 255, 0.9));
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(var(--hour-rotation, 0deg));
+            border-radius: 0.4vw;
+        }
+
+        // Minute Hand
+        .clock-minute-hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            width: 0.5vw; // Thickness of the minute hand (responsive)
+            height: 42%; // Slightly longer than hour hand
+            background-color: var(--clock-hands-color, rgba(255, 255, 255, 0.9));
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(var(--minute-rotation, 0deg));
+            border-radius: 0.3vw;
+            box-shadow: 0 0 0.3vw rgba(0,0,0,0.3);
+        }
+
+        // Center Pivot Dot
+        .clock-center-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0.8vw;
+            height: 0.8vw;
+            background-color: white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 0.4vw rgba(0,0,0,0.5);
+            opacity: 0; // EDITABLE: Center dot opacity (set to 0 to hide)
+        }
+    }
+}
+
+// EDITABLE: Wind Direction Arrow - Upper Left, Right of Moon
+.wind-direction-display {
+    position: absolute;
+    top: 2vw; // EDITABLE: Vertical position
+    left: 16vw; // EDITABLE: Horizontal position
+    width: 12vw; // EDITABLE: Arrow width (10% smaller than previous)
+    height: 12vw; // EDITABLE: Arrow height (10% smaller than previous)
+    z-index: 999;
+    pointer-events: none;
+    opacity: 0.9; // EDITABLE: Transparency
+
+    &.spinning .wind-arrow-color {
+        animation: wind-direction-spin 1s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    }
+
+    .wind-arrow-color {
+        width: 100%;
+        height: 100%;
+        background-color: transparent; // Default transparent to prevent white flash, updated by JS
+        -webkit-mask-image: url('../img/dir2.svg');
+        mask-image: url('../img/dir2.svg');
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        transition: background-color 0.3s ease, transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        transform: rotate(var(--wind-rotation, 0deg));
+        transform-origin: center center;
+    }
+}
+
+@keyframes wind-direction-spin {
+    0% {
+        transform: rotate(calc(var(--wind-rotation, 0deg) - 360deg));
+    }
+
+    100% {
+        transform: rotate(var(--wind-rotation, 0deg));
+    }
+}
+
+// EDITABLE: Barometric Pressure Circular Gauge
+.barometric-pressure-display {
+    position: absolute;
+    top: 12.75vw; // EDITABLE: Vertical position (placed below the wind arrow)
+    left: 16vw; // EDITABLE: Horizontal position
+    width: 12.75vw; // EDITABLE: Matches wind arrow width
+    height: 12.75vw; // EDITABLE: Matches wind arrow height
+    z-index: 999;
+    pointer-events: none;
+    opacity: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .barometric-gauge-svg {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        transform: rotate(135deg); // Positive 135deg correctly puts the gap at the bottom like a speedometer
+        
+        .barometric-track {
+            stroke: rgba(255, 255, 255, 0.2); // Dimmed background track
+            stroke-width: 3; // Same thickness feel as the arrow
+            stroke-dasharray: 212, 283; // Leaves a gap at the bottom (optional style choice)
+            stroke-linecap: round;
+        }
+
+        .barometric-fill {
+            stroke: white; // Replaced by JS dynamically to match theme
+            stroke-width: 3;
+            stroke-dasharray: 0, 283; // Filled dynamically by JS
+            stroke-linecap: round;
+            transition: stroke-dasharray 1s ease-in-out, stroke 0.5s ease;
+        }
+
+        .barometric-needle {
+            stroke: rgba(255, 255, 255, 0.9);
+            stroke-width: 3;
+            transform-origin: 50px 50px;
+            transition: transform 1s ease-in-out;
+            opacity: 0; // Hide by default, can un-hide if you prefer a needle over a fill ring
+        }
+    }
+
+    .barometric-text {
+        position: relative;
+        font-family: "bold", sans-serif;
+        font-size: 4vw; // EDITABLE: Size of pressure text inside the circle
+        color: white;
+        text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5);
+        text-align: center;
+        line-height: .5;
+        transform: translateY(1vw); // Shift down slightly inside the ring
+    }
+}
+
+// EDITABLE: High wind pulsating glow effect (Stage 1 preview)
+@-webkit-keyframes high-wind-glow-pulse {
+    0%, 100% {
+        -webkit-filter: drop-shadow(0 0 0.1vw var(--base-color, white));
+        filter: drop-shadow(0 0 0.1vw var(--base-color, white));
+    }
+    50% {
+        // Tighter radius (0.6vw) without brightness shift to maintain pure temp color
+        -webkit-filter: drop-shadow(0 0 1.5vw var(--glow-color, white));
+        filter: drop-shadow(0 0 1.5vw var(--glow-color, white));
+    }
+}
+
+@keyframes high-wind-glow-pulse {
+    0%, 100% {
+        -webkit-filter: drop-shadow(0 0 0.1vw var(--base-color, white));
+        filter: drop-shadow(0 0 0.1vw var(--base-color, white));
+    }
+    50% {
+        // Tighter radius (0.6vw) without brightness shift to maintain pure temp color
+        -webkit-filter: drop-shadow(0 0 1.5vw var(--glow-color, white));
+        filter: drop-shadow(0 0 1.5vw var(--glow-color, white));
+    }
+}
+
+@-webkit-keyframes high-wind-bg-pulse {
+    0%, 100% { background-color: var(--base-color, white); }
+    50% { background-color: var(--glow-color, white); }
+}
+
+@keyframes high-wind-bg-pulse {
+    0%, 100% { background-color: var(--base-color, white); }
+    50% { background-color: var(--glow-color, white); }
+}
+
+.high-wind-active {
+    -webkit-animation: high-wind-glow-pulse 1.8s ease-in-out infinite !important;
+    animation: high-wind-glow-pulse 1.8s ease-in-out infinite !important;
+    
+    &.circular-overlay {
+        animation: high-wind-glow-pulse 1.8s ease-in-out infinite, high-wind-bg-pulse 1.8s ease-in-out infinite !important;
+    }
+    
+    .wind-arrow-color {
+        animation: high-wind-bg-pulse 1.8s ease-in-out infinite !important;
+    }
+}
+
+// EDITABLE: Temperature Pointer - White triangle indicating current temp on today's hi/lo cells
+.temp-pointer {
+    position: absolute;
+    width: 1.732vw; // Width of equilateral triangle (height * sqrt(3)/2, for 2vw tall)
+    height: 2vw; // EDITABLE: Height of the triangle
+    background-color: white; // EDITABLE: Triangle color
+    clip-path: polygon(0% 50%, 100% 0%, 100% 100%); // Left-pointing triangle (vertical side at right)
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0; // Initially hidden until positioned by JS
+    transition: top 0.5s ease-out, opacity 0.3s ease; // EDITABLE: Smooth sliding animation duration
+    border-radius: 0; // Ensure sharp corners, no rounding
+    shape-rendering: crispEdges; // Force sharp rendering
+
+    // EDITABLE: Shadow effect
+    filter: drop-shadow(0.3vw 0.3vw 0.5vw rgba(0, 0, 0, 0.5));
+}
+
+//>  ████████████████████████████████████  CITY OVERLAY BUTTON
+
+main {
+    position: relative;
+}
+
+// EDITABLE: City Text Overlay Button - Positioned in the city text area
+.city-overlay-button {
+    // EDITABLE: Size controls
+    width: 60vw;            // EDITABLE: Button width (widened to ensure it covers long descriptions)
+    height: 24vw;           // EDITABLE: Button height (tall enough to catch City through line 3/4)
+    
+    // EDITABLE: Positioning - ABSOLUTE so it doesn't move other elements
+    position: absolute;     // Removed from document flow - won't affect other elements
+    top: -.5vw;               // EDITABLE: Distance from top of MAIN (not page). 2vw is right at the top of the City name
+    left: 50%;              // EDITABLE: Horizontal centering (50% = center)
+    transform: translateX(-50%) translateY(0vw); // Centers it + fine-tune Y position
+    
+    // Note: The button now floats independently and won't push/pull other elements!
+    
+    // EDITABLE: Visual appearance (now invisible)
+    background: transparent;           // EDITABLE: Background color
+    border: none;                      // EDITABLE: No border (invisible)
+    border-radius: 0.5vw;              // EDITABLE: Corner rounding
+    
+    // EDITABLE: Behavior
+    cursor: pointer;                   // EDITABLE: Mouse cursor on hover
+    z-index: 50;                       // EDITABLE: Stacking order
+    transition: all 0.3s ease;         // EDITABLE: Smooth transitions
+    
+    // EDITABLE: Text/Content styling (if you add text later)
+    font-family: 'bold', sans-serif;
+    font-size: 3vw;
+    color: white;
+    text-align: center;
+    line-height: 15vw;                 // EDITABLE: Vertical center text (matches height)
+    
+    // EDITABLE: Shadow for depth (disabled for invisible button)
+    box-shadow: none; // EDITABLE: No shadow when invisible
+    
+    // EDITABLE: Hover state
+    &:hover {
+        opacity: 1;                    // EDITABLE: No opacity change when invisible
+        cursor: pointer;               // Show it's clickable
+        transform: translateX(-50%) translateY(0vw); // EDITABLE: No movement for invisible button
+    }
+    
+    // EDITABLE: Active/Click state
+    &:active {
+        transform: translateX(-50%) translateY(0.1vw); // EDITABLE: Press down effect (keeps centering!)
+        opacity: 0.9;
+    }
+    
+    // Remove default button styling
+    outline: none;
+    padding: 0;
+    
+    // EDITABLE: Remove iOS tap highlight and selection
+    -webkit-tap-highlight-color: transparent; // Remove gray flash on iOS
+    -webkit-touch-callout: none;              // Disable iOS callout menu
+    user-select: none;                        // Prevent text selection
+    -webkit-user-select: none;                // Prevent text selection (Safari)
+}
+
+//>  ████████████████████████████████████  2
+
+//>  ████████████████████████████████████  HOURLY FORECAST
+
+.hourly-forecast-wrapper {
+    width: 100vw;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 10;
+}
+
+.hourly-bars-container {
+    width: 100%;
+    height: 40vw; // Match the hi-lo dualContainer exactly
+    display: grid;
+    grid-template-columns: repeat(24, minmax(0, 1fr));
+    align-items: end;
+    gap: 0.25vw;
+}
+
+.hourly-bar {
+    text-align: center;
+    color: white;
+    font-size: 0.72vw; // Base size (can be overridden by JS inline style)
+    font-family: 'bold', sans-serif;
+    padding-top: 0.5vw;
+    padding-left: 0.3vw; // Visual centering adjustment for the degree symbol
+    line-height: 1.2;
+}
+
+.hourly-images-container {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(24, minmax(0, 1fr));
+    gap: 0.25vw;
+    margin-top: 0.5vw;
+}
+
+.hourly-image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background-color: rgba(100, 100, 100, 0.3);
+    background-size: auto 100%;
+    background-repeat: repeat-x;
+    background-position: 0 center;
+}
+
+.hourly-labels-container {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(24, minmax(0, 1fr));
+    gap: 0.25vw;
+    margin-top: 0.5vw;
+}
+
+.hourly-label {
+    text-align: center;
+    color: white;
+    font-size: 0.25vw; // Base size (can be overridden by JS inline style)
+    line-height: 1;
+    white-space: nowrap;
+
+    .time-hour {
+        font-family: 'bold', sans-serif;
+        color: white; // Force white to prevent inheriting brown
+        font-size: 1em; // Enforce scaling exactly with parent
+        padding-left: 0.3vw; // Visual centering adjustment for the am/pm text
+    }
+
+    .time-ampm {
+        font-family: 'light', sans-serif;
+        opacity: 0.8;
+        color: white; // Force white to prevent inheriting brown
+        font-size: 1em; // Enforce scaling exactly with parent
+    }
+}
+
+.hourly-rain-container {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(24, minmax(0, 1fr));
+    gap: 0.25vw;
+    margin-top: 0vw;
+}
+
+.hourly-rain-cell {
+    background-color: var(--bitByBitBlue, hsl(205, 100%, 27%));
+    text-align: center;
+    color: white;
+    font-family: 'light', sans-serif;
+    padding: 0;
+    aspect-ratio: 1 / 1; // Force perfectly square cells
+    display: flex;
+    flex-direction: column;
+    justify-content: center; // Center the text vertically inside the square
+    align-items: center;
+    border-radius: 0 0 0.2vw 0.2vw;
+
+    .rain-text {
+        display: inline-block;
+        color: white; // Enforce white text
+        line-height: 1; // Keep text block compact
+        font-size: 1em; // Guarantee it matches JS inline style exactly
+        font-family: 'bold', sans-serif;
+    }
+}
+
+//^  FLEX START██████████████████████████  
+
+
+.container {
+
+    background-color: var(--theRed);
+    padding: var(--padding-m);
+
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 1vw;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.item {
+
+    background-color: var(--theBrown);
+
+    padding: var(--padding-m);
+    padding-top: var(--padding-s);
+    padding-bottom: var(--padding-s);
+
+    font-size: var(--fontsize-l);
+}
+
+//^  ██████████GRID START██████████████████████████ 
+
+.dualContainer {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1vw;
+
+    margin-top: 14vw; // EDITABLE: Gap above the hi/lo temperatures grid
+    padding-top: var(--padding-l);
+    position: relative; // Positioning context for temp-pointer
+}
+
+.loContainer,
+.hiContainer {
+    width: 100%;
+    height: 40vw;
+    margin: 0 auto;
+    padding-top: var(--padding-l);
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-column: 1;
+    grid-row: 1;
+    align-items: end;
+    gap: 1vw;
+}
+
+.loContainer {
+    z-index: 2;
+}
+
+.hiContainer {
+    z-index: 1;
+}
+
+.loItem {
+    background-color: transparent; // Start transparent until JS injects the actual temp color
+    opacity: 0; // Hide until JS injects data
+    transition: opacity 0.5s ease; // Smooth fade-in
+    border-width: .5vw;
+    line-height: 1.2;
+    font-family: "bold", sans-serif;
+    font-size: 5vw;
+    color: var(--theBrown);
+
+    // Soft black shadow - easily editable
+    // Format: horizontal vertical blur spread color
+    box-shadow: 0 0.4vw 1.2vw 0 rgba(0, 0, 0, 1);
+
+    // border-style: solid;
+    // border-color: var(--theBrown);
+
+
+}
+
+.hiItem {
+    background-color: transparent; // Start transparent until JS injects the actual temp color
+    opacity: 0; // Hide until JS injects data
+    transition: opacity 0.5s ease; // Smooth fade-in
+    line-height: 1.2;
+    font-family: "bold", sans-serif;
+    font-size: 5vw;
+    color: var(--theBrown);
+    //     border-width: .5vw;
+    // border-style: solid;
+    // border-color: var(--theBrown);
+
+}
+
+.dayContainer {
+    width: 100%;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 1vw;
+    padding-top: 0.25vw;
+    margin-bottom: -.5vw; // EDITABLE: Gap above days and dates row
+}
+
+.dayItem {
+    color: white;
+    text-align: center;
+    padding: 0.25vw 0;
+    font-size: 3.5vw;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+
+    .day-letter {
+        font-family: 'light', sans-serif;
+        opacity: 1;
+        font-weight: normal;
+        font-size: inherit;
+        color: white;
+    }
+}
+
+.rainContainer {
+    width: 100%;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 1vw;
+    padding-top: 0vw; // EDITABLE: Gap between day dates row and rain inches row
+}
+
+.rainItem {
+    background-color: var(--bitByBitBlue);
+    opacity: 0; // Hide until JS calculates rain percentage
+    visibility: hidden;
+    transition: opacity 0.5s ease, transform 0.5s ease-out; // Smooth fade and stretch
+    padding: 0.25vw 0;
+    text-align: center;
+    color: white;
+    font-size: 3.5vw;
+
+    // Stack children vertically and align to top
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+
+    // Rain text span (prevents stretching when cell scales)
+    .rain-text {
+        display: inline-block;
+        color: white;
+        font-family: 'bold', sans-serif;
+    }
+}
+
+//^  ████████████████████████████████████  F&C MODE HELPER CLASSES
+.fc-mode-text {
+    display: inline-block;
+    transform: scaleX(1.0);
+    transform-origin: center;
+    white-space: nowrap;
+}

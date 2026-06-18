@@ -1,0 +1,61 @@
+{
+    "workbench.colorCustomizations": {
+        "activityBar.activeBackground": "#f89642",
+        "activityBar.background": "#f89642",
+        "activityBar.foreground": "#15202b",
+        "activityBar.inactiveForeground": "#15202b99",
+        "activityBarBadge.background": "#e0feee",
+        "activityBarBadge.foreground": "#15202b",
+        "commandCenter.border": "#15202b99",
+        "sash.hoverBorder": "#f89642",
+        "statusBar.background": "#f67b11",
+        "statusBar.foreground": "#15202b",
+        "statusBarItem.hoverBackground": "#cc6308",
+        "statusBarItem.remoteBackground": "#f67b11",
+        "statusBarItem.remoteForeground": "#15202b",
+        "titleBar.activeBackground": "#f67b11",
+        "titleBar.activeForeground": "#15202b",
+        "titleBar.inactiveBackground": "#f67b1199",
+        "titleBar.inactiveForeground": "#15202b99"
+    },
+    "peacock.color": "#f67b11",
+    "liveServer.settings.port": 5512,
+    "cSpell.words": [
+        "ashutterstock",
+        "childnodes",
+        "shutterstock"
+    ],
+    "favorites.resources": [
+        {
+            "filePath": "index.html",
+            "group": "Default"
+        },
+        {
+            "filePath": "css/index.scss",
+            "group": "Default"
+        },
+        {
+            "filePath": "css/reset.scss",
+            "group": "Default"
+        },
+        {
+            "filePath": "css/universal.scss",
+            "group": "Default"
+        },
+        {
+            "filePath": "js/index.js",
+            "group": "Default"
+        },
+        {
+            "filePath": "js/myfunctions.js",
+            "group": "Default"
+        },
+        {
+            "filePath": "-.txt",
+            "group": "Default"
+        }
+    ],
+    "files.readonlyInclude": {
+        "/*": true
+    }
+}

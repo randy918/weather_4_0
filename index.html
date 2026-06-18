@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather 2.5</title>
+  
+<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" href="/favicon.ico?v=3" type="image/x-icon">
+  <link rel="stylesheet" href="./src/css/universal.scss">
+
+  <!-- Pre-load styles to prevent flash of unstyled content (FOUC) -->
+  <style>
+    #startup-loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 99999;
+      pointer-events: none;
+    }
+    @keyframes startup-pulse-simple {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    #startup-loader img {
+      width: 25vw;
+      height: 25vw;
+      margin-bottom: 25vw; /* Fallback offset; index.scss will override this when it loads */
+      animation: startup-pulse-simple 1.5s ease-in-out infinite alternate !important;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Scrolling Gradient Overlay -->
+  <div class="scrolling-gradient-overlay"></div>
+  <div class="scrolling-gradient-overlay-lower"></div>
+
+  <!-- Startup Loader - Covers everything during initial draw -->
+  <div id="startup-loader">
+<img src="img/w.svg" alt="Startup Logo">
+  </div>
+
+  <!-- Moon Phase Display - Upper Left Corner -->
+  <div id="moon-phase-img" class="moon-phase-display" role="img" aria-label="Moon Phase"></div>
+
+  <!-- Analog Clock Display -->
+  <div id="analog-clock" class="clock-hands-container">
+    <svg class="clock-timer-svg" viewBox="0 0 100 100">
+      <!-- Dimmed background track like barometer -->
+      <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+      <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+    </svg>
+    <div class="clock-face">
+      <div class="clock-hour-hand"></div>
+      <div class="clock-minute-hand"></div>
+      <div class="clock-center-dot"></div>
+    </div>
+  </div>
+
+  <!-- Win Direction Arrow - Upper Left, Right of Moon -->
+  <div id="wind-direction-arrow" class="wind-direction-display">
+    <div class="wind-arrow-color"></div>
+  </div>
+
+  <!-- Barometric Pressure Circular Gauge -->
+  <div id="barometric-pressure-gauge" class="barometric-pressure-display">
+    <svg class="barometric-gauge-svg" viewBox="0 0 100 100">
+      <!-- Background track -->
+      <circle class="barometric-track" cx="50" cy="50" r="45" fill="none" />
+      <!-- Active fill track -->
+      <circle class="barometric-fill" cx="50" cy="50" r="45" fill="none" />
+      <!-- Needle/Pointer indicator (Optional, can be used or hidden) -->
+      <line class="barometric-needle" x1="50" y1="50" x2="50" y2="15" stroke-linecap="round" />
+    </svg>
+    <div class="barometric-text"></div>
+  </div>
+
+  <main>
+
+    <!-- <h1 class="h1Light">Weather 2.0</h1> -->
+    <div id="weather-feels-like"></div>
+
+    <!-- EDITABLE: City Text Overlay Button -->
+    <button id="city-overlay-btn" class="city-overlay-button" aria-label="City overlay button">
+      <!-- Empty button for now, can add content later -->
+    </button>
+
+    <!-- ^   FLEX START -->
+<!-- 
+    <div class="container">
+      <div class="item">1</div>
+      <div class="item i2">2</div>
+      <div class="item">3</div>
+      <div class="item">4</div>
+      <div class="item">5</div>
+    </div> -->
+
+
+
+    <!-- ^   GRID START -->
+
+    <div class="dualContainer">
+      <div class="hiContainer">
+        <div class="hiItem hiItem-0"></div>
+        <div class="hiItem hiItem-1"></div>
+        <div class="hiItem hiItem-2"></div>
+        <div class="hiItem hiItem-3"></div>
+        <div class="hiItem hiItem-4"></div>
+        <div class="hiItem hiItem-5"></div>
+        <div class="hiItem hiItem-6"></div>
+        <div class="hiItem hiItem-7"></div>
+      </div>
+      <div class="loContainer">
+        <div class="loItem loItem-0"></div>
+        <div class="loItem loItem-1"></div>
+        <div class="loItem loItem-2"></div>
+        <div class="loItem loItem-3"></div>
+        <div class="loItem loItem-4"></div>
+        <div class="loItem loItem-5"></div>
+        <div class="loItem loItem-6"></div>
+        <div class="loItem loItem-7"></div>
+      </div>
+
+      <!-- Temperature Pointer - indicates current temp on today's hi/lo cells -->
+      <div id="temp-pointer" class="temp-pointer"></div>
+
+    </div>
+
+    <div class="rainContainer">
+    
+      <div class="rainItem rainItem-0"></div>
+      <div class="rainItem rainItem-1"></div>
+      <div class="rainItem rainItem-2"></div>
+      <div class="rainItem rainItem-3"></div>
+      <div class="rainItem rainItem-4"></div>
+      <div class="rainItem rainItem-5"></div>
+      <div class="rainItem rainItem-6"></div>
+      <div class="rainItem rainItem-7"></div>
+
+    </div>
+
+    <!-- EDITABLE: Height spacer underneath the lower rain inches row -->
+    <div id="rain-spacer" style="height: 2vw; width: 100%;"></div>
+
+
+<script type="module" src="./src/js/index.js"></script>
+  </main>
+
+</body>
+
+</html>

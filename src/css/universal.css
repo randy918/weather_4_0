@@ -1,0 +1,176 @@
+@import url("https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,200;0,400;0,700;0,900;1,400;1,700;1,900&display=swap");
+:root {
+  --border-s: 0.2vw;
+  --border-m: 0.33vw;
+  --border-l: 0.5vw;
+  --fontsize-s: 1vw;
+  --fontsize-m: 1.5vw;
+  --fontsize-l: 3vw;
+  --fontsize-xl: 4.5vw;
+  --fontsize-xxl: 6vw;
+  --distance-s: 0.5vw;
+  --distance-m: 1.5vw;
+  --distance-l: 3vw;
+  --margin-s: 0.5vw;
+  --margin-m: 1.5vw;
+  --margin-l: 3vw;
+  --padding-s: 0.5vw;
+  --padding-m: 1.5vw;
+  --padding-l: 3vw;
+  --radius-s: 0.5vw;
+  --radius-m: 1vw;
+  --radius-l: 2vw;
+  --theBackground: hsla(29, 49%, 89%, 1);
+  --theGray: hsla(211, 23%, 61%, 1);
+  --theGreen: hsl(135, 100%, 34%);
+  --theRed: hsla(358, 61%, 47%, 1);
+  --theYellow: hsla(37, 65%, 90%, 1);
+  --modalBackground: hsla(0, 0%, 33%, 1);
+  --bg: hsl(209, 16%, 26%);
+  --theRed: hsl(358, 61%, 47%);
+  --theOrange: hsl(24, 100%, 50%);
+  --theRodeoPink: hsl(358, 74%, 79%);
+  --theRodeoBlue: hsl(231, 24%, 59%);
+  --theYellow: hsl(37, 65%, 62%);
+  --theGray: hsl(211, 16%, 36%);
+  --theBackground: hsl(29, 49%, 89%);
+  --theDarkGray: hsl(208, 13%, 19%);
+  --theBrown: hsl(6, 47%, 27%);
+  --bitByBitRed: hsl(349, 87%, 56%);
+  --bitByBitBlue: hsl(205, 100%, 27%);
+  --newGray00: hsl(220, 20%, 98%); /* Crisp, tinted white */
+  --newGray25: hsl(220, 20%, 94%); /* Distinctly separated off-white */
+  --newGray50: hsl(220, 18%, 90%);
+  --newGray100: hsl(220, 18%, 85%);
+  --newGray150: hsl(220, 16%, 80%);
+  --newGray200: hsl(220, 16%, 74%);
+  --newGray300: hsl(220, 15%, 66%);
+  --newGray400: hsl(220, 15%, 58%);
+  --newGray500: hsl(220, 14%, 50%); /* Midpoint */
+  --newGray600: hsl(220, 16%, 42%);
+  --newGray700: hsl(220, 18%, 34%);
+  --newGray800: hsl(220, 22%, 26%);
+  --newGray850: hsl(220, 24%, 21%);
+  --newGray900: hsl(220, 26%, 16%);
+  --newGray950: hsl(220, 30%, 10%);
+  --newGray1000: hsl(220, 35%, 5%);
+  --bitByBitBlonde: hsl(29, 49%, 89%)
+  --coolGray50: rgb(245, 247, 250);
+  --coolGray100: hsl(214, 15%, 91%);
+  --coolGray200: hsl(210, 16%, 82%);
+  --coolGray300: hsl(211, 13%, 65%);
+  --coolGray400: rgb(123, 135, 148);
+  --coolGray500: hsl(211, 12%, 43%);
+  --coolGray600: hsl(209, 14%, 37%);
+  --coolGray700: hsl(209, 18%, 30%);
+  --coolGray800: hsl(209, 20%, 25%);
+  --coolGray900: rgb(31, 41, 51);
+  --gray200: hsl(0, 0%, 100%);
+  --gray400: hsl(0, 0%, 67%);
+  --gray600: hsl(0, 0%, 24%);
+  --gray800: hsl(0, 0%, 13%);
+  --gray1000: hsl(0, 0%, 9%);
+  --gray5000: hsl(0, 0%, 5%);
+  --gray10000: hsl(0, 0%, 0%);
+  --hadiannaBlueOne: hsl(196, 48%, 52%);
+  --hadiannaBlueTwo: hsl(195, 51%, 59%);
+  --hadiannaBlueThree: rgb(161, 224, 249);
+  --hadiannaBlueFour: hsl(196, 63%, 60%);
+  --hadiannaOrangeOne: hsl(25, 48%, 52%);
+  --hadiannaOrangeFour: hsl(25, 63%, 60%);
+  --hadiannaSalmonOne: hsl(8, 71%, 65%);
+  --hadiannaSalmonFour: hsl(8, 100%, 73%);
+}
+
+@font-face {
+  font-family: "bold";
+  src: url("../fonts/FiraSans-Black.ttf");
+}
+@font-face {
+  font-family: "light";
+  src: url("../fonts/FiraSans-Light.ttf");
+}
+@font-face {
+  font-family: "ital";
+  src: url("../fonts/FiraSans-Italic.ttf");
+}
+@font-face {
+  font-family: "very-light";
+  src: url("../fonts/IBMPlexMono-Thin.otf");
+}
+@font-face {
+  font-family: "tall";
+  src: url("../fonts/LeagueGothic-Regular-VariableFont_wdth.ttf");
+}
+@font-face {
+  font-family: "anton";
+  src: url("../fonts/Anton-Regular.ttf");
+}
+* {
+  font-family: "bold";
+  font-size: 5vw;
+  color: var(--theBrown);
+  border-radius: var(--radius-m);
+  text-align: center;
+}
+
+body {
+  height: max(100vw, 100vh);
+}
+
+h1 {
+  font-family: "bold";
+  font-size: 8vw;
+  color: inherit;
+  margin-top: 6vw;
+}
+
+h2 {
+  font-family: "very-light";
+  font-size: 6vw;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+h3 {
+  font-family: "anton";
+  font-size: 4vw;
+  color: white;
+  line-height: 1.1;
+}
+
+h4 {
+  font-family: "bold";
+  font-size: 3vw;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+h5 {
+  font-family: "bold";
+  font-size: 2vw;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+h6 {
+  font-family: "bold";
+  font-size: 1.5vw;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+p {
+  font-family: "light";
+  line-height: 1.1;
+  font-size: 2vw;
+  color: var(--gray400);
+}
+
+.white {
+  color: white;
+}
+
+.center-text {
+  align-content: center;
+}
+
+.mt6 {
+  margin-top: 6vw;
+}/*# sourceMappingURL=universal.css.map */
