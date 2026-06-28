@@ -25,7 +25,7 @@ import weatherConditions from '../data/weather-conditions.json';
   let currentRefreshMs = DEFAULT_REFRESH_MS;
   let refreshTimerId = null;
 
-  // Store last weather data for resize repositioning of temp pointer
+  // Store last weather data for resize repositioning of temp pointer--
   let lastWeatherData = null;
 
   // Editable minimum threshold for showing rain amounts (in inches) throughout the app
