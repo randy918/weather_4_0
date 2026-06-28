@@ -714,6 +714,12 @@ main {
     justify-content: center;
     align-items: center;
 
+    &.clockGridItem-0 {
+        .clock-timer-svg .countdown-progress {
+            stroke: var(--clock-hands-color, rgba(255, 255, 255, 0.4)) !important;
+        }
+    }
+
     .clock-timer-svg {
         position: absolute;
         top: 0;
@@ -735,6 +741,64 @@ main {
             stroke-dashoffset: 0; /* Default fully full */
             stroke-linecap: round;
         }
+    }
+
+    .clock-face {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: calc(var(--clock-grid-stroke-width, 4) * 0.11vw) solid transparent;
+        background: rgba(0, 0, 0, 0.0); 
+        box-shadow: inset 0 0 1vw rgba(0,0,0,0.5);
+
+        // Hour Hand
+        .clock-hour-hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            width: 0.4vw; // Thickness of the hour hand
+            height: 30%; // Length
+            background-color: var(--clock-hands-color, rgba(255, 255, 255, 0.9));
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(var(--hour-rotation, 0deg));
+            border-radius: 0.4vw;
+        }
+
+        // Minute Hand
+        .clock-minute-hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            width: 0.4vw; // Thickness of the minute hand
+            height: 42%; // Slightly longer than hour hand
+            background-color: var(--clock-hands-color, rgba(255, 255, 255, 0.9));
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(var(--minute-rotation, 0deg));
+            border-radius: 0.4vw;
+        }
+
+        // Center Pivot Dot
+        .clock-center-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 1vw; // size of dot
+            height: 1vw;
+            background-color: var(--clock-hands-color, rgba(255, 255, 255, 0.9));
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            opacity: 0; // Hidden matching main clock center pivot dot
+        }
+    }
+
+    .grid-moon-phase {
+        position: relative !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        z-index: 1 !important;
     }
 }
 

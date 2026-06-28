@@ -44,7 +44,7 @@ import weatherConditions from '../data/weather-conditions.json';
   const CLOCK_GRID_MARGIN_RIGHT = '2vw'; // EDITABLE: Right margin for the row as a whole
   const CLOCK_GRID_TRACK_COLOR = 'rgba(255, 255, 255, 0.2)'; // EDITABLE: Circle track color
   const CLOCK_GRID_PROGRESS_COLOR = 'rgba(255, 255, 255, 0.5)'; // EDITABLE: Active progress fill color
-  const CLOCK_GRID_STROKE_WIDTH = 4;     // EDITABLE: SVG stroke thickness
+  const CLOCK_GRID_STROKE_WIDTH = 3.5;     // EDITABLE: SVG stroke thickness
 
   // Inject these config variables into CSS properties immediately
   document.documentElement.style.setProperty('--clock-grid-size', CLOCK_GRID_SIZE);
@@ -482,14 +482,21 @@ import weatherConditions from '../data/weather-conditions.json';
     console.log(`Moon phase: ${moonPhase.toFixed(3)}, raw=${rawIndex}, offset=${MOON_IMAGE_OFFSET} -> 2moon${imgIndexStr}.png`);
 
     const imgEl = document.getElementById('moon-phase-img');
+    const gridImgEl = document.querySelector('.grid-moon-phase');
     
-    if (imgEl) {
+    if (imgEl || gridImgEl) {
       const moonSrcUrl = `url(img/2moon${imgIndexStr}.png)`;
       
-      // Update the mask image
-      imgEl.style.webkitMaskImage = moonSrcUrl;
-      imgEl.style.maskImage = moonSrcUrl;
-      imgEl.setAttribute('aria-label', `Moon Phase ${imgIndex} (${moonPhase})`);
+      if (imgEl) {
+        imgEl.style.webkitMaskImage = moonSrcUrl;
+        imgEl.style.maskImage = moonSrcUrl;
+        imgEl.setAttribute('aria-label', `Moon Phase ${imgIndex} (${moonPhase})`);
+      }
+      if (gridImgEl) {
+        gridImgEl.style.webkitMaskImage = moonSrcUrl;
+        gridImgEl.style.maskImage = moonSrcUrl;
+        gridImgEl.setAttribute('aria-label', `Moon Phase ${imgIndex} (${moonPhase})`);
+      }
       
       // Check if moon is currently risen (between moonrise and moonset)
       // EASY TOGGLE: Set to false to always show full opacity, true to dim it when moon is down
@@ -525,15 +532,33 @@ import weatherConditions from '../data/weather-conditions.json';
         }
         
         if (isMoonUp) {
-          imgEl.classList.remove('moon-down');
-          imgEl.style.backgroundColor = '#FFFFFF'; // White when moon is risen
+          if (imgEl) {
+            imgEl.classList.remove('moon-down');
+            imgEl.style.backgroundColor = '#FFFFFF'; // White when moon is risen
+          }
+          if (gridImgEl) {
+            gridImgEl.classList.remove('moon-down');
+            gridImgEl.style.backgroundColor = '#FFFFFF';
+          }
         } else {
-          imgEl.classList.add('moon-down');
-          imgEl.style.backgroundColor = tempColorStr; // Temp color when moon is set
+          if (imgEl) {
+            imgEl.classList.add('moon-down');
+            imgEl.style.backgroundColor = tempColorStr; // Temp color when moon is set
+          }
+          if (gridImgEl) {
+            gridImgEl.classList.add('moon-down');
+            gridImgEl.style.backgroundColor = tempColorStr;
+          }
         }
       } else {
-        imgEl.classList.remove('moon-down');
-        imgEl.style.backgroundColor = '#FFFFFF';
+        if (imgEl) {
+          imgEl.classList.remove('moon-down');
+          imgEl.style.backgroundColor = '#FFFFFF';
+        }
+        if (gridImgEl) {
+          gridImgEl.classList.remove('moon-down');
+          gridImgEl.style.backgroundColor = '#FFFFFF';
+        }
       }
     }
   }
@@ -2524,12 +2549,32 @@ import weatherConditions from '../data/weather-conditions.json';
       for (let i = 0; i < 8; i++) {
         const item = document.createElement('div');
         item.className = `clockGridItem clockGridItem-${i}`;
-        item.innerHTML = `
-          <svg class="clock-timer-svg" viewBox="0 0 100 100">
-            <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
-            <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
-          </svg>
-        `;
+        
+        let innerHtml = '';
+        if (i === 1) {
+          // Cell #2: Moon phase circle area only (no SVG countdown circle)
+          innerHtml = `<div class="moon-phase-display grid-moon-phase" role="img" aria-label="Moon Phase"></div>`;
+        } else {
+          innerHtml = `
+            <svg class="clock-timer-svg" viewBox="0 0 100 100">
+              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+            </svg>
+          `;
+          
+          // Duplicate the main clock face (hands and center dot) in the first cell on the left
+          if (i === 0) {
+            innerHtml += `
+              <div class="clock-face">
+                <div class="clock-hour-hand"></div>
+                <div class="clock-minute-hand"></div>
+                <div class="clock-center-dot"></div>
+              </div>
+            `;
+          }
+        }
+        
+        item.innerHTML = innerHtml;
         container.appendChild(item);
       }
       
@@ -5507,7 +5552,8 @@ import weatherConditions from '../data/weather-conditions.json';
 
   function updateCountdownGauge() {
     const progressEl = document.querySelector('#analog-clock .countdown-progress');
-    if (!progressEl || !nextRefreshAt) return;
+    const gridProgressEl = document.querySelector('.clockGridItem-0 .countdown-progress');
+    if ((!progressEl && !gridProgressEl) || !nextRefreshAt) return;
     
     const now = Date.now();
     const refreshTime = nextRefreshAt.getTime();
@@ -5518,7 +5564,8 @@ import weatherConditions from '../data/weather-conditions.json';
     // stroke-dashoffset: 0 = full circle, CIRCUMFERENCE = empty
     // We want it to shrink as time passes, so offset increases
     const dashOffset = CIRCLE_CIRCUMFERENCE * (1 - percent);
-    progressEl.style.strokeDashoffset = dashOffset;
+    if (progressEl) progressEl.style.strokeDashoffset = dashOffset;
+    if (gridProgressEl) gridProgressEl.style.strokeDashoffset = dashOffset;
   }
 
   function updateDotsCountdown() {
@@ -5528,7 +5575,8 @@ import weatherConditions from '../data/weather-conditions.json';
   // Clock hands update
   function updateClockHands() {
     const container = document.querySelector('.clock-hands-container');
-    if (!container) return;
+    const gridContainer = document.querySelector('.clockGridItem-0');
+    if (!container && !gridContainer) return;
     
     const now = new Date();
     const hours = now.getHours() % 12;
@@ -5541,15 +5589,25 @@ import weatherConditions from '../data/weather-conditions.json';
     // Minute hand: 360° / 60 minutes = 6° per minute, plus gradual movement from seconds
     const minuteRotation = (minutes * 6) + (seconds * 0.1);
     
-    container.style.setProperty('--hour-rotation', `${hourRotation}deg`);
-    container.style.setProperty('--minute-rotation', `${minuteRotation}deg`);
-
     // Dynamically set clock hands to the current daily temperature color
-    // Reaching out to the global lastWeatherData so it updates flawlessly independent of API calls
+    let currentColor = null;
     if (window.lastWeatherData && window.lastWeatherData.current && typeof window.lastWeatherData.current.temp === 'number') {
-      const currentColor = tempToColor(window.lastWeatherData.current.temp);
+      currentColor = tempToColor(window.lastWeatherData.current.temp);
+    }
+
+    if (container) {
+      container.style.setProperty('--hour-rotation', `${hourRotation}deg`);
+      container.style.setProperty('--minute-rotation', `${minuteRotation}deg`);
       if (currentColor) {
         container.style.setProperty('--clock-hands-color', currentColor);
+      }
+    }
+
+    if (gridContainer) {
+      gridContainer.style.setProperty('--hour-rotation', `${hourRotation}deg`);
+      gridContainer.style.setProperty('--minute-rotation', `${minuteRotation}deg`);
+      if (currentColor) {
+        gridContainer.style.setProperty('--clock-hands-color', currentColor);
       }
     }
   }
