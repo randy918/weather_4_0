@@ -692,6 +692,52 @@ main {
     }
 }
 
+//>  ████████████████████████████████████  CLOCK GRID ROW
+.clockGridContainer {
+    width: auto;
+    margin-top: var(--clock-grid-margin-top, 2vw);
+    margin-bottom: var(--clock-grid-margin-bottom, 2vw);
+    margin-left: var(--clock-grid-margin-left, 0vw);
+    margin-right: var(--clock-grid-margin-right, 0vw);
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: var(--clock-grid-gap, 1vw);
+    justify-items: center;
+    align-items: center;
+}
+
+.clockGridItem {
+    position: relative;
+    width: var(--clock-grid-size, 10vw);
+    height: var(--clock-grid-size, 10vw);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .clock-timer-svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+        overflow: visible;
+
+        .countdown-track {
+            stroke: var(--clock-grid-track-color, rgba(255, 255, 255, 0.2));
+            stroke-width: var(--clock-grid-stroke-width, 4);
+        }
+
+        .countdown-progress {
+            stroke: var(--clock-grid-progress-color, rgba(255, 255, 255, 0.5));
+            stroke-width: var(--clock-grid-stroke-width, 4);
+            stroke-dasharray: 289; /* 2 * PI * r(46) */
+            stroke-dashoffset: 0; /* Default fully full */
+            stroke-linecap: round;
+        }
+    }
+}
+
 //^  ████████████████████████████████████  F&C MODE HELPER CLASSES
 .fc-mode-text {
     display: inline-block;

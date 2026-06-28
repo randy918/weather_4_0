@@ -35,6 +35,28 @@ import weatherConditions from '../data/weather-conditions.json';
   // Increase to prevent minor noise/dust (clutter) from showing the radar. Try 80, 120, or 200!
   const RADAR_PRECIPITATION_PIXEL_THRESHOLD = 120;
 
+  // --- CONFIG: Clock Grid (8 Countdown Circles Row) ---
+  const CLOCK_GRID_SIZE = '11vw';         // EDITABLE: Width and height of each circle widget
+  const CLOCK_GRID_GAP = '0vw';          // EDITABLE: Gap between cells
+  const CLOCK_GRID_MARGIN_TOP = '-3vw';   // EDITABLE: Top margin of the row
+  const CLOCK_GRID_MARGIN_BOTTOM = '2vw';// EDITABLE: Bottom margin of the row
+  const CLOCK_GRID_MARGIN_LEFT = '2vw';  // EDITABLE: Left margin for the row as a whole
+  const CLOCK_GRID_MARGIN_RIGHT = '2vw'; // EDITABLE: Right margin for the row as a whole
+  const CLOCK_GRID_TRACK_COLOR = 'rgba(255, 255, 255, 0.2)'; // EDITABLE: Circle track color
+  const CLOCK_GRID_PROGRESS_COLOR = 'rgba(255, 255, 255, 0.5)'; // EDITABLE: Active progress fill color
+  const CLOCK_GRID_STROKE_WIDTH = 4;     // EDITABLE: SVG stroke thickness
+
+  // Inject these config variables into CSS properties immediately
+  document.documentElement.style.setProperty('--clock-grid-size', CLOCK_GRID_SIZE);
+  document.documentElement.style.setProperty('--clock-grid-gap', CLOCK_GRID_GAP);
+  document.documentElement.style.setProperty('--clock-grid-margin-top', CLOCK_GRID_MARGIN_TOP);
+  document.documentElement.style.setProperty('--clock-grid-margin-bottom', CLOCK_GRID_MARGIN_BOTTOM);
+  document.documentElement.style.setProperty('--clock-grid-margin-left', CLOCK_GRID_MARGIN_LEFT);
+  document.documentElement.style.setProperty('--clock-grid-margin-right', CLOCK_GRID_MARGIN_RIGHT);
+  document.documentElement.style.setProperty('--clock-grid-track-color', CLOCK_GRID_TRACK_COLOR);
+  document.documentElement.style.setProperty('--clock-grid-progress-color', CLOCK_GRID_PROGRESS_COLOR);
+  document.documentElement.style.setProperty('--clock-grid-stroke-width', CLOCK_GRID_STROKE_WIDTH);
+
   // Removed lastBarometricPressure as we now use future predictive trend
 
   // Easily editable animation duration for the alert banner slide (in milliseconds)
@@ -580,6 +602,9 @@ import weatherConditions from '../data/weather-conditions.json';
     
     // Update barometric pressure gauge
     updateBarometricGauge(data);
+
+    // Update clock grid row
+    updateClockGridRow(data);
 
     // Update wind speed dots row
     updateWindDotsRow(data);
@@ -2486,6 +2511,38 @@ import weatherConditions from '../data/weather-conditions.json';
     return { active, inactive };
   }
 
+  // Create and insert the 8-cell clock grid container dynamically
+  function updateClockGridRow(data) {
+    const containerId = 'clock-grid-container';
+    let container = document.getElementById(containerId);
+    
+    if (!container) {
+      container = document.createElement('div');
+      container.id = containerId;
+      container.className = 'clockGridContainer';
+      
+      for (let i = 0; i < 8; i++) {
+        const item = document.createElement('div');
+        item.className = `clockGridItem clockGridItem-${i}`;
+        item.innerHTML = `
+          <svg class="clock-timer-svg" viewBox="0 0 100 100">
+            <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+            <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+          </svg>
+        `;
+        container.appendChild(item);
+      }
+      
+      // Insert right below the refresh dots container
+      const refreshDots = document.getElementById('refresh-dots-container');
+      if (refreshDots && refreshDots.parentNode) {
+        refreshDots.parentNode.insertBefore(container, refreshDots.nextSibling);
+      } else {
+        (document.querySelector('main.content') || document.body).appendChild(container);
+      }
+    }
+  }
+
   // Create and update the wind dots row (pill + 60 dots)
   function updateWindDotsRow(data) {
     const windSpeed = data?.current?.wind_speed || 0;
@@ -2548,10 +2605,12 @@ import weatherConditions from '../data/weather-conditions.json';
       wrapper.appendChild(dotsContainer);
       wrapper.appendChild(pill);
       
-      // Insert right below the refresh dots container
+      // Insert right below the clock grid container (or fallback to refresh dots container)
+      const clockGrid = document.getElementById('clock-grid-container');
       const refreshDots = document.getElementById('refresh-dots-container');
-      if (refreshDots && refreshDots.parentNode) {
-        refreshDots.parentNode.insertBefore(wrapper, refreshDots.nextSibling);
+      const targetAnchor = clockGrid || refreshDots;
+      if (targetAnchor && targetAnchor.parentNode) {
+        targetAnchor.parentNode.insertBefore(wrapper, targetAnchor.nextSibling);
       } else {
         (document.querySelector('main.content') || document.body).appendChild(wrapper);
       }
