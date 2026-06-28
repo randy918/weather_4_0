@@ -12,6 +12,10 @@ import weatherConditions from '../data/weather-conditions.json';
   // Dynamic NWS radar station identifier (defaults to Tulsa's KINX)
   let currentRadarStation = 'KINX';
 
+  // Radar loop interval and index trackers
+  let radarLoopIntervalId = null;
+  let currentRadarFrameIndex = 0;
+
   // Track the last fetched city to prevent unnecessary API calls--
   let currentCityLat = null; 
   let currentCityLon = null;
@@ -27,6 +31,10 @@ import weatherConditions from '../data/weather-conditions.json';
   // Editable minimum threshold for showing rain amounts (in inches) throughout the app
   const MIN_RAIN_DISPLAY_THRESHOLD = 0.05;
 
+  // EDITABLE: Minimum precipitation pixels in downscaled 80x80 radar map area to trigger Doppler loop.
+  // Increase to prevent minor noise/dust (clutter) from showing the radar. Try 80, 120, or 200!
+  const RADAR_PRECIPITATION_PIXEL_THRESHOLD = 120;
+
   // Removed lastBarometricPressure as we now use future predictive trend
 
   // Easily editable animation duration for the alert banner slide (in milliseconds)
@@ -35,12 +43,16 @@ import weatherConditions from '../data/weather-conditions.json';
   // --- CONFIG: Doppler Radar Option for Upper Right ---
   // Set to true to show Tulsa Doppler Radar (with black background).
   // Set to false to show the original scrolling weather description background with centered date.
-  const SHOW_DOPPLER_RADAR = true;
+  let SHOW_DOPPLER_RADAR = false;
 
   // --- Doppler Radar Zoom & Pan Config (Active only when SHOW_DOPPLER_RADAR is true) ---
   const RADAR_ZOOM = 1.35;        // EDITABLE: Zoom level (e.g. 1.0 for cover, 1.35 to zoom in)
   const RADAR_OFFSET_X = '10%';   // EDITABLE: Horizontal shift (positive shifts right, e.g. '10%' to center Tulsa)
   const RADAR_OFFSET_Y = '-5%';   // EDITABLE: Vertical shift (positive shifts down, negative shifts up)
+
+  // --- Doppler Radar Playback Config ---
+  const RADAR_LOOP_SPEED_MS = 1000;    // EDITABLE: Time each frame is fully visible (in milliseconds)
+  const RADAR_FADE_DURATION_MS = 400;  // EDITABLE: Transition duration for cross-fade (in milliseconds)
 
 
   // --- Weather Image Config (Upper Right) ---
@@ -134,6 +146,7 @@ import weatherConditions from '../data/weather-conditions.json';
     "DENSE FOG ADVISORY": "rgba(128, 128, 128, 0.85)", // Gray
     "FLOOD ADVISORY": "hsl(195, 90%, 45%)", // Bright blue-purple
     "FLOOD WATCH": "hsl(195, 90%, 65%)", // Bright blue-purple
+    "HEAT ADVISORY": "rgba(250, 38, 38, 0.85)", // Standard red
     "SEVERE THUNDERSTORM WARNING": "rgba(220, 38, 38, 0.85)", // Standard red
     "SEVERE THUNDERSTORM WATCH": "hsl(280, 90%, 50%)", // Bright blue-purple
     "SPECIAL WEATHER STATEMENT": "rgba(100, 130, 160, 0.85)", // Steel blue/gray
@@ -150,6 +163,7 @@ import weatherConditions from '../data/weather-conditions.json';
     "FLOOD ADVISORY": "img/flood-wat.svg",
     "FLOOD WATCH": "img/flood-wat.svg",
     "DENSE FOG ADVISORY": "img/fog-wat.svg",
+    "HEAT ADVISORY": "img/heat-wat.svg",
     "DEFAULT": "img/trn-wat.svg"
   };
 
@@ -971,19 +985,31 @@ import weatherConditions from '../data/weather-conditions.json';
         top: ${WEATHER_IMAGE_TOP};
         width: ${WEATHER_IMAGE_WIDTH};
         height: ${WEATHER_IMAGE_HEIGHT};
-        background-color: ${SHOW_DOPPLER_RADAR ? 'black' : 'rgba(100, 100, 100, 0.5)'};
-        background-image: url('${SHOW_DOPPLER_RADAR ? `https://radar.weather.gov/ridge/standard/${currentRadarStation}_0.gif` : 'img/desc-overcast-clouds.jpg'}');
-        background-size: ${SHOW_DOPPLER_RADAR ? `calc(${RADAR_ZOOM} * 100%) auto` : 'auto 100%'};
-        background-repeat: ${SHOW_DOPPLER_RADAR ? 'no-repeat' : 'repeat-x'};
-        background-position: ${SHOW_DOPPLER_RADAR ? `calc(50% + ${RADAR_OFFSET_X}) calc(50% + ${RADAR_OFFSET_Y})` : 'center'};
-        ${SHOW_DOPPLER_RADAR ? '' : `animation: scroll-weather-bg ${WEATHER_IMAGE_SCROLL_SPEED_S}s linear infinite !important;`}
+        background-color: rgba(100, 100, 100, 0.5);
+        background-image: url('img/desc-overcast-clouds.jpg');
+        background-size: auto 100%;
+        background-repeat: repeat-x;
+        background-position: center;
+        --radar-loop-speed: ${RADAR_LOOP_SPEED_MS}ms;
+        --radar-fade-duration: ${RADAR_FADE_DURATION_MS}ms;
+        animation: scroll-weather-bg ${WEATHER_IMAGE_SCROLL_SPEED_S}s linear infinite !important;
         border-radius: ${WEATHER_IMAGE_BORDER_RADIUS};
         transform-origin: top right !important;
         transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw))) !important;
         z-index: 50;
         overflow: hidden;
         opacity: 0; /* Hide initially to prevent page load flash */
-        ${SHOW_DOPPLER_RADAR ? 'filter: invert(1) hue-rotate(180deg);' : ''}
+      }
+      #weather-desc-image.radar-mode {
+        background-color: black;
+        background-image: none;
+        background-size: cover;
+        background-repeat: no-repeat;
+        animation: none !important;
+        filter: invert(1) hue-rotate(180deg);
+      }
+      #weather-desc-image.radar-mode #simple-month {
+        display: none !important;
       }
       body.transitions-ready #moon-phase-img {
         transition: transform ${ALERT_ANIMATION_MS}ms ease, filter 0.3s ease !important;
@@ -2036,9 +2062,57 @@ import weatherConditions from '../data/weather-conditions.json';
       const descImageEl = document.getElementById('weather-desc-image');
       if (descImageEl) {
         if (SHOW_DOPPLER_RADAR) {
-          // Keep the Doppler Radar image loaded for the current station
-          descImageEl.style.backgroundImage = `url('https://radar.weather.gov/ridge/standard/${currentRadarStation}_0.gif')`;
+          // Set parent container styling via class
+          descImageEl.classList.add('radar-mode');
+          descImageEl.style.setProperty('--radar-fade-duration', `${RADAR_FADE_DURATION_MS}ms`);
+
+          // Ensure we have 4 frame layers
+          let frames = descImageEl.querySelectorAll('.radar-frame');
+          if (frames.length !== 4) {
+            descImageEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
+            frames = [];
+            for (let i = 3; i >= 0; i--) { // Order: 3 (oldest, bottom) to 0 (newest, top)
+              const frame = document.createElement('div');
+              frame.className = 'radar-frame';
+              frame.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-size: calc(${RADAR_ZOOM} * 100%) auto;
+                background-repeat: no-repeat;
+                background-position: calc(50% + ${RADAR_OFFSET_X}) calc(50% + ${RADAR_OFFSET_Y});
+                opacity: ${i === 0 ? 1 : 0};
+                transition: opacity var(--radar-fade-duration, 400ms) ease-in-out;
+              `;
+              descImageEl.appendChild(frame);
+              frames.push(frame);
+            }
+          }
+
+          // Update image URLs dynamically based on currentRadarStation with 20-minute cache-busting
+          const timeParam = Math.floor(Date.now() / 1200000); // changes every 20 mins
+          for (let i = 0; i < 4; i++) {
+            const frameNum = 3 - i; // 3, 2, 1, 0
+            const url = `https://radar.weather.gov/ridge/standard/${currentRadarStation}_${frameNum}.gif?t=${timeParam}`;
+            frames[i].style.backgroundImage = `url('${url}')`;
+            frames[i].style.backgroundSize = `calc(${RADAR_ZOOM} * 100%) auto`;
+            frames[i].style.backgroundPosition = `calc(50% + ${RADAR_OFFSET_X}) calc(50% + ${RADAR_OFFSET_Y})`;
+            frames[i].style.transition = `opacity var(--radar-fade-duration, 400ms) ease-in-out`;
+          }
+
+          // Start loop
+          startRadarLoop(frames);
         } else {
+          // Clear radar loop and elements if they exist
+          if (radarLoopIntervalId) {
+            clearInterval(radarLoopIntervalId);
+            radarLoopIntervalId = null;
+          }
+          descImageEl.classList.remove('radar-mode');
+          descImageEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
+          
           // Determine if it is currently night time
           const now = Math.floor(Date.now() / 1000);
           const sunrise = data?.current?.sunrise || data?.daily?.[0]?.sunrise;
@@ -3468,7 +3542,6 @@ import weatherConditions from '../data/weather-conditions.json';
     Inserts a 3-letter lowercase month above the high box and colors it using tempToColor
   */
   function createSimpleMonthIfMissing() {
-    if (SHOW_DOPPLER_RADAR) return;
     if (document.getElementById('simple-month')) return;
     const el = document.createElement('div');
     el.id = 'simple-month';
@@ -3530,7 +3603,6 @@ import weatherConditions from '../data/weather-conditions.json';
   let lastSimpleMonthStr = '';
 
   function updateSimpleMonthContent() {
-    if (SHOW_DOPPLER_RADAR) return;
     try {
       const months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
       const days = ['sun','mon','tue','wed','thu','fri','sat'];
@@ -4774,7 +4846,6 @@ import weatherConditions from '../data/weather-conditions.json';
 
   // Fetch nearest NWS radar station ID based on coordinates from the NWS Points API
   async function updateRadarStation(lat, lon) {
-    if (!SHOW_DOPPLER_RADAR) return;
     try {
       const res = await fetch(`https://api.weather.gov/points/${lat.toFixed(4)},${lon.toFixed(4)}`);
       if (!res.ok) throw new Error(`NWS API error: ${res.status}`);
@@ -4793,6 +4864,323 @@ import weatherConditions from '../data/weather-conditions.json';
       console.warn('Unable to resolve NWS radar station for coordinates, falling back to KINX:', e);
     }
   }
+
+  function startRadarLoop(frames) {
+    if (radarLoopIntervalId) {
+      clearInterval(radarLoopIntervalId);
+    }
+
+    let speed = RADAR_LOOP_SPEED_MS;
+    const descImageEl = document.getElementById('weather-desc-image');
+    if (descImageEl) {
+      const computedSpeed = getComputedStyle(descImageEl).getPropertyValue('--radar-loop-speed').trim();
+      if (computedSpeed) {
+        const parsed = parseFloat(computedSpeed);
+        if (!isNaN(parsed) && parsed > 0) {
+          speed = computedSpeed.endsWith('ms') ? parsed : parsed * 1000;
+        }
+      }
+    }
+
+    currentRadarFrameIndex = 0;
+    frames.forEach((frame, idx) => {
+      frame.style.opacity = idx === 0 ? '1' : '0';
+    });
+
+    radarLoopIntervalId = setInterval(() => {
+      currentRadarFrameIndex = (currentRadarFrameIndex + 1) % 4;
+      frames.forEach((frame, idx) => {
+        frame.style.opacity = idx === currentRadarFrameIndex ? '1' : '0';
+      });
+    }, speed);
+  }
+
+  /**
+   * Checks the latest radar image for precipitation color activity.
+   * Returns a promise resolving to true if precipitation exceeds the threshold, or false.
+   */
+  async function checkRadarPrecipitationActivity(stationId) {
+    return new Promise((resolve) => {
+      // Build the URL for the latest frame (frameNum = 0)
+      const timeParam = Math.floor(Date.now() / 600000); // 10 minutes cache bust
+      const rawUrl = `https://radar.weather.gov/ridge/standard/${stationId}_0.gif?t=${timeParam}`;
+      const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(rawUrl)}`;
+
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+
+      // Set a safety timeout of 5 seconds for image loading
+      const timeoutId = setTimeout(() => {
+        console.warn('⚠️ Radar pixel check timed out.');
+        img.src = '';
+        resolve(null); // Resolve with null to indicate failure
+      }, 5000);
+
+      img.onload = () => {
+        clearTimeout(timeoutId);
+        try {
+          // Downscale the image on canvas for speed and noise filtering
+          const canvas = document.createElement('canvas');
+          const size = 80; // downscale to 80x80 pixels
+          canvas.width = size;
+          canvas.height = size;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            resolve(null);
+            return;
+          }
+          
+          ctx.drawImage(img, 0, 0, size, size);
+          const imgData = ctx.getImageData(0, 0, size, size);
+          const pixels = imgData.data;
+
+          let precipitationPixelCount = 0;
+
+          // Helper to convert RGB to HSL
+          const getHsl = (r, g, b) => {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            if (max === min) {
+              h = s = 0;
+            } else {
+              const d = max - min;
+              s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+              switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+              }
+              h /= 6;
+            }
+            return [h * 360, s * 100, l * 100];
+          };
+
+          for (let y = 10; y < 68; y++) { // Crop out top header text (0-9) and bottom legend bar (68-79)
+            for (let x = 0; x < size; x++) {
+              const idx = (y * size + x) * 4;
+              const r = pixels[idx];
+              const g = pixels[idx + 1];
+              const b = pixels[idx + 2];
+              const a = pixels[idx + 3];
+
+              if (a < 50) continue; // skip transparent pixels
+
+              const [h, s, l] = getHsl(r, g, b);
+
+              // Filter out base map elements (which have low saturation or extreme lightness)
+              // Rain and radar echoes are highly saturated (S > 45%) and mid-lightness (L between 20% and 85%).
+              if (s > 45 && l > 20 && l < 85) {
+                precipitationPixelCount++;
+              }
+            }
+          }
+
+          // Crop boundary contains 58 rows * 80 cols = 4640 pixels.
+          // Threshold of RADAR_PRECIPITATION_PIXEL_THRESHOLD defines the trigger point.
+          const threshold = RADAR_PRECIPITATION_PIXEL_THRESHOLD; 
+          console.log(`📡 Radar Pixel Check [${stationId}]: Found ${precipitationPixelCount} precipitation pixels (Threshold is ${threshold})`);
+          resolve(precipitationPixelCount >= threshold);
+        } catch (e) {
+          console.warn('⚠️ Radar pixel check failed during analysis:', e);
+          resolve(null);
+        }
+      };
+
+      img.onerror = (e) => {
+        clearTimeout(timeoutId);
+        console.warn('⚠️ Radar pixel check failed to load image:', e);
+        resolve(null);
+      };
+
+      img.src = proxyUrl;
+    });
+  }
+
+  /**
+   * Helper check: Checks if precipitation is active right now or if a weather alert is present.
+   */
+  function isPrecipitationActiveNow(data) {
+    if (!data) return false;
+    
+    // 1. Current weather condition ID indicates rain/storm/snow (OpenWeather codes: 2xx = Storm, 3xx = Drizzle, 5xx = Rain, 6xx = Snow)
+    const currentId = data.current?.weather?.[0]?.id;
+    if (currentId && (currentId >= 200 && currentId < 700)) {
+      console.log(`🌧️ activeNow Check: Current weather ID ${currentId} indicates precipitation.`);
+      return true;
+    }
+
+    // 2. Current rain/snow volume > 0.01mm
+    const currentRain = data.current?.rain?.['1h'] || data.current?.rain || 0;
+    const currentSnow = data.current?.snow?.['1h'] || data.current?.snow || 0;
+    if (currentRain > 0.01 || currentSnow > 0.01) {
+      console.log(`🌧️ activeNow Check: Current rain/snow volume > 0.`);
+      return true;
+    }
+
+    // 3. Active weather alerts (e.g. Tornado, Severe Thunderstorm watch/warning)
+    if (data.alerts && data.alerts.length > 0) {
+      const activePrecipAlert = data.alerts.some(alert => {
+        const event = (alert.event || '').toLowerCase();
+        return event.includes('thunderstorm') ||
+               event.includes('tornado') ||
+               event.includes('flood') ||
+               event.includes('storm') ||
+               event.includes('winter') ||
+               event.includes('blizzard') ||
+               event.includes('snow') ||
+               event.includes('rain') ||
+               event.includes('squall') ||
+               event.includes('hail');
+      });
+      if (activePrecipAlert) {
+        console.log(`🌧️ activeNow Check: Active storm/precipitation weather alert detected.`);
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Coordinator: Determines if the Doppler radar loop should be enabled.
+   * Runs the radar pixel analysis, falling back to OpenWeather data on failure/clear skies.
+   */
+  async function determineRadarStatus(data) {
+    if (currentRadarStation) {
+      const radarActive = await checkRadarPrecipitationActivity(currentRadarStation);
+      if (radarActive !== null) {
+        // Radar check succeeded!
+        if (radarActive) {
+          console.log(`📡 Dynamic Radar: Radar check detected precipitation pixels.`);
+          return true;
+        } else {
+          // Radar check is clear. Only activate if it is actively raining right now or severe alerts are active.
+          // We do NOT override a clear radar check just for low-probability hourly forecasts.
+          const activeNow = isPrecipitationActiveNow(data);
+          if (activeNow) {
+            console.log(`📡 Dynamic Radar: Radar image clear, but current rain/alerts at home triggered activation.`);
+            return true;
+          }
+          return false;
+        }
+      }
+    }
+
+    // Fallback entirely to OpenWeather data if radar check failed or timed out
+    console.log(`📡 Dynamic Radar: Radar check failed or timed out. Falling back to OpenWeather data...`);
+    if (isPrecipitationActiveNow(data)) return true;
+
+    // Check hourly forecast for the next 3 hours (hours 0, 1, 2)
+    // Require a higher probability (pop > 30%) and rain/snow forecasted to trigger
+    const hourly = data.hourly || [];
+    for (let i = 0; i < Math.min(3, hourly.length); i++) {
+      const hour = hourly[i];
+      const hourId = hour.weather?.[0]?.id;
+      const hourPop = hour.pop || 0;
+      const hourRain = hour.rain?.['1h'] || hour.rain || 0;
+      const hourSnow = hour.snow?.['1h'] || hour.snow || 0;
+
+      if (hourId && (hourId >= 200 && hourId < 700) && (hourPop > 0.30 || hourRain > 0.1 || hourSnow > 0.1)) {
+        console.log(`🌧️ Fallback: Hourly forecast indicates upcoming precipitation (Pop: ${hourPop}, Rain: ${hourRain}).`);
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  // Expose diagnostic tool to browser console
+  window.testRadar = async () => {
+    console.log("🔍 Running radar diagnostic test...");
+    if (!currentRadarStation) {
+      console.error("❌ No radar station is currently resolved.");
+      return;
+    }
+    const rawUrl = `https://radar.weather.gov/ridge/standard/${currentRadarStation}_0.gif?t=${Date.now()}`;
+    const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(rawUrl)}`;
+    
+    console.log(`📡 Fetching radar image from proxy: ${proxyUrl}`);
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        const size = 80;
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          console.error("❌ Failed to get 2D canvas context.");
+          return;
+        }
+        ctx.drawImage(img, 0, 0, size, size);
+        const imgData = ctx.getImageData(0, 0, size, size);
+        const pixels = imgData.data;
+        
+        let precipPixels = 0;
+        let baseMapPixels = 0;
+        const colorsSample = [];
+        
+        const getHsl = (r, g, b) => {
+          r /= 255; g /= 255; b /= 255;
+          const max = Math.max(r, g, b), min = Math.min(r, g, b);
+          let h, s, l = (max + min) / 2;
+          if (max === min) {
+            h = s = 0;
+          } else {
+            const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+              case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+              case g: h = (b - r) / d + 2; break;
+              case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+          }
+          return [h * 360, s * 100, l * 100];
+        };
+
+        for (let y = 10; y < 68; y++) {
+          for (let x = 0; x < size; x++) {
+            const idx = (y * size + x) * 4;
+            const r = pixels[idx];
+            const g = pixels[idx + 1];
+            const b = pixels[idx + 2];
+            const a = pixels[idx + 3];
+            
+            if (a < 50) continue;
+            
+            const [h, s, l] = getHsl(r, g, b);
+            
+            if (s > 45 && l > 20 && l < 85) {
+              precipPixels++;
+              if (colorsSample.length < 5) {
+                colorsSample.push({ rgb: `rgb(${r},${g},${b})`, hsl: `hsl(${Math.round(h)},${Math.round(s)}%,${Math.round(l)}%)` });
+              }
+            } else {
+              baseMapPixels++;
+            }
+          }
+        }
+        
+        console.log(`📊 DIAGNOSTIC RESULTS for ${currentRadarStation}:`);
+        console.log(`   - Cropped Area Size: 4,640 pixels`);
+        console.log(`   - Base Map / Background pixels: ${baseMapPixels}`);
+        console.log(`   - Precipitation / Echo pixels: ${precipPixels}`);
+        console.log(`   - Configured Threshold: ${RADAR_PRECIPITATION_PIXEL_THRESHOLD}`);
+        console.log(`   - Decision: ${precipPixels >= RADAR_PRECIPITATION_PIXEL_THRESHOLD ? "🔴 TRIGGER RADAR MODE" : "🟢 SHOW SCROLLING MONTH"}`);
+        if (colorsSample.length > 0) {
+          console.log(`   - Sample Precipitation Colors found:`, colorsSample);
+        }
+      } catch (e) {
+        console.error("❌ Diagnostic analysis failed:", e);
+      }
+    };
+    img.onerror = (e) => console.error("❌ Failed to load radar image for diagnostics:", e);
+    img.src = proxyUrl;
+  };
 
 
 
@@ -4815,6 +5203,10 @@ import weatherConditions from '../data/weather-conditions.json';
     setLoading(true);
 
     try {
+      if (radarLoopIntervalId) {
+        clearInterval(radarLoopIntervalId);
+        radarLoopIntervalId = null;
+      }
       // Resolve the local NWS radar station ID dynamically for coordinates
       await updateRadarStation(LAT, LON);
 
@@ -4824,6 +5216,15 @@ import weatherConditions from '../data/weather-conditions.json';
       const res = await fetch(url, { cache: 'no-store' });
       if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
       const data = await res.json();
+
+      // Determine if radar mode should be active based on canvas check and/or OpenWeather data
+      try {
+        SHOW_DOPPLER_RADAR = await determineRadarStatus(data);
+        console.log(`📡 Dynamic Radar Status decided: ${SHOW_DOPPLER_RADAR ? 'ENABLED' : 'DISABLED'}`);
+      } catch (e) {
+        console.warn('Error determining dynamic radar status, defaulting to false:', e);
+        SHOW_DOPPLER_RADAR = false;
+      }
       
       // Store data for resize repositioning and component styling (like clock hands)
       window.lastWeatherData = data;
