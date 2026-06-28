@@ -31,7 +31,7 @@ import weatherConditions from '../data/weather-conditions.json';
   // Editable minimum threshold for showing rain amounts (in inches) throughout the app
   const MIN_RAIN_DISPLAY_THRESHOLD = 0.05;
 
-  // EDITABLE: Minimum precipitation pixels in downscaled 80x80 radar map area to trigger Doppler loop.
+  // EDITABLE: Minimum precipitation pixels in downscaled 80x80 radar map area to trigger Doppler loop.==
   // Increase to prevent minor noise/dust (clutter) from showing the radar. Try 80, 120, or 200!
   const RADAR_PRECIPITATION_PIXEL_THRESHOLD = 120;
 
