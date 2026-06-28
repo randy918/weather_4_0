@@ -622,14 +622,14 @@ import weatherConditions from '../data/weather-conditions.json';
     // Update weather description
     updateWeatherDescription(data);
     
+    // Update clock grid row
+    updateClockGridRow(data);
+
     // Update wind gauge
     updateWindGauge(data);
     
     // Update barometric pressure gauge
     updateBarometricGauge(data);
-
-    // Update clock grid row
-    updateClockGridRow(data);
 
     // Update wind speed dots row
     updateWindDotsRow(data);
@@ -806,8 +806,8 @@ import weatherConditions from '../data/weather-conditions.json';
 
   // Update the barometric pressure gauge
   function updateBarometricGauge(data) {
-    const pressureEl = document.querySelector('.barometric-text');
-    const pressureFill = document.querySelector('.barometric-fill');
+    const pressureEls = document.querySelectorAll('.barometric-text');
+    const pressureFills = document.querySelectorAll('.barometric-fill');
     // OpenWeather provides pressure in hPa. Typical sea level range is 950 to 1050.
     const pressure = data?.current?.pressure || 1013; 
     
@@ -841,11 +841,14 @@ import weatherConditions from '../data/weather-conditions.json';
       }
     }
 
-    if (pressureEl) {
-      pressureEl.innerHTML = `${trendHtml}${Math.round(pressure)}<br><span style="font-size: 1.5vw; opacity: 1; font-family: 'light', sans-serif;">hPa</span>`;
-    }
+    pressureEls.forEach(el => {
+      // Scale dynamic inner elements if it's placed inside the smaller grid circle!
+      const isGrid = el.closest('.grid-barometric-pressure') !== null;
+      const unitFontSize = isGrid ? '1.1vw' : '1.5vw';
+      el.innerHTML = `${trendHtml}${Math.round(pressure)}<br><span style="font-size: ${unitFontSize}; opacity: 1; font-family: 'light', sans-serif;">hPa</span>`;
+    });
 
-    if (pressureFill) {
+    if (pressureFills.length > 0) {
       // Map pressure range to circle percentage:
       // Minimum realistic ~950 (0%), Maximum ~1050 (100%)
       const minPressure = 950;
@@ -859,19 +862,22 @@ import weatherConditions from '../data/weather-conditions.json';
       const maxStrokeLength = 212; 
       const dashOffset = maxStrokeLength * percent;
       
-      // Apply fill amount to the dasharray
-      pressureFill.style.strokeDasharray = `${dashOffset}, 283`;
+      pressureFills.forEach(fill => {
+        // Apply fill amount to the dasharray
+        fill.style.strokeDasharray = `${dashOffset}, 283`;
+      });
       
       // Inherit the color of the current temperature
       const currentTemp = data?.current?.temp;
       if (currentTemp !== null && currentTemp !== undefined) {
         const color = tempToColor(currentTemp);
         if (color) {
-          pressureFill.style.stroke = color;
-          // Apply temp color to the text as well
-          if (pressureEl) {
-            pressureEl.style.color = color;
-          }
+          pressureFills.forEach(fill => {
+            fill.style.stroke = color;
+          });
+          pressureEls.forEach(el => {
+            el.style.color = color;
+          });
         }
       }
     }
@@ -2554,6 +2560,25 @@ import weatherConditions from '../data/weather-conditions.json';
         if (i === 1) {
           // Cell #2: Moon phase circle area only (no SVG countdown circle)
           innerHtml = `<div class="moon-phase-display grid-moon-phase" role="img" aria-label="Moon Phase"></div>`;
+        } else if (i === 2) {
+          // Cell #3: Wind direction gauge (no SVG countdown circle)
+          innerHtml = `
+            <div class="wind-direction-display grid-wind-direction">
+              <div class="wind-arrow-color"></div>
+            </div>
+          `;
+        } else if (i === 7) {
+          // Cell #8: Barometric pressure display
+          innerHtml = `
+            <div class="barometric-pressure-display grid-barometric-pressure">
+              <svg class="barometric-gauge-svg" viewBox="0 0 100 100">
+                <circle class="barometric-track" cx="50" cy="50" r="45" fill="none" />
+                <circle class="barometric-fill" cx="50" cy="50" r="45" fill="none" />
+                <line class="barometric-needle" x1="50" y1="50" x2="50" y2="15" stroke-linecap="round" />
+              </svg>
+              <div class="barometric-text"></div>
+            </div>
+          `;
         } else {
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
@@ -5775,18 +5800,20 @@ import weatherConditions from '../data/weather-conditions.json';
   let lastWindDirection = null;
 
   function updateWindDirectionArrow(temp, windDeg) {
-    const arrow = document.getElementById('wind-direction-arrow');
-    if (!arrow) {
-      console.warn('Wind direction arrow element not found');
+    const arrows = document.querySelectorAll('.wind-direction-display');
+    if (arrows.length === 0) {
+      console.warn('Wind direction arrow elements not found');
       return;
     }
     
     // Color the arrow the same as current temperature
     const color = tempToColor(temp);
-    const colorDiv = arrow.querySelector('.wind-arrow-color');
-    if (color && colorDiv) {
-      colorDiv.style.backgroundColor = color;
-    }
+    arrows.forEach(arrow => {
+      const colorDiv = arrow.querySelector('.wind-arrow-color');
+      if (color && colorDiv) {
+        colorDiv.style.backgroundColor = color;
+      }
+    });
     
     // Rotate arrow to point at wind direction
     const deg = parseFloat(windDeg);
@@ -5801,17 +5828,21 @@ import weatherConditions from '../data/weather-conditions.json';
       // Check if direction changed significantly (more than 10 degrees)
       const directionChanged = lastWindDirection === null || Math.abs(deg - lastWindDirection) > 10;
       
-      if (directionChanged) {
-        // Add spinning class for initial animation
-        arrow.classList.add('spinning');
-        setTimeout(() => arrow.classList.remove('spinning'), 1000);
-      }
-      
-      // Wind degrees are meteorological (direction wind is FROM)
-      // Set rotation as CSS variable - the CSS rule will combine it with --alert-push
-      arrow.style.setProperty('--wind-rotation', `${displayDeg}deg`);
-      console.log(`Wind from ${deg}° (arrow rotated to ${displayDeg}° after offset)`);
-      arrow.title = `Wind from ${deg}°`;
+      arrows.forEach(arrow => {
+        if (directionChanged) {
+          // Add spinning class for initial animation
+          arrow.classList.add('spinning');
+          setTimeout(() => arrow.classList.remove('spinning'), 1000);
+        }
+        
+        // Wind degrees are meteorological (direction wind is FROM)
+        // Set rotation on the color div directly where rotation is applied in SCSS
+        const colorDiv = arrow.querySelector('.wind-arrow-color');
+        if (colorDiv) {
+          colorDiv.style.setProperty('--wind-rotation', `${displayDeg}deg`);
+        }
+        arrow.title = `Wind from ${deg}°`;
+      });
       
       lastWindDirection = deg;
     }
