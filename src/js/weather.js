@@ -45,6 +45,7 @@ import weatherConditions from '../data/weather-conditions.json';
   const CLOCK_GRID_TRACK_COLOR = 'rgba(255, 255, 255, 0.2)'; // EDITABLE: Circle track color
   const CLOCK_GRID_PROGRESS_COLOR = 'rgba(255, 255, 255, 0.5)'; // EDITABLE: Active progress fill color
   const CLOCK_GRID_STROKE_WIDTH = 3.5;     // EDITABLE: SVG stroke thickness
+  const CLOCK_GRID_GUST_OPACITY = 0;     // EDITABLE: Wind gust ring opacity (0.0 to 1.0)
 
   // Inject these config variables into CSS properties immediately
   document.documentElement.style.setProperty('--clock-grid-size', CLOCK_GRID_SIZE);
@@ -56,6 +57,7 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--clock-grid-track-color', CLOCK_GRID_TRACK_COLOR);
   document.documentElement.style.setProperty('--clock-grid-progress-color', CLOCK_GRID_PROGRESS_COLOR);
   document.documentElement.style.setProperty('--clock-grid-stroke-width', CLOCK_GRID_STROKE_WIDTH);
+  document.documentElement.style.setProperty('--clock-grid-gust-opacity', CLOCK_GRID_GUST_OPACITY);
 
   // Removed lastBarometricPressure as we now use future predictive trend
 
@@ -795,19 +797,27 @@ import weatherConditions from '../data/weather-conditions.json';
     if (gustValueEl) {
       gustValueEl.textContent = Math.round(windGust);
     }
-    
-    // Update the wind speed progress ring in grid cell #3 (0 to 60 mph scale)
+    // Update the wind speed progress and track rings in grid cell #3 (0 to 60 mph scale)
     const gridWindProgressEl = document.querySelector('.clockGridItem-2 .countdown-progress');
+    const gridWindTrackEl = document.querySelector('.clockGridItem-2 .countdown-track');
+    const radius = 46;
+    const circumference = 2 * Math.PI * radius; // ~289
+    
     if (gridWindProgressEl) {
-      const radius = 46;
-      const circumference = 2 * Math.PI * radius; // ~289
-      const maxWindMph = 60;
       const percent = Math.max(0, Math.min(1, windSpeed / maxWindMph));
       const dashOffset = circumference * (1 - percent);
       gridWindProgressEl.style.strokeDashoffset = dashOffset;
       if (tempColor) {
         gridWindProgressEl.style.stroke = tempColor;
       }
+    }
+    
+    if (gridWindTrackEl) {
+      const percent = Math.max(0, Math.min(1, windGust / maxWindMph));
+      const trackLength = circumference * (1 - percent);
+      // Only draw the track from windGust up to 60 mph (leaving a blank gap from windSpeed to windGust)
+      gridWindTrackEl.style.strokeDasharray = `${trackLength}, ${circumference}`;
+      gridWindTrackEl.style.strokeDashoffset = - (circumference * percent);
     }
     
     console.log(`Wind updated: Speed ${Math.round(windSpeed)} mph (${speedPercent.toFixed(1)}%), Gust ${Math.round(windGust)} mph (${gustPercent.toFixed(1)}%)`);
@@ -2577,7 +2587,7 @@ import weatherConditions from '../data/weather-conditions.json';
           // Cell #2: Moon phase circle area only (no SVG countdown circle)
           innerHtml = `<div class="moon-phase-display grid-moon-phase" role="img" aria-label="Moon Phase"></div>`;
         } else if (i === 2) {
-          // Cell #3: Wind direction gauge with standard countdown circle track/progress
+          // Cell #3: Wind direction gauge with standard countdown circle track and progress
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
               <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
