@@ -796,6 +796,20 @@ import weatherConditions from '../data/weather-conditions.json';
       gustValueEl.textContent = Math.round(windGust);
     }
     
+    // Update the wind speed progress ring in grid cell #3 (0 to 60 mph scale)
+    const gridWindProgressEl = document.querySelector('.clockGridItem-2 .countdown-progress');
+    if (gridWindProgressEl) {
+      const radius = 46;
+      const circumference = 2 * Math.PI * radius; // ~289
+      const maxWindMph = 60;
+      const percent = Math.max(0, Math.min(1, windSpeed / maxWindMph));
+      const dashOffset = circumference * (1 - percent);
+      gridWindProgressEl.style.strokeDashoffset = dashOffset;
+      if (tempColor) {
+        gridWindProgressEl.style.stroke = tempColor;
+      }
+    }
+    
     console.log(`Wind updated: Speed ${Math.round(windSpeed)} mph (${speedPercent.toFixed(1)}%), Gust ${Math.round(windGust)} mph (${gustPercent.toFixed(1)}%)`);
   }
 
@@ -858,13 +872,15 @@ import weatherConditions from '../data/weather-conditions.json';
       // Clamp between 0 and 1
       percent = Math.max(0, Math.min(1, percent));
       
-      // SVG Circle math: circumference is 283, but our track gap limits the max fill line to 212
-      const maxStrokeLength = 212; 
-      const dashOffset = maxStrokeLength * percent;
-      
       pressureFills.forEach(fill => {
+        const isGrid = fill.closest('.grid-barometric-pressure') !== null;
+        const radius = isGrid ? 46 : 45;
+        const circumference = 2 * Math.PI * radius; // ~289 or ~283
+        const maxStrokeLength = circumference * 0.75; // ~217 or ~212
+        const dashOffset = maxStrokeLength * percent;
+        
         // Apply fill amount to the dasharray
-        fill.style.strokeDasharray = `${dashOffset}, 283`;
+        fill.style.strokeDasharray = `${dashOffset}, ${circumference}`;
       });
       
       // Inherit the color of the current temperature
@@ -2561,19 +2577,23 @@ import weatherConditions from '../data/weather-conditions.json';
           // Cell #2: Moon phase circle area only (no SVG countdown circle)
           innerHtml = `<div class="moon-phase-display grid-moon-phase" role="img" aria-label="Moon Phase"></div>`;
         } else if (i === 2) {
-          // Cell #3: Wind direction gauge (no SVG countdown circle)
+          // Cell #3: Wind direction gauge with standard countdown circle track/progress
           innerHtml = `
+            <svg class="clock-timer-svg" viewBox="0 0 100 100">
+              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+            </svg>
             <div class="wind-direction-display grid-wind-direction">
               <div class="wind-arrow-color"></div>
             </div>
           `;
         } else if (i === 7) {
-          // Cell #8: Barometric pressure display
+          // Cell #8: Barometric pressure display with radius 46 matching standard clock circles
           innerHtml = `
             <div class="barometric-pressure-display grid-barometric-pressure">
               <svg class="barometric-gauge-svg" viewBox="0 0 100 100">
-                <circle class="barometric-track" cx="50" cy="50" r="45" fill="none" />
-                <circle class="barometric-fill" cx="50" cy="50" r="45" fill="none" />
+                <circle class="barometric-track" cx="50" cy="50" r="46" fill="none" />
+                <circle class="barometric-fill" cx="50" cy="50" r="46" fill="none" />
                 <line class="barometric-needle" x1="50" y1="50" x2="50" y2="15" stroke-linecap="round" />
               </svg>
               <div class="barometric-text"></div>
@@ -5600,8 +5620,9 @@ import weatherConditions from '../data/weather-conditions.json';
   // Clock hands update
   function updateClockHands() {
     const container = document.querySelector('.clock-hands-container');
-    const gridContainer = document.querySelector('.clockGridItem-0');
-    if (!container && !gridContainer) return;
+    const gridItem0 = document.querySelector('.clockGridItem-0');
+    const gridRow = document.getElementById('clock-grid-container');
+    if (!container && !gridItem0 && !gridRow) return;
     
     const now = new Date();
     const hours = now.getHours() % 12;
@@ -5628,12 +5649,13 @@ import weatherConditions from '../data/weather-conditions.json';
       }
     }
 
-    if (gridContainer) {
-      gridContainer.style.setProperty('--hour-rotation', `${hourRotation}deg`);
-      gridContainer.style.setProperty('--minute-rotation', `${minuteRotation}deg`);
-      if (currentColor) {
-        gridContainer.style.setProperty('--clock-hands-color', currentColor);
-      }
+    if (gridItem0) {
+      gridItem0.style.setProperty('--hour-rotation', `${hourRotation}deg`);
+      gridItem0.style.setProperty('--minute-rotation', `${minuteRotation}deg`);
+    }
+
+    if (gridRow && currentColor) {
+      gridRow.style.setProperty('--clock-hands-color', currentColor);
     }
   }
 
