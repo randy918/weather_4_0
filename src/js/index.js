@@ -50,11 +50,11 @@ document.addEventListener("DOMContentLoaded", function () {
     //     return [rgbColor1, rgbColor2];
     // }
     function getBrightRandomGradientRGB() {
-        // Random hue but exclude brown range (15-45 degrees)
-        let hue;
-        do {
-            hue = Math.floor(Math.random() * 360);
-        } while (hue >= 15 && hue <= 45); // Skip muddy brown/orange hues
+        // Random hue in the red-purple-blue range (240 to 370 modulo 360)
+        // Spans from Blue (240) -> Violet -> Magenta -> Red -> Red-Orange (10)
+        const minHue = 240;
+        const maxHue = 370;
+        const hue = (minHue + Math.floor(Math.random() * (maxHue - minHue + 1))) % 360;
         
         // Similar saturation and lightness ranges to maintain dark aesthetic
         const saturation1 = 30 + Math.floor(Math.random() * 20); // 30-50%

@@ -46,6 +46,10 @@ import weatherConditions from '../data/weather-conditions.json';
   const CLOCK_GRID_PROGRESS_COLOR = 'rgba(255, 255, 255, 0.5)'; // EDITABLE: Active progress fill color
   const CLOCK_GRID_STROKE_WIDTH = 3.5;     // EDITABLE: SVG stroke thickness
   const CLOCK_GRID_GUST_OPACITY = 0;     // EDITABLE: Wind gust ring opacity (0.0 to 1.0)
+  const CLOCK_GRID_WIND_SPEED_Y_OFFSET = '0.7vw'; // EDITABLE: Vertical offset of the wind speed number inside cell #3 (e.g. '0vw', '0.7vw')
+  const CLOCK_GRID_HUMIDITY_Y_OFFSET = '0.7vw';   // EDITABLE: Vertical offset of the humidity number inside cell #4 (e.g. '0vw', '0.7vw')
+  const CLOCK_GRID_DEWPOINT_Y_OFFSET = '0.7vw';   // EDITABLE: Vertical offset of the dewpoint number inside cell #5 (e.g. '0vw', '0.7vw')
+  const CLOCK_GRID_WIND_SPEED_TEXT_SHADOW = '2px 2px 0px black)'; // EDITABLE: Text shadow for wind speed number (offset-x offset-y blur color)
 
   // Inject these config variables into CSS properties immediately
   document.documentElement.style.setProperty('--clock-grid-size', CLOCK_GRID_SIZE);
@@ -58,6 +62,10 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--clock-grid-progress-color', CLOCK_GRID_PROGRESS_COLOR);
   document.documentElement.style.setProperty('--clock-grid-stroke-width', CLOCK_GRID_STROKE_WIDTH);
   document.documentElement.style.setProperty('--clock-grid-gust-opacity', CLOCK_GRID_GUST_OPACITY);
+  document.documentElement.style.setProperty('--grid-wind-speed-y-offset', CLOCK_GRID_WIND_SPEED_Y_OFFSET);
+  document.documentElement.style.setProperty('--grid-humidity-y-offset', CLOCK_GRID_HUMIDITY_Y_OFFSET);
+  document.documentElement.style.setProperty('--grid-dewpoint-y-offset', CLOCK_GRID_DEWPOINT_Y_OFFSET);
+  document.documentElement.style.setProperty('--grid-wind-speed-text-shadow', CLOCK_GRID_WIND_SPEED_TEXT_SHADOW);
 
   // Removed lastBarometricPressure as we now use future predictive trend
 
@@ -818,6 +826,37 @@ import weatherConditions from '../data/weather-conditions.json';
       // Only draw the track from windGust up to 60 mph (leaving a blank gap from windSpeed to windGust)
       gridWindTrackEl.style.strokeDasharray = `${trackLength}, ${circumference}`;
       gridWindTrackEl.style.strokeDashoffset = - (circumference * percent);
+    }
+
+    // Update the gust-dot positioning at the point indicating gust speed
+    const gustDotEl = document.querySelector('.clockGridItem-2 .gust-dot');
+    if (gustDotEl) {
+      if (typeof windGust === 'number') {
+        const percent = Math.max(0, Math.min(1, windGust / maxWindMph));
+        // CSS rotates the parent SVG by 90deg, so we compute in unrotated space (0 starts at 3 o'clock)
+        const angleRad = 2 * Math.PI * percent;
+        const cx = 50 + radius * Math.cos(angleRad);
+        const cy = 50 + radius * Math.sin(angleRad);
+        
+        gustDotEl.setAttribute('cx', cx.toFixed(3));
+        gustDotEl.setAttribute('cy', cy.toFixed(3));
+        // Make the dot larger to stand out (0.8 * stroke width radius, meaning 1.6 * stroke width diameter)
+        gustDotEl.setAttribute('r', (CLOCK_GRID_STROKE_WIDTH * 0.8).toFixed(3));
+        gustDotEl.style.display = 'block';
+        if (tempColor) {
+          gustDotEl.style.fill = tempColor;
+        }
+      } else {
+        gustDotEl.style.display = 'none';
+      }
+    }
+    
+    const gridWindSpeedTextEl = document.querySelector('.clockGridItem-2 .grid-wind-speed-text');
+    if (gridWindSpeedTextEl) {
+      gridWindSpeedTextEl.textContent = Math.round(windSpeed);
+      if (tempColor) {
+        gridWindSpeedTextEl.style.color = tempColor;
+      }
     }
     
     console.log(`Wind updated: Speed ${Math.round(windSpeed)} mph (${speedPercent.toFixed(1)}%), Gust ${Math.round(windGust)} mph (${gustPercent.toFixed(1)}%)`);
@@ -2587,15 +2626,36 @@ import weatherConditions from '../data/weather-conditions.json';
           // Cell #2: Moon phase circle area only (no SVG countdown circle)
           innerHtml = `<div class="moon-phase-display grid-moon-phase" role="img" aria-label="Moon Phase"></div>`;
         } else if (i === 2) {
-          // Cell #3: Wind direction gauge with standard countdown circle track and progress
+          // Cell #3: Wind direction gauge with standard countdown circle track and progress, a wind hand matching clock style, and wind speed number centered
+          innerHtml = `
+            <svg class="clock-timer-svg" viewBox="0 0 100 100">
+              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+              <circle class="gust-dot" r="1.75" />
+            </svg>
+            <div class="clock-face">
+              <div class="clock-hand clock-hand-wind-direction"></div>
+              <div class="clock-center-dot"></div>
+            </div>
+            <div class="grid-wind-speed-text"></div>
+          `;
+        } else if (i === 3) {
+          // Cell #4: Humidity display with starting at bottom (6 o'clock) 0% to 100% (clockwise)
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
               <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
               <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
             </svg>
-            <div class="wind-direction-display grid-wind-direction">
-              <div class="wind-arrow-color"></div>
-            </div>
+            <div class="grid-humidity-text"></div>
+          `;
+        } else if (i === 4) {
+          // Cell #5: Dew point (Td) display with starting at bottom (6 o'clock) 0 to 100 degrees (clockwise)
+          innerHtml = `
+            <svg class="clock-timer-svg" viewBox="0 0 100 100">
+              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+            </svg>
+            <div class="grid-dewpoint-text"></div>
           `;
         } else if (i === 7) {
           // Cell #8: Barometric pressure display with radius 46 matching standard clock circles
@@ -2822,6 +2882,8 @@ import weatherConditions from '../data/weather-conditions.json';
   // Create and update the humidity dots row (pill + 100 dots for RH %)
   function updateHumidityDotsRow(data) {
     const humidity = data?.current?.humidity || 0;
+    const currentTemp = (data?.current?.temp !== undefined) ? data.current.temp : null;
+    const tempColor = currentTemp !== null ? tempToColor(currentTemp) : null;
     
     const wrapperId = 'humidity-dots-wrapper';
     let wrapper = document.getElementById(wrapperId);
@@ -2959,6 +3021,29 @@ import weatherConditions from '../data/weather-conditions.json';
             pill.style.transform = 'translateX(-50%)';
           }
         }
+      }
+    }
+
+    // Update the humidity progress and text in grid cell #4 (0 to 100% scale)
+    const gridHumidityProgressEl = document.querySelector('.clockGridItem-3 .countdown-progress');
+    const gridHumidityTextEl = document.querySelector('.clockGridItem-3 .grid-humidity-text');
+    const radius = 46;
+    const circumference = 2 * Math.PI * radius; // ~289.0265
+    const finalColor = tempColor || activeColor;
+    
+    if (gridHumidityProgressEl) {
+      const percent = Math.max(0, Math.min(1, humidity / 100));
+      const dashOffset = circumference * (1 - percent);
+      gridHumidityProgressEl.style.strokeDashoffset = dashOffset;
+      if (finalColor) {
+        gridHumidityProgressEl.style.stroke = finalColor;
+      }
+    }
+    
+    if (gridHumidityTextEl) {
+      gridHumidityTextEl.innerHTML = `${Math.round(humidity)}%<br><span style="font-size: 1.1vw; opacity: 1; font-family: 'light', sans-serif;">RH</span>`;
+      if (finalColor) {
+        gridHumidityTextEl.style.color = finalColor;
       }
     }
   }
@@ -3132,6 +3217,41 @@ import weatherConditions from '../data/weather-conditions.json';
       const dots = dotsContainer.children;
       for (let i = 0; i < dots.length; i++) {
         dots[i].style.backgroundColor = inactiveColor;
+      }
+    }
+
+    // Update the dewpoint progress and text inside grid cell #5 (0 to 100° scale)
+    const gridDewpointProgressEl = document.querySelector('.clockGridItem-4 .countdown-progress');
+    const gridDewpointTextEl = document.querySelector('.clockGridItem-4 .grid-dewpoint-text');
+    const radius = 46;
+    const circumference = 2 * Math.PI * radius; // ~289.0265
+    
+    // Get current temperature color
+    const currentTemp = (data?.current?.temp !== undefined) ? data.current.temp : null;
+    const tempColor = currentTemp !== null ? tempToColor(currentTemp) : null;
+    const finalColor = tempColor || dewpointColor;
+    
+    if (gridDewpointProgressEl) {
+      if (dewpoint !== null) {
+        const percent = Math.max(0, Math.min(1, dewpoint / 100));
+        const dashOffset = circumference * (1 - percent);
+        gridDewpointProgressEl.style.strokeDashoffset = dashOffset;
+        if (finalColor) {
+          gridDewpointProgressEl.style.stroke = finalColor;
+        }
+      } else {
+        gridDewpointProgressEl.style.strokeDashoffset = circumference;
+      }
+    }
+    
+    if (gridDewpointTextEl) {
+      if (dewpoint !== null) {
+        gridDewpointTextEl.innerHTML = `${Math.round(dewpoint)}°<br><span style="font-size: 1.1vw; opacity: 1; font-family: 'light', sans-serif;">Td</span>`;
+      } else {
+        gridDewpointTextEl.innerHTML = `--<br><span style="font-size: 1.1vw; opacity: 1; font-family: 'light', sans-serif;">Td</span>`;
+      }
+      if (finalColor) {
+        gridDewpointTextEl.style.color = finalColor;
       }
     }
   }
@@ -3932,8 +4052,11 @@ import weatherConditions from '../data/weather-conditions.json';
     const soften = (typeof opts.soften === 'number') ? opts.soften : 1.0;
     const alpha = (typeof opts.alpha === 'number') ? opts.alpha : 1;
 
-    // Use a random hue for both colors (same hue for both)
-    const randomHue = Math.floor(Math.random() * 360);
+    // Use a random hue in the red-purple-blue range (240 to 370 modulo 360)
+    // Spans from Blue (240) -> Violet -> Magenta -> Red -> Red-Orange (10)
+    const minHue = 240;
+    const maxHue = 370;
+    const randomHue = (minHue + Math.floor(Math.random() * (maxHue - minHue + 1))) % 360;
 
     // allow boosting saturation for the background shades
     const saturate = (typeof opts.saturate === 'number') ? opts.saturate : 1.25; // 25% more saturation by default
@@ -5833,19 +5956,16 @@ import weatherConditions from '../data/weather-conditions.json';
 
   function updateWindDirectionArrow(temp, windDeg) {
     const arrows = document.querySelectorAll('.wind-direction-display');
-    if (arrows.length === 0) {
-      console.warn('Wind direction arrow elements not found');
-      return;
-    }
-    
-    // Color the arrow the same as current temperature
     const color = tempToColor(temp);
-    arrows.forEach(arrow => {
-      const colorDiv = arrow.querySelector('.wind-arrow-color');
-      if (color && colorDiv) {
-        colorDiv.style.backgroundColor = color;
-      }
-    });
+    
+    if (arrows.length > 0) {
+      arrows.forEach(arrow => {
+        const colorDiv = arrow.querySelector('.wind-arrow-color');
+        if (color && colorDiv) {
+          colorDiv.style.backgroundColor = color;
+        }
+      });
+    }
     
     // Rotate arrow to point at wind direction
     const deg = parseFloat(windDeg);
@@ -5860,21 +5980,37 @@ import weatherConditions from '../data/weather-conditions.json';
       // Check if direction changed significantly (more than 10 degrees)
       const directionChanged = lastWindDirection === null || Math.abs(deg - lastWindDirection) > 10;
       
-      arrows.forEach(arrow => {
-        if (directionChanged) {
-          // Add spinning class for initial animation
-          arrow.classList.add('spinning');
-          setTimeout(() => arrow.classList.remove('spinning'), 1000);
+      if (arrows.length > 0) {
+        arrows.forEach(arrow => {
+          if (directionChanged) {
+            // Add spinning class for initial animation
+            arrow.classList.add('spinning');
+            setTimeout(() => arrow.classList.remove('spinning'), 1000);
+          }
+          
+          // Wind degrees are meteorological (direction wind is FROM)
+          // Set rotation on the color div directly where rotation is applied in SCSS
+          const colorDiv = arrow.querySelector('.wind-arrow-color');
+          if (colorDiv) {
+            colorDiv.style.setProperty('--wind-rotation', `${displayDeg}deg`);
+          }
+          arrow.title = `Wind from ${deg}°`;
+        });
+      }
+
+      // Sync the rotated wind direction hand inside grid cell #3 (index 2)
+      const gridWindHand = document.querySelector('.clockGridItem-2 .clock-hand-wind-direction');
+      if (gridWindHand) {
+        gridWindHand.style.transform = `translateX(-50%) rotate(${displayDeg}deg)`;
+        if (color) {
+          gridWindHand.style.backgroundColor = color;
         }
-        
-        // Wind degrees are meteorological (direction wind is FROM)
-        // Set rotation on the color div directly where rotation is applied in SCSS
-        const colorDiv = arrow.querySelector('.wind-arrow-color');
-        if (colorDiv) {
-          colorDiv.style.setProperty('--wind-rotation', `${displayDeg}deg`);
-        }
-        arrow.title = `Wind from ${deg}°`;
-      });
+      }
+      
+      const gridWindCenterDot = document.querySelector('.clockGridItem-2 .clock-center-dot');
+      if (gridWindCenterDot && color) {
+        gridWindCenterDot.style.backgroundColor = color;
+      }
       
       lastWindDirection = deg;
     }
