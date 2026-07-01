@@ -891,3 +891,11 @@ main {
     transform-origin: center;
     white-space: nowrap;
 }
+
+// Hide the original 4 upper-left dials since they are duplicated in the row of 8
+#moon-phase-img,
+#analog-clock,
+#wind-direction-arrow,
+#barometric-pressure-gauge {
+    display: none !important;
+}

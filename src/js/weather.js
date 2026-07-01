@@ -1142,10 +1142,43 @@ import weatherConditions from '../data/weather-conditions.json';
       #weather-desc-image.radar-mode #simple-month {
         display: none !important;
       }
+      #weather-desc-image-left {
+        position: absolute;
+        left: ${WEATHER_IMAGE_RIGHT};
+        top: ${WEATHER_IMAGE_TOP};
+        width: ${WEATHER_IMAGE_WIDTH};
+        height: ${WEATHER_IMAGE_HEIGHT};
+        background-color: rgba(100, 100, 100, 0.5);
+        background-image: url('img/desc-overcast-clouds.jpg');
+        background-size: auto 100%;
+        background-repeat: repeat-x;
+        background-position: center;
+        --radar-loop-speed: ${RADAR_LOOP_SPEED_MS}ms;
+        --radar-fade-duration: ${RADAR_FADE_DURATION_MS}ms;
+        animation: scroll-weather-bg ${WEATHER_IMAGE_SCROLL_SPEED_S}s linear infinite !important;
+        border-radius: ${WEATHER_IMAGE_BORDER_RADIUS};
+        transform-origin: top left !important;
+        transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw))) !important;
+        z-index: 50;
+        overflow: hidden;
+        opacity: 0; /* Hide initially to prevent page load flash */
+      }
+      #weather-desc-image-left.radar-mode {
+        background-color: black;
+        background-image: none;
+        background-size: cover;
+        background-repeat: no-repeat;
+        animation: none !important;
+        filter: invert(1) hue-rotate(180deg);
+      }
+      #weather-desc-image-left.radar-mode #simple-month-left {
+        display: none !important;
+      }
       body.transitions-ready #moon-phase-img {
         transition: transform ${ALERT_ANIMATION_MS}ms ease, filter 0.3s ease !important;
       }
-      body.transitions-ready #weather-desc-image {
+      body.transitions-ready #weather-desc-image,
+      body.transitions-ready #weather-desc-image-left {
         transition: transform ${ALERT_ANIMATION_MS}ms ease, filter 0.3s ease, opacity 0.5s ease !important;
       }
       body.transitions-ready #wind-direction-arrow {
@@ -1257,6 +1290,23 @@ import weatherConditions from '../data/weather-conditions.json';
       }
     }
 
+    if (!document.getElementById('weather-desc-image-left')) {
+      const descImgLeft = document.createElement('div');
+      descImgLeft.id = 'weather-desc-image-left';
+      if (!SHOW_DOPPLER_RADAR) {
+        // Random animation delay to start at different scroll position
+        const randomDelay = -Math.random() * WEATHER_IMAGE_SCROLL_SPEED_S;
+        descImgLeft.style.setProperty('animation-delay', `${randomDelay}s`, 'important');
+      }
+      document.body.appendChild(descImgLeft);
+      
+      // If simple-month-left was already created, move it inside the scrolling banner
+      const simpleMonthLeft = document.getElementById('simple-month-left');
+      if (simpleMonthLeft && !SHOW_DOPPLER_RADAR) {
+        descImgLeft.appendChild(simpleMonthLeft);
+      }
+    }
+
     // DUPLICATE CELL CODE (For backtracking/reference)
     /*
     if (!document.getElementById('weather-desc-image')) {
@@ -1277,6 +1327,7 @@ import weatherConditions from '../data/weather-conditions.json';
     // Initialize fragile elements with starting position
     const moon = document.getElementById('moon-phase-img');
     const descImg = document.getElementById('weather-desc-image');
+    const descImgLeft = document.getElementById('weather-desc-image-left');
     const windArrow = document.getElementById('wind-direction-arrow');
     const clockHands = document.getElementById('analog-clock');
     const baroGauge = document.getElementById('barometric-pressure-gauge');
@@ -1284,6 +1335,7 @@ import weatherConditions from '../data/weather-conditions.json';
     const gradientLower = document.querySelector('.scrolling-gradient-overlay-lower');
     if (moon) moon.style.setProperty('--alert-push', '0vw');
     if (descImg) descImg.style.setProperty('--alert-push', '0vw');
+    if (descImgLeft) descImgLeft.style.setProperty('--alert-push', '0vw');
     if (windArrow) windArrow.style.setProperty('--alert-push', '0vw');
     if (clockHands) clockHands.style.setProperty('--alert-push', '0vw');
     if (baroGauge) baroGauge.style.setProperty('--alert-push', '0vw');
@@ -1296,6 +1348,7 @@ import weatherConditions from '../data/weather-conditions.json';
       // Initialize fragile elements with starting position
       const moon = document.getElementById('moon-phase-img');
       const descImg = document.getElementById('weather-desc-image');
+      const descImgLeft = document.getElementById('weather-desc-image-left');
       const windArrow = document.getElementById('wind-direction-arrow');
       const clockHands = document.getElementById('analog-clock');
       const baroGauge = document.getElementById('barometric-pressure-gauge');
@@ -1303,6 +1356,7 @@ import weatherConditions from '../data/weather-conditions.json';
       const gradientLower = document.querySelector('.scrolling-gradient-overlay-lower');
       if (moon) moon.style.setProperty('--alert-push', '0vw');
       if (descImg) descImg.style.setProperty('--alert-push', '0vw');
+      if (descImgLeft) descImgLeft.style.setProperty('--alert-push', '0vw');
       if (windArrow) windArrow.style.setProperty('--alert-push', '0vw');
       if (clockHands) clockHands.style.setProperty('--alert-push', '0vw');
       if (baroGauge) baroGauge.style.setProperty('--alert-push', '0vw');
@@ -1349,6 +1403,10 @@ import weatherConditions from '../data/weather-conditions.json';
     }
     if (descImg) {
       descImg.style.setProperty('--alert-push', pushValue);
+    }
+    const descImgLeft = document.getElementById('weather-desc-image-left');
+    if (descImgLeft) {
+      descImgLeft.style.setProperty('--alert-push', pushValue);
     }
     if (windArrow) {
       windArrow.style.setProperty('--alert-push', pushValue);
@@ -1710,6 +1768,8 @@ import weatherConditions from '../data/weather-conditions.json';
       const gradientLower = document.querySelector('.scrolling-gradient-overlay-lower');
       if (moon) moon.style.setProperty('--alert-push', startPushValue);
       if (descImg) descImg.style.setProperty('--alert-push', startPushValue);
+      const descImgLeft = document.getElementById('weather-desc-image-left');
+      if (descImgLeft) descImgLeft.style.setProperty('--alert-push', startPushValue);
       if (windArrow) windArrow.style.setProperty('--alert-push', startPushValue);
       if (clockHands) clockHands.style.setProperty('--alert-push', startPushValue);
       if (baroGauge) baroGauge.style.setProperty('--alert-push', startPushValue);
@@ -1824,6 +1884,8 @@ import weatherConditions from '../data/weather-conditions.json';
     const baroGauge = document.getElementById('barometric-pressure-gauge');
     if (moon) moon.style.setProperty('--alert-push', startPushValue);
     if (descImg) descImg.style.setProperty('--alert-push', startPushValue);
+    const descImgLeft = document.getElementById('weather-desc-image-left');
+    if (descImgLeft) descImgLeft.style.setProperty('--alert-push', startPushValue);
     if (windArrow) windArrow.style.setProperty('--alert-push', startPushValue);
     if (clockHands) clockHands.style.setProperty('--alert-push', startPushValue);
     if (baroGauge) baroGauge.style.setProperty('--alert-push', startPushValue);
@@ -2191,58 +2253,93 @@ import weatherConditions from '../data/weather-conditions.json';
 
       // Update the side-scrolling image based on the description
       const descImageEl = document.getElementById('weather-desc-image');
-      if (descImageEl) {
+      const descImageLeftEl = document.getElementById('weather-desc-image-left');
+      if (descImageEl || descImageLeftEl) {
         if (SHOW_DOPPLER_RADAR) {
-          // Set parent container styling via class
-          descImageEl.classList.add('radar-mode');
-          descImageEl.style.setProperty('--radar-fade-duration', `${RADAR_FADE_DURATION_MS}ms`);
-
-          // Ensure we have 4 frame layers
-          let frames = descImageEl.querySelectorAll('.radar-frame');
-          if (frames.length !== 4) {
-            descImageEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
-            frames = [];
-            for (let i = 3; i >= 0; i--) { // Order: 3 (oldest, bottom) to 0 (newest, top)
-              const frame = document.createElement('div');
-              frame.className = 'radar-frame';
-              frame.style.cssText = `
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-size: calc(${RADAR_ZOOM} * 100%) auto;
-                background-repeat: no-repeat;
-                background-position: calc(50% + ${RADAR_OFFSET_X}) calc(50% + ${RADAR_OFFSET_Y});
-                opacity: ${i === 0 ? 1 : 0};
-                transition: opacity var(--radar-fade-duration, 400ms) ease-in-out;
-              `;
-              descImageEl.appendChild(frame);
-              frames.push(frame);
+          let framesRight = [];
+          if (descImageEl) {
+            descImageEl.classList.add('radar-mode');
+            descImageEl.style.setProperty('--radar-fade-duration', `${RADAR_FADE_DURATION_MS}ms`);
+            framesRight = descImageEl.querySelectorAll('.radar-frame');
+            if (framesRight.length !== 4) {
+              descImageEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
+              framesRight = [];
+              for (let i = 3; i >= 0; i--) {
+                const frame = document.createElement('div');
+                frame.className = 'radar-frame';
+                frame.style.cssText = `
+                  position: absolute;
+                  top: 0; left: 0; width: 100%; height: 100%;
+                  background-size: calc(${RADAR_ZOOM} * 100%) auto;
+                  background-repeat: no-repeat;
+                  background-position: calc(50% + ${RADAR_OFFSET_X}) calc(50% + ${RADAR_OFFSET_Y});
+                  opacity: ${i === 0 ? 1 : 0};
+                  transition: opacity var(--radar-fade-duration, 400ms) ease-in-out;
+                `;
+                descImageEl.appendChild(frame);
+                framesRight.push(frame);
+              }
             }
           }
 
-          // Update image URLs dynamically based on currentRadarStation with 20-minute cache-busting
-          const timeParam = Math.floor(Date.now() / 1200000); // changes every 20 mins
-          for (let i = 0; i < 4; i++) {
-            const frameNum = 3 - i; // 3, 2, 1, 0
-            const url = `https://radar.weather.gov/ridge/standard/${currentRadarStation}_${frameNum}.gif?t=${timeParam}`;
-            frames[i].style.backgroundImage = `url('${url}')`;
-            frames[i].style.backgroundSize = `calc(${RADAR_ZOOM} * 100%) auto`;
-            frames[i].style.backgroundPosition = `calc(50% + ${RADAR_OFFSET_X}) calc(50% + ${RADAR_OFFSET_Y})`;
-            frames[i].style.transition = `opacity var(--radar-fade-duration, 400ms) ease-in-out`;
+          let framesLeft = [];
+          if (descImageLeftEl) {
+            descImageLeftEl.classList.add('radar-mode');
+            descImageLeftEl.style.setProperty('--radar-fade-duration', `${RADAR_FADE_DURATION_MS}ms`);
+            framesLeft = descImageLeftEl.querySelectorAll('.radar-frame');
+            if (framesLeft.length !== 4) {
+              descImageLeftEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
+              framesLeft = [];
+              for (let i = 3; i >= 0; i--) {
+                const frame = document.createElement('div');
+                frame.className = 'radar-frame';
+                frame.style.cssText = `
+                  position: absolute;
+                  top: 0; left: 0; width: 100%; height: 100%;
+                  background-size: calc(${RADAR_ZOOM} * 100%) auto;
+                  background-repeat: no-repeat;
+                  background-position: calc(50% + ${RADAR_OFFSET_X}) calc(50% + ${RADAR_OFFSET_Y});
+                  opacity: ${i === 0 ? 1 : 0};
+                  transition: opacity var(--radar-fade-duration, 400ms) ease-in-out;
+                `;
+                descImageLeftEl.appendChild(frame);
+                framesLeft.push(frame);
+              }
+            }
           }
 
-          // Start loop
-          startRadarLoop(frames);
+          const timeParam = Math.floor(Date.now() / 1200000);
+          for (let i = 0; i < 4; i++) {
+            const frameNum = 3 - i;
+            const url = `https://radar.weather.gov/ridge/standard/${currentRadarStation}_${frameNum}.gif?t=${timeParam}`;
+            if (descImageEl && framesRight[i]) {
+              framesRight[i].style.backgroundImage = `url('${url}')`;
+              framesRight[i].style.backgroundSize = `calc(${RADAR_ZOOM} * 100%) auto`;
+              framesRight[i].style.backgroundPosition = `calc(50% + ${RADAR_OFFSET_X}) calc(50% + ${RADAR_OFFSET_Y})`;
+              framesRight[i].style.transition = `opacity var(--radar-fade-duration, 400ms) ease-in-out`;
+            }
+            if (descImageLeftEl && framesLeft[i]) {
+              framesLeft[i].style.backgroundImage = `url('${url}')`;
+              framesLeft[i].style.backgroundSize = `calc(${RADAR_ZOOM} * 100%) auto`;
+              framesLeft[i].style.backgroundPosition = `calc(50% + ${RADAR_OFFSET_X}) calc(50% + ${RADAR_OFFSET_Y})`;
+              framesLeft[i].style.transition = `opacity var(--radar-fade-duration, 400ms) ease-in-out`;
+            }
+          }
+
+          startRadarLoop(descImageEl ? framesRight : null, descImageLeftEl ? framesLeft : null);
         } else {
-          // Clear radar loop and elements if they exist
           if (radarLoopIntervalId) {
             clearInterval(radarLoopIntervalId);
             radarLoopIntervalId = null;
           }
-          descImageEl.classList.remove('radar-mode');
-          descImageEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
+          if (descImageEl) {
+            descImageEl.classList.remove('radar-mode');
+            descImageEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
+          }
+          if (descImageLeftEl) {
+            descImageLeftEl.classList.remove('radar-mode');
+            descImageLeftEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
+          }
           
           // Determine if it is currently night time
           const now = Math.floor(Date.now() / 1000);
@@ -2262,17 +2359,26 @@ import weatherConditions from '../data/weather-conditions.json';
           
           const imgPreload = new Image();
           imgPreload.onload = () => {
-            descImageEl.style.backgroundImage = `url('${primaryImgPath}')`;
+            if (descImageEl) descImageEl.style.backgroundImage = `url('${primaryImgPath}')`;
+            if (descImageLeftEl) descImageLeftEl.style.backgroundImage = `url('${primaryImgPath}')`;
           };
           imgPreload.onerror = () => {
             if (isNight) {
               // If the dark image is missing, gracefully fall back to the standard day image
               const dayPreload = new Image();
-              dayPreload.onload = () => { descImageEl.style.backgroundImage = `url('${dayImgPath}')`; };
-              dayPreload.onerror = () => { descImageEl.style.backgroundImage = `url('${fallbackPath}')`; recordMissingAsset(dayImgPath); };
+              dayPreload.onload = () => {
+                if (descImageEl) descImageEl.style.backgroundImage = `url('${dayImgPath}')`;
+                if (descImageLeftEl) descImageLeftEl.style.backgroundImage = `url('${dayImgPath}')`;
+              };
+              dayPreload.onerror = () => {
+                if (descImageEl) descImageEl.style.backgroundImage = `url('${fallbackPath}')`;
+                if (descImageLeftEl) descImageLeftEl.style.backgroundImage = `url('${fallbackPath}')`;
+                recordMissingAsset(dayImgPath);
+              };
               dayPreload.src = dayImgPath;
             } else {
-              descImageEl.style.backgroundImage = `url('${fallbackPath}')`;
+              if (descImageEl) descImageEl.style.backgroundImage = `url('${fallbackPath}')`;
+              if (descImageLeftEl) descImageLeftEl.style.backgroundImage = `url('${fallbackPath}')`;
               recordMissingAsset(primaryImgPath);
             }
           };
@@ -2282,13 +2388,13 @@ import weatherConditions from '../data/weather-conditions.json';
       
       // Toggle drop shadow on the white date text ONLY for "overcast clouds"
       const simpleMonthEl = document.getElementById('simple-month');
-      if (simpleMonthEl) {
+      const simpleMonthLeftEl = document.getElementById('simple-month-left');
+      if (simpleMonthEl || simpleMonthLeftEl) {
         const descLower = description.toLowerCase();
-        if (descLower === 'overcast clouds' || descLower === 'broken clouds') {
-          simpleMonthEl.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.6)';
-        } else {
-          simpleMonthEl.style.textShadow = 'none';
-        }
+        const hasShadow = descLower === 'overcast clouds' || descLower === 'broken clouds';
+        const shadowVal = hasShadow ? '0 2px 4px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.6)' : 'none';
+        if (simpleMonthEl) simpleMonthEl.style.textShadow = shadowVal;
+        if (simpleMonthLeftEl) simpleMonthLeftEl.style.textShadow = shadowVal;
       }
     } else {
       el.textContent = '';
@@ -2444,7 +2550,6 @@ import weatherConditions from '../data/weather-conditions.json';
     if (!btnContainer) {
       btnContainer = document.createElement('div');
       btnContainer.id = 'temp-format-buttons';
-      container.appendChild(btnContainer);
       
       const btn1 = document.createElement('button');
       btn1.id = 'btn-format-fc';
@@ -2507,18 +2612,33 @@ import weatherConditions from '../data/weather-conditions.json';
       btnContainer.appendChild(btn1);
       btnContainer.appendChild(btn2);
     }
+
+    // Position/Append formats buttons centered at the very bottom after last updated
+    const targetParent = document.querySelector('main.content') || document.body;
+    const lastUpdatedEl = document.getElementById('weather-last-updated');
+    if (lastUpdatedEl) {
+      if (lastUpdatedEl.nextSibling !== btnContainer) {
+        lastUpdatedEl.parentNode.insertBefore(btnContainer, lastUpdatedEl.nextSibling);
+      }
+    } else {
+      if (btnContainer.parentNode !== targetParent) {
+        targetParent.appendChild(btnContainer);
+      }
+    }
     
     // Update Button Styles (for live hot-reloading)
-    btnContainer.style.position = 'absolute';
+    btnContainer.style.position = 'relative';
     btnContainer.style.zIndex = '9999'; // FORCE ABOVE ALL OTHER OVERLAYS
-    // Place it right after the dots container ends (which is exactly where the empty gap begins)
-    btnContainer.style.left = `calc(100% + ${TEMP_BTN_OFFSET_X})`;
-    btnContainer.style.top = '50%';
-    btnContainer.style.marginTop = TEMP_BTN_OFFSET_Y;
-    btnContainer.style.transform = 'translateY(-50%)';
+    btnContainer.style.left = 'auto';
+    btnContainer.style.top = 'auto';
+    btnContainer.style.marginTop = '2vw';
+    btnContainer.style.transform = 'none';
     btnContainer.style.display = 'flex';
-    btnContainer.style.gap = TEMP_BTN_GAP;
+    btnContainer.style.justifyContent = 'center';
     btnContainer.style.alignItems = 'center';
+    btnContainer.style.gap = TEMP_BTN_GAP;
+    btnContainer.style.width = '100%';
+    btnContainer.style.paddingBottom = '6vw'; // Responsive padding to keep a nice gap at the bottom of the page
     
     const btns = btnContainer.querySelectorAll('.temp-btn');
     if (btns.length >= 2) {
@@ -3924,7 +4044,7 @@ import weatherConditions from '../data/weather-conditions.json';
   function updateLastUpdated(date) {
     const container = document.querySelector('main.content') || document.body;
     const id = 'weather-last-updated';
-    const existing = document.getElementById(id);
+    let span = document.getElementById(id);
     
     // Format date to have lowercase am/pm and NO SECONDS
     const text = date ? date.toLocaleString('en-US', {
@@ -3935,32 +4055,38 @@ import weatherConditions from '../data/weather-conditions.json';
     // Safely grab the timestamp injected by Vite during the build process
     const appBuildDate = typeof __APP_BUILD_DATE__ !== 'undefined' ? __APP_BUILD_DATE__ : 'Local Dev Mode';
 
-    if (existing) {
-      existing.innerHTML = `Weather last updated: ${text}<br>App last updated: ${appBuildDate}`;
-      // Also update font size on existing element for hot-reloading
-      existing.style.fontSize = '1.6875vw';
-      existing.style.color = 'white';
-      existing.style.opacity = '1';
-      return;
+    if (span) {
+      span.innerHTML = `Weather last updated: ${text}<br>App last updated: ${appBuildDate}`;
+      span.style.fontSize = '1.6875vw';
+      span.style.color = 'white';
+      span.style.opacity = '1';
+    } else {
+      span = document.createElement('div');
+      span.id = id;
+      span.innerHTML = `Weather last updated: ${text}<br>App last updated: ${appBuildDate}`;
+      span.style.position = 'relative'; // Normal document flow
+      span.style.margin = '0 auto'; // 0 top (earth spacer handles the 4vw above)
+      span.style.paddingBottom = '4vw'; // Use padding instead of margin to prevent collapse
+      span.style.width = '100%';
+      span.style.fontSize = '1.6875vw'; // 75% of 2.25vw
+      span.style.fontFamily = "'light', sans-serif";
+      span.style.color = 'white';
+      span.style.opacity = '0'; // Start invisible to prevent initialization flash
+      span.style.transition = 'opacity 1s ease'; // Smooth fade in
+      span.style.lineHeight = '1.5';
+      span.style.textAlign = 'center';
+      span.style.pointerEvents = 'none';
+      span.style.zIndex = '10';
+      container.appendChild(span);
     }
 
-    const span = document.createElement('div');
-    span.id = id;
-    span.innerHTML = `Weather last updated: ${text}<br>App last updated: ${appBuildDate}`;
-    span.style.position = 'relative'; // Normal document flow
-    span.style.margin = '0 auto'; // 0 top (earth spacer handles the 4vw above)
-    span.style.paddingBottom = '4vw'; // Use padding instead of margin to prevent collapse
-    span.style.width = '100%';
-    span.style.fontSize = '1.6875vw'; // 75% of 2.25vw
-    span.style.fontFamily = "'light', sans-serif";
-    span.style.color = 'white';
-    span.style.opacity = '0'; // Start invisible to prevent initialization flash
-    span.style.transition = 'opacity 1s ease'; // Smooth fade in
-    span.style.lineHeight = '1.5';
-    span.style.textAlign = 'center';
-    span.style.pointerEvents = 'none';
-    span.style.zIndex = '10';
-    container.appendChild(span);
+    // Reposition the buttons right below the last-updated element
+    const btnContainer = document.getElementById('temp-format-buttons');
+    if (btnContainer) {
+      if (span.nextSibling !== btnContainer) {
+        container.insertBefore(btnContainer, span.nextSibling);
+      }
+    }
   }
 
   // Helper to persistently record missing assets to a To-Do list
@@ -4047,61 +4173,114 @@ import weatherConditions from '../data/weather-conditions.json';
     Inserts a 3-letter lowercase month above the high box and colors it using tempToColor
   */
   function createSimpleMonthIfMissing() {
-    if (document.getElementById('simple-month')) return;
-    const el = document.createElement('div');
-    el.id = 'simple-month';
-    el.className = 'simple-month';
-    el.setAttribute('aria-hidden', 'true');
-    
-    // Place it perfectly centered over the top right side-scrolling graphic
-    el.style.position = 'absolute';
-    el.style.top = '0';
-    el.style.left = '0';
-    el.style.width = '100%';
-    el.style.height = '100%';
-    el.style.display = 'flex';
-    el.style.justifyContent = 'center';
-    el.style.alignItems = 'center';
-    el.style.gap = '0'; // Gap removed here, space is now handled via margin on the month span
-    el.style.color = 'white';
-    el.style.fontSize = '5.04vw'; // 10% smaller than 5.6vw
-    el.style.zIndex = '10';
-    // el.style.WebkitFontSmoothing = 'antialiased'; // Prevents overly thick shadows on iOS retina displays
-    el.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.6)'; // EDITABLE: Uncomment to add drop shadow back
-    
-    // Make it a clickable button that resets the 5-minute timer and forces a refresh
-    el.style.cursor = 'pointer';
-    el.style.pointerEvents = 'auto';
-    el.addEventListener('click', (e) => {
-      e.stopPropagation(); // prevent other clicks from triggering
-      console.log('🔄 Date phrase clicked - resetting API timer & forcing refresh...');
+    if (!document.getElementById('simple-month')) {
+      const el = document.createElement('div');
+      el.id = 'simple-month';
+      el.className = 'simple-month';
+      el.setAttribute('aria-hidden', 'true');
       
-      // Fade to black, then back to white
-      const applyTransition = (color) => {
-        el.style.setProperty('transition', 'color 0.5s ease-out', 'important');
-        el.style.setProperty('color', color, 'important');
-        const spans = el.querySelectorAll('span');
-        spans.forEach(span => {
-          span.style.setProperty('transition', 'color 0.5s ease-out', 'important');
-          span.style.setProperty('color', color, 'important');
-        });
-      };
+      // Place it perfectly centered over the top right side-scrolling graphic
+      el.style.position = 'absolute';
+      el.style.top = '0';
+      el.style.left = '0';
+      el.style.width = '100%';
+      el.style.height = '100%';
+      el.style.display = 'flex';
+      el.style.justifyContent = 'center';
+      el.style.alignItems = 'center';
+      el.style.gap = '0'; // Gap removed here, space is now handled via margin on the month span
+      el.style.color = 'white';
+      el.style.fontSize = '5.04vw'; // 10% smaller than 5.6vw
+      el.style.zIndex = '10';
+      el.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.6)';
+      
+      // Make it a clickable button that resets the 5-minute timer and forces a refresh
+      el.style.cursor = 'pointer';
+      el.style.pointerEvents = 'auto';
+      el.addEventListener('click', (e) => {
+        e.stopPropagation(); // prevent other clicks from triggering
+        console.log('🔄 Date phrase clicked - resetting API timer & forcing refresh...');
+        
+        // Fade to black, then back to white
+        const applyTransition = (color) => {
+          el.style.setProperty('transition', 'color 0.5s ease-out', 'important');
+          el.style.setProperty('color', color, 'important');
+          const spans = el.querySelectorAll('span');
+          spans.forEach(span => {
+            span.style.setProperty('transition', 'color 0.5s ease-out', 'important');
+            span.style.setProperty('color', color, 'important');
+          });
+        };
 
-      requestAnimationFrame(() => applyTransition('black'));
-      setTimeout(() => {
-        requestAnimationFrame(() => applyTransition('white'));
-      }, 500);
+        requestAnimationFrame(() => applyTransition('black'));
+        setTimeout(() => {
+          requestAnimationFrame(() => applyTransition('white'));
+        }, 500);
 
-      stopAutoRefresh();
-      getLocalWeather();
-      startAutoRefresh(currentRefreshMs, autoRefreshAligned);
-    });
-    
-    const descImage = document.getElementById('weather-desc-image');
-    if (descImage) {
-      descImage.appendChild(el);
-    } else {
-      (document.querySelector('main.content') || document.body).appendChild(el);
+        stopAutoRefresh();
+        getLocalWeather();
+        startAutoRefresh(currentRefreshMs, autoRefreshAligned);
+      });
+      
+      const descImage = document.getElementById('weather-desc-image');
+      if (descImage) {
+        descImage.appendChild(el);
+      } else {
+        (document.querySelector('main.content') || document.body).appendChild(el);
+      }
+    }
+
+    if (!document.getElementById('simple-month-left')) {
+      const elLeft = document.createElement('div');
+      elLeft.id = 'simple-month-left';
+      elLeft.className = 'simple-month';
+      elLeft.setAttribute('aria-hidden', 'true');
+      
+      // Place it perfectly centered over the top left side-scrolling graphic
+      elLeft.style.position = 'absolute';
+      elLeft.style.top = '0';
+      elLeft.style.left = '0';
+      elLeft.style.width = '100%';
+      elLeft.style.height = '100%';
+      elLeft.style.display = 'flex';
+      elLeft.style.justifyContent = 'center';
+      elLeft.style.alignItems = 'center';
+      elLeft.style.gap = '0';
+      elLeft.style.color = 'white';
+      elLeft.style.fontSize = '5.04vw';
+      elLeft.style.zIndex = '10';
+      elLeft.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.6)';
+      
+      elLeft.style.cursor = 'pointer';
+      elLeft.style.pointerEvents = 'auto';
+      elLeft.addEventListener('click', (e) => {
+        e.stopPropagation();
+        console.log('🔄 Date phrase clicked - resetting API timer & forcing refresh...');
+        
+        const applyTransition = (color) => {
+          elLeft.style.setProperty('transition', 'color 0.5s ease-out', 'important');
+          elLeft.style.setProperty('color', color, 'important');
+          const spans = elLeft.querySelectorAll('span');
+          spans.forEach(span => {
+            span.style.setProperty('transition', 'color 0.5s ease-out', 'important');
+            span.style.setProperty('color', color, 'important');
+          });
+        };
+
+        requestAnimationFrame(() => applyTransition('black'));
+        setTimeout(() => {
+          requestAnimationFrame(() => applyTransition('white'));
+        }, 500);
+
+        stopAutoRefresh();
+        getLocalWeather();
+        startAutoRefresh(currentRefreshMs, autoRefreshAligned);
+      });
+      
+      const descImageLeft = document.getElementById('weather-desc-image-left');
+      if (descImageLeft) {
+        descImageLeft.appendChild(elLeft);
+      }
     }
   }
 
@@ -4133,6 +4312,10 @@ import weatherConditions from '../data/weather-conditions.json';
       const el = document.getElementById('simple-month');
       if (el) {
         el.innerHTML = `<span style="font-family: 'light', sans-serif; font-weight: normal; color: white; letter-spacing: -0.06em; margin-right: 0.75vw;">${month}</span><span style="font-family: 'bold', sans-serif; font-weight: normal; color: white;">${day}</span><span style="font-family: 'light', sans-serif; font-weight: normal; color: white; letter-spacing: -0.06em;">${dayOfWeek}</span>`;
+      }
+      const elLeft = document.getElementById('simple-month-left');
+      if (elLeft) {
+        elLeft.innerHTML = `<span style="font-family: 'light', sans-serif; font-weight: normal; color: white; letter-spacing: -0.06em; margin-right: 0.75vw;">${month}</span><span style="font-family: 'bold', sans-serif; font-weight: normal; color: white;">${day}</span><span style="font-family: 'light', sans-serif; font-weight: normal; color: white; letter-spacing: -0.06em;">${dayOfWeek}</span>`;
       }
     } catch (e) { /* noop */ }
   }
@@ -5373,7 +5556,7 @@ import weatherConditions from '../data/weather-conditions.json';
     }
   }
 
-  function startRadarLoop(frames) {
+  function startRadarLoop(framesRight, framesLeft) {
     if (radarLoopIntervalId) {
       clearInterval(radarLoopIntervalId);
     }
@@ -5391,15 +5574,29 @@ import weatherConditions from '../data/weather-conditions.json';
     }
 
     currentRadarFrameIndex = 0;
-    frames.forEach((frame, idx) => {
-      frame.style.opacity = idx === 0 ? '1' : '0';
-    });
+    if (framesRight) {
+      framesRight.forEach((frame, idx) => {
+        frame.style.opacity = idx === 0 ? '1' : '0';
+      });
+    }
+    if (framesLeft) {
+      framesLeft.forEach((frame, idx) => {
+        frame.style.opacity = idx === 0 ? '1' : '0';
+      });
+    }
 
     radarLoopIntervalId = setInterval(() => {
       currentRadarFrameIndex = (currentRadarFrameIndex + 1) % 4;
-      frames.forEach((frame, idx) => {
-        frame.style.opacity = idx === currentRadarFrameIndex ? '1' : '0';
-      });
+      if (framesRight) {
+        framesRight.forEach((frame, idx) => {
+          frame.style.opacity = idx === currentRadarFrameIndex ? '1' : '0';
+        });
+      }
+      if (framesLeft) {
+        framesLeft.forEach((frame, idx) => {
+          frame.style.opacity = idx === currentRadarFrameIndex ? '1' : '0';
+        });
+      }
     }, speed);
   }
 
@@ -5816,6 +6013,8 @@ import weatherConditions from '../data/weather-conditions.json';
         
         const descImg = document.getElementById('weather-desc-image');
         if (descImg) descImg.style.opacity = '1';
+        const descImgLeft = document.getElementById('weather-desc-image-left');
+        if (descImgLeft) descImgLeft.style.opacity = '1';
         
         // The math is done! Force the inline transition to bypass any CSS conflicts
         const loader = document.getElementById('startup-loader');
@@ -6073,7 +6272,7 @@ import weatherConditions from '../data/weather-conditions.json';
           dots[i].style.backgroundColor = colors.active;
         }
         
-        const btnFC = container.querySelector('#btn-format-fc');
+        const btnFC = document.getElementById('btn-format-fc');
         if (btnFC) {
           if (btnFC.classList.contains('active-mode')) {
             if (displayUnit === 'F') {
@@ -6086,7 +6285,7 @@ import weatherConditions from '../data/weather-conditions.json';
           }
         }
         
-        const btnBoth = container.querySelector('#btn-format-both');
+        const btnBoth = document.getElementById('btn-format-both');
         if (btnBoth) {
           const activeColor = btnBoth.classList.contains('active-mode') ? colors.active : 'white';
           btnBoth.innerHTML = `<span style="color: ${activeColor}; font-size: inherit; font-family: inherit;">F&C</span>`;
