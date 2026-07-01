@@ -91,12 +91,27 @@ import weatherConditions from '../data/weather-conditions.json';
   const RADAR_FADE_DURATION_MS = 400;  // EDITABLE: Transition duration for cross-fade (in milliseconds)
 
 
-  // --- Weather Image Config (Upper Right) ---
-  const WEATHER_IMAGE_WIDTH = '25vw';   // EDITABLE: Width of the upper right image
-  const WEATHER_IMAGE_HEIGHT = '16vw';  // EDITABLE: Height of the upper right image
-  const WEATHER_IMAGE_TOP = '8vw';      // EDITABLE: Distance from top of screen
-  const WEATHER_IMAGE_RIGHT = '3vw';    // EDITABLE: Distance from right of screen
-  const WEATHER_IMAGE_BORDER_RADIUS = '1vw'; // EDITABLE: Corner rounding
+  // --- Weather Image Config (Upper Right/Left Circle Cells) ---
+  // EDITABLE: Size, margins, and offsets for the left and right weather circle cells.
+  // These variables are injected as CSS variables, allowing easy tweaks here or via CSS.
+  const CIRCLE_CELL_SIZE = '24vw';           // EDITABLE: Diameter of the circles (resizes them)
+  const CIRCLE_CELL_TOP = '0vw';            // EDITABLE: Space above the circles (top spacing)
+  const CIRCLE_CELL_LEFT = '3vw';           // EDITABLE: Space left of the left circle cell
+  const CIRCLE_CELL_RIGHT = '3vw';          // EDITABLE: Space right of the right circle cell
+  const CIRCLE_CELL_MARGIN_BOTTOM = '2vw';  // EDITABLE: Space below the circle cells (margin-bottom)
+  const WEATHER_IMAGE_BORDER_RADIUS = '50%'; // EDITABLE: Circle shape rounding (keep at 50%)
+
+  // Set initial CSS variables for sizing and spacing
+  document.documentElement.style.setProperty('--circle-cell-size', CIRCLE_CELL_SIZE);
+  document.documentElement.style.setProperty('--circle-cell-top', CIRCLE_CELL_TOP);
+  document.documentElement.style.setProperty('--circle-cell-left', CIRCLE_CELL_LEFT);
+  document.documentElement.style.setProperty('--circle-cell-right', CIRCLE_CELL_RIGHT);
+  document.documentElement.style.setProperty('--circle-cell-margin-bottom', CIRCLE_CELL_MARGIN_BOTTOM);
+
+  const WEATHER_IMAGE_WIDTH = CIRCLE_CELL_SIZE;
+  const WEATHER_IMAGE_HEIGHT = CIRCLE_CELL_SIZE;
+  const WEATHER_IMAGE_TOP = CIRCLE_CELL_TOP;
+  const WEATHER_IMAGE_RIGHT = CIRCLE_CELL_RIGHT;
 
   // EDITABLE: Side-scrolling speed for weather images (in seconds)
   const WEATHER_IMAGE_SCROLL_SPEED_S = 240;
@@ -1112,10 +1127,11 @@ import weatherConditions from '../data/weather-conditions.json';
       }
       #weather-desc-image {
         position: absolute;
-        right: ${WEATHER_IMAGE_RIGHT};
-        top: ${WEATHER_IMAGE_TOP};
-        width: ${WEATHER_IMAGE_WIDTH};
-        height: ${WEATHER_IMAGE_HEIGHT};
+        right: var(--circle-cell-right, ${WEATHER_IMAGE_RIGHT});
+        top: var(--circle-cell-top, ${WEATHER_IMAGE_TOP});
+        width: var(--circle-cell-size, ${WEATHER_IMAGE_WIDTH});
+        height: var(--circle-cell-size, ${WEATHER_IMAGE_HEIGHT});
+        margin-bottom: var(--circle-cell-margin-bottom, 0vw);
         background-color: rgba(100, 100, 100, 0.5);
         background-image: url('img/desc-overcast-clouds.jpg');
         background-size: auto 100%;
@@ -1144,10 +1160,11 @@ import weatherConditions from '../data/weather-conditions.json';
       }
       #weather-desc-image-left {
         position: absolute;
-        left: ${WEATHER_IMAGE_RIGHT};
-        top: ${WEATHER_IMAGE_TOP};
-        width: ${WEATHER_IMAGE_WIDTH};
-        height: ${WEATHER_IMAGE_HEIGHT};
+        left: var(--circle-cell-left, ${CIRCLE_CELL_LEFT});
+        top: var(--circle-cell-top, ${WEATHER_IMAGE_TOP});
+        width: var(--circle-cell-size, ${WEATHER_IMAGE_WIDTH});
+        height: var(--circle-cell-size, ${WEATHER_IMAGE_HEIGHT});
+        margin-bottom: var(--circle-cell-margin-bottom, 0vw);
         background-color: rgba(100, 100, 100, 0.5);
         background-image: url('img/desc-overcast-clouds.jpg');
         background-size: auto 100%;
@@ -4190,7 +4207,7 @@ import weatherConditions from '../data/weather-conditions.json';
       el.style.alignItems = 'center';
       el.style.gap = '0'; // Gap removed here, space is now handled via margin on the month span
       el.style.color = 'white';
-      el.style.fontSize = '5.04vw'; // 10% smaller than 5.6vw
+      el.style.fontSize = '3.20vw'; // Scaled to fit comfortably inside circular shape
       el.style.zIndex = '10';
       el.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.6)';
       
@@ -4247,7 +4264,7 @@ import weatherConditions from '../data/weather-conditions.json';
       elLeft.style.alignItems = 'center';
       elLeft.style.gap = '0';
       elLeft.style.color = 'white';
-      elLeft.style.fontSize = '5.04vw';
+      elLeft.style.fontSize = '3.20vw'; // Scaled to fit comfortably inside circular shape
       elLeft.style.zIndex = '10';
       elLeft.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.6)';
       
