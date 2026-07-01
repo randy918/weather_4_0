@@ -837,11 +837,13 @@ main {
     .grid-sun-text {
         transform: translate(-50%, calc(-50% + var(--grid-sun-y-offset, 0.7vw))) !important;
         line-height: 0.5 !important;
+        font-size: 3.0vw !important; /* Slightly smaller to fit time formatting comfortably */
     }
 
     .grid-moon-text {
         transform: translate(-50%, calc(-50% + var(--grid-moon-y-offset, 0.7vw))) !important;
         line-height: 0.5 !important;
+        font-size: 3.0vw !important; /* Slightly smaller to fit time formatting comfortably */
     }
 
     .clock-hand-wind-direction {

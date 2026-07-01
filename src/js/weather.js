@@ -2755,9 +2755,6 @@ import weatherConditions from '../data/weather-conditions.json';
       return;
     }
     
-    // Calculate day length and format
-    const dayLengthHours = (sunset - sunrise) / 3600;
-    
     // Get midnight of current day in local time
     const nowDate = new Date();
     const midnightToday = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate()).getTime() / 1000;
@@ -2783,9 +2780,36 @@ import weatherConditions from '../data/weather-conditions.json';
       }
     }
     
+    // Calculate the next sun event (sunrise or sunset)
+    const now = Date.now() / 1000;
+    let nextEventTime = null;
+    let nextEventLabel = '';
+    
+    if (now < sunrise) {
+      nextEventTime = sunrise;
+      nextEventLabel = 'Rise';
+    } else if (now < sunset) {
+      nextEventTime = sunset;
+      nextEventLabel = 'Set';
+    } else {
+      // Tomorrow's sunrise
+      nextEventTime = data?.daily?.[1]?.sunrise || (sunrise + 86400);
+      nextEventLabel = 'Rise';
+    }
+    
+    // Format next event time (example: 9:43p, where a/p are 2/3 sized, using 'medium' font)
+    const eventDate = new Date(nextEventTime * 1000);
+    let hours = eventDate.getHours();
+    const minutes = eventDate.getMinutes();
+    const ampm = hours >= 12 ? 'p' : 'a';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const minutesStr = minutes < 10 ? '0' + minutes : minutes;
+    
+    const formattedTime = `${hours}:${minutesStr}<span style="font-size: 0.67em; font-family: 'medium', sans-serif;">${ampm}</span>`;
+    
     if (gridSunTextEl) {
-      // Show day length in hours (e.g. 14.2h) and a light "Day" label below
-      gridSunTextEl.innerHTML = `${Math.round(dayLengthHours * 10) / 10}h<br><span style="font-size: 1.1vw; opacity: 1; font-family: 'light', sans-serif;">Day</span>`;
+      gridSunTextEl.innerHTML = `${formattedTime}<br><span style="font-size: 1.1vw; opacity: 1; font-family: 'light', sans-serif;">${nextEventLabel}</span>`;
       if (tempColor) {
         gridSunTextEl.style.color = tempColor;
       }
@@ -2830,9 +2854,6 @@ import weatherConditions from '../data/weather-conditions.json';
     const radius = 46;
     const circumference = 2 * Math.PI * radius; // ~289.0265
     
-    // Duration in hours
-    const moonUpDurationHours = (moonrise < moonset) ? (moonset - moonrise) / 3600 : 24 - (moonrise - moonset) / 3600;
-    
     if (gridMoonProgressEl) {
       if (moonrise < moonset) {
         // Simple case: moon is up within the same calendar day
@@ -2856,8 +2877,52 @@ import weatherConditions from '../data/weather-conditions.json';
       }
     }
     
+    // Calculate the next moon event (moonrise or moonset)
+    const now = Date.now() / 1000;
+    let nextEventTime = null;
+    let nextEventLabel = '';
+    
+    if (moonrise < moonset) {
+      // Moon rises and sets on the same day
+      if (now < moonrise) {
+        nextEventTime = moonrise;
+        nextEventLabel = 'Rise';
+      } else if (now < moonset) {
+        nextEventTime = moonset;
+        nextEventLabel = 'Set';
+      } else {
+        // Tomorrow's moonrise
+        nextEventTime = data?.daily?.[1]?.moonrise || (moonrise + 86400);
+        nextEventLabel = 'Rise';
+      }
+    } else {
+      // Moon sets in morning, rises in evening
+      if (now < moonset) {
+        nextEventTime = moonset;
+        nextEventLabel = 'Set';
+      } else if (now < moonrise) {
+        nextEventTime = moonrise;
+        nextEventLabel = 'Rise';
+      } else {
+        // Tomorrow's moonset
+        nextEventTime = data?.daily?.[1]?.moonset || (moonset + 86400);
+        nextEventLabel = 'Set';
+      }
+    }
+    
+    // Format next event time (example: 9:43p, where a/p are 2/3 sized, using 'medium' font)
+    const eventDate = new Date(nextEventTime * 1000);
+    let hours = eventDate.getHours();
+    const minutes = eventDate.getMinutes();
+    const ampm = hours >= 12 ? 'p' : 'a';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const minutesStr = minutes < 10 ? '0' + minutes : minutes;
+    
+    const formattedTime = `${hours}:${minutesStr}<span style="font-size: 0.67em; font-family: 'medium', sans-serif;">${ampm}</span>`;
+    
     if (gridMoonTextEl) {
-      gridMoonTextEl.innerHTML = `${Math.round(moonUpDurationHours * 10) / 10}h<br><span style="font-size: 1.1vw; opacity: 1; font-family: 'light', sans-serif;">Moon</span>`;
+      gridMoonTextEl.innerHTML = `${formattedTime}<br><span style="font-size: 1.1vw; opacity: 1; font-family: 'light', sans-serif;">${nextEventLabel}</span>`;
       if (tempColor) {
         gridMoonTextEl.style.color = tempColor;
       }
