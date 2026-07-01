@@ -46,9 +46,10 @@ import weatherConditions from '../data/weather-conditions.json';
   const CLOCK_GRID_PROGRESS_COLOR = 'rgba(255, 255, 255, 0.5)'; // EDITABLE: Active progress fill color
   const CLOCK_GRID_STROKE_WIDTH = 3.5;     // EDITABLE: SVG stroke thickness
   const CLOCK_GRID_GUST_OPACITY = 0;     // EDITABLE: Wind gust ring opacity (0.0 to 1.0)
-  const CLOCK_GRID_WIND_SPEED_Y_OFFSET = '0.7vw'; // EDITABLE: Vertical offset of the wind speed number inside cell #3 (e.g. '0vw', '0.7vw')
+  const CLOCK_GRID_WIND_SPEED_Y_OFFSET = '-.25vw'; // EDITABLE: Vertical offset of the wind speed number inside cell #3 (e.g. '0vw', '0.7vw')
   const CLOCK_GRID_HUMIDITY_Y_OFFSET = '0.7vw';   // EDITABLE: Vertical offset of the humidity number inside cell #4 (e.g. '0vw', '0.7vw')
   const CLOCK_GRID_DEWPOINT_Y_OFFSET = '0.7vw';   // EDITABLE: Vertical offset of the dewpoint number inside cell #5 (e.g. '0vw', '0.7vw')
+  const CLOCK_GRID_SUN_Y_OFFSET = '0.7vw';        // EDITABLE: Vertical offset of the sun dial day-length number inside cell #6 (e.g. '0vw', '0.7vw')
   const CLOCK_GRID_WIND_SPEED_TEXT_SHADOW = '2px 2px 0px black)'; // EDITABLE: Text shadow for wind speed number (offset-x offset-y blur color)
 
   // Inject these config variables into CSS properties immediately
@@ -65,6 +66,7 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--grid-wind-speed-y-offset', CLOCK_GRID_WIND_SPEED_Y_OFFSET);
   document.documentElement.style.setProperty('--grid-humidity-y-offset', CLOCK_GRID_HUMIDITY_Y_OFFSET);
   document.documentElement.style.setProperty('--grid-dewpoint-y-offset', CLOCK_GRID_DEWPOINT_Y_OFFSET);
+  document.documentElement.style.setProperty('--grid-sun-y-offset', CLOCK_GRID_SUN_Y_OFFSET);
   document.documentElement.style.setProperty('--grid-wind-speed-text-shadow', CLOCK_GRID_WIND_SPEED_TEXT_SHADOW);
 
   // Removed lastBarometricPressure as we now use future predictive trend
@@ -634,6 +636,9 @@ import weatherConditions from '../data/weather-conditions.json';
     
     // Update clock grid row
     updateClockGridRow(data);
+
+    // Update sun dial
+    updateSunDial(data);
 
     // Update wind gauge
     updateWindGauge(data);
@@ -2669,6 +2674,15 @@ import weatherConditions from '../data/weather-conditions.json';
               <div class="barometric-text"></div>
             </div>
           `;
+        } else if (i === 5) {
+          // Cell #6: Sun dial showing daytime period
+          innerHtml = `
+            <svg class="clock-timer-svg" viewBox="0 0 100 100">
+              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+            </svg>
+            <div class="grid-sun-text"></div>
+          `;
         } else {
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
@@ -2699,6 +2713,67 @@ import weatherConditions from '../data/weather-conditions.json';
         refreshDots.parentNode.insertBefore(container, refreshDots.nextSibling);
       } else {
         (document.querySelector('main.content') || document.body).appendChild(container);
+      }
+    }
+  }
+
+  // Update the sun dial in grid cell #6 (index 5)
+  function updateSunDial(data) {
+    const gridSunProgressEl = document.querySelector('.clockGridItem-5 .countdown-progress');
+    const gridSunTextEl = document.querySelector('.clockGridItem-5 .grid-sun-text');
+    
+    // Get sunrise/sunset times (Unix timestamps)
+    const today = data?.daily?.[0];
+    const sunrise = today?.sunrise;
+    const sunset = today?.sunset;
+    const currentTemp = (data?.current?.temp !== undefined) ? data.current.temp : null;
+    const tempColor = currentTemp !== null ? tempToColor(currentTemp) : null;
+    
+    if (typeof sunrise !== 'number' || typeof sunset !== 'number') {
+      console.log('Sun dial: sunrise/sunset data unavailable');
+      const circumference = 2 * Math.PI * 46;
+      if (gridSunProgressEl) {
+        gridSunProgressEl.style.strokeDashoffset = circumference; // hide progress
+      }
+      if (gridSunTextEl) {
+        gridSunTextEl.innerHTML = `--<br><span style="font-size: 1.1vw; opacity: 1; font-family: 'light', sans-serif;">Day</span>`;
+      }
+      return;
+    }
+    
+    // Calculate day length and format
+    const dayLengthHours = (sunset - sunrise) / 3600;
+    
+    // Get midnight of current day in local time
+    const nowDate = new Date();
+    const midnightToday = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate()).getTime() / 1000;
+    
+    const sunriseSec = sunrise - midnightToday;
+    const sunsetSec = sunset - midnightToday;
+    
+    // Normalize fractions to 0..1 representing 24 hours
+    const fSunrise = Math.max(0, Math.min(1, sunriseSec / 86400));
+    const fSunset = Math.max(0, Math.min(1, sunsetSec / 86400));
+    
+    const radius = 46;
+    const circumference = 2 * Math.PI * radius; // ~289.0265
+    
+    const length = (fSunset - fSunrise) * circumference;
+    const offset = fSunrise * circumference;
+    
+    if (gridSunProgressEl) {
+      gridSunProgressEl.style.strokeDasharray = `${length} ${circumference}`;
+      gridSunProgressEl.style.strokeDashoffset = -offset;
+      if (tempColor) {
+        gridSunProgressEl.style.stroke = tempColor;
+      }
+    }
+    
+    if (gridSunTextEl) {
+      // Show day length in hours (e.g. 14.2h) and a light "Day" label below
+      gridSunTextEl.innerHTML = `${Math.round(dayLengthHours * 10) / 10}h<br><span style="font-size: 1.1vw; opacity: 1; font-family: 'light', sans-serif;">Day</span>`;
+      if (tempColor) {
+        gridSunTextEl.style.color = tempColor;
       }
     }
   }

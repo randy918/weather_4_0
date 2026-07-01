@@ -714,13 +714,13 @@ main {
     justify-content: center;
     align-items: center;
 
-    &.clockGridItem-0, &.clockGridItem-2, &.clockGridItem-3, &.clockGridItem-4 {
+    &.clockGridItem-0, &.clockGridItem-2, &.clockGridItem-3, &.clockGridItem-4, &.clockGridItem-5 {
         .clock-timer-svg .countdown-progress {
             stroke: var(--temp-color, var(--clock-hands-color, rgba(255, 255, 255, 0.4))) !important;
         }
     }
 
-    &.clockGridItem-2, &.clockGridItem-3, &.clockGridItem-4 {
+    &.clockGridItem-2, &.clockGridItem-3, &.clockGridItem-4, &.clockGridItem-5 {
         .clock-timer-svg {
             transform: rotate(90deg) !important;
         }
@@ -807,7 +807,7 @@ main {
         z-index: 1 !important;
     }
 
-    .grid-wind-speed-text, .grid-humidity-text, .grid-dewpoint-text {
+    .grid-wind-speed-text, .grid-humidity-text, .grid-dewpoint-text, .grid-sun-text {
         position: absolute !important;
         top: 50% !important;
         left: 50% !important;
@@ -831,6 +831,11 @@ main {
 
     .grid-dewpoint-text {
         transform: translate(-50%, calc(-50% + var(--grid-dewpoint-y-offset, 0.7vw))) !important;
+        line-height: 0.5 !important;
+    }
+
+    .grid-sun-text {
+        transform: translate(-50%, calc(-50% + var(--grid-sun-y-offset, 0.7vw))) !important;
         line-height: 0.5 !important;
     }
 
