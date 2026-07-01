@@ -572,7 +572,7 @@ main {
     grid-template-columns: 1fr;
     gap: 1vw;
 
-    margin-top: 14vw; // EDITABLE: Gap above the hi/lo temperatures grid
+    margin-top: var(--dual-container-margin-top, -4vw); // EDITABLE: Spacing between dials and temperature highs (shrunk to 12vw)
     padding-top: var(--padding-l);
     position: relative; // Positioning context for temp-pointer
 }
@@ -897,5 +897,14 @@ main {
 #analog-clock,
 #wind-direction-arrow,
 #barometric-pressure-gauge {
+    display: none !important;
+}
+
+// Hide the 5 dots wrapper rows since they are replaced by dials
+#wind-dots-wrapper,
+#humidity-dots-wrapper,
+#dewpoint-dots-wrapper,
+#sun-dots-wrapper,
+#moon-dots-wrapper {
     display: none !important;
 }

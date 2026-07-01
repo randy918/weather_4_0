@@ -82,9 +82,15 @@ import weatherConditions from '../data/weather-conditions.json';
   let SHOW_DOPPLER_RADAR = false;
 
   // --- Doppler Radar Zoom & Pan Config (Active only when SHOW_DOPPLER_RADAR is true) ---
-  const RADAR_ZOOM = 1.35;        // EDITABLE: Zoom level (e.g. 1.0 for cover, 1.35 to zoom in)
-  const RADAR_OFFSET_X = '10%';   // EDITABLE: Horizontal shift (positive shifts right, e.g. '10%' to center Tulsa)
-  const RADAR_OFFSET_Y = '-5%';   // EDITABLE: Vertical shift (positive shifts down, negative shifts up)
+  // LEFT Circle Cell (Far/Wide View)
+  const RADAR_ZOOM_LEFT = 1.1;           // EDITABLE: Zoom level for far view (1.0 = covers container, e.g. 1.1 for slight zoom)
+  const RADAR_OFFSET_X_LEFT = '0%';      // EDITABLE: Horizontal center offset (positive = right, negative = left)
+  const RADAR_OFFSET_Y_LEFT = '0%';      // EDITABLE: Vertical center offset (positive = down, negative = up)
+
+  // RIGHT Circle Cell (Local/Zoomed View)
+  const RADAR_ZOOM_RIGHT = 1.6;          // EDITABLE: Zoom level for local view (e.g. 1.6 to zoom in closer)
+  const RADAR_OFFSET_X_RIGHT = '10%';    // EDITABLE: Horizontal center offset (positive = right, e.g. '10%')
+  const RADAR_OFFSET_Y_RIGHT = '-5%';    // EDITABLE: Vertical center offset (positive = down, negative = up)
 
   // --- Doppler Radar Playback Config ---
   const RADAR_LOOP_SPEED_MS = 1000;    // EDITABLE: Time each frame is fully visible (in milliseconds)
@@ -123,7 +129,7 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--fragile-y-offset', FRAGILE_ELEMENTS_Y_OFFSET);
 
   // EDITABLE: Scrolling Gradient Overlay configuration
-  const GRADIENT_OVERLAY_TOP = '72.5vw';    // Adjust starting location from the top
+  const GRADIENT_OVERLAY_TOP = '30.5vw';    // Adjust starting location from the top
   document.documentElement.style.setProperty('--gradient-top', GRADIENT_OVERLAY_TOP);
 
   const GRADIENT_OVERLAY_HEIGHT = '45vw'; // Adjust the height of the gradient
@@ -136,7 +142,7 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--gradient-mid-opacity', GRADIENT_OVERLAY_MID_OPACITY);
 
   // EDITABLE: Lower Scrolling Gradient Overlay configuration
-  const GRADIENT_OVERLAY_LOWER_TOP = '152vw';    // Adjust starting location from the top for lower gradient
+  const GRADIENT_OVERLAY_LOWER_TOP = '112vw';    // Adjust starting location from the top for lower gradient
   document.documentElement.style.setProperty('--gradient-lower-top', GRADIENT_OVERLAY_LOWER_TOP);
 
   const GRADIENT_OVERLAY_LOWER_HEIGHT = '32vw'; // Adjust the height of the lower gradient
@@ -666,20 +672,20 @@ import weatherConditions from '../data/weather-conditions.json';
     // Update barometric pressure gauge
     updateBarometricGauge(data);
 
-    // Update wind speed dots row
-    updateWindDotsRow(data);
+    // Update wind speed dots row (Disabled since replaced by dials)
+    // updateWindDotsRow(data);
     
-    // Update humidity dots row
-    updateHumidityDotsRow(data);
+    // Update humidity dial
+    updateHumidityDial(data);
     
-    // Update dewpoint dots row
-    updateDewpointDotsRow(data);
+    // Update dewpoint dial
+    updateDewpointDial(data);
     
-    // Update sun position dots row
-    updateSunDotsRow(data);
+    // Update sun position dots row (Disabled since replaced by dials)
+    // updateSunDotsRow(data);
     
-    // Update moon rise/set dots row
-    updateMoonDotsRow(data);
+    // Update moon rise/set dots row (Disabled since replaced by dials)
+    // updateMoonDotsRow(data);
     
     // Update second gauge
     updateSecondGauge(data);
@@ -2287,9 +2293,9 @@ import weatherConditions from '../data/weather-conditions.json';
                 frame.style.cssText = `
                   position: absolute;
                   top: 0; left: 0; width: 100%; height: 100%;
-                  background-size: calc(${RADAR_ZOOM} * 100%) auto;
+                  background-size: calc(${RADAR_ZOOM_RIGHT} * 100%) auto;
                   background-repeat: no-repeat;
-                  background-position: calc(50% + ${RADAR_OFFSET_X}) calc(50% + ${RADAR_OFFSET_Y});
+                  background-position: calc(50% + ${RADAR_OFFSET_X_RIGHT}) calc(50% + ${RADAR_OFFSET_Y_RIGHT});
                   opacity: ${i === 0 ? 1 : 0};
                   transition: opacity var(--radar-fade-duration, 400ms) ease-in-out;
                 `;
@@ -2313,9 +2319,9 @@ import weatherConditions from '../data/weather-conditions.json';
                 frame.style.cssText = `
                   position: absolute;
                   top: 0; left: 0; width: 100%; height: 100%;
-                  background-size: calc(${RADAR_ZOOM} * 100%) auto;
+                  background-size: calc(${RADAR_ZOOM_LEFT} * 100%) auto;
                   background-repeat: no-repeat;
-                  background-position: calc(50% + ${RADAR_OFFSET_X}) calc(50% + ${RADAR_OFFSET_Y});
+                  background-position: calc(50% + ${RADAR_OFFSET_X_LEFT}) calc(50% + ${RADAR_OFFSET_Y_LEFT});
                   opacity: ${i === 0 ? 1 : 0};
                   transition: opacity var(--radar-fade-duration, 400ms) ease-in-out;
                 `;
@@ -2331,14 +2337,14 @@ import weatherConditions from '../data/weather-conditions.json';
             const url = `https://radar.weather.gov/ridge/standard/${currentRadarStation}_${frameNum}.gif?t=${timeParam}`;
             if (descImageEl && framesRight[i]) {
               framesRight[i].style.backgroundImage = `url('${url}')`;
-              framesRight[i].style.backgroundSize = `calc(${RADAR_ZOOM} * 100%) auto`;
-              framesRight[i].style.backgroundPosition = `calc(50% + ${RADAR_OFFSET_X}) calc(50% + ${RADAR_OFFSET_Y})`;
+              framesRight[i].style.backgroundSize = `calc(${RADAR_ZOOM_RIGHT} * 100%) auto`;
+              framesRight[i].style.backgroundPosition = `calc(50% + ${RADAR_OFFSET_X_RIGHT}) calc(50% + ${RADAR_OFFSET_Y_RIGHT})`;
               framesRight[i].style.transition = `opacity var(--radar-fade-duration, 400ms) ease-in-out`;
             }
             if (descImageLeftEl && framesLeft[i]) {
               framesLeft[i].style.backgroundImage = `url('${url}')`;
-              framesLeft[i].style.backgroundSize = `calc(${RADAR_ZOOM} * 100%) auto`;
-              framesLeft[i].style.backgroundPosition = `calc(50% + ${RADAR_OFFSET_X}) calc(50% + ${RADAR_OFFSET_Y})`;
+              framesLeft[i].style.backgroundSize = `calc(${RADAR_ZOOM_LEFT} * 100%) auto`;
+              framesLeft[i].style.backgroundPosition = `calc(50% + ${RADAR_OFFSET_X_LEFT}) calc(50% + ${RADAR_OFFSET_Y_LEFT})`;
               framesLeft[i].style.transition = `opacity var(--radar-fade-duration, 400ms) ease-in-out`;
             }
           }
@@ -2595,7 +2601,7 @@ import weatherConditions from '../data/weather-conditions.json';
           updateFields(lastWeatherData);
           updateHourlyForecast(lastWeatherData);
           updateOverlappingBarChart(lastWeatherData);
-          updateDewpointDotsRow(lastWeatherData);
+          updateDewpointDial(lastWeatherData);
           setTimeout(() => updateTempPointer(lastWeatherData), 50);
         }
         if (window.Weather && window.Weather.refreshDotColors) {
@@ -2618,7 +2624,7 @@ import weatherConditions from '../data/weather-conditions.json';
           updateFields(lastWeatherData);
           updateHourlyForecast(lastWeatherData);
           updateOverlappingBarChart(lastWeatherData);
-          updateDewpointDotsRow(lastWeatherData);
+          updateDewpointDial(lastWeatherData);
           setTimeout(() => updateTempPointer(lastWeatherData), 50);
         }
         if (window.Weather && window.Weather.refreshDotColors) {
@@ -2864,6 +2870,76 @@ import weatherConditions from '../data/weather-conditions.json';
         refreshDots.parentNode.insertBefore(container, refreshDots.nextSibling);
       } else {
         (document.querySelector('main.content') || document.body).appendChild(container);
+      }
+    }
+  }
+
+  // Update the humidity dial in grid cell #4 (index 3)
+  function updateHumidityDial(data) {
+    const humidity = data?.current?.humidity;
+    if (typeof humidity !== 'number') return;
+    
+    const currentTemp = data?.current?.temp || null;
+    const tempColor = currentTemp !== null ? tempToColor(currentTemp) : null;
+    const activeColor = getDotsColors(currentTemp).active;
+    const finalColor = tempColor || activeColor;
+    
+    const gridHumidityProgressEl = document.querySelector('.clockGridItem-3 .countdown-progress');
+    const gridHumidityTextEl = document.querySelector('.clockGridItem-3 .grid-humidity-text');
+    const radius = 46;
+    const circumference = 2 * Math.PI * radius; // ~289.0265
+    
+    if (gridHumidityProgressEl) {
+      const percent = Math.max(0, Math.min(1, humidity / 100));
+      const dashOffset = circumference * (1 - percent);
+      gridHumidityProgressEl.style.strokeDashoffset = dashOffset;
+      if (finalColor) {
+        gridHumidityProgressEl.style.stroke = finalColor;
+      }
+    }
+    
+    if (gridHumidityTextEl) {
+      gridHumidityTextEl.innerHTML = `${Math.round(humidity)}%<br><span style="font-size: 1.1vw; opacity: 1; font-family: 'light', sans-serif;">RH</span>`;
+      if (finalColor) {
+        gridHumidityTextEl.style.color = finalColor;
+      }
+    }
+  }
+
+  // Update the dewpoint dial in grid cell #5 (index 4)
+  function updateDewpointDial(data) {
+    const dewpoint = data?.current?.dew_point || null;
+    const currentTemp = (data?.current?.temp !== undefined) ? data.current.temp : null;
+    const tempColor = currentTemp !== null ? tempToColor(currentTemp) : null;
+    const dewpointColor = dewpoint !== null ? tempToColor(dewpoint) : 'hsl(120, 80%, 40%)';
+    const finalColor = tempColor || dewpointColor;
+    
+    const gridDewpointProgressEl = document.querySelector('.clockGridItem-4 .countdown-progress');
+    const gridDewpointTextEl = document.querySelector('.clockGridItem-4 .grid-dewpoint-text');
+    const radius = 46;
+    const circumference = 2 * Math.PI * radius; // ~289.0265
+    
+    if (gridDewpointProgressEl) {
+      if (dewpoint !== null) {
+        const percent = Math.max(0, Math.min(1, dewpoint / 100));
+        const dashOffset = circumference * (1 - percent);
+        gridDewpointProgressEl.style.strokeDashoffset = dashOffset;
+        if (finalColor) {
+          gridDewpointProgressEl.style.stroke = finalColor;
+        }
+      } else {
+        gridDewpointProgressEl.style.strokeDashoffset = circumference;
+      }
+    }
+    
+    if (gridDewpointTextEl) {
+      if (dewpoint !== null) {
+        gridDewpointTextEl.innerHTML = `${Math.round(dewpoint)}°<br><span style="font-size: 1.1vw; opacity: 1; font-family: 'light', sans-serif;">Td</span>`;
+      } else {
+        gridDewpointTextEl.innerHTML = `--<br><span style="font-size: 1.1vw; opacity: 1; font-family: 'light', sans-serif;">Td</span>`;
+      }
+      if (finalColor) {
+        gridDewpointTextEl.style.color = finalColor;
       }
     }
   }
@@ -4207,7 +4283,7 @@ import weatherConditions from '../data/weather-conditions.json';
       el.style.alignItems = 'center';
       el.style.gap = '0'; // Gap removed here, space is now handled via margin on the month span
       el.style.color = 'white';
-      el.style.fontSize = '3.20vw'; // Scaled to fit comfortably inside circular shape
+      el.style.fontSize = '4.16vw'; // Made 30% bigger (from 3.20vw)
       el.style.zIndex = '10';
       el.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.6)';
       
@@ -4264,7 +4340,7 @@ import weatherConditions from '../data/weather-conditions.json';
       elLeft.style.alignItems = 'center';
       elLeft.style.gap = '0';
       elLeft.style.color = 'white';
-      elLeft.style.fontSize = '3.20vw'; // Scaled to fit comfortably inside circular shape
+      elLeft.style.fontSize = '4.37vw'; // Made 20% bigger (from 3.64vw)
       elLeft.style.zIndex = '10';
       elLeft.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.6)';
       
@@ -4330,10 +4406,7 @@ import weatherConditions from '../data/weather-conditions.json';
       if (el) {
         el.innerHTML = `<span style="font-family: 'light', sans-serif; font-weight: normal; color: white; letter-spacing: -0.06em; margin-right: 0.75vw;">${month}</span><span style="font-family: 'bold', sans-serif; font-weight: normal; color: white;">${day}</span><span style="font-family: 'light', sans-serif; font-weight: normal; color: white; letter-spacing: -0.06em;">${dayOfWeek}</span>`;
       }
-      const elLeft = document.getElementById('simple-month-left');
-      if (elLeft) {
-        elLeft.innerHTML = `<span style="font-family: 'light', sans-serif; font-weight: normal; color: white; letter-spacing: -0.06em; margin-right: 0.75vw;">${month}</span><span style="font-family: 'bold', sans-serif; font-weight: normal; color: white;">${day}</span><span style="font-family: 'light', sans-serif; font-weight: normal; color: white; letter-spacing: -0.06em;">${dayOfWeek}</span>`;
-      }
+      // Left circle date update removed as it now displays the current digital time with seconds instead.
     } catch (e) { /* noop */ }
   }
 
@@ -6234,20 +6307,41 @@ import weatherConditions from '../data/weather-conditions.json';
     }
   }
 
+  // Dynamic digital time display with seconds for left circle cell (replaces date)
+  function updateLeftCircleTime() {
+    const elLeft = document.getElementById('simple-month-left');
+    if (!elLeft) return;
+    
+    const now = new Date();
+    let hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+    const ampm = hours >= 12 ? 'p' : 'a';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    
+    const minutesStr = minutes < 10 ? '0' + minutes : minutes;
+    const secondsStr = seconds < 10 ? '0' + seconds : seconds;
+    
+    elLeft.innerHTML = `<span style="font-family: 'bold', sans-serif; letter-spacing: -0.02em;">${hours}:${minutesStr}</span><span style="font-family: 'light', sans-serif; letter-spacing: -0.02em;">:${secondsStr}</span><span style="font-size: 0.67em; font-family: 'medium', sans-serif; margin-left: 0.1vw;">${ampm}</span>`;
+  }
+
   function startCountdownGauge() {
     if (countdownIntervalId) clearInterval(countdownIntervalId);
     
-    // Update every 100ms for smooth animation (countdown + clock hands)
+    // Update every 100ms for smooth animation (countdown + clock hands + left circle seconds)
     countdownIntervalId = setInterval(() => {
       updateCountdownGauge();
       updateDotsCountdown();
       updateClockHands();
       updateSimpleMonthContent();
+      updateLeftCircleTime();
     }, 100);
     updateCountdownGauge();
     updateDotsCountdown();
     updateClockHands();
     updateSimpleMonthContent();
+    updateLeftCircleTime();
   }
 
   function stopCountdownGauge() {
@@ -6388,7 +6482,7 @@ import weatherConditions from '../data/weather-conditions.json';
       // Delay to ensure DOM has settled after resize
       setTimeout(() => {
         updateTempPointer(lastWeatherData);
-        updateWindDotsRow(lastWeatherData); // Reposition wind arrow
+        // updateWindDotsRow(lastWeatherData); // Reposition wind arrow
       }, 100);
     }
   });
