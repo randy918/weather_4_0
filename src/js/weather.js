@@ -50,6 +50,7 @@ import weatherConditions from '../data/weather-conditions.json';
   const CLOCK_GRID_HUMIDITY_Y_OFFSET = '0.7vw';   // EDITABLE: Vertical offset of the humidity number inside cell #4 (e.g. '0vw', '0.7vw')
   const CLOCK_GRID_DEWPOINT_Y_OFFSET = '0.7vw';   // EDITABLE: Vertical offset of the dewpoint number inside cell #5 (e.g. '0vw', '0.7vw')
   const CLOCK_GRID_SUN_Y_OFFSET = '0.7vw';        // EDITABLE: Vertical offset of the sun dial day-length number inside cell #6 (e.g. '0vw', '0.7vw')
+  const CLOCK_GRID_MOON_Y_OFFSET = '0.7vw';       // EDITABLE: Vertical offset of the moon dial moon-up number inside cell #7 (e.g. '0vw', '0.7vw')
   const CLOCK_GRID_WIND_SPEED_TEXT_SHADOW = '2px 2px 0px black)'; // EDITABLE: Text shadow for wind speed number (offset-x offset-y blur color)
 
   // Inject these config variables into CSS properties immediately
@@ -67,6 +68,7 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--grid-humidity-y-offset', CLOCK_GRID_HUMIDITY_Y_OFFSET);
   document.documentElement.style.setProperty('--grid-dewpoint-y-offset', CLOCK_GRID_DEWPOINT_Y_OFFSET);
   document.documentElement.style.setProperty('--grid-sun-y-offset', CLOCK_GRID_SUN_Y_OFFSET);
+  document.documentElement.style.setProperty('--grid-moon-y-offset', CLOCK_GRID_MOON_Y_OFFSET);
   document.documentElement.style.setProperty('--grid-wind-speed-text-shadow', CLOCK_GRID_WIND_SPEED_TEXT_SHADOW);
 
   // Removed lastBarometricPressure as we now use future predictive trend
@@ -639,6 +641,9 @@ import weatherConditions from '../data/weather-conditions.json';
 
     // Update sun dial
     updateSunDial(data);
+
+    // Update moon dial
+    updateMoonDial(data);
 
     // Update wind gauge
     updateWindGauge(data);
@@ -2683,6 +2688,15 @@ import weatherConditions from '../data/weather-conditions.json';
             </svg>
             <div class="grid-sun-text"></div>
           `;
+        } else if (i === 6) {
+          // Cell #7: Moon dial showing moonrise period
+          innerHtml = `
+            <svg class="clock-timer-svg" viewBox="0 0 100 100">
+              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+            </svg>
+            <div class="grid-moon-text"></div>
+          `;
         } else {
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
@@ -2774,6 +2788,78 @@ import weatherConditions from '../data/weather-conditions.json';
       gridSunTextEl.innerHTML = `${Math.round(dayLengthHours * 10) / 10}h<br><span style="font-size: 1.1vw; opacity: 1; font-family: 'light', sans-serif;">Day</span>`;
       if (tempColor) {
         gridSunTextEl.style.color = tempColor;
+      }
+    }
+  }
+
+  // Update the moon dial in grid cell #7 (index 6)
+  function updateMoonDial(data) {
+    const gridMoonProgressEl = document.querySelector('.clockGridItem-6 .countdown-progress');
+    const gridMoonTextEl = document.querySelector('.clockGridItem-6 .grid-moon-text');
+    
+    // Get moonrise/moonset times (Unix timestamps)
+    const today = data?.daily?.[0];
+    const moonrise = today?.moonrise;
+    const moonset = today?.moonset;
+    const currentTemp = (data?.current?.temp !== undefined) ? data.current.temp : null;
+    const tempColor = currentTemp !== null ? tempToColor(currentTemp) : null;
+    
+    if (typeof moonrise !== 'number' || typeof moonset !== 'number') {
+      console.log('Moon dial: moonrise/moonset data unavailable');
+      const circumference = 2 * Math.PI * 46;
+      if (gridMoonProgressEl) {
+        gridMoonProgressEl.style.strokeDashoffset = circumference; // hide progress
+      }
+      if (gridMoonTextEl) {
+        gridMoonTextEl.innerHTML = `--<br><span style="font-size: 1.1vw; opacity: 1; font-family: 'light', sans-serif;">Moon</span>`;
+      }
+      return;
+    }
+    
+    // Get midnight of current day in local time
+    const nowDate = new Date();
+    const midnightToday = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate()).getTime() / 1000;
+    
+    const moonriseSec = moonrise - midnightToday;
+    const moonsetSec = moonset - midnightToday;
+    
+    // Normalize fractions to 0..1 representing 24 hours
+    const fMoonrise = Math.max(0, Math.min(1, moonriseSec / 86400));
+    const fMoonset = Math.max(0, Math.min(1, moonsetSec / 86400));
+    
+    const radius = 46;
+    const circumference = 2 * Math.PI * radius; // ~289.0265
+    
+    // Duration in hours
+    const moonUpDurationHours = (moonrise < moonset) ? (moonset - moonrise) / 3600 : 24 - (moonrise - moonset) / 3600;
+    
+    if (gridMoonProgressEl) {
+      if (moonrise < moonset) {
+        // Simple case: moon is up within the same calendar day
+        const length = (fMoonset - fMoonrise) * circumference;
+        const offset = fMoonrise * circumference;
+        
+        gridMoonProgressEl.style.strokeDasharray = `${length} ${circumference}`;
+        gridMoonProgressEl.style.strokeDashoffset = -offset;
+      } else {
+        // Crossing midnight: moon is up from 00:00 to fMoonset, and from fMoonrise to 24:00
+        const L1 = fMoonset * circumference;
+        const G1 = (fMoonrise - fMoonset) * circumference;
+        const L2 = (1.0 - fMoonrise) * circumference;
+        
+        gridMoonProgressEl.style.strokeDasharray = `${L1} ${G1} ${L2} ${circumference}`;
+        gridMoonProgressEl.style.strokeDashoffset = 0;
+      }
+      
+      if (tempColor) {
+        gridMoonProgressEl.style.stroke = tempColor;
+      }
+    }
+    
+    if (gridMoonTextEl) {
+      gridMoonTextEl.innerHTML = `${Math.round(moonUpDurationHours * 10) / 10}h<br><span style="font-size: 1.1vw; opacity: 1; font-family: 'light', sans-serif;">Moon</span>`;
+      if (tempColor) {
+        gridMoonTextEl.style.color = tempColor;
       }
     }
   }
