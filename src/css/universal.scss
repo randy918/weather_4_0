@@ -138,6 +138,11 @@
     src: url("../assets/fonts/Anton-Regular.ttf");
 }
 
+@font-face {
+    font-family: "mono";
+    src: url("../assets/fonts/RobotoMono-Regular.ttf");
+}
+
 //>  ████████████████████████████████████  RESET
 
 * {
@@ -149,6 +154,10 @@
 }
 
 //>  ████████████████████████████████████  BODY
+
+html, body {
+    background-color: #000;
+}
 
 body {
     height: max(100vw, 100vh);

@@ -15,6 +15,7 @@ import weatherConditions from '../data/weather-conditions.json';
   // Radar loop interval and index trackers
   let radarLoopIntervalId = null;
   let currentRadarFrameIndex = 0;
+  let radarLoopCounter = 0;
 
   // Track the last fetched city to prevent unnecessary API calls--
   let currentCityLat = null; 
@@ -88,7 +89,7 @@ import weatherConditions from '../data/weather-conditions.json';
   const RADAR_OFFSET_Y_LEFT = '0%';      // EDITABLE: Vertical center offset (positive = down, negative = up)
 
   // RIGHT Circle Cell (Local/Zoomed View)
-  const RADAR_ZOOM_RIGHT = 1.6;          // EDITABLE: Zoom level for local view (e.g. 1.6 to zoom in closer)
+  const RADAR_ZOOM_RIGHT = 4.8;          // EDITABLE: Zoom level for local view (e.g. 1.6 to zoom in closer)
   const RADAR_OFFSET_X_RIGHT = '10%';    // EDITABLE: Horizontal center offset (positive = right, e.g. '10%')
   const RADAR_OFFSET_Y_RIGHT = '-5%';    // EDITABLE: Vertical center offset (positive = down, negative = up)
 
@@ -1138,7 +1139,7 @@ import weatherConditions from '../data/weather-conditions.json';
         width: var(--circle-cell-size, ${WEATHER_IMAGE_WIDTH});
         height: var(--circle-cell-size, ${WEATHER_IMAGE_HEIGHT});
         margin-bottom: var(--circle-cell-margin-bottom, 0vw);
-        background-color: rgba(100, 100, 100, 0.5);
+        background-color: #000;
         background-image: url('img/desc-overcast-clouds.jpg');
         background-size: auto 100%;
         background-repeat: repeat-x;
@@ -1159,6 +1160,8 @@ import weatherConditions from '../data/weather-conditions.json';
         background-size: cover;
         background-repeat: no-repeat;
         animation: none !important;
+      }
+      #weather-desc-image.radar-mode .radar-frame {
         filter: invert(1) hue-rotate(180deg);
       }
       #weather-desc-image.radar-mode #simple-month {
@@ -1171,7 +1174,7 @@ import weatherConditions from '../data/weather-conditions.json';
         width: var(--circle-cell-size, ${WEATHER_IMAGE_WIDTH});
         height: var(--circle-cell-size, ${WEATHER_IMAGE_HEIGHT});
         margin-bottom: var(--circle-cell-margin-bottom, 0vw);
-        background-color: rgba(100, 100, 100, 0.5);
+        background-color: #000;
         background-image: url('img/desc-overcast-clouds.jpg');
         background-size: auto 100%;
         background-repeat: repeat-x;
@@ -1192,6 +1195,8 @@ import weatherConditions from '../data/weather-conditions.json';
         background-size: cover;
         background-repeat: no-repeat;
         animation: none !important;
+      }
+      #weather-desc-image-left.radar-mode .radar-frame {
         filter: invert(1) hue-rotate(180deg);
       }
       #weather-desc-image-left.radar-mode #simple-month-left {
@@ -2342,7 +2347,8 @@ import weatherConditions from '../data/weather-conditions.json';
               framesRight[i].style.transition = `opacity var(--radar-fade-duration, 400ms) ease-in-out`;
             }
             if (descImageLeftEl && framesLeft[i]) {
-              framesLeft[i].style.backgroundImage = `url('${url}')`;
+              const conusUrl = `https://radar.weather.gov/ridge/standard/CONUS_${frameNum}.gif?t=${timeParam}`;
+              framesLeft[i].style.backgroundImage = `url('${conusUrl}')`;
               framesLeft[i].style.backgroundSize = `calc(${RADAR_ZOOM_LEFT} * 100%) auto`;
               framesLeft[i].style.backgroundPosition = `calc(50% + ${RADAR_OFFSET_X_LEFT}) calc(50% + ${RADAR_OFFSET_Y_LEFT})`;
               framesLeft[i].style.transition = `opacity var(--radar-fade-duration, 400ms) ease-in-out`;
@@ -5650,8 +5656,10 @@ import weatherConditions from '../data/weather-conditions.json';
     if (radarLoopIntervalId) {
       clearInterval(radarLoopIntervalId);
     }
+    const currentLoopToken = ++radarLoopCounter;
 
     let speed = RADAR_LOOP_SPEED_MS;
+    let fadeDuration = RADAR_FADE_DURATION_MS;
     const descImageEl = document.getElementById('weather-desc-image');
     if (descImageEl) {
       const computedSpeed = getComputedStyle(descImageEl).getPropertyValue('--radar-loop-speed').trim();
@@ -5659,6 +5667,13 @@ import weatherConditions from '../data/weather-conditions.json';
         const parsed = parseFloat(computedSpeed);
         if (!isNaN(parsed) && parsed > 0) {
           speed = computedSpeed.endsWith('ms') ? parsed : parsed * 1000;
+        }
+      }
+      const computedFade = getComputedStyle(descImageEl).getPropertyValue('--radar-fade-duration').trim();
+      if (computedFade) {
+        const parsed = parseFloat(computedFade);
+        if (!isNaN(parsed) && parsed > 0) {
+          fadeDuration = computedFade.endsWith('ms') ? parsed : parsed * 1000;
         }
       }
     }
@@ -5675,18 +5690,40 @@ import weatherConditions from '../data/weather-conditions.json';
       });
     }
 
+    // Set overlap delay (75% of fade-in duration, capped at 80% of speed)
+    const overlapDelay = Math.min(fadeDuration * 0.75, speed * 0.8);
+
     radarLoopIntervalId = setInterval(() => {
       currentRadarFrameIndex = (currentRadarFrameIndex + 1) % 4;
-      if (framesRight) {
-        framesRight.forEach((frame, idx) => {
-          frame.style.opacity = idx === currentRadarFrameIndex ? '1' : '0';
-        });
+
+      // 1. Immediately start fading in the new active frame
+      if (framesRight && framesRight[currentRadarFrameIndex]) {
+        framesRight[currentRadarFrameIndex].style.opacity = '1';
       }
-      if (framesLeft) {
-        framesLeft.forEach((frame, idx) => {
-          frame.style.opacity = idx === currentRadarFrameIndex ? '1' : '0';
-        });
+      if (framesLeft && framesLeft[currentRadarFrameIndex]) {
+        framesLeft[currentRadarFrameIndex].style.opacity = '1';
       }
+
+      // 2. Keep the previous frame visible during the overlap window, then fade it out
+      setTimeout(() => {
+        // Prevent action if a new loop instance has started
+        if (currentLoopToken !== radarLoopCounter) return;
+
+        if (framesRight) {
+          framesRight.forEach((frame, idx) => {
+            if (idx !== currentRadarFrameIndex) {
+              frame.style.opacity = '0';
+            }
+          });
+        }
+        if (framesLeft) {
+          framesLeft.forEach((frame, idx) => {
+            if (idx !== currentRadarFrameIndex) {
+              frame.style.opacity = '0';
+            }
+          });
+        }
+      }, overlapDelay);
     }, speed);
   }
 
@@ -6323,7 +6360,7 @@ import weatherConditions from '../data/weather-conditions.json';
     const minutesStr = minutes < 10 ? '0' + minutes : minutes;
     const secondsStr = seconds < 10 ? '0' + seconds : seconds;
     
-    elLeft.innerHTML = `<span style="font-family: 'bold', sans-serif; letter-spacing: -0.02em;">${hours}:${minutesStr}</span><span style="font-family: 'light', sans-serif; letter-spacing: -0.02em;">:${secondsStr}</span><span style="font-size: 0.67em; font-family: 'medium', sans-serif; margin-left: 0.1vw;">${ampm}</span>`;
+    elLeft.innerHTML = `<span style="font-family: 'bold', sans-serif; letter-spacing: -0.02em;">${hours}:${minutesStr}</span><span style="font-family: 'mono', sans-serif; letter-spacing: -0.02em;">:${secondsStr}</span><span style="font-size: 0.67em; font-family: 'medium', sans-serif; margin-left: 0.1vw;">${ampm}</span>`;
   }
 
   function startCountdownGauge() {

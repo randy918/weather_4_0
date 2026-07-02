@@ -108,7 +108,7 @@
 
 @font-face {
     font-family: "mono";
-    src: url("../assets/fonts/");
+    src: url("../assets/fonts/ro");
 }
 
 
@@ -154,6 +154,10 @@
 }
 
 //>  ████████████████████████████████████  BODY
+
+html, body {
+    background-color: #000;
+}
 
 body {
     height: max(100vw, 100vh);
