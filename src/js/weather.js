@@ -54,8 +54,8 @@ import weatherConditions from '../data/weather-conditions.json';
   const CLOCK_GRID_DEWPOINT_Y_OFFSET = '0.7vw';   // EDITABLE: Vertical offset of the dewpoint number inside cell #5 (e.g. '0vw', '0.7vw')
   const CLOCK_GRID_SUN_Y_OFFSET = '0.7vw';        // EDITABLE: Vertical offset of the sun dial day-length number inside cell #6 (e.g. '0vw', '0.7vw')
   const CLOCK_GRID_MOON_Y_OFFSET = '0.7vw';       // EDITABLE: Vertical offset of the moon dial moon-up number inside cell #7 (e.g. '0vw', '0.7vw')
-  const CLOCK_GRID_CELESTIAL_DOT_RADIUS = '0.5vw';  // EDITABLE: Radius of the celestial dots marking current time on the dial track
-  const CLOCK_GRID_CELESTIAL_DOT_STROKE_WIDTH = 3; // EDITABLE: Stroke width for the celestial dots
+  const CLOCK_GRID_CELESTIAL_DOT_RADIUS = 6.4;  // EDITABLE: Radius of the celestial dots marking current time on the dial track (using SVG native viewBox units, e.g. 2 means 2 viewBox units out of 100)
+  const CLOCK_GRID_CELESTIAL_DOT_STROKE_WIDTH = 2; // EDITABLE: Stroke width for the celestial dots (using SVG native viewBox units)
   const CLOCK_GRID_CELESTIAL_DOT_FILL = 'rgba(0,0,0,0.5)'; // EDITABLE: Fill color for the celestial dots
   const CLOCK_GRID_WIND_SPEED_TEXT_SHADOW = '2px 2px 0px black)'; // EDITABLE: Text shadow for wind speed number (offset-x offset-y blur color)
 
@@ -3061,8 +3061,10 @@ import weatherConditions from '../data/weather-conditions.json';
       
       const isUp = fNow >= fSunrise && fNow <= fSunset;
       
-      // Inherit stroke (or fill) from JS css var config or explicit js setting
-      celestialDotEl.style.r = 'var(--grid-celestial-dot-radius)';
+      // SVG circles cannot natively accept `r` radius definitions dynamically derived strictly from CSS variable styles. 
+      // It must be explicitly set as an attribute. We grab it from config.
+      celestialDotEl.setAttribute('r', String(CLOCK_GRID_CELESTIAL_DOT_RADIUS));
+      
       celestialDotEl.style.fill = isUp ? (tempColor || 'white') : '#333333'; // Solid 100% opaque gray matching the translucent track over a black background
       celestialDotEl.style.opacity = '1';
       celestialDotEl.style.strokeWidth = 'var(--grid-celestial-dot-stroke-width)';
@@ -3193,7 +3195,10 @@ import weatherConditions from '../data/weather-conditions.json';
         isUp = fNow <= fMoonset || fNow >= fMoonrise;
       }
 
-      celestialDotEl.style.r = 'var(--grid-celestial-dot-radius)';
+      // SVG circles cannot natively accept `r` radius definitions dynamically derived strictly from CSS variable styles. 
+      // It must be explicitly set as an attribute. We grab it from config.
+      celestialDotEl.setAttribute('r', String(CLOCK_GRID_CELESTIAL_DOT_RADIUS));
+      
       celestialDotEl.style.fill = isUp ? (tempColor || 'white') : '#333333'; // Solid 100% opaque gray matching the translucent track over a black background
       celestialDotEl.style.opacity = '1';
       celestialDotEl.style.strokeWidth = 'var(--grid-celestial-dot-stroke-width)';
