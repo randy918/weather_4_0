@@ -84,14 +84,14 @@ import weatherConditions from '../data/weather-conditions.json';
 
   // --- Doppler Radar Zoom & Pan Config (Active only when SHOW_DOPPLER_RADAR is true) ---
   // LEFT Circle Cell (Far/Wide View)
-  const RADAR_ZOOM_LEFT = 1.1;           // EDITABLE: Zoom level for far view (1.0 = covers container, e.g. 1.1 for slight zoom)
+  const RADAR_ZOOM_LEFT = 3.1;           // EDITABLE: Zoom level for far view (1.0 = covers container, e.g. 1.1 for slight zoom)
   const RADAR_OFFSET_X_LEFT = '0%';      // EDITABLE: Horizontal center offset (positive = right, negative = left)
-  const RADAR_OFFSET_Y_LEFT = '0%';      // EDITABLE: Vertical center offset (positive = down, negative = up)
+  const RADAR_OFFSET_Y_LEFT = '7.5%';      // EDITABLE: Vertical center offset (positive = down, negative = up)
 
   // RIGHT Circle Cell (Local/Zoomed View)
   const RADAR_ZOOM_RIGHT = 4.8;          // EDITABLE: Zoom level for local view (e.g. 1.6 to zoom in closer)
-  const RADAR_OFFSET_X_RIGHT = '10%';    // EDITABLE: Horizontal center offset (positive = right, e.g. '10%')
-  const RADAR_OFFSET_Y_RIGHT = '-5%';    // EDITABLE: Vertical center offset (positive = down, negative = up)
+  const RADAR_OFFSET_X_RIGHT = '-10%';    // EDITABLE: Horizontal center offset (positive = right, e.g. '10%')
+  const RADAR_OFFSET_Y_RIGHT = '3.5%';    // EDITABLE: Vertical center offset (positive = down, negative = up)
 
   // --- Doppler Radar Playback Config ---
   const RADAR_LOOP_SPEED_MS = 1000;    // EDITABLE: Time each frame is fully visible (in milliseconds)
@@ -143,10 +143,10 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--gradient-mid-opacity', GRADIENT_OVERLAY_MID_OPACITY);
 
   // EDITABLE: Lower Scrolling Gradient Overlay configuration
-  const GRADIENT_OVERLAY_LOWER_TOP = '112vw';    // Adjust starting location from the top for lower gradient
+  const GRADIENT_OVERLAY_LOWER_TOP = '111vw';    // Adjust starting location from the top for lower gradient
   document.documentElement.style.setProperty('--gradient-lower-top', GRADIENT_OVERLAY_LOWER_TOP);
 
-  const GRADIENT_OVERLAY_LOWER_HEIGHT = '32vw'; // Adjust the height of the lower gradient
+  const GRADIENT_OVERLAY_LOWER_HEIGHT = '38vw'; // Adjust the height of the lower gradient
   document.documentElement.style.setProperty('--gradient-lower-height', GRADIENT_OVERLAY_LOWER_HEIGHT);
 
   const GRADIENT_OVERLAY_LOWER_MIDPOINT = '90%'; // SCSS DOM JS variable for the middle solid color position
@@ -462,7 +462,7 @@ import weatherConditions from '../data/weather-conditions.json';
     { max: 80,  color: 'hsl(45,  100%, 50%)' },  // 70s: yellow-gold
     { max: 90,  color: 'hsl(30,  100%, 50%)' },  // 80s: orange
     { max: 100, color: 'hsl(0,   90%, 55%)' },   // 90s: red
-    { max: Infinity, color: 'hsl(0, 90%, 35%)' } // 100+: dark red
+    { max: Infinity, color: 'hsl(360, 90%, 35%)' } // 100+: dark red
   ];
 
   function tempToColor(temp) {
@@ -940,7 +940,7 @@ import weatherConditions from '../data/weather-conditions.json';
       // Scale dynamic inner elements if it's placed inside the smaller grid circle!
       const isGrid = el.closest('.grid-barometric-pressure') !== null;
       const unitFontSize = isGrid ? '1.1vw' : '1.5vw';
-      el.innerHTML = `${trendHtml}${Math.round(pressure)}<br><span style="font-size: ${unitFontSize}; opacity: 1; font-family: 'light', sans-serif;">hPa</span>`;
+      el.innerHTML = `${trendHtml}${Math.round(pressure)}<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">hPa</span>`;
     });
 
     if (pressureFills.length > 0) {
@@ -1304,6 +1304,8 @@ import weatherConditions from '../data/weather-conditions.json';
     if (!document.getElementById('weather-desc-image')) {
       const descImg = document.createElement('div');
       descImg.id = 'weather-desc-image';
+      
+      
       if (!SHOW_DOPPLER_RADAR) {
         // Random animation delay to start at different scroll position
         const randomDelay = -Math.random() * WEATHER_IMAGE_SCROLL_SPEED_S;
@@ -2905,7 +2907,7 @@ import weatherConditions from '../data/weather-conditions.json';
     }
     
     if (gridHumidityTextEl) {
-      gridHumidityTextEl.innerHTML = `${Math.round(humidity)}%<br><span style="font-size: 1.1vw; opacity: 1; font-family: 'light', sans-serif;">RH</span>`;
+      gridHumidityTextEl.innerHTML = `${Math.round(humidity)}%<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">RH</span>`;
       if (finalColor) {
         gridHumidityTextEl.style.color = finalColor;
       }
@@ -2940,9 +2942,9 @@ import weatherConditions from '../data/weather-conditions.json';
     
     if (gridDewpointTextEl) {
       if (dewpoint !== null) {
-        gridDewpointTextEl.innerHTML = `${Math.round(dewpoint)}°<br><span style="font-size: 1.1vw; opacity: 1; font-family: 'light', sans-serif;">Td</span>`;
+        gridDewpointTextEl.innerHTML = `${Math.round(dewpoint)}°<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">Td</span>`;
       } else {
-        gridDewpointTextEl.innerHTML = `--<br><span style="font-size: 1.1vw; opacity: 1; font-family: 'light', sans-serif;">Td</span>`;
+        gridDewpointTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">Td</span>`;
       }
       if (finalColor) {
         gridDewpointTextEl.style.color = finalColor;
@@ -2969,7 +2971,7 @@ import weatherConditions from '../data/weather-conditions.json';
         gridSunProgressEl.style.strokeDashoffset = circumference; // hide progress
       }
       if (gridSunTextEl) {
-        gridSunTextEl.innerHTML = `--<br><span style="font-size: 1.1vw; opacity: 1; font-family: 'light', sans-serif;">Day</span>`;
+        gridSunTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">Day</span>`;
       }
       return;
     }
@@ -3028,7 +3030,7 @@ import weatherConditions from '../data/weather-conditions.json';
     const formattedTime = `${hours}:${minutesStr}<span style="font-size: 0.67em; font-family: 'medium', sans-serif;">${ampm}</span>`;
     
     if (gridSunTextEl) {
-      gridSunTextEl.innerHTML = `${formattedTime}<br><span style="font-size: 1.1vw; opacity: 1; font-family: 'light', sans-serif;">${nextEventLabel}</span>`;
+      gridSunTextEl.innerHTML = `${formattedTime}<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">${nextEventLabel}</span>`;
       if (tempColor) {
         gridSunTextEl.style.color = tempColor;
       }
@@ -3054,7 +3056,7 @@ import weatherConditions from '../data/weather-conditions.json';
         gridMoonProgressEl.style.strokeDashoffset = circumference; // hide progress
       }
       if (gridMoonTextEl) {
-        gridMoonTextEl.innerHTML = `--<br><span style="font-size: 1.1vw; opacity: 1; font-family: 'light', sans-serif;">Moon</span>`;
+        gridMoonTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">Moon</span>`;
       }
       return;
     }
@@ -3141,7 +3143,7 @@ import weatherConditions from '../data/weather-conditions.json';
     const formattedTime = `${hours}:${minutesStr}<span style="font-size: 0.67em; font-family: 'medium', sans-serif;">${ampm}</span>`;
     
     if (gridMoonTextEl) {
-      gridMoonTextEl.innerHTML = `${formattedTime}<br><span style="font-size: 1.1vw; opacity: 1; font-family: 'light', sans-serif;">${nextEventLabel}</span>`;
+      gridMoonTextEl.innerHTML = `${formattedTime}<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">${nextEventLabel}</span>`;
       if (tempColor) {
         gridMoonTextEl.style.color = tempColor;
       }
@@ -3486,7 +3488,7 @@ import weatherConditions from '../data/weather-conditions.json';
     }
     
     if (gridHumidityTextEl) {
-      gridHumidityTextEl.innerHTML = `${Math.round(humidity)}%<br><span style="font-size: 1.1vw; opacity: 1; font-family: 'light', sans-serif;">RH</span>`;
+      gridHumidityTextEl.innerHTML = `${Math.round(humidity)}%<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">RH</span>`;
       if (finalColor) {
         gridHumidityTextEl.style.color = finalColor;
       }
@@ -3691,9 +3693,9 @@ import weatherConditions from '../data/weather-conditions.json';
     
     if (gridDewpointTextEl) {
       if (dewpoint !== null) {
-        gridDewpointTextEl.innerHTML = `${Math.round(dewpoint)}°<br><span style="font-size: 1.1vw; opacity: 1; font-family: 'light', sans-serif;">Td</span>`;
+        gridDewpointTextEl.innerHTML = `${Math.round(dewpoint)}°<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">Td</span>`;
       } else {
-        gridDewpointTextEl.innerHTML = `--<br><span style="font-size: 1.1vw; opacity: 1; font-family: 'light', sans-serif;">Td</span>`;
+        gridDewpointTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">Td</span>`;
       }
       if (finalColor) {
         gridDewpointTextEl.style.color = finalColor;
