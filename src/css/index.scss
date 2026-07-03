@@ -706,6 +706,40 @@ main {
     align-items: center;
 }
 
+.clockGridLabelsContainer {
+    width: auto;
+    margin-top: calc(var(--clock-grid-margin-bottom, 2vw) * -1 + var(--clock-grid-label-margin-top, 0.5vw)); /* Pull up under the grid */
+    margin-bottom: var(--clock-grid-margin-bottom, 2vw);
+    margin-left: var(--clock-grid-margin-left, 0vw);
+    margin-right: var(--clock-grid-margin-right, 0vw);
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: var(--clock-grid-gap, 1vw);
+    justify-items: center;
+    align-items: start;
+    
+    .clockGridLabel {
+        font-family: var(--clock-grid-label-font-family, 'bold');
+        font-size: var(--clock-grid-label-font-size, 1.8vw);
+        letter-spacing: var(--clock-grid-label-letter-spacing, 0.05vw);
+        color: var(--temp-color, rgba(255,255,255,0.7)); /* Use current temperature color */
+        text-transform: uppercase;
+        text-align: center;
+        width: 100%;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        
+        .label-api-value {
+          /* Add styling for API values to distinguish them */
+          // font-size: 1.5vw;
+          // color: rgba(255,255,255,0.9);
+          // margin-top: 0.2vw;
+        }
+    }
+}
+
 .clockGridItem {
     position: relative;
     width: var(--clock-grid-size, 10vw);

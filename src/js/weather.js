@@ -60,6 +60,17 @@ import weatherConditions from '../data/weather-conditions.json';
   const CLOCK_GRID_WIND_SPEED_TEXT_SHADOW = '2px 2px 0px black)'; // EDITABLE: Text shadow for wind speed number (offset-x offset-y blur color)
 
   // Inject these config variables into CSS properties immediately
+  const CLOCK_GRID_LABEL_FONT_SIZE = '1.8vw';     // EDITABLE: Font size for the labels beneath the dials
+  const CLOCK_GRID_LABEL_FONT_FAMILY = 'light';   // EDITABLE: Font family for the dial labels
+  const CLOCK_GRID_LABEL_MARGIN_TOP = '0.5vw';    // EDITABLE: Space between dial and its label
+  const CLOCK_GRID_LABEL_LETTER_SPACING = '-0.05vw'; // EDITABLE: Letter spacing (kerning) for the labels
+  const CLOCK_GRID_LABELS = ['TIME', 'PHASE', 'WIND', 'HUMIDITY', 'DEW PT', 'SUN', 'MOON', 'RAIN']; // EDITABLE: Labels for the 8 dials
+  
+  document.documentElement.style.setProperty('--clock-grid-label-font-size', CLOCK_GRID_LABEL_FONT_SIZE);
+  document.documentElement.style.setProperty('--clock-grid-label-font-family', CLOCK_GRID_LABEL_FONT_FAMILY);
+  document.documentElement.style.setProperty('--clock-grid-label-margin-top', CLOCK_GRID_LABEL_MARGIN_TOP);
+  document.documentElement.style.setProperty('--clock-grid-label-letter-spacing', CLOCK_GRID_LABEL_LETTER_SPACING);
+
   document.documentElement.style.setProperty('--clock-grid-size', CLOCK_GRID_SIZE);
   document.documentElement.style.setProperty('--clock-grid-gap', CLOCK_GRID_GAP);
   document.documentElement.style.setProperty('--clock-grid-margin-top', CLOCK_GRID_MARGIN_TOP);
@@ -2912,6 +2923,44 @@ import weatherConditions from '../data/weather-conditions.json';
         refreshDots.parentNode.insertBefore(container, refreshDots.nextSibling);
       } else {
         (document.querySelector('main.content') || document.body).appendChild(container);
+      }
+
+      // Add labels container right after the clock grid
+      const labelsContainerId = 'clock-grid-labels-container';
+      let labelsContainer = document.getElementById(labelsContainerId);
+      if (!labelsContainer) {
+        labelsContainer = document.createElement('div');
+        labelsContainer.id = labelsContainerId;
+        labelsContainer.className = 'clockGridLabelsContainer';
+
+        for (let i = 0; i < 8; i++) {
+          const item = document.createElement('div');
+          item.className = `clockGridLabel clockGridLabel-${i}`;
+          // Extract active tempColor if data available
+          if (data && data.current && typeof data.current.temp === 'number') {
+             const tempColorLocal = tempToColor(data.current.temp);
+             if(tempColorLocal) {
+                item.style.color = tempColorLocal;
+             }
+          }
+          // Add a span for the text and an empty span with a unique ID for dynamic API datav
+          item.innerHTML = `
+            <span class="label-title">${CLOCK_GRID_LABELS[i] || ''}</span>
+            <span class="label-api-value" id="clock-grid-val-${i}"></span>
+          `;
+          labelsContainer.appendChild(item);
+        }
+
+        container.parentNode.insertBefore(labelsContainer, container.nextSibling);
+      } else {
+        // If container already exists but we're re-running this loop, update the colors directly
+        if (data && data.current && typeof data.current.temp === 'number') {
+          const tempColorLocal = tempToColor(data.current.temp);
+          if(tempColorLocal) {
+            const labels = labelsContainer.querySelectorAll('.clockGridLabel');
+            labels.forEach(label => label.style.color = tempColorLocal);
+          }
+        }
       }
     }
   }
