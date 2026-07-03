@@ -750,6 +750,116 @@ main {
     }
 }
 
+// 7-cell Clock Grid Container & Labels
+.clockGridContainer7 {
+    width: auto;
+    margin-top: var(--clock-grid-margin-top, 2vw);
+    margin-bottom: var(--clock-grid-margin-bottom, 2vw);
+    margin-left: var(--clock-grid-margin-left, 0vw);
+    margin-right: var(--clock-grid-margin-right, 0vw);
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: var(--clock-grid-gap, 1vw);
+    justify-items: center;
+    align-items: center;
+}
+
+.clockGridLabelsContainer7 {
+    width: auto;
+    margin-top: calc(var(--clock-grid-margin-bottom, 2vw) * -1 + var(--clock-grid-label-margin-top, 0.5vw)); /* Pull up under the grid */
+    margin-bottom: var(--clock-grid-margin-bottom, 2vw);
+    margin-left: var(--clock-grid-margin-left, 0vw);
+    margin-right: var(--clock-grid-margin-right, 0vw);
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: var(--clock-grid-gap, 1vw);
+    justify-items: center;
+    align-items: start;
+    
+    .clockGridLabel7 {
+        font-family: var(--clock-grid-label-font-family, 'bold');
+        font-size: 2.08vw;
+        letter-spacing: 0.058vw;
+        color: var(--temp-color, rgba(255,255,255,0.7)); /* Use current temperature color */
+        text-align: center;
+        width: 100%;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        
+        .label-title {
+            text-transform: uppercase;
+        }
+
+        &.clockGridLabel7-1 .label-title,
+        &.clockGridLabel7-2 .label-title,
+        &.clockGridLabel7-3 .label-title,
+        &.clockGridLabel7-4 .label-title,
+        &.clockGridLabel7-5 .label-title,
+        &.clockGridLabel7-6 .label-title {
+            text-transform: none; /* Keep natural case for dynamic text */
+            font-family: 'light', sans-serif; /* Light font style */
+            white-space: nowrap;
+            letter-spacing: -0.058vw;
+            font-size: 1.85vw;
+        }
+    }
+}
+
+.clockGridItem7 {
+    width: 11.57vw !important;
+    height: 11.57vw !important;
+
+    .clock-face {
+        border: calc(var(--clock-grid-stroke-width, 4) * 0.127vw) solid transparent !important;
+        
+        .clock-hour-hand {
+            width: 0.46vw !important;
+            border-radius: 0.46vw !important;
+        }
+
+        .clock-minute-hand {
+            width: 0.35vw !important;
+            border-radius: 0.35vw !important;
+        }
+    }
+
+    .clock-hand-wind-direction {
+        width: 0.46vw !important;
+    }
+
+    .grid-wind-speed-text, .grid-humidity-text, .grid-sun-text, .grid-moon-text {
+        font-size: 4.05vw !important;
+    }
+
+    .grid-wind-speed-text {
+        transform: translate(-50%, calc(-50% + 0.81vw)) !important;
+    }
+
+    .grid-humidity-text {
+        transform: translate(-50%, calc(-50% + 0.81vw)) !important;
+    }
+
+    .grid-sun-text {
+        transform: translate(-50%, calc(-50% + 0.81vw)) !important;
+        font-size: 3.47vw !important;
+    }
+
+    .grid-moon-text {
+        transform: translate(-50%, calc(-50% + 0.81vw)) !important;
+        font-size: 3.47vw !important;
+    }
+
+    .grid-barometric-pressure {
+        .barometric-text {
+            font-size: 4.05vw !important;
+            transform: translateY(0.81vw) !important;
+        }
+    }
+}
+
+
 .clockGridItem {
     position: relative;
     width: var(--clock-grid-size, 10vw);

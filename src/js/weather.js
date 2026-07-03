@@ -553,9 +553,9 @@ import weatherConditions from '../data/weather-conditions.json';
     console.log(`Moon phase: ${moonPhase.toFixed(3)}, raw=${rawIndex}, offset=${MOON_IMAGE_OFFSET} -> 2moon${imgIndexStr}.png`);
 
     const imgEl = document.getElementById('moon-phase-img');
-    const gridImgEl = document.querySelector('.grid-moon-phase');
+    const gridImgEls = document.querySelectorAll('.grid-moon-phase');
     
-    if (imgEl || gridImgEl) {
+    if (imgEl || gridImgEls.length > 0) {
       const moonSrcUrl = `url(img/2moon${imgIndexStr}.png)`;
       
       if (imgEl) {
@@ -563,11 +563,11 @@ import weatherConditions from '../data/weather-conditions.json';
         imgEl.style.maskImage = moonSrcUrl;
         imgEl.setAttribute('aria-label', `Moon Phase ${imgIndex} (${moonPhase})`);
       }
-      if (gridImgEl) {
+      gridImgEls.forEach(gridImgEl => {
         gridImgEl.style.webkitMaskImage = moonSrcUrl;
         gridImgEl.style.maskImage = moonSrcUrl;
         gridImgEl.setAttribute('aria-label', `Moon Phase ${imgIndex} (${moonPhase})`);
-      }
+      });
       
       // Check if moon is currently risen (between moonrise and moonset)
       // EASY TOGGLE: Set to false to always show full opacity, true to dim it when moon is down
@@ -607,29 +607,29 @@ import weatherConditions from '../data/weather-conditions.json';
             imgEl.classList.remove('moon-down');
             imgEl.style.backgroundColor = '#FFFFFF'; // White when moon is risen
           }
-          if (gridImgEl) {
+          gridImgEls.forEach(gridImgEl => {
             gridImgEl.classList.remove('moon-down');
             gridImgEl.style.backgroundColor = '#FFFFFF';
-          }
+          });
         } else {
           if (imgEl) {
             imgEl.classList.add('moon-down');
             imgEl.style.backgroundColor = tempColorStr; // Temp color when moon is set
           }
-          if (gridImgEl) {
+          gridImgEls.forEach(gridImgEl => {
             gridImgEl.classList.add('moon-down');
             gridImgEl.style.backgroundColor = tempColorStr;
-          }
+          });
         }
       } else {
         if (imgEl) {
           imgEl.classList.remove('moon-down');
           imgEl.style.backgroundColor = '#FFFFFF';
         }
-        if (gridImgEl) {
+        gridImgEls.forEach(gridImgEl => {
           gridImgEl.classList.remove('moon-down');
           gridImgEl.style.backgroundColor = '#FFFFFF';
-        }
+        });
       }
     }
   }
@@ -873,31 +873,31 @@ import weatherConditions from '../data/weather-conditions.json';
       gustValueEl.textContent = Math.round(windGust);
     }
     // Update the wind speed progress and track rings in grid cell #3 (0 to 60 mph scale)
-    const gridWindProgressEl = document.querySelector('.clockGridItem-2 .countdown-progress');
-    const gridWindTrackEl = document.querySelector('.clockGridItem-2 .countdown-track');
+    const gridWindProgressEls = document.querySelectorAll('.clockGridItem-2 .countdown-progress, .clockGridItem7-2 .countdown-progress');
+    const gridWindTrackEls = document.querySelectorAll('.clockGridItem-2 .countdown-track, .clockGridItem7-2 .countdown-track');
     const radius = 46;
     const circumference = 2 * Math.PI * radius; // ~289
     
-    if (gridWindProgressEl) {
+    gridWindProgressEls.forEach(gridWindProgressEl => {
       const percent = Math.max(0, Math.min(1, windSpeed / maxWindMph));
       const dashOffset = circumference * (1 - percent);
       gridWindProgressEl.style.strokeDashoffset = dashOffset;
       if (tempColor) {
         gridWindProgressEl.style.stroke = tempColor;
       }
-    }
+    });
     
-    if (gridWindTrackEl) {
+    gridWindTrackEls.forEach(gridWindTrackEl => {
       const percent = Math.max(0, Math.min(1, windGust / maxWindMph));
       const trackLength = circumference * (1 - percent);
       // Only draw the track from windGust up to 60 mph (leaving a blank gap from windSpeed to windGust)
       gridWindTrackEl.style.strokeDasharray = `${trackLength}, ${circumference}`;
       gridWindTrackEl.style.strokeDashoffset = - (circumference * percent);
-    }
+    });
 
     // Update the gust-dot positioning at the point indicating gust speed
-    const gustDotEl = document.querySelector('.clockGridItem-2 .gust-dot');
-    if (gustDotEl) {
+    const gustDotEls = document.querySelectorAll('.clockGridItem-2 .gust-dot, .clockGridItem7-2 .gust-dot');
+    gustDotEls.forEach(gustDotEl => {
       if (typeof windGust === 'number') {
         const percent = Math.max(0, Math.min(1, windGust / maxWindMph));
         // CSS rotates the parent SVG by 90deg, so we compute in unrotated space (0 starts at 3 o'clock)
@@ -916,28 +916,10 @@ import weatherConditions from '../data/weather-conditions.json';
       } else {
         gustDotEl.style.display = 'none';
       }
-    }
+    });
     
-    const gridWindSpeedTextEl = document.querySelector('.clockGridItem-2 .grid-wind-speed-text');
-    if (gridWindSpeedTextEl) {
-      // Wind degree from API represents direction wind is FROM.
-      // So if wind_deg is between 270 and 90 (North-ish), it blows TOWARDS South.
-      // Easiest is to check screen angle:
-      // displayDeg = deg - 180. 
-      // If displayDeg points downward (overlapping the bottom text), it is between 90 and 270 degrees in a standard CSS rotation starting at top.
-      const windDeg = data?.current?.wind_deg || 0;
-      let displayDeg = (windDeg - 180) % 360;
-      if (displayDeg < 0) displayDeg += 360;
-      
-      // If it points into the bottom half of the circle (between 90 and 270 degrees), move text up above the center.
-      // Otherwise keep it at the bottom.
-      const pointsDown = displayDeg > 90 && displayDeg < 270;
-      
-      const overWordY = 'var(--grid-wind-gust-over-y-offset)';
-      const underWordY = 'var(--grid-wind-gust-under-y-offset)';
-      
-      const translateY = pointsDown ? overWordY : underWordY; // Lift to top if pointing down
-      
+    const gridWindSpeedTextEls = document.querySelectorAll('.clockGridItem-2 .grid-wind-speed-text, .clockGridItem7-2 .grid-wind-speed-text');
+    gridWindSpeedTextEls.forEach(gridWindSpeedTextEl => {
       gridWindSpeedTextEl.innerHTML = `
         <span style="position: relative; display: inline-block;">${Math.round(windSpeed)}</span>
       `;
@@ -945,7 +927,7 @@ import weatherConditions from '../data/weather-conditions.json';
       if (tempColor) {
         gridWindSpeedTextEl.style.color = tempColor;
       }
-    }
+    });
     
     console.log(`Wind updated: Speed ${Math.round(windSpeed)} mph (${speedPercent.toFixed(1)}%), Gust ${Math.round(windGust)} mph (${gustPercent.toFixed(1)}%)`);
   }
@@ -3157,6 +3139,323 @@ import weatherConditions from '../data/weather-conditions.json';
         }
       }
     }
+
+    // --- 7-cell grid layout & labels ---
+    const indices7 = [0, 1, 2, 3, 5, 6, 7];
+    const containerId7 = 'clock-grid-container-7';
+    let container7 = document.getElementById(containerId7);
+
+    if (!container7) {
+      container7 = document.createElement('div');
+      container7.id = containerId7;
+      container7.className = 'clockGridContainer7';
+
+      for (let j = 0; j < 7; j++) {
+        const i = indices7[j];
+        const item = document.createElement('div');
+        item.className = `clockGridItem clockGridItem7 clockGridItem-${i} clockGridItem7-${j}`;
+
+        let innerHtml = '';
+        if (i === 1) {
+          innerHtml = `<div class="moon-phase-display grid-moon-phase" role="img" aria-label="Moon Phase"></div>`;
+        } else if (i === 2) {
+          innerHtml = `
+            <svg class="clock-timer-svg" viewBox="0 0 100 100">
+              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+              <circle class="gust-dot" r="1.75" />
+            </svg>
+            <div class="clock-face">
+              <div class="clock-hand clock-hand-wind-direction"></div>
+              <div class="clock-center-dot"></div>
+            </div>
+            <div class="grid-wind-speed-text"></div>
+          `;
+        } else if (i === 3) {
+          innerHtml = `
+            <svg class="clock-timer-svg" viewBox="0 0 100 100">
+              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+            </svg>
+            <div class="grid-humidity-text"></div>
+          `;
+        } else if (i === 7) {
+          innerHtml = `
+            <div class="barometric-pressure-display grid-barometric-pressure">
+              <svg class="barometric-gauge-svg" viewBox="0 0 100 100">
+                <circle class="barometric-track" cx="50" cy="50" r="46" fill="none" />
+                <circle class="barometric-fill" cx="50" cy="50" r="46" fill="none" />
+                <line class="barometric-needle" x1="50" y1="50" x2="50" y2="15" stroke-linecap="round" />
+              </svg>
+              <div class="barometric-text"></div>
+            </div>
+          `;
+        } else if (i === 5) {
+          innerHtml = `
+            <svg class="clock-timer-svg" viewBox="0 0 100 100">
+              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+              <circle class="celestial-dot" cx="50" cy="4" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
+            </svg>
+            <div class="grid-sun-text"></div>
+          `;
+        } else if (i === 6) {
+          innerHtml = `
+            <svg class="clock-timer-svg" viewBox="0 0 100 100">
+              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+              <circle class="celestial-dot" cx="50" cy="4" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
+            </svg>
+            <div class="grid-moon-text"></div>
+          `;
+        } else {
+          innerHtml = `
+            <svg class="clock-timer-svg" viewBox="0 0 100 100">
+              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+            </svg>
+          `;
+          if (i === 0) {
+            innerHtml += `
+              <div class="clock-face">
+                <div class="clock-hour-hand"></div>
+                <div class="clock-minute-hand"></div>
+                <div class="clock-center-dot"></div>
+              </div>
+            `;
+          }
+        }
+
+        item.innerHTML = innerHtml;
+        container7.appendChild(item);
+      }
+
+      const labelsContainer8 = document.getElementById('clock-grid-labels-container');
+      if (labelsContainer8 && labelsContainer8.parentNode) {
+        labelsContainer8.parentNode.insertBefore(container7, labelsContainer8.nextSibling);
+      } else {
+        (document.querySelector('main.content') || document.body).appendChild(container7);
+      }
+    }
+
+    const labelsContainerId7 = 'clock-grid-labels-container-7';
+    let labelsContainer7 = document.getElementById(labelsContainerId7);
+    if (!labelsContainer7) {
+      labelsContainer7 = document.createElement('div');
+      labelsContainer7.id = labelsContainerId7;
+      labelsContainer7.className = 'clockGridLabelsContainer7';
+
+      for (let j = 0; j < 7; j++) {
+        const i = indices7[j];
+        const item = document.createElement('div');
+        item.className = `clockGridLabel clockGridLabel7 clockGridLabel7-${j}`;
+        
+        if (data && data.current && typeof data.current.temp === 'number') {
+           const tempColorLocal = tempToColor(data.current.temp);
+           if(tempColorLocal) {
+              item.style.color = tempColorLocal;
+           }
+        }
+
+        let titleText = CLOCK_GRID_LABELS[i] || '';
+
+        if (i === 1 && data && data.daily && data.daily[0] && typeof data.daily[0].moon_phase === 'number') {
+           titleText = getMoonPhaseName(data.daily[0].moon_phase);
+        }
+        
+        if (i === 2 && data && data.current) {
+           const windSpeed = data.current.wind_speed || 0;
+           const windGust = data.current.wind_gust || windSpeed;
+           titleText = `Gust ${Math.round(windGust)} mph`;
+        }
+
+        if (i === 3 && data && data.current && typeof data.current.dew_point === 'number') {
+           titleText = `Dew Pt ${Math.round(data.current.dew_point)}°`;
+        }
+        
+        if (i === 5 && data && data.daily && data.daily[0]) {
+           const now = Date.now() / 1000;
+           const sunrise = data.daily[0].sunrise;
+           const sunset = data.daily[0].sunset;
+           let oppEventTime = null;
+           let oppEventLabel = '';
+           
+           if (typeof sunrise === 'number' && typeof sunset === 'number') {
+              if (now < sunrise) {
+                 oppEventTime = sunset;
+                 oppEventLabel = 'Sunset';
+              } else if (now < sunset) {
+                 oppEventTime = data.daily[1]?.sunrise || (sunrise + 86400);
+                 oppEventLabel = 'Sunrise';
+              } else {
+                 oppEventTime = data.daily[1]?.sunset || (sunset + 86400);
+                 oppEventLabel = 'Sunset';
+              }
+              
+              const oppDate = new Date(oppEventTime * 1000);
+              let oppHours = oppDate.getHours();
+              const oppMinutes = oppDate.getMinutes();
+              const oppAmPm = oppHours >= 12 ? 'p' : 'a';
+              oppHours = oppHours % 12 || 12;
+              const oppMinutesStr = oppMinutes < 10 ? '0' + oppMinutes : oppMinutes;
+              
+              titleText = `${oppEventLabel} ${oppHours}:${oppMinutesStr}${oppAmPm}`;
+           }
+        }
+        
+        if (i === 6 && data && data.daily && data.daily[0]) {
+           const now = Date.now() / 1000;
+           const moonrise = data.daily[0].moonrise;
+           const moonset = data.daily[0].moonset;
+           let oppEventTime = null;
+           let oppEventLabel = '';
+           
+           if (typeof moonrise === 'number' && typeof moonset === 'number') {
+              if (moonrise < moonset) {
+                 if (now < moonrise) {
+                    oppEventTime = moonset;
+                    oppEventLabel = 'Moonset';
+                 } else if (now < moonset) {
+                    oppEventTime = data.daily[1]?.moonrise || (moonrise + 86400);
+                    oppEventLabel = 'Moonrise';
+                 } else {
+                    oppEventTime = data.daily[1]?.moonset || (moonset + 86400);
+                    oppEventLabel = 'Moonset';
+                 }
+              } else {
+                 if (now < moonset) {
+                    oppEventTime = moonrise;
+                    oppEventLabel = 'Moonrise';
+                 } else if (now < moonrise) {
+                    oppEventTime = data.daily[1]?.moonset || (moonset + 86400);
+                    oppEventLabel = 'Moonset';
+                 } else {
+                    oppEventTime = data.daily[1]?.moonrise || (moonrise + 86400);
+                    oppEventLabel = 'Moonrise';
+                 }
+              }
+              
+              const oppDate = new Date(oppEventTime * 1000);
+              let oppHours = oppDate.getHours();
+              const oppMinutes = oppDate.getMinutes();
+              const oppAmPm = oppHours >= 12 ? 'p' : 'a';
+              oppHours = oppHours % 12 || 12;
+              const oppMinutesStr = oppMinutes < 10 ? '0' + oppMinutes : oppMinutes;
+              
+              titleText = `${oppEventLabel} ${oppHours}:${oppMinutesStr}${oppAmPm}`;
+           }
+        }
+
+        item.innerHTML = `
+          <span class="label-title label-title-${i}" id="clock-grid-val-7-${j}">${titleText}</span>
+        `;
+        labelsContainer7.appendChild(item);
+      }
+
+      container7.parentNode.insertBefore(labelsContainer7, container7.nextSibling);
+    } else {
+      if (data && data.current && typeof data.current.temp === 'number') {
+        const tempColorLocal = tempToColor(data.current.temp);
+        if (tempColorLocal) {
+          const labels = labelsContainer7.querySelectorAll('.clockGridLabel7');
+          labels.forEach(label => label.style.color = tempColorLocal);
+        }
+      }
+
+      const phaseTitle = labelsContainer7.querySelector('.label-title-1');
+      if (phaseTitle && data && data.daily && data.daily[0] && typeof data.daily[0].moon_phase === 'number') {
+         phaseTitle.innerText = getMoonPhaseName(data.daily[0].moon_phase);
+      }
+      
+      const windTitle = labelsContainer7.querySelector('.label-title-2');
+      if (windTitle && data && data.current) {
+         const windSpeed = data.current.wind_speed || 0;
+         const windGust = data.current.wind_gust || windSpeed;
+         windTitle.innerText = `Gust ${Math.round(windGust)} mph`;
+      }
+
+      const humidityTitle = labelsContainer7.querySelector('.label-title-3');
+      if (humidityTitle && data && data.current && typeof data.current.dew_point === 'number') {
+         humidityTitle.innerText = `Dew Pt ${Math.round(data.current.dew_point)}°`;
+      }
+      
+      const sunTitle = labelsContainer7.querySelector('.label-title-5');
+      if (sunTitle && data && data.daily && data.daily[0]) {
+         const now = Date.now() / 1000;
+         const sunrise = data.daily[0].sunrise;
+         const sunset = data.daily[0].sunset;
+         
+         if (typeof sunrise === 'number' && typeof sunset === 'number') {
+            let oppEventTime = null;
+            let oppEventLabel = '';
+            
+            if (now < sunrise) {
+               oppEventTime = sunset;
+               oppEventLabel = 'Sunset';
+            } else if (now < sunset) {
+               oppEventTime = data.daily[1]?.sunrise || (sunrise + 86400);
+               oppEventLabel = 'Sunrise';
+            } else {
+               oppEventTime = data.daily[1]?.sunset || (sunset + 86400);
+               oppEventLabel = 'Sunset';
+            }
+            
+            const oppDate = new Date(oppEventTime * 1000);
+            let oppHours = oppDate.getHours();
+            const oppMinutes = oppDate.getMinutes();
+            const oppAmPm = oppHours >= 12 ? 'p' : 'a';
+            oppHours = oppHours % 12 || 12;
+            const oppMinutesStr = oppMinutes < 10 ? '0' + oppMinutes : oppMinutes;
+            
+            sunTitle.innerText = `${oppEventLabel} ${oppHours}:${oppMinutesStr}${oppAmPm}`;
+         }
+      }
+      
+      const moonTitle = labelsContainer7.querySelector('.label-title-6');
+      if (moonTitle && data && data.daily && data.daily[0]) {
+         const now = Date.now() / 1000;
+         const moonrise = data.daily[0].moonrise;
+         const moonset = data.daily[0].moonset;
+         
+         if (typeof moonrise === 'number' && typeof moonset === 'number') {
+            let oppEventTime = null;
+            let oppEventLabel = '';
+            
+            if (moonrise < moonset) {
+               if (now < moonrise) {
+                  oppEventTime = moonset;
+                  oppEventLabel = 'Moonset';
+               } else if (now < moonset) {
+                  oppEventTime = data.daily[1]?.moonrise || (moonrise + 86400);
+                  oppEventLabel = 'Moonrise';
+               } else {
+                  oppEventTime = data.daily[1]?.moonset || (moonset + 86400);
+                  oppEventLabel = 'Moonset';
+               }
+            } else {
+               if (now < moonset) {
+                  oppEventTime = moonrise;
+                  oppEventLabel = 'Moonrise';
+               } else if (now < moonrise) {
+                  oppEventTime = data.daily[1]?.moonset || (moonset + 86400);
+                  oppEventLabel = 'Moonset';
+               } else {
+                  oppEventTime = data.daily[1]?.moonrise || (moonrise + 86400);
+                  oppEventLabel = 'Moonrise';
+               }
+            }
+            
+            const oppDate = new Date(oppEventTime * 1000);
+            let oppHours = oppDate.getHours();
+            const oppMinutes = oppDate.getMinutes();
+            const oppAmPm = oppHours >= 12 ? 'p' : 'a';
+            oppHours = oppHours % 12 || 12;
+            const oppMinutesStr = oppMinutes < 10 ? '0' + oppMinutes : oppMinutes;
+            
+            moonTitle.innerText = `${oppEventLabel} ${oppHours}:${oppMinutesStr}${oppAmPm}`;
+         }
+      }
+    }
   }
 
   // Update the humidity dial in grid cell #4 (index 3)
@@ -3169,26 +3468,26 @@ import weatherConditions from '../data/weather-conditions.json';
     const activeColor = getDotsColors(currentTemp).active;
     const finalColor = tempColor || activeColor;
     
-    const gridHumidityProgressEl = document.querySelector('.clockGridItem-3 .countdown-progress');
-    const gridHumidityTextEl = document.querySelector('.clockGridItem-3 .grid-humidity-text');
+    const gridHumidityProgressEls = document.querySelectorAll('.clockGridItem-3 .countdown-progress, .clockGridItem7-3 .countdown-progress');
+    const gridHumidityTextEls = document.querySelectorAll('.clockGridItem-3 .grid-humidity-text, .clockGridItem7-3 .grid-humidity-text');
     const radius = 46;
     const circumference = 2 * Math.PI * radius; // ~289.0265
     
-    if (gridHumidityProgressEl) {
+    gridHumidityProgressEls.forEach(gridHumidityProgressEl => {
       const percent = Math.max(0, Math.min(1, humidity / 100));
       const dashOffset = circumference * (1 - percent);
       gridHumidityProgressEl.style.strokeDashoffset = dashOffset;
       if (finalColor) {
         gridHumidityProgressEl.style.stroke = finalColor;
       }
-    }
+    });
     
-    if (gridHumidityTextEl) {
+    gridHumidityTextEls.forEach(gridHumidityTextEl => {
       gridHumidityTextEl.innerHTML = `${Math.round(humidity)}%<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">RH</span>`;
       if (finalColor) {
         gridHumidityTextEl.style.color = finalColor;
       }
-    }
+    });
   }
 
   // Update the dewpoint dial in grid cell #5 (index 4)
@@ -3231,8 +3530,8 @@ import weatherConditions from '../data/weather-conditions.json';
 
   // Update the sun dial in grid cell #6 (index 5)
   function updateSunDial(data) {
-    const gridSunProgressEl = document.querySelector('.clockGridItem-5 .countdown-progress');
-    const gridSunTextEl = document.querySelector('.clockGridItem-5 .grid-sun-text');
+    const gridSunProgressEls = document.querySelectorAll('.clockGridItem-5 .countdown-progress, .clockGridItem7-4 .countdown-progress');
+    const gridSunTextEls = document.querySelectorAll('.clockGridItem-5 .grid-sun-text, .clockGridItem7-4 .grid-sun-text');
     
     // Get sunrise/sunset times (Unix timestamps)
     const today = data?.daily?.[0];
@@ -3244,12 +3543,12 @@ import weatherConditions from '../data/weather-conditions.json';
     if (typeof sunrise !== 'number' || typeof sunset !== 'number') {
       console.log('Sun dial: sunrise/sunset data unavailable');
       const circumference = 2 * Math.PI * 46;
-      if (gridSunProgressEl) {
+      gridSunProgressEls.forEach(gridSunProgressEl => {
         gridSunProgressEl.style.strokeDashoffset = circumference; // hide progress
-      }
-      if (gridSunTextEl) {
+      });
+      gridSunTextEls.forEach(gridSunTextEl => {
         gridSunTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">Day</span>`;
-      }
+      });
       return;
     }
     
@@ -3270,51 +3569,35 @@ import weatherConditions from '../data/weather-conditions.json';
     const length = (fSunset - fSunrise) * circumference;
     const offset = fSunrise * circumference;
     
-    if (gridSunProgressEl) {
+    gridSunProgressEls.forEach(gridSunProgressEl => {
       gridSunProgressEl.style.strokeDasharray = `${length} ${circumference}`;
       gridSunProgressEl.style.strokeDashoffset = -offset;
       if (tempColor) {
         gridSunProgressEl.style.stroke = tempColor;
       }
-    }
+    });
     
-    const celestialDotEl = document.querySelector('.clockGridItem-5 .celestial-dot');
-    if (celestialDotEl) {
-      // Current time fraction over 24h
-      const nowSec = (Date.now() / 1000) - midnightToday;
-      const fNow = Math.max(0, Math.min(1, nowSec / 86400));
-      // Angles in SVG: 0 starts at 3 o'clock natively, but usually dials are rotated -90deg in CSS so 0 is 12 o'clock. 
-      // fNow mapping: midnight (fNow=0) -> bottom, 6am (0.25) -> left, noon (0.5) -> top, 6pm (0.75) -> right.
-      // Mathematical coordinates natively inside SVG BEFORE applying `transform: rotate(90deg)` in CSS:
-      // We want bottom to map visually to bottom. If CSS rotate is 90deg clockwise:
-      // Native East (0 rad) -> rotates to Visual South (bottom)
-      // Native South (+pi/2) -> rotates to Visual West (left)
-      // Native West (+pi) -> rotates to Visual North (top)
-      // Native North (+3pi/2) -> rotates to Visual East (right)
-      // So natively, the angle goes 0 -> 2*PI positively!
-      
-      const angleRad = fNow * 2 * Math.PI;
-      
-      const cx = 50 + radius * Math.cos(angleRad);
-      const cy = 50 + radius * Math.sin(angleRad);
-      
+    const celestialDotEls = document.querySelectorAll('.clockGridItem-5 .celestial-dot, .clockGridItem7-4 .celestial-dot');
+    // Current time fraction over 24h
+    const nowSec = (Date.now() / 1000) - midnightToday;
+    const fNow = Math.max(0, Math.min(1, nowSec / 86400));
+    const angleRad = fNow * 2 * Math.PI;
+    const cx = 50 + radius * Math.cos(angleRad);
+    const cy = 50 + radius * Math.sin(angleRad);
+    const isUp = fNow >= fSunrise && fNow <= fSunset;
+
+    celestialDotEls.forEach(celestialDotEl => {
       celestialDotEl.setAttribute('cx', cx.toFixed(3));
       celestialDotEl.setAttribute('cy', cy.toFixed(3));
       celestialDotEl.style.display = 'block';
-      
-      const isUp = fNow >= fSunrise && fNow <= fSunset;
-      
-      // SVG circles cannot natively accept `r` radius definitions dynamically derived strictly from CSS variable styles. 
-      // It must be explicitly set as an attribute. We grab it from config.
       celestialDotEl.setAttribute('r', String(CLOCK_GRID_CELESTIAL_DOT_RADIUS));
-      
-      celestialDotEl.style.fill = isUp ? (tempColor || 'white') : '#333333'; // Solid 100% opaque gray matching the translucent track over a black background
+      celestialDotEl.style.fill = isUp ? (tempColor || 'white') : '#333333';
       celestialDotEl.style.opacity = '1';
       celestialDotEl.style.strokeWidth = 'var(--grid-celestial-dot-stroke-width)';
       if (tempColor) {
         celestialDotEl.style.stroke = tempColor;
       }
-    }
+    });
     
     // Calculate the next sun event (sunrise or sunset)
     const now = Date.now() / 1000;
@@ -3328,12 +3611,10 @@ import weatherConditions from '../data/weather-conditions.json';
       nextEventTime = sunset;
       nextEventLabel = 'Set';
     } else {
-      // Tomorrow's sunrise
       nextEventTime = data?.daily?.[1]?.sunrise || (sunrise + 86400);
       nextEventLabel = 'Rise';
     }
     
-    // Format next event time (example: 9:43p, where a/p are 2/3 sized, using 'medium' font)
     const eventDate = new Date(nextEventTime * 1000);
     let hours = eventDate.getHours();
     const minutes = eventDate.getMinutes();
@@ -3344,18 +3625,18 @@ import weatherConditions from '../data/weather-conditions.json';
     
     const formattedTime = `${hours}:${minutesStr}<span style="font-size: 0.67em; font-family: 'medium', sans-serif;">${ampm}</span>`;
     
-    if (gridSunTextEl) {
+    gridSunTextEls.forEach(gridSunTextEl => {
       gridSunTextEl.innerHTML = `${formattedTime}<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">${nextEventLabel}</span>`;
       if (tempColor) {
         gridSunTextEl.style.color = tempColor;
       }
-    }
+    });
   }
 
   // Update the moon dial in grid cell #7 (index 6)
   function updateMoonDial(data) {
-    const gridMoonProgressEl = document.querySelector('.clockGridItem-6 .countdown-progress');
-    const gridMoonTextEl = document.querySelector('.clockGridItem-6 .grid-moon-text');
+    const gridMoonProgressEls = document.querySelectorAll('.clockGridItem-6 .countdown-progress, .clockGridItem7-5 .countdown-progress');
+    const gridMoonTextEls = document.querySelectorAll('.clockGridItem-6 .grid-moon-text, .clockGridItem7-5 .grid-moon-text');
     
     // Get moonrise/moonset times (Unix timestamps)
     const today = data?.daily?.[0];
@@ -3367,12 +3648,12 @@ import weatherConditions from '../data/weather-conditions.json';
     if (typeof moonrise !== 'number' || typeof moonset !== 'number') {
       console.log('Moon dial: moonrise/moonset data unavailable');
       const circumference = 2 * Math.PI * 46;
-      if (gridMoonProgressEl) {
+      gridMoonProgressEls.forEach(gridMoonProgressEl => {
         gridMoonProgressEl.style.strokeDashoffset = circumference; // hide progress
-      }
-      if (gridMoonTextEl) {
+      });
+      gridMoonTextEls.forEach(gridMoonTextEl => {
         gridMoonTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">Moon</span>`;
-      }
+      });
       return;
     }
     
@@ -3390,7 +3671,7 @@ import weatherConditions from '../data/weather-conditions.json';
     const radius = 46;
     const circumference = 2 * Math.PI * radius; // ~289.0265
     
-    if (gridMoonProgressEl) {
+    gridMoonProgressEls.forEach(gridMoonProgressEl => {
       if (moonrise < moonset) {
         // Simple case: moon is up within the same calendar day
         const length = (fMoonset - fMoonrise) * circumference;
@@ -3411,44 +3692,36 @@ import weatherConditions from '../data/weather-conditions.json';
       if (tempColor) {
         gridMoonProgressEl.style.stroke = tempColor;
       }
-    }
+    });
     
-    const celestialDotEl = document.querySelector('.clockGridItem-6 .celestial-dot');
-    if (celestialDotEl) {
-      // Current time fraction over 24h
-      const nowSec = (Date.now() / 1000) - midnightToday;
-      const fNow = Math.max(0, Math.min(1, nowSec / 86400));
-      // Same mapping as Sun dial: midnight=bottom, 6am=left, noon=top, 6pm=right
-      const angleRad = fNow * 2 * Math.PI;
-      
-      const cx = 50 + radius * Math.cos(angleRad);
-      const cy = 50 + radius * Math.sin(angleRad);
-      
+    const celestialDotEls = document.querySelectorAll('.clockGridItem-6 .celestial-dot, .clockGridItem7-5 .celestial-dot');
+    // Current time fraction over 24h
+    const nowSec = (Date.now() / 1000) - midnightToday;
+    const fNow = Math.max(0, Math.min(1, nowSec / 86400));
+    const angleRad = fNow * 2 * Math.PI;
+    const cx = 50 + radius * Math.cos(angleRad);
+    const cy = 50 + radius * Math.sin(angleRad);
+    
+    // Determine if the moon is "up" based on whether fNow is amidst the moonrise/moonset span(s)
+    let isUp = false;
+    if (moonrise < moonset) {
+      isUp = fNow >= fMoonrise && fNow <= fMoonset;
+    } else {
+      isUp = fNow <= fMoonset || fNow >= fMoonrise;
+    }
+
+    celestialDotEls.forEach(celestialDotEl => {
       celestialDotEl.setAttribute('cx', cx.toFixed(3));
       celestialDotEl.setAttribute('cy', cy.toFixed(3));
       celestialDotEl.style.display = 'block';
-      
-      // Determine if the moon is "up" based on whether fNow is amidst the moonrise/moonset span(s)
-      let isUp = false;
-      if (moonrise < moonset) {
-        // Rises and sets functionally on the same calendar day mapping
-        isUp = fNow >= fMoonrise && fNow <= fMoonset;
-      } else {
-        // Crossing midnight (up between 0..fMoonset OR fMoonrise..1)
-        isUp = fNow <= fMoonset || fNow >= fMoonrise;
-      }
-
-      // SVG circles cannot natively accept `r` radius definitions dynamically derived strictly from CSS variable styles. 
-      // It must be explicitly set as an attribute. We grab it from config.
       celestialDotEl.setAttribute('r', String(CLOCK_GRID_CELESTIAL_DOT_RADIUS));
-      
-      celestialDotEl.style.fill = isUp ? (tempColor || 'white') : '#333333'; // Solid 100% opaque gray matching the translucent track over a black background
+      celestialDotEl.style.fill = isUp ? (tempColor || 'white') : '#333333';
       celestialDotEl.style.opacity = '1';
       celestialDotEl.style.strokeWidth = 'var(--grid-celestial-dot-stroke-width)';
       if (tempColor) {
         celestialDotEl.style.stroke = tempColor;
       }
-    }
+    });
     
     // Calculate the next moon event (moonrise or moonset)
     const now = Date.now() / 1000;
@@ -3456,7 +3729,6 @@ import weatherConditions from '../data/weather-conditions.json';
     let nextEventLabel = '';
     
     if (moonrise < moonset) {
-      // Moon rises and sets on the same day
       if (now < moonrise) {
         nextEventTime = moonrise;
         nextEventLabel = 'Rise';
@@ -3464,12 +3736,10 @@ import weatherConditions from '../data/weather-conditions.json';
         nextEventTime = moonset;
         nextEventLabel = 'Set';
       } else {
-        // Tomorrow's moonrise
         nextEventTime = data?.daily?.[1]?.moonrise || (moonrise + 86400);
         nextEventLabel = 'Rise';
       }
     } else {
-      // Moon sets in morning, rises in evening
       if (now < moonset) {
         nextEventTime = moonset;
         nextEventLabel = 'Set';
@@ -3477,13 +3747,11 @@ import weatherConditions from '../data/weather-conditions.json';
         nextEventTime = moonrise;
         nextEventLabel = 'Rise';
       } else {
-        // Tomorrow's moonset
         nextEventTime = data?.daily?.[1]?.moonset || (moonset + 86400);
         nextEventLabel = 'Set';
       }
     }
     
-    // Format next event time (example: 9:43p, where a/p are 2/3 sized, using 'medium' font)
     const eventDate = new Date(nextEventTime * 1000);
     let hours = eventDate.getHours();
     const minutes = eventDate.getMinutes();
@@ -3494,12 +3762,12 @@ import weatherConditions from '../data/weather-conditions.json';
     
     const formattedTime = `${hours}:${minutesStr}<span style="font-size: 0.67em; font-family: 'medium', sans-serif;">${ampm}</span>`;
     
-    if (gridMoonTextEl) {
+    gridMoonTextEls.forEach(gridMoonTextEl => {
       gridMoonTextEl.innerHTML = `${formattedTime}<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">${nextEventLabel}</span>`;
       if (tempColor) {
         gridMoonTextEl.style.color = tempColor;
       }
-    }
+    });
   }
 
   // Create and update the wind dots row (pill + 60 dots)
@@ -6636,8 +6904,8 @@ import weatherConditions from '../data/weather-conditions.json';
 
   function updateCountdownGauge() {
     const progressEl = document.querySelector('#analog-clock .countdown-progress');
-    const gridProgressEl = document.querySelector('.clockGridItem-0 .countdown-progress');
-    if ((!progressEl && !gridProgressEl) || !nextRefreshAt) return;
+    const gridProgressEls = document.querySelectorAll('.clockGridItem-0 .countdown-progress, .clockGridItem7-0 .countdown-progress');
+    if ((!progressEl && gridProgressEls.length === 0) || !nextRefreshAt) return;
     
     const now = Date.now();
     const refreshTime = nextRefreshAt.getTime();
@@ -6649,7 +6917,9 @@ import weatherConditions from '../data/weather-conditions.json';
     // We want it to shrink as time passes, so offset increases
     const dashOffset = CIRCLE_CIRCUMFERENCE * (1 - percent);
     if (progressEl) progressEl.style.strokeDashoffset = dashOffset;
-    if (gridProgressEl) gridProgressEl.style.strokeDashoffset = dashOffset;
+    gridProgressEls.forEach(el => {
+      el.style.strokeDashoffset = dashOffset;
+    });
   }
 
   function updateDotsCountdown() {
@@ -6660,8 +6930,10 @@ import weatherConditions from '../data/weather-conditions.json';
   function updateClockHands() {
     const container = document.querySelector('.clock-hands-container');
     const gridItem0 = document.querySelector('.clockGridItem-0');
+    const gridItem0_7 = document.querySelector('.clockGridItem7-0');
     const gridRow = document.getElementById('clock-grid-container');
-    if (!container && !gridItem0 && !gridRow) return;
+    const gridRow7 = document.getElementById('clock-grid-container-7');
+    if (!container && !gridItem0 && !gridItem0_7 && !gridRow && !gridRow7) return;
     
     const now = new Date();
     const hours = now.getHours() % 12;
@@ -6692,17 +6964,28 @@ import weatherConditions from '../data/weather-conditions.json';
       gridItem0.style.setProperty('--hour-rotation', `${hourRotation}deg`);
       gridItem0.style.setProperty('--minute-rotation', `${minuteRotation}deg`);
     }
+    if (gridItem0_7) {
+      gridItem0_7.style.setProperty('--hour-rotation', `${hourRotation}deg`);
+      gridItem0_7.style.setProperty('--minute-rotation', `${minuteRotation}deg`);
+    }
 
     if (gridRow && currentColor) {
       gridRow.style.setProperty('--clock-hands-color', currentColor);
     }
+    if (gridRow7 && currentColor) {
+      gridRow7.style.setProperty('--clock-hands-color', currentColor);
+    }
     
     // Dynamically update the 'TIME' label on the clock grid to military time (e.g. "15:17")
     const timeLabelVal = document.getElementById('clock-grid-val-0'); // index 0 is TIME dial
+    const timeLabelVal7 = document.getElementById('clock-grid-val-7-0');
+    const militaryHours = now.getHours().toString().padStart(2, '0');
+    const militaryMinutes = minutes.toString().padStart(2, '0');
     if (timeLabelVal) {
-       const militaryHours = now.getHours().toString().padStart(2, '0');
-       const militaryMinutes = minutes.toString().padStart(2, '0');
        timeLabelVal.innerText = `${militaryHours}:${militaryMinutes}`;
+    }
+    if (timeLabelVal7) {
+       timeLabelVal7.innerText = `${militaryHours}:${militaryMinutes}`;
     }
   }
 
@@ -6934,18 +7217,20 @@ import weatherConditions from '../data/weather-conditions.json';
       }
 
       // Sync the rotated wind direction hand inside grid cell #3 (index 2)
-      const gridWindHand = document.querySelector('.clockGridItem-2 .clock-hand-wind-direction');
-      if (gridWindHand) {
+      const gridWindHands = document.querySelectorAll('.clockGridItem-2 .clock-hand-wind-direction, .clockGridItem7-2 .clock-hand-wind-direction');
+      gridWindHands.forEach(gridWindHand => {
         gridWindHand.style.transform = `translateX(-50%) rotate(${displayDeg}deg)`;
         if (color) {
           gridWindHand.style.backgroundColor = color;
         }
-      }
+      });
       
-      const gridWindCenterDot = document.querySelector('.clockGridItem-2 .clock-center-dot');
-      if (gridWindCenterDot && color) {
-        gridWindCenterDot.style.backgroundColor = color;
-      }
+      const gridWindCenterDots = document.querySelectorAll('.clockGridItem-2 .clock-center-dot, .clockGridItem7-2 .clock-center-dot');
+      gridWindCenterDots.forEach(gridWindCenterDot => {
+        if (color) {
+          gridWindCenterDot.style.backgroundColor = color;
+        }
+      });
       
       lastWindDirection = deg;
     }
