@@ -47,7 +47,9 @@ import weatherConditions from '../data/weather-conditions.json';
   const CLOCK_GRID_PROGRESS_COLOR = 'rgba(255, 255, 255, 0.5)'; // EDITABLE: Active progress fill color
   const CLOCK_GRID_STROKE_WIDTH = 3.5;     // EDITABLE: SVG stroke thickness
   const CLOCK_GRID_GUST_OPACITY = 0;     // EDITABLE: Wind gust ring opacity (0.0 to 1.0)
-  const CLOCK_GRID_WIND_SPEED_Y_OFFSET = '-.25vw'; // EDITABLE: Vertical offset of the wind speed number inside cell #3 (e.g. '0vw', '0.7vw')
+  const CLOCK_GRID_WIND_SPEED_Y_OFFSET = '0vw'; // EDITABLE: Vertical offset of the wind speed number inside cell #3 (e.g. '0vw', '0.7vw')
+  const CLOCK_GRID_WIND_GUST_OVER_Y_OFFSET = '-2.5vw'; // EDITABLE: Vertical offset of the wind gust text when placed over the number
+  const CLOCK_GRID_WIND_GUST_UNDER_Y_OFFSET = '2.5vw'; // EDITABLE: Vertical offset of the wind gust text when placed under the number
   const CLOCK_GRID_HUMIDITY_Y_OFFSET = '0.7vw';   // EDITABLE: Vertical offset of the humidity number inside cell #4 (e.g. '0vw', '0.7vw')
   const CLOCK_GRID_DEWPOINT_Y_OFFSET = '0.7vw';   // EDITABLE: Vertical offset of the dewpoint number inside cell #5 (e.g. '0vw', '0.7vw')
   const CLOCK_GRID_SUN_Y_OFFSET = '0.7vw';        // EDITABLE: Vertical offset of the sun dial day-length number inside cell #6 (e.g. '0vw', '0.7vw')
@@ -66,6 +68,8 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--clock-grid-stroke-width', CLOCK_GRID_STROKE_WIDTH);
   document.documentElement.style.setProperty('--clock-grid-gust-opacity', CLOCK_GRID_GUST_OPACITY);
   document.documentElement.style.setProperty('--grid-wind-speed-y-offset', CLOCK_GRID_WIND_SPEED_Y_OFFSET);
+  document.documentElement.style.setProperty('--grid-wind-gust-over-y-offset', CLOCK_GRID_WIND_GUST_OVER_Y_OFFSET);
+  document.documentElement.style.setProperty('--grid-wind-gust-under-y-offset', CLOCK_GRID_WIND_GUST_UNDER_Y_OFFSET);
   document.documentElement.style.setProperty('--grid-humidity-y-offset', CLOCK_GRID_HUMIDITY_Y_OFFSET);
   document.documentElement.style.setProperty('--grid-dewpoint-y-offset', CLOCK_GRID_DEWPOINT_Y_OFFSET);
   document.documentElement.style.setProperty('--grid-sun-y-offset', CLOCK_GRID_SUN_Y_OFFSET);
@@ -885,7 +889,29 @@ import weatherConditions from '../data/weather-conditions.json';
     
     const gridWindSpeedTextEl = document.querySelector('.clockGridItem-2 .grid-wind-speed-text');
     if (gridWindSpeedTextEl) {
-      gridWindSpeedTextEl.textContent = Math.round(windSpeed);
+      // Wind degree from API represents direction wind is FROM.
+      // So if wind_deg is between 270 and 90 (North-ish), it blows TOWARDS South.
+      // Easiest is to check screen angle:
+      // displayDeg = deg - 180. 
+      // If displayDeg points downward (overlapping the bottom text), it is between 90 and 270 degrees in a standard CSS rotation starting at top.
+      const windDeg = data?.current?.wind_deg || 0;
+      let displayDeg = (windDeg - 180) % 360;
+      if (displayDeg < 0) displayDeg += 360;
+      
+      // If it points into the bottom half of the circle (between 90 and 270 degrees), move text up above the center.
+      // Otherwise keep it at the bottom.
+      const pointsDown = displayDeg > 90 && displayDeg < 270;
+      
+      const overWordY = 'var(--grid-wind-gust-over-y-offset)';
+      const underWordY = 'var(--grid-wind-gust-under-y-offset)';
+      
+      const translateY = pointsDown ? overWordY : underWordY; // Lift to top if pointing down
+      
+      gridWindSpeedTextEl.innerHTML = `
+        <span style="position: relative; display: inline-block;">${Math.round(windSpeed)}</span>
+        <span style="position: absolute; left: 50%; display: inline-block; transform: translate(-50%, ${translateY}); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">${Math.round(windGust)}mph</span>
+      `;
+      
       if (tempColor) {
         gridWindSpeedTextEl.style.color = tempColor;
       }
