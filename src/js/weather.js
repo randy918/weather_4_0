@@ -64,7 +64,7 @@ import weatherConditions from '../data/weather-conditions.json';
   const CLOCK_GRID_LABEL_FONT_FAMILY = 'light';   // EDITABLE: Font family for the dial labels
   const CLOCK_GRID_LABEL_MARGIN_TOP = '0.5vw';    // EDITABLE: Space between dial and its label
   const CLOCK_GRID_LABEL_LETTER_SPACING = '-0.05vw'; // EDITABLE: Letter spacing (kerning) for the labels
-  const CLOCK_GRID_LABELS = ['TIME', 'PHASE', 'WIND', 'HUMIDITY', 'DEW PT', 'SUN', 'MOON', 'RAIN']; // EDITABLE: Labels for the 8 dials
+  const CLOCK_GRID_LABELS = ['TIME', 'PHASE', 'WIND', 'Humidity', 'Dew Pt', 'SUN', 'MOON', 'Barometer']; // EDITABLE: Labels for the 8 dials
   
   document.documentElement.style.setProperty('--clock-grid-label-font-size', CLOCK_GRID_LABEL_FONT_SIZE);
   document.documentElement.style.setProperty('--clock-grid-label-font-family', CLOCK_GRID_LABEL_FONT_FAMILY);
@@ -511,6 +511,20 @@ import weatherConditions from '../data/weather-conditions.json';
     }
   }
 
+  function getMoonPhaseName(phase) {
+    if (typeof phase !== 'number') return '';
+    // Based on standard OpenWeather API moon_phase values (0..1)
+    if (phase === 0 || phase === 1) return 'New moon';
+    if (phase > 0 && phase < 0.25) return 'Waxing crescent';
+    if (phase === 0.25) return 'First quarter';
+    if (phase > 0.25 && phase < 0.5) return 'Waxing gibbous';
+    if (phase === 0.5) return 'Full moon';
+    if (phase > 0.5 && phase < 0.75) return 'Waning gibbous';
+    if (phase === 0.75) return 'Last quarter';
+    if (phase > 0.75 && phase < 1) return 'Waning crescent';
+    return '';
+  }
+
   function updateMoonPhase(data) {
     const moonPhase = data?.daily?.[0]?.moon_phase;
     if (typeof moonPhase !== 'number') return;
@@ -926,7 +940,6 @@ import weatherConditions from '../data/weather-conditions.json';
       
       gridWindSpeedTextEl.innerHTML = `
         <span style="position: relative; display: inline-block;">${Math.round(windSpeed)}</span>
-        <span style="position: absolute; left: 50%; display: inline-block; transform: translate(-50%, ${translateY}); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">${Math.round(windGust)}mph</span>
       `;
       
       if (tempColor) {
@@ -2943,10 +2956,98 @@ import weatherConditions from '../data/weather-conditions.json';
                 item.style.color = tempColorLocal;
              }
           }
-          // Add a span for the text and an empty span with a unique ID for dynamic API datav
+          
+          let titleText = CLOCK_GRID_LABELS[i] || '';
+          
+          // If this is the "PHASE" dial (index 1), replace the title with the moon phase name
+          if (i === 1 && data && data.daily && data.daily[0] && typeof data.daily[0].moon_phase === 'number') {
+             titleText = getMoonPhaseName(data.daily[0].moon_phase);
+          }
+          
+          // If this is the "WIND" dial (index 2), replace the title with "Gust [X] mph"
+          if (i === 2 && data && data.current) {
+             const windSpeed = data.current.wind_speed || 0;
+             const windGust = data.current.wind_gust || windSpeed;
+             titleText = `Gust ${Math.round(windGust)} mph`;
+          }
+          
+          // If this is the "SUN" dial (index 5), show the OPPOSITE event of what's inside the dial
+          if (i === 5 && data && data.daily && data.daily[0]) {
+             const now = Date.now() / 1000;
+             const sunrise = data.daily[0].sunrise;
+             const sunset = data.daily[0].sunset;
+             let oppEventTime = null;
+             let oppEventLabel = '';
+             
+             if (typeof sunrise === 'number' && typeof sunset === 'number') {
+                if (now < sunrise) {
+                   oppEventTime = sunset;
+                   oppEventLabel = 'Sunset';
+                } else if (now < sunset) {
+                   oppEventTime = data.daily[1]?.sunrise || (sunrise + 86400);
+                   oppEventLabel = 'Sunrise';
+                } else {
+                   oppEventTime = data.daily[1]?.sunset || (sunset + 86400);
+                   oppEventLabel = 'Sunset';
+                }
+                
+                const oppDate = new Date(oppEventTime * 1000);
+                let oppHours = oppDate.getHours();
+                const oppMinutes = oppDate.getMinutes();
+                const oppAmPm = oppHours >= 12 ? 'p' : 'a';
+                oppHours = oppHours % 12 || 12;
+                const oppMinutesStr = oppMinutes < 10 ? '0' + oppMinutes : oppMinutes;
+                
+                titleText = `${oppEventLabel} ${oppHours}:${oppMinutesStr}${oppAmPm}`;
+             }
+          }
+          
+          // If this is the "MOON" dial (index 6, cell #7), show the OPPOSITE event of what's inside the dial
+          if (i === 6 && data && data.daily && data.daily[0]) {
+             const now = Date.now() / 1000;
+             const moonrise = data.daily[0].moonrise;
+             const moonset = data.daily[0].moonset;
+             let oppEventTime = null;
+             let oppEventLabel = '';
+             
+             if (typeof moonrise === 'number' && typeof moonset === 'number') {
+                if (moonrise < moonset) {
+                   if (now < moonrise) {
+                      oppEventTime = moonset;
+                      oppEventLabel = 'Moonset';
+                   } else if (now < moonset) {
+                      oppEventTime = data.daily[1]?.moonrise || (moonrise + 86400);
+                      oppEventLabel = 'Moonrise';
+                   } else {
+                      oppEventTime = data.daily[1]?.moonset || (moonset + 86400);
+                      oppEventLabel = 'Moonset';
+                   }
+                } else {
+                   if (now < moonset) {
+                      oppEventTime = moonrise;
+                      oppEventLabel = 'Moonrise';
+                   } else if (now < moonrise) {
+                      oppEventTime = data.daily[1]?.moonset || (moonset + 86400);
+                      oppEventLabel = 'Moonset';
+                   } else {
+                      oppEventTime = data.daily[1]?.moonrise || (moonrise + 86400);
+                      oppEventLabel = 'Moonrise';
+                   }
+                }
+                
+                const oppDate = new Date(oppEventTime * 1000);
+                let oppHours = oppDate.getHours();
+                const oppMinutes = oppDate.getMinutes();
+                const oppAmPm = oppHours >= 12 ? 'p' : 'a';
+                oppHours = oppHours % 12 || 12;
+                const oppMinutesStr = oppMinutes < 10 ? '0' + oppMinutes : oppMinutes;
+                
+                titleText = `${oppEventLabel} ${oppHours}:${oppMinutesStr}${oppAmPm}`;
+             }
+          }
+          
           item.innerHTML = `
-            <span class="label-title">${CLOCK_GRID_LABELS[i] || ''}</span>
-            <span class="label-api-value" id="clock-grid-val-${i}"></span>
+            <span class="label-title label-title-${i}" id="clock-grid-val-${i}">${titleText}</span>
           `;
           labelsContainer.appendChild(item);
         }
@@ -2960,6 +3061,99 @@ import weatherConditions from '../data/weather-conditions.json';
             const labels = labelsContainer.querySelectorAll('.clockGridLabel');
             labels.forEach(label => label.style.color = tempColorLocal);
           }
+        }
+        
+        // Also update the phase text in case it changed overnight
+        const phaseTitle = labelsContainer.querySelector('.label-title-1');
+        if (phaseTitle && data && data.daily && data.daily[0] && typeof data.daily[0].moon_phase === 'number') {
+           phaseTitle.innerText = getMoonPhaseName(data.daily[0].moon_phase);
+        }
+        
+        // Also update the wind gust text live
+        const windTitle = labelsContainer.querySelector('.label-title-2');
+        if (windTitle && data && data.current) {
+           const windSpeed = data.current.wind_speed || 0;
+           const windGust = data.current.wind_gust || windSpeed;
+           windTitle.innerText = `Gust ${Math.round(windGust)} mph`;
+        }
+        
+        // Also update the sun opposite event text live
+        const sunTitle = labelsContainer.querySelector('.label-title-5');
+        if (sunTitle && data && data.daily && data.daily[0]) {
+           const now = Date.now() / 1000;
+           const sunrise = data.daily[0].sunrise;
+           const sunset = data.daily[0].sunset;
+           
+           if (typeof sunrise === 'number' && typeof sunset === 'number') {
+              let oppEventTime = null;
+              let oppEventLabel = '';
+              
+              if (now < sunrise) {
+                 oppEventTime = sunset;
+                 oppEventLabel = 'Sunset';
+              } else if (now < sunset) {
+                 oppEventTime = data.daily[1]?.sunrise || (sunrise + 86400);
+                 oppEventLabel = 'Sunrise';
+              } else {
+                 oppEventTime = data.daily[1]?.sunset || (sunset + 86400);
+                 oppEventLabel = 'Sunset';
+              }
+              
+              const oppDate = new Date(oppEventTime * 1000);
+              let oppHours = oppDate.getHours();
+              const oppMinutes = oppDate.getMinutes();
+              const oppAmPm = oppHours >= 12 ? 'p' : 'a';
+              oppHours = oppHours % 12 || 12;
+              const oppMinutesStr = oppMinutes < 10 ? '0' + oppMinutes : oppMinutes;
+              
+              sunTitle.innerText = `${oppEventLabel} ${oppHours}:${oppMinutesStr}${oppAmPm}`;
+           }
+        }
+        
+        // Also update the moon opposite event text live
+        const moonTitle = labelsContainer.querySelector('.label-title-6');
+        if (moonTitle && data && data.daily && data.daily[0]) {
+           const now = Date.now() / 1000;
+           const moonrise = data.daily[0].moonrise;
+           const moonset = data.daily[0].moonset;
+           
+           if (typeof moonrise === 'number' && typeof moonset === 'number') {
+              let oppEventTime = null;
+              let oppEventLabel = '';
+              
+              if (moonrise < moonset) {
+                 if (now < moonrise) {
+                    oppEventTime = moonset;
+                    oppEventLabel = 'Moonset';
+                 } else if (now < moonset) {
+                    oppEventTime = data.daily[1]?.moonrise || (moonrise + 86400);
+                    oppEventLabel = 'Moonrise';
+                 } else {
+                    oppEventTime = data.daily[1]?.moonset || (moonset + 86400);
+                    oppEventLabel = 'Moonset';
+                 }
+              } else {
+                 if (now < moonset) {
+                    oppEventTime = moonrise;
+                    oppEventLabel = 'Moonrise';
+                 } else if (now < moonrise) {
+                    oppEventTime = data.daily[1]?.moonset || (moonset + 86400);
+                    oppEventLabel = 'Moonset';
+                 } else {
+                    oppEventTime = data.daily[1]?.moonrise || (moonrise + 86400);
+                    oppEventLabel = 'Moonrise';
+                 }
+              }
+              
+              const oppDate = new Date(oppEventTime * 1000);
+              let oppHours = oppDate.getHours();
+              const oppMinutes = oppDate.getMinutes();
+              const oppAmPm = oppHours >= 12 ? 'p' : 'a';
+              oppHours = oppHours % 12 || 12;
+              const oppMinutesStr = oppMinutes < 10 ? '0' + oppMinutes : oppMinutes;
+              
+              moonTitle.innerText = `${oppEventLabel} ${oppHours}:${oppMinutesStr}${oppAmPm}`;
+           }
         }
       }
     }
@@ -6501,6 +6695,14 @@ import weatherConditions from '../data/weather-conditions.json';
 
     if (gridRow && currentColor) {
       gridRow.style.setProperty('--clock-hands-color', currentColor);
+    }
+    
+    // Dynamically update the 'TIME' label on the clock grid to military time (e.g. "15:17")
+    const timeLabelVal = document.getElementById('clock-grid-val-0'); // index 0 is TIME dial
+    if (timeLabelVal) {
+       const militaryHours = now.getHours().toString().padStart(2, '0');
+       const militaryMinutes = minutes.toString().padStart(2, '0');
+       timeLabelVal.innerText = `${militaryHours}:${militaryMinutes}`;
     }
   }
 

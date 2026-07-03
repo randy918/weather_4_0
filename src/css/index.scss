@@ -723,7 +723,6 @@ main {
         font-size: var(--clock-grid-label-font-size, 1.8vw);
         letter-spacing: var(--clock-grid-label-letter-spacing, 0.05vw);
         color: var(--temp-color, rgba(255,255,255,0.7)); /* Use current temperature color */
-        text-transform: uppercase;
         text-align: center;
         width: 100%;
         position: relative;
@@ -731,11 +730,22 @@ main {
         flex-direction: column;
         align-items: center;
         
-        .label-api-value {
-          /* Add styling for API values to distinguish them */
-          // font-size: 1.5vw;
-          // color: rgba(255,255,255,0.9);
-          // margin-top: 0.2vw;
+        .label-title {
+            text-transform: uppercase;
+        }
+
+        &.clockGridLabel-1 .label-title,
+        &.clockGridLabel-2 .label-title,
+        &.clockGridLabel-3 .label-title,
+        &.clockGridLabel-4 .label-title,
+        &.clockGridLabel-5 .label-title,
+        &.clockGridLabel-6 .label-title,
+        &.clockGridLabel-7 .label-title {
+            text-transform: none; /* Keep natural case for dynamic text */
+            font-family: 'light', sans-serif; /* Light font style */
+            white-space: nowrap;
+            letter-spacing: -0.05vw;
+            font-size: 1.6vw;
         }
     }
 }
