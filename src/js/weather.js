@@ -54,6 +54,9 @@ import weatherConditions from '../data/weather-conditions.json';
   const CLOCK_GRID_DEWPOINT_Y_OFFSET = '0.7vw';   // EDITABLE: Vertical offset of the dewpoint number inside cell #5 (e.g. '0vw', '0.7vw')
   const CLOCK_GRID_SUN_Y_OFFSET = '0.7vw';        // EDITABLE: Vertical offset of the sun dial day-length number inside cell #6 (e.g. '0vw', '0.7vw')
   const CLOCK_GRID_MOON_Y_OFFSET = '0.7vw';       // EDITABLE: Vertical offset of the moon dial moon-up number inside cell #7 (e.g. '0vw', '0.7vw')
+  const CLOCK_GRID_CELESTIAL_DOT_RADIUS = '0.5vw';  // EDITABLE: Radius of the celestial dots marking current time on the dial track
+  const CLOCK_GRID_CELESTIAL_DOT_STROKE_WIDTH = 3; // EDITABLE: Stroke width for the celestial dots
+  const CLOCK_GRID_CELESTIAL_DOT_FILL = 'rgba(0,0,0,0.5)'; // EDITABLE: Fill color for the celestial dots
   const CLOCK_GRID_WIND_SPEED_TEXT_SHADOW = '2px 2px 0px black)'; // EDITABLE: Text shadow for wind speed number (offset-x offset-y blur color)
 
   // Inject these config variables into CSS properties immediately
@@ -74,6 +77,9 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--grid-dewpoint-y-offset', CLOCK_GRID_DEWPOINT_Y_OFFSET);
   document.documentElement.style.setProperty('--grid-sun-y-offset', CLOCK_GRID_SUN_Y_OFFSET);
   document.documentElement.style.setProperty('--grid-moon-y-offset', CLOCK_GRID_MOON_Y_OFFSET);
+  document.documentElement.style.setProperty('--grid-celestial-dot-radius', CLOCK_GRID_CELESTIAL_DOT_RADIUS);
+  document.documentElement.style.setProperty('--grid-celestial-dot-stroke-width', CLOCK_GRID_CELESTIAL_DOT_STROKE_WIDTH);
+  document.documentElement.style.setProperty('--grid-celestial-dot-fill', CLOCK_GRID_CELESTIAL_DOT_FILL);
   document.documentElement.style.setProperty('--grid-wind-speed-text-shadow', CLOCK_GRID_WIND_SPEED_TEXT_SHADOW);
 
   // Removed lastBarometricPressure as we now use future predictive trend
@@ -2862,6 +2868,7 @@ import weatherConditions from '../data/weather-conditions.json';
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
               <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
               <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+              <circle class="celestial-dot" cx="50" cy="4" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
             </svg>
             <div class="grid-sun-text"></div>
           `;
@@ -2871,6 +2878,7 @@ import weatherConditions from '../data/weather-conditions.json';
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
               <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
               <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+              <circle class="celestial-dot" cx="50" cy="4" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
             </svg>
             <div class="grid-moon-text"></div>
           `;
@@ -3027,6 +3035,42 @@ import weatherConditions from '../data/weather-conditions.json';
       }
     }
     
+    const celestialDotEl = document.querySelector('.clockGridItem-5 .celestial-dot');
+    if (celestialDotEl) {
+      // Current time fraction over 24h
+      const nowSec = (Date.now() / 1000) - midnightToday;
+      const fNow = Math.max(0, Math.min(1, nowSec / 86400));
+      // Angles in SVG: 0 starts at 3 o'clock natively, but usually dials are rotated -90deg in CSS so 0 is 12 o'clock. 
+      // fNow mapping: midnight (fNow=0) -> bottom, 6am (0.25) -> left, noon (0.5) -> top, 6pm (0.75) -> right.
+      // Mathematical coordinates natively inside SVG BEFORE applying `transform: rotate(90deg)` in CSS:
+      // We want bottom to map visually to bottom. If CSS rotate is 90deg clockwise:
+      // Native East (0 rad) -> rotates to Visual South (bottom)
+      // Native South (+pi/2) -> rotates to Visual West (left)
+      // Native West (+pi) -> rotates to Visual North (top)
+      // Native North (+3pi/2) -> rotates to Visual East (right)
+      // So natively, the angle goes 0 -> 2*PI positively!
+      
+      const angleRad = fNow * 2 * Math.PI;
+      
+      const cx = 50 + radius * Math.cos(angleRad);
+      const cy = 50 + radius * Math.sin(angleRad);
+      
+      celestialDotEl.setAttribute('cx', cx.toFixed(3));
+      celestialDotEl.setAttribute('cy', cy.toFixed(3));
+      celestialDotEl.style.display = 'block';
+      
+      const isUp = fNow >= fSunrise && fNow <= fSunset;
+      
+      // Inherit stroke (or fill) from JS css var config or explicit js setting
+      celestialDotEl.style.r = 'var(--grid-celestial-dot-radius)';
+      celestialDotEl.style.fill = isUp ? (tempColor || 'white') : '#333333'; // Solid 100% opaque gray matching the translucent track over a black background
+      celestialDotEl.style.opacity = '1';
+      celestialDotEl.style.strokeWidth = 'var(--grid-celestial-dot-stroke-width)';
+      if (tempColor) {
+        celestialDotEl.style.stroke = tempColor;
+      }
+    }
+    
     // Calculate the next sun event (sunrise or sunset)
     const now = Date.now() / 1000;
     let nextEventTime = null;
@@ -3121,6 +3165,40 @@ import weatherConditions from '../data/weather-conditions.json';
       
       if (tempColor) {
         gridMoonProgressEl.style.stroke = tempColor;
+      }
+    }
+    
+    const celestialDotEl = document.querySelector('.clockGridItem-6 .celestial-dot');
+    if (celestialDotEl) {
+      // Current time fraction over 24h
+      const nowSec = (Date.now() / 1000) - midnightToday;
+      const fNow = Math.max(0, Math.min(1, nowSec / 86400));
+      // Same mapping as Sun dial: midnight=bottom, 6am=left, noon=top, 6pm=right
+      const angleRad = fNow * 2 * Math.PI;
+      
+      const cx = 50 + radius * Math.cos(angleRad);
+      const cy = 50 + radius * Math.sin(angleRad);
+      
+      celestialDotEl.setAttribute('cx', cx.toFixed(3));
+      celestialDotEl.setAttribute('cy', cy.toFixed(3));
+      celestialDotEl.style.display = 'block';
+      
+      // Determine if the moon is "up" based on whether fNow is amidst the moonrise/moonset span(s)
+      let isUp = false;
+      if (moonrise < moonset) {
+        // Rises and sets functionally on the same calendar day mapping
+        isUp = fNow >= fMoonrise && fNow <= fMoonset;
+      } else {
+        // Crossing midnight (up between 0..fMoonset OR fMoonrise..1)
+        isUp = fNow <= fMoonset || fNow >= fMoonrise;
+      }
+
+      celestialDotEl.style.r = 'var(--grid-celestial-dot-radius)';
+      celestialDotEl.style.fill = isUp ? (tempColor || 'white') : '#333333'; // Solid 100% opaque gray matching the translucent track over a black background
+      celestialDotEl.style.opacity = '1';
+      celestialDotEl.style.strokeWidth = 'var(--grid-celestial-dot-stroke-width)';
+      if (tempColor) {
+        celestialDotEl.style.stroke = tempColor;
       }
     }
     
