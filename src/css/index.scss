@@ -693,7 +693,10 @@ main {
 }
 
 //>  ████████████████████████████████████  CLOCK GRID ROW
+//>  ████████████████████████████████████  CLOCK GRID ROW
 .clockGridContainer {
+    --dynamic-item-size: calc((100vw - var(--clock-grid-margin-left, 0vw) - var(--clock-grid-margin-right, 0vw) - 7 * var(--clock-grid-gap, 1vw)) / 8);
+
     width: auto;
     margin-top: var(--clock-grid-margin-top, 2vw);
     margin-bottom: var(--clock-grid-margin-bottom, 2vw);
@@ -707,6 +710,8 @@ main {
 }
 
 .clockGridLabelsContainer {
+    --label-item-size: calc((100vw - var(--clock-grid-margin-left, 0vw) - var(--clock-grid-margin-right, 0vw) - 7 * var(--clock-grid-gap, 1vw)) / 8);
+
     width: auto;
     margin-top: calc(var(--clock-grid-margin-bottom, 2vw) * -1 + var(--clock-grid-label-margin-top, 0.5vw)); /* Pull up under the grid */
     margin-bottom: var(--clock-grid-margin-bottom, 2vw);
@@ -720,8 +725,8 @@ main {
     
     .clockGridLabel {
         font-family: var(--clock-grid-label-font-family, 'bold');
-        font-size: var(--clock-grid-label-font-size, 1.8vw);
-        letter-spacing: var(--clock-grid-label-letter-spacing, 0.05vw);
+        font-size: calc(var(--label-item-size) * 0.18) !important;
+        letter-spacing: calc(var(--label-item-size) * 0.005) !important;
         color: var(--temp-color, rgba(255,255,255,0.7)); /* Use current temperature color */
         text-align: center;
         width: 100%;
@@ -744,14 +749,16 @@ main {
             text-transform: none; /* Keep natural case for dynamic text */
             font-family: 'light', sans-serif; /* Light font style */
             white-space: nowrap;
-            letter-spacing: -0.05vw;
-            font-size: 1.6vw;
+            letter-spacing: calc(var(--label-item-size) * -0.005) !important;
+            font-size: calc(var(--label-item-size) * 0.16) !important;
         }
     }
 }
 
 // 7-cell Clock Grid Container & Labels
 .clockGridContainer7 {
+    --dynamic-item-size-7: calc((100vw - var(--clock-grid-margin-left, 0vw) - var(--clock-grid-margin-right, 0vw) - 6 * var(--clock-grid-gap, 1vw)) / 7);
+
     width: auto;
     margin-top: var(--clock-grid-margin-top, 2vw);
     margin-bottom: var(--clock-grid-margin-bottom, 2vw);
@@ -765,6 +772,8 @@ main {
 }
 
 .clockGridLabelsContainer7 {
+    --label-item-size: calc((100vw - var(--clock-grid-margin-left, 0vw) - var(--clock-grid-margin-right, 0vw) - 6 * var(--clock-grid-gap, 1vw)) / 7);
+
     width: auto;
     margin-top: calc(var(--clock-grid-margin-bottom, 2vw) * -1 + var(--clock-grid-label-margin-top, 0.5vw)); /* Pull up under the grid */
     margin-bottom: var(--clock-grid-margin-bottom, 2vw);
@@ -778,8 +787,8 @@ main {
     
     .clockGridLabel7 {
         font-family: var(--clock-grid-label-font-family, 'bold');
-        font-size: 2.08vw;
-        letter-spacing: 0.058vw;
+        font-size: calc(var(--label-item-size) * 0.18) !important;
+        letter-spacing: calc(var(--label-item-size) * 0.005) !important;
         color: var(--temp-color, rgba(255,255,255,0.7)); /* Use current temperature color */
         text-align: center;
         width: 100%;
@@ -801,69 +810,25 @@ main {
             text-transform: none; /* Keep natural case for dynamic text */
             font-family: 'light', sans-serif; /* Light font style */
             white-space: nowrap;
-            letter-spacing: -0.058vw;
-            font-size: 1.85vw;
+            letter-spacing: calc(var(--label-item-size) * -0.005) !important;
+            font-size: calc(var(--label-item-size) * 0.16) !important;
         }
     }
 }
-
-.clockGridItem7 {
-    width: 11.57vw !important;
-    height: 11.57vw !important;
-
-    .clock-face {
-        border: calc(var(--clock-grid-stroke-width, 4) * 0.127vw) solid transparent !important;
-        
-        .clock-hour-hand {
-            width: 0.46vw !important;
-            border-radius: 0.46vw !important;
-        }
-
-        .clock-minute-hand {
-            width: 0.35vw !important;
-            border-radius: 0.35vw !important;
-        }
-    }
-
-    .clock-hand-wind-direction {
-        width: 0.46vw !important;
-    }
-
-    .grid-wind-speed-text, .grid-humidity-text, .grid-sun-text, .grid-moon-text {
-        font-size: 4.05vw !important;
-    }
-
-    .grid-wind-speed-text {
-        transform: translate(-50%, calc(-50% + 0.81vw)) !important;
-    }
-
-    .grid-humidity-text {
-        transform: translate(-50%, calc(-50% + 0.81vw)) !important;
-    }
-
-    .grid-sun-text {
-        transform: translate(-50%, calc(-50% + 0.81vw)) !important;
-        font-size: 3.47vw !important;
-    }
-
-    .grid-moon-text {
-        transform: translate(-50%, calc(-50% + 0.81vw)) !important;
-        font-size: 3.47vw !important;
-    }
-
-    .grid-barometric-pressure {
-        .barometric-text {
-            font-size: 4.05vw !important;
-            transform: translateY(0.81vw) !important;
-        }
-    }
-}
-
 
 .clockGridItem {
+    --item-current-size: var(--clock-grid-size, 10vw);
+
+    .clockGridContainer & {
+        --item-current-size: var(--dynamic-item-size);
+    }
+    .clockGridContainer7 & {
+        --item-current-size: var(--dynamic-item-size-7);
+    }
+
     position: relative;
-    width: var(--clock-grid-size, 10vw);
-    height: var(--clock-grid-size, 10vw);
+    width: var(--item-current-size);
+    height: var(--item-current-size);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -908,7 +873,7 @@ main {
         width: 100%;
         height: 100%;
         border-radius: 50%;
-        border: calc(var(--clock-grid-stroke-width, 4) * 0.11vw) solid transparent;
+        border: calc(var(--clock-grid-stroke-width, 4) * var(--item-current-size) * 0.011) solid transparent;
         background: rgba(0, 0, 0, 0.0); 
         box-shadow: inset 0 0 1vw rgba(0,0,0,0.5);
 
@@ -917,12 +882,12 @@ main {
             position: absolute;
             bottom: 50%;
             left: 50%;
-            width: 0.4vw; // Thickness of the hour hand
+            width: calc(var(--item-current-size) * 0.04);
             height: 30%; // Length
             background-color: var(--clock-hands-color, rgba(255, 255, 255, 0.9));
             transform-origin: bottom center;
             transform: translateX(-50%) rotate(var(--hour-rotation, 0deg));
-            border-radius: 0.4vw;
+            border-radius: calc(var(--item-current-size) * 0.04);
         }
 
         // Minute Hand
@@ -930,12 +895,12 @@ main {
             position: absolute;
             bottom: 50%;
             left: 50%;
-            width: 0.4vw; // Thickness of the minute hand
+            width: calc(var(--item-current-size) * 0.04);
             height: 42%; // Slightly longer than hour hand
             background-color: var(--clock-hands-color, rgba(255, 255, 255, 0.9));
             transform-origin: bottom center;
             transform: translateX(-50%) rotate(var(--minute-rotation, 0deg));
-            border-radius: 0.4vw;
+            border-radius: calc(var(--item-current-size) * 0.04);
         }
 
         // Center Pivot Dot
@@ -943,8 +908,8 @@ main {
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 1vw; // size of dot
-            height: 1vw;
+            width: calc(var(--item-current-size) * 0.1);
+            height: calc(var(--item-current-size) * 0.1);
             background-color: var(--clock-hands-color, rgba(255, 255, 255, 0.9));
             transform: translate(-50%, -50%);
             border-radius: 50%;
@@ -966,7 +931,7 @@ main {
         top: 50% !important;
         left: 50% !important;
         font-family: "bold", sans-serif !important;
-        font-size: 3.5vw !important;
+        font-size: calc(var(--item-current-size) * 0.35) !important;
         color: var(--clock-hands-color, white);
         text-shadow: var(--grid-wind-speed-text-shadow, 0px 1px 3px rgba(0, 0, 0, 0.5)) !important;
         text-align: center !important;
@@ -975,40 +940,40 @@ main {
     }
 
     .grid-wind-speed-text {
-        transform: translate(-50%, calc(-50% + var(--grid-wind-speed-y-offset, 0.7vw))) !important;
+        transform: translate(-50%, calc(-50% + var(--item-current-size) * 0.07)) !important;
     }
 
     .grid-humidity-text {
-        transform: translate(-50%, calc(-50% + var(--grid-humidity-y-offset, 0.7vw))) !important;
+        transform: translate(-50%, calc(-50% + var(--item-current-size) * 0.07)) !important;
         line-height: 0.5 !important;
     }
 
     .grid-dewpoint-text {
-        transform: translate(-50%, calc(-50% + var(--grid-dewpoint-y-offset, 0.7vw))) !important;
+        transform: translate(-50%, calc(-50% + var(--item-current-size) * 0.07)) !important;
         line-height: 0.5 !important;
     }
 
     .grid-sun-text {
-        transform: translate(-50%, calc(-50% + var(--grid-sun-y-offset, 0.7vw))) !important;
+        transform: translate(-50%, calc(-50% + var(--item-current-size) * 0.07)) !important;
         line-height: 0.5 !important;
-        font-size: 3.0vw !important; /* Slightly smaller to fit time formatting comfortably */
+        font-size: calc(var(--item-current-size) * 0.30) !important; /* Slightly smaller to fit time formatting comfortably */
     }
 
     .grid-moon-text {
-        transform: translate(-50%, calc(-50% + var(--grid-moon-y-offset, 0.7vw))) !important;
+        transform: translate(-50%, calc(-50% + var(--item-current-size) * 0.07)) !important;
         line-height: 0.5 !important;
-        font-size: 3.0vw !important; /* Slightly smaller to fit time formatting comfortably */
+        font-size: calc(var(--item-current-size) * 0.30) !important; /* Slightly smaller to fit time formatting comfortably */
     }
 
     .clock-hand-wind-direction {
         position: absolute !important;
         bottom: 50% !important;
         left: 50% !important;
-        width: 0.4vw !important;
+        width: calc(var(--item-current-size) * 0.04) !important;
         height: 42% !important;
         background: linear-gradient(to top, transparent 50%, var(--clock-hands-color, rgba(255, 255, 255, 0.9)) 50%) !important;
         transform-origin: bottom center !important;
-        border-radius: 0.4vw !important;
+        border-radius: calc(var(--item-current-size) * 0.04) !important;
         z-index: 1 !important;
     }
 
@@ -1021,8 +986,8 @@ main {
         z-index: 1 !important;
 
         .barometric-text {
-            font-size: 3.5vw !important;
-            transform: translateY(0.7vw) !important;
+            font-size: calc(var(--item-current-size) * 0.35) !important;
+            transform: translateY(calc(var(--item-current-size) * 0.07)) !important;
         }
 
         .barometric-gauge-svg {

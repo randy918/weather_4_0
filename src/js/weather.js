@@ -38,7 +38,7 @@ import weatherConditions from '../data/weather-conditions.json';
 
   // --- CONFIG: Clock Grid (8 Countdown Circles Row) ---
   const CLOCK_GRID_SIZE = '11vw';         // EDITABLE: Width and height of each circle widget
-  const CLOCK_GRID_GAP = '0vw';          // EDITABLE: Gap between cells
+  const CLOCK_GRID_GAP = '1vw';          // EDITABLE: Gap between cells
   const CLOCK_GRID_MARGIN_TOP = '-3vw';   // EDITABLE: Top margin of the row
   const CLOCK_GRID_MARGIN_BOTTOM = '2vw';// EDITABLE: Bottom margin of the row
   const CLOCK_GRID_MARGIN_LEFT = '2vw';  // EDITABLE: Left margin for the row as a whole
