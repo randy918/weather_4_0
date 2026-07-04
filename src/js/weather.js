@@ -145,8 +145,9 @@ import weatherConditions from '../data/weather-conditions.json';
   const RADAR_OFFSET_Y_RIGHT = '3.5%';    // EDITABLE: Vertical center offset (positive = down, negative = up)
 
   // --- Doppler Radar Playback Config ---
-  const RADAR_LOOP_SPEED_MS = 1000;    // EDITABLE: Time each frame is fully visible (in milliseconds)
-  const RADAR_FADE_DURATION_MS = 400;  // EDITABLE: Transition duration for cross-fade (in milliseconds)
+  const RADAR_LOOP_SPEED_MS = 500;     // EDITABLE: Time each frame is fully visible (in milliseconds)
+  const RADAR_FADE_DURATION_MS = 200;  // EDITABLE: Transition duration for cross-fade (in milliseconds)
+  const RADAR_FRAME_COUNT = 12;        // EDITABLE: Number of recent radar frames to loop (default is 6)
 
 
   // --- Weather Image Config (Upper Right/Left Circle Cells) ---
@@ -158,6 +159,7 @@ import weatherConditions from '../data/weather-conditions.json';
   const CIRCLE_CELL_RIGHT = '3vw';          // EDITABLE: Space right of the right circle cell
   const CIRCLE_CELL_MARGIN_BOTTOM = '2vw';  // EDITABLE: Space below the circle cells (margin-bottom)
   const WEATHER_IMAGE_BORDER_RADIUS = '50%'; // EDITABLE: Circle shape rounding (keep at 50%)
+  const RADAR_CENTER_DOT_SIZE = '1.0vw';      // EDITABLE: Size of the radar center dot (middle dot)
 
   // Set initial CSS variables for sizing and spacing
   document.documentElement.style.setProperty('--circle-cell-size', CIRCLE_CELL_SIZE);
@@ -165,6 +167,7 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--circle-cell-left', CIRCLE_CELL_LEFT);
   document.documentElement.style.setProperty('--circle-cell-right', CIRCLE_CELL_RIGHT);
   document.documentElement.style.setProperty('--circle-cell-margin-bottom', CIRCLE_CELL_MARGIN_BOTTOM);
+  document.documentElement.style.setProperty('--radar-center-dot-size', RADAR_CENTER_DOT_SIZE);
 
   const WEATHER_IMAGE_WIDTH = CIRCLE_CELL_SIZE;
   const WEATHER_IMAGE_HEIGHT = CIRCLE_CELL_SIZE;
@@ -278,6 +281,7 @@ import weatherConditions from '../data/weather-conditions.json';
   const ALERT_COLORS = {
     "DEFAULT": "rgba(0,0,0, 0.75)", // Default translucent red for anything else
     "DENSE FOG ADVISORY": "rgba(128, 128, 128, 0.85)", // Gray
+    "EXTREME HEAT WARNING": "hsl(0, 90%, 35%)", 
     "FLOOD ADVISORY": "hsl(195, 90%, 45%)", // Bright blue-purple
     "FLOOD WATCH": "hsl(195, 90%, 65%)", // Bright blue-purple
     "HEAT ADVISORY": "rgba(250, 38, 38, 0.85)", // Standard red
@@ -292,13 +296,18 @@ import weatherConditions from '../data/weather-conditions.json';
   // EDITABLE: Alert Banner Icons
   // Maps specific alert keywords to their SVG icons.
   const ALERT_ICONS = {
-    "SEVERE THUNDERSTORM WATCH": "img/thun-wat.svg",
-    "WIND ADVISORY": "img/wind-wat.svg",
+    "DEFAULT": "img/default-wat.svg",
+    "DENSE FOG ADVISORY": "img/fog-wat.svg",
+    "EXTREME HEAT WARNING": "img/heat-wat.svg",
     "FLOOD ADVISORY": "img/flood-wat.svg",
     "FLOOD WATCH": "img/flood-wat.svg",
-    "DENSE FOG ADVISORY": "img/fog-wat.svg",
     "HEAT ADVISORY": "img/heat-wat.svg",
-    "DEFAULT": "img/trn-wat.svg"
+    "SEVERE THUNDERSTORM WARNING": "img/thun-wat.svg",
+    "SEVERE THUNDERSTORM WATCH": "img/thun-wat.svg",
+    "SPECIAL WEATHER STATEMENT": "img/thun-wat.svg",
+    "TORNADO WARNING": "img/thun-wat.svg",
+    "TORNADO WATCH": "img/thun-wat.svg",
+    "WIND ADVISORY": "img/wind-wat.svg",
   };
 
   // Dynamic temperature range based on actual week's data
@@ -1288,6 +1297,8 @@ import weatherConditions from '../data/weather-conditions.json';
         background-repeat: no-repeat;
         animation: var(--radar-animation, none) !important;
         mix-blend-mode: var(--radar-blend-mode, normal);
+        box-sizing: border-box;
+        border: 0.48vw solid var(--clock-grid-track-color, rgba(255, 255, 255, 0.2));
       }
       #weather-desc-image.radar-mode .radar-frame {
         filter: invert(1) hue-rotate(180deg);
@@ -1324,12 +1335,42 @@ import weatherConditions from '../data/weather-conditions.json';
         background-repeat: no-repeat;
         animation: var(--radar-animation, none) !important;
         mix-blend-mode: var(--radar-blend-mode, normal);
+        box-sizing: border-box;
+        border: 0.48vw solid var(--clock-grid-track-color, rgba(255, 255, 255, 0.2));
       }
       #weather-desc-image-left.radar-mode .radar-frame {
         filter: invert(1) hue-rotate(180deg);
       }
       #weather-desc-image-left.radar-mode #simple-month-left {
         display: none !important;
+      }
+      #weather-desc-image-left.radar-mode::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 50%;
+        height: 50%;
+        transform: translate(-50%, -50%);
+        box-sizing: border-box;
+        border: 0.24vw solid var(--clock-grid-track-color, rgba(255, 255, 255, 0.2));
+        border-radius: 50%;
+        z-index: 90;
+        pointer-events: none;
+      }
+      #weather-desc-image.radar-mode::after,
+      #weather-desc-image-left.radar-mode::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: var(--radar-center-dot-size, 0.5vw);
+        height: var(--radar-center-dot-size, 0.5vw);
+        background-color: var(--clock-grid-track-color, rgba(255, 255, 255, 0.2));
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 100;
+        pointer-events: none;
       }
       body.transitions-ready #moon-phase-img {
         transition: transform ${ALERT_ANIMATION_MS}ms ease, filter 0.3s ease !important;
@@ -2508,10 +2549,10 @@ import weatherConditions from '../data/weather-conditions.json';
             const gridLeftPct = (0.5 - dX_new) * 100;
             const gridTopPct = (0.5 - dY_new) * 100;
 
-            if (framesRight.length !== 4) {
+            if (framesRight.length !== RADAR_FRAME_COUNT) {
               descImageEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
               framesRight = [];
-              for (let i = 3; i >= 0; i--) {
+              for (let i = RADAR_FRAME_COUNT - 1; i >= 0; i--) {
                 const frame = document.createElement('div');
                 frame.className = 'radar-frame';
                 frame.style.cssText = `
@@ -2581,10 +2622,10 @@ import weatherConditions from '../data/weather-conditions.json';
             const gridLeftPct = (0.5 - dX_new) * 100;
             const gridTopPct = (0.5 - dY_new) * 100;
 
-            if (framesLeft.length !== 4) {
+            if (framesLeft.length !== RADAR_FRAME_COUNT) {
               descImageLeftEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
               framesLeft = [];
-              for (let i = 3; i >= 0; i--) {
+              for (let i = RADAR_FRAME_COUNT - 1; i >= 0; i--) {
                 const frame = document.createElement('div');
                 frame.className = 'radar-frame';
                 frame.style.cssText = `
@@ -2651,8 +2692,8 @@ import weatherConditions from '../data/weather-conditions.json';
         const x_startRight = (dXRight < 0.5) ? x0Right - 1 : x0Right;
         const y_startRight = (dYRight < 0.5) ? y0Right - 1 : y0Right;
 
-        for (let i = 0; i < 4; i++) {
-          const frameNum = 3 - i;
+        for (let i = 0; i < RADAR_FRAME_COUNT; i++) {
+          const frameNum = (RADAR_FRAME_COUNT - 1) - i;
           
           // Left circle (RainViewer Zoom 6)
           if (SHOW_DOPPLER_RADAR_LEFT && descImageLeftEl && framesLeft[i]) {
@@ -2682,7 +2723,8 @@ import weatherConditions from '../data/weather-conditions.json';
                 url('${baseTiles[0]}'), url('${baseTiles[1]}'), url('${baseTiles[2]}'), url('${baseTiles[3]}')
               `;
             } else {
-              const conusUrl = `https://radar.weather.gov/ridge/standard/CONUS_${frameNum}.gif?t=${timeParam}`;
+              const fallbackFrameNum = Math.min(3, frameNum);
+              const conusUrl = `https://radar.weather.gov/ridge/standard/CONUS_${fallbackFrameNum}.gif?t=${timeParam}`;
               framesLeft[i].style.backgroundImage = `url('${conusUrl}')`;
               framesLeft[i].style.backgroundSize = `calc(${RADAR_ZOOM_LEFT} * 100%) auto`;
               framesLeft[i].style.backgroundPosition = `calc(50% + ${RADAR_OFFSET_X_LEFT}) calc(50% + ${RADAR_OFFSET_Y_LEFT})`;
@@ -2717,7 +2759,8 @@ import weatherConditions from '../data/weather-conditions.json';
                 url('${baseTiles[0]}'), url('${baseTiles[1]}'), url('${baseTiles[2]}'), url('${baseTiles[3]}')
               `;
             } else {
-              const url = `https://radar.weather.gov/ridge/standard/${currentRadarStation}_${frameNum}.gif?t=${timeParam}`;
+              const fallbackFrameNum = Math.min(3, frameNum);
+              const url = `https://radar.weather.gov/ridge/standard/${currentRadarStation}_${fallbackFrameNum}.gif?t=${timeParam}`;
               framesRight[i].style.backgroundImage = `url('${url}')`;
               framesRight[i].style.backgroundSize = `calc(${RADAR_ZOOM_RIGHT} * 100%) auto`;
               framesRight[i].style.backgroundPosition = `calc(50% + ${RADAR_OFFSET_X_RIGHT}) calc(50% + ${RADAR_OFFSET_Y_RIGHT})`;
@@ -7033,7 +7076,8 @@ import weatherConditions from '../data/weather-conditions.json';
         return;
       }
 
-      currentRadarFrameIndex = (currentRadarFrameIndex + 1) % 4;
+      const totalFrames = (framesRight && framesRight.length) || (framesLeft && framesLeft.length) || RADAR_FRAME_COUNT;
+      currentRadarFrameIndex = (currentRadarFrameIndex + 1) % totalFrames;
 
       if (framesRight) {
         framesRight.forEach((frame, idx) => {
