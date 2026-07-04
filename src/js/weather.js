@@ -16,6 +16,7 @@ import weatherConditions from '../data/weather-conditions.json';
 
   // Radar loop interval and index trackers
   let radarLoopIntervalId = null;
+  let radarSweepIntervalId = null;
   let currentRadarFrameIndex = 0;
   let radarLoopCounter = 0;
 
@@ -168,6 +169,7 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--circle-cell-right', CIRCLE_CELL_RIGHT);
   document.documentElement.style.setProperty('--circle-cell-margin-bottom', CIRCLE_CELL_MARGIN_BOTTOM);
   document.documentElement.style.setProperty('--radar-center-dot-size', RADAR_CENTER_DOT_SIZE);
+  document.documentElement.style.setProperty('--radar-sweep-duration', `${RADAR_FRAME_COUNT * RADAR_LOOP_SPEED_MS}ms`);
 
   const WEATHER_IMAGE_WIDTH = CIRCLE_CELL_SIZE;
   const WEATHER_IMAGE_HEIGHT = CIRCLE_CELL_SIZE;
@@ -2551,6 +2553,7 @@ import weatherConditions from '../data/weather-conditions.json';
 
             if (framesRight.length !== RADAR_FRAME_COUNT) {
               descImageEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
+              descImageEl.querySelectorAll('.radar-sweep-line').forEach(l => l.remove());
               framesRight = [];
               for (let i = RADAR_FRAME_COUNT - 1; i >= 0; i--) {
                 const frame = document.createElement('div');
@@ -2570,6 +2573,10 @@ import weatherConditions from '../data/weather-conditions.json';
                 descImageEl.appendChild(frame);
                 framesRight.push(frame);
               }
+              // Create the sweep line element
+              const sweepLine = document.createElement('div');
+              sweepLine.className = 'radar-sweep-line';
+              descImageEl.appendChild(sweepLine);
             } else {
               framesRight.forEach(frame => {
                 frame.style.left = `${gridLeftPct}%`;
@@ -2579,6 +2586,7 @@ import weatherConditions from '../data/weather-conditions.json';
           } else {
             descImageEl.classList.remove('radar-mode');
             descImageEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
+            descImageEl.querySelectorAll('.radar-sweep-line').forEach(l => l.remove());
             
             // Set standard background image
             const imgPreload = new Image();
@@ -2624,6 +2632,7 @@ import weatherConditions from '../data/weather-conditions.json';
 
             if (framesLeft.length !== RADAR_FRAME_COUNT) {
               descImageLeftEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
+              descImageLeftEl.querySelectorAll('.radar-sweep-line').forEach(l => l.remove());
               framesLeft = [];
               for (let i = RADAR_FRAME_COUNT - 1; i >= 0; i--) {
                 const frame = document.createElement('div');
@@ -2643,6 +2652,10 @@ import weatherConditions from '../data/weather-conditions.json';
                 descImageLeftEl.appendChild(frame);
                 framesLeft.push(frame);
               }
+              // Create the sweep line element
+              const sweepLine = document.createElement('div');
+              sweepLine.className = 'radar-sweep-line';
+              descImageLeftEl.appendChild(sweepLine);
             } else {
               framesLeft.forEach(frame => {
                 frame.style.left = `${gridLeftPct}%`;
@@ -2652,6 +2665,7 @@ import weatherConditions from '../data/weather-conditions.json';
           } else {
             descImageLeftEl.classList.remove('radar-mode');
             descImageLeftEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
+            descImageLeftEl.querySelectorAll('.radar-sweep-line').forEach(l => l.remove());
             
             // Set standard background image
             const imgPreload = new Image();
@@ -2777,6 +2791,10 @@ import weatherConditions from '../data/weather-conditions.json';
           if (radarLoopIntervalId) {
             clearInterval(radarLoopIntervalId);
             radarLoopIntervalId = null;
+          }
+          if (radarSweepIntervalId) {
+            clearInterval(radarSweepIntervalId);
+            radarSweepIntervalId = null;
           }
         }
       }
@@ -7043,6 +7061,9 @@ import weatherConditions from '../data/weather-conditions.json';
     if (radarLoopIntervalId) {
       clearInterval(radarLoopIntervalId);
     }
+    if (radarSweepIntervalId) {
+      clearInterval(radarSweepIntervalId);
+    }
     const currentLoopToken = ++radarLoopCounter;
 
     let speed = RADAR_LOOP_SPEED_MS;
@@ -7068,6 +7089,22 @@ import weatherConditions from '../data/weather-conditions.json';
         frame.style.opacity = idx === 0 ? '1' : '0';
       });
     }
+
+    const sweepDuration = RADAR_FRAME_COUNT * RADAR_LOOP_SPEED_MS;
+    const sweepStartTime = Date.now();
+
+    radarSweepIntervalId = setInterval(() => {
+      if (currentLoopToken !== radarLoopCounter) {
+        clearInterval(radarSweepIntervalId);
+        return;
+      }
+      const elapsed = (Date.now() - sweepStartTime) % sweepDuration;
+      const angle = (elapsed / sweepDuration) * 360;
+      
+      document.querySelectorAll('.radar-sweep-line').forEach(line => {
+        line.style.transform = `rotate(${angle}deg)`;
+      });
+    }, 16); // 60 FPS smooth rotation
 
     radarLoopIntervalId = setInterval(() => {
       // Prevent action if a new loop instance has started
@@ -7297,7 +7334,7 @@ import weatherConditions from '../data/weather-conditions.json';
     }
     
     const finalLeft = leftActive || activeNow || fallbackHourly;
-    const finalRight = rightActive || activeNow || fallbackHourly;
+    const finalRight = rightActive;
     
     return { left: finalLeft, right: finalRight };
   }
@@ -7418,6 +7455,10 @@ import weatherConditions from '../data/weather-conditions.json';
       if (radarLoopIntervalId) {
         clearInterval(radarLoopIntervalId);
         radarLoopIntervalId = null;
+      }
+      if (radarSweepIntervalId) {
+        clearInterval(radarSweepIntervalId);
+        radarSweepIntervalId = null;
       }
       // Resolve the local NWS radar station ID dynamically for coordinates
       await updateRadarStation(LAT, LON);

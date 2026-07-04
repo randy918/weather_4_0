@@ -1182,3 +1182,15 @@ main {
 .feels-like-temp-val {
     animation: feelsLikeGlow 3s ease-in-out infinite !important;
 }
+
+.radar-sweep-line {
+    position: absolute;
+    top: 0;
+    left: calc(50% - 0.12vw);
+    width: 0.24vw;
+    height: 50%;
+    background-color: var(--clock-grid-track-color, rgba(255, 255, 255, 0.2));
+    transform-origin: 50% 100%;
+    z-index: 95;
+    pointer-events: none;
+}
