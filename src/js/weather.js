@@ -1265,7 +1265,7 @@ import weatherConditions from '../data/weather-conditions.json';
         left: 0;
         right: 0;
         height: 2vw;
-        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), transparent), linear-gradient(to bottom, var(--banner-color, rgba(220, 38, 38, 0.75)), transparent);
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.65), transparent);
         pointer-events: none;
         z-index: 10;
       }
