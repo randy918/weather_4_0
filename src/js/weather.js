@@ -1431,6 +1431,12 @@ import weatherConditions from '../data/weather-conditions.json';
 
     // Inject the SVG filter for removing blue haze on startup
     if (!document.getElementById('remove-blue-haze-svg')) {
+      const rootStyles = getComputedStyle(document.documentElement);
+      const mR = rootStyles.getPropertyValue('--radar-matrix-r').trim() || '3.0';
+      const mG = rootStyles.getPropertyValue('--radar-matrix-g').trim() || '3.0';
+      const mB = rootStyles.getPropertyValue('--radar-matrix-b').trim() || '-5.0';
+      const mOffset = rootStyles.getPropertyValue('--radar-matrix-offset').trim() || '-0.1';
+      
       const svgFilterHtml = `
         <svg id="remove-blue-haze-svg" style="position: absolute; width: 0; height: 0; overflow: hidden;" aria-hidden="true">
           <defs>
@@ -1439,7 +1445,7 @@ import weatherConditions from '../data/weather-conditions.json';
                 1   0   0   0   0
                 0   1   0   0   0
                 0   0   1   0   0
-                10.0 0.0 0.0 1.0 -9.5
+                ${mR} ${mG} ${mB} 1.0 ${mOffset}
               "/>
               <feComponentTransfer>
                 <feFuncA type="linear" slope="10" intercept="-4"/>

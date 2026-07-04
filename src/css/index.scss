@@ -1118,6 +1118,12 @@ main {
     --radar-bg-image: none;
     --radar-animation: none;
 
+    /* Doppler Radar Color Matrix Coefficients (Baseline approved settings) */
+    --radar-matrix-r: 3.0;
+    --radar-matrix-g: 0.0;
+    --radar-matrix-b: -5.0;
+    --radar-matrix-offset: -0.6;
+
     /* Option B: Solid Dark Map (To revert, uncomment below and comment out Option A) */
     /*
     --radar-blend-mode: normal;
