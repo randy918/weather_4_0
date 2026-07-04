@@ -113,13 +113,28 @@ import weatherConditions from '../data/weather-conditions.json';
   // Easily editable animation duration for the alert banner slide (in milliseconds)
   const ALERT_ANIMATION_MS = 1000;
 
-  // --- CONFIG: Doppler Radar Option for Upper Right ---
-  // Set to true to show Tulsa Doppler Radar (with black background).
-  // Set to false to show the original scrolling weather description background with centered date.
-  let SHOW_DOPPLER_RADAR = false;
+  // --- CONFIG: Doppler Radar Option ---
+  // Status of the left and right widgets
+  let SHOW_DOPPLER_RADAR_LEFT = false;
+  let SHOW_DOPPLER_RADAR_RIGHT = false;
+
+  // Set to true to force SHOW_DOPPLER_RADAR = true for testing (otherwise depends on active rain).
+  const FORCE_DOPPLER_RADAR = false;
+
+  // --- RainViewer Config for Left and Right Circle Cells ---
+  const RAINVIEWER_ZOOM_LEFT = 6;       // Zoom level for far view (e.g. 6 = ~300 miles)
+  const RAINVIEWER_ZOOM_RIGHT = 7;      // Zoom level for close-up view (e.g. 7 = ~150 miles)
+  const RAINVIEWER_TILE_SIZE = 512;     // Tile size for RainViewer tiles (256 or 512)
+  const RAINVIEWER_COLOR_SCHEME = 1;    // Color scheme (1 is Universal Blue, free personal use standard)
+
+  // Default precipitation thresholds (minimum active pixels inside viewport circle)
+  const RAINVIEWER_PRECIPITATION_PIXEL_THRESHOLD_LEFT = 150;
+  const RAINVIEWER_PRECIPITATION_PIXEL_THRESHOLD_RIGHT = 300;
+
+  let latestRainViewerData = null;
 
   // --- Doppler Radar Zoom & Pan Config (Active only when SHOW_DOPPLER_RADAR is true) ---
-  // LEFT Circle Cell (Far/Wide View)
+  // LEFT Circle Cell (Far/Wide View) - Fallback NWS radar config
   const RADAR_ZOOM_LEFT = 3.1;           // EDITABLE: Zoom level for far view (1.0 = covers container, e.g. 1.1 for slight zoom)
   const RADAR_OFFSET_X_LEFT = '0%';      // EDITABLE: Horizontal center offset (positive = right, negative = left)
   const RADAR_OFFSET_Y_LEFT = '7.5%';      // EDITABLE: Vertical center offset (positive = down, negative = up)
@@ -1267,11 +1282,12 @@ import weatherConditions from '../data/weather-conditions.json';
         opacity: 0; /* Hide initially to prevent page load flash */
       }
       #weather-desc-image.radar-mode {
-        background-color: black;
-        background-image: none;
+        background-color: var(--radar-bg-color, black);
+        background-image: var(--radar-bg-image, none);
         background-size: cover;
         background-repeat: no-repeat;
-        animation: none !important;
+        animation: var(--radar-animation, none) !important;
+        mix-blend-mode: var(--radar-blend-mode, normal);
       }
       #weather-desc-image.radar-mode .radar-frame {
         filter: invert(1) hue-rotate(180deg);
@@ -1302,11 +1318,12 @@ import weatherConditions from '../data/weather-conditions.json';
         opacity: 0; /* Hide initially to prevent page load flash */
       }
       #weather-desc-image-left.radar-mode {
-        background-color: black;
-        background-image: none;
+        background-color: var(--radar-bg-color, black);
+        background-image: var(--radar-bg-image, none);
         background-size: cover;
         background-repeat: no-repeat;
-        animation: none !important;
+        animation: var(--radar-animation, none) !important;
+        mix-blend-mode: var(--radar-blend-mode, normal);
       }
       #weather-desc-image-left.radar-mode .radar-frame {
         filter: invert(1) hue-rotate(180deg);
@@ -1418,7 +1435,7 @@ import weatherConditions from '../data/weather-conditions.json';
       descImg.id = 'weather-desc-image';
       
       
-      if (!SHOW_DOPPLER_RADAR) {
+      if (!SHOW_DOPPLER_RADAR_RIGHT) {
         // Random animation delay to start at different scroll position
         const randomDelay = -Math.random() * WEATHER_IMAGE_SCROLL_SPEED_S;
         descImg.style.setProperty('animation-delay', `${randomDelay}s`, 'important');
@@ -1427,7 +1444,7 @@ import weatherConditions from '../data/weather-conditions.json';
       
       // If simple-month was already created, move it inside the scrolling banner
       const simpleMonth = document.getElementById('simple-month');
-      if (simpleMonth && !SHOW_DOPPLER_RADAR) {
+      if (simpleMonth && !SHOW_DOPPLER_RADAR_RIGHT) {
         descImg.appendChild(simpleMonth);
       }
     }
@@ -1435,7 +1452,7 @@ import weatherConditions from '../data/weather-conditions.json';
     if (!document.getElementById('weather-desc-image-left')) {
       const descImgLeft = document.createElement('div');
       descImgLeft.id = 'weather-desc-image-left';
-      if (!SHOW_DOPPLER_RADAR) {
+      if (!SHOW_DOPPLER_RADAR_LEFT) {
         // Random animation delay to start at different scroll position
         const randomDelay = -Math.random() * WEATHER_IMAGE_SCROLL_SPEED_S;
         descImgLeft.style.setProperty('animation-delay', `${randomDelay}s`, 'important');
@@ -1444,7 +1461,7 @@ import weatherConditions from '../data/weather-conditions.json';
       
       // If simple-month-left was already created, move it inside the scrolling banner
       const simpleMonthLeft = document.getElementById('simple-month-left');
-      if (simpleMonthLeft && !SHOW_DOPPLER_RADAR) {
+      if (simpleMonthLeft && !SHOW_DOPPLER_RADAR_LEFT) {
         descImgLeft.appendChild(simpleMonthLeft);
       }
     }
@@ -2426,12 +2443,43 @@ import weatherConditions from '../data/weather-conditions.json';
       const descImageEl = document.getElementById('weather-desc-image');
       const descImageLeftEl = document.getElementById('weather-desc-image-left');
       if (descImageEl || descImageLeftEl) {
-        if (SHOW_DOPPLER_RADAR) {
-          let framesRight = [];
-          if (descImageEl) {
+        // Determine if it is currently night time
+        const now = Math.floor(Date.now() / 1000);
+        const sunrise = data?.current?.sunrise || data?.daily?.[0]?.sunrise;
+        const sunset = data?.current?.sunset || data?.daily?.[0]?.sunset;
+        let isNight = false;
+        if (sunrise && sunset) {
+          isNight = now < sunrise || now >= sunset;
+        }
+
+        const baseFileName = 'desc-' + description.toLowerCase().replace(/\s+/g, '-') + '.jpg';
+        const dayImgPath = 'img/' + baseFileName;
+        const nightImgPath = 'img/dark-' + baseFileName;
+        const fallbackPath = 'img/desc-rem.jpg';
+        const primaryImgPath = isNight ? nightImgPath : dayImgPath;
+
+        let framesRight = [];
+        if (descImageEl) {
+          if (SHOW_DOPPLER_RADAR_RIGHT) {
             descImageEl.classList.add('radar-mode');
             descImageEl.style.setProperty('--radar-fade-duration', `${RADAR_FADE_DURATION_MS}ms`);
             framesRight = descImageEl.querySelectorAll('.radar-frame');
+            
+            // Calculate coordinates and offsets dynamically to center the RainViewer map on LAT/LON for the right circle (Zoom 7)
+            const coords = getTileCoords(LAT, LON, RAINVIEWER_ZOOM_RIGHT);
+            const x0 = Math.floor(coords.x);
+            const y0 = Math.floor(coords.y);
+            const dX = coords.x - x0;
+            const dY = coords.y - y0;
+            
+            const x_start = (dX < 0.5) ? x0 - 1 : x0;
+            const y_start = (dY < 0.5) ? y0 - 1 : y0;
+            const dX_new = coords.x - x_start;
+            const dY_new = coords.y - y_start;
+            
+            const gridLeftPct = (0.5 - dX_new) * 100;
+            const gridTopPct = (0.5 - dY_new) * 100;
+
             if (framesRight.length !== 4) {
               descImageEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
               framesRight = [];
@@ -2440,24 +2488,71 @@ import weatherConditions from '../data/weather-conditions.json';
                 frame.className = 'radar-frame';
                 frame.style.cssText = `
                   position: absolute;
-                  top: 0; left: 0; width: 100%; height: 100%;
-                  background-size: calc(${RADAR_ZOOM_RIGHT} * 100%) auto;
+                  width: 200%; height: 200%;
+                  left: ${gridLeftPct}%;
+                  top: ${gridTopPct}%;
+                  background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%, 0% 0%, 100% 0%, 0% 100%, 100% 100%;
+                  background-size: 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%;
                   background-repeat: no-repeat;
-                  background-position: calc(50% + ${RADAR_OFFSET_X_RIGHT}) calc(50% + ${RADAR_OFFSET_Y_RIGHT});
                   opacity: ${i === 0 ? 1 : 0};
                   transition: opacity var(--radar-fade-duration, 400ms) ease-in-out;
+                  filter: none !important;
                 `;
                 descImageEl.appendChild(frame);
                 framesRight.push(frame);
               }
+            } else {
+              framesRight.forEach(frame => {
+                frame.style.left = `${gridLeftPct}%`;
+                frame.style.top = `${gridTopPct}%`;
+              });
             }
+          } else {
+            descImageEl.classList.remove('radar-mode');
+            descImageEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
+            
+            // Set standard background image
+            const imgPreload = new Image();
+            imgPreload.onload = () => {
+              descImageEl.style.backgroundImage = `url('${primaryImgPath}')`;
+            };
+            imgPreload.onerror = () => {
+              if (isNight) {
+                const dayPreload = new Image();
+                dayPreload.onload = () => { descImageEl.style.backgroundImage = `url('${dayImgPath}')`; };
+                dayPreload.onerror = () => { descImageEl.style.backgroundImage = `url('${fallbackPath}')`; };
+                dayPreload.src = dayImgPath;
+              } else {
+                descImageEl.style.backgroundImage = `url('${fallbackPath}')`;
+              }
+            };
+            imgPreload.src = primaryImgPath;
           }
+        }
 
-          let framesLeft = [];
-          if (descImageLeftEl) {
+        let framesLeft = [];
+        if (descImageLeftEl) {
+          if (SHOW_DOPPLER_RADAR_LEFT) {
             descImageLeftEl.classList.add('radar-mode');
             descImageLeftEl.style.setProperty('--radar-fade-duration', `${RADAR_FADE_DURATION_MS}ms`);
             framesLeft = descImageLeftEl.querySelectorAll('.radar-frame');
+            
+            // Calculate coordinates and offsets dynamically to center the RainViewer map on LAT/LON for the left circle (Zoom 6)
+            const coords = getTileCoords(LAT, LON, RAINVIEWER_ZOOM_LEFT);
+            const x0 = Math.floor(coords.x);
+            const y0 = Math.floor(coords.y);
+            const dX = coords.x - x0;
+            const dY = coords.y - y0;
+            
+            // Adjust the loaded tiles based on whether center coordinates fall in left/right or top/bottom halves of the tile
+            const x_start = (dX < 0.5) ? x0 - 1 : x0;
+            const y_start = (dY < 0.5) ? y0 - 1 : y0;
+            const dX_new = coords.x - x_start;
+            const dY_new = coords.y - y_start;
+            
+            const gridLeftPct = (0.5 - dX_new) * 100;
+            const gridTopPct = (0.5 - dY_new) * 100;
+
             if (framesLeft.length !== 4) {
               descImageLeftEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
               framesLeft = [];
@@ -2466,95 +2561,152 @@ import weatherConditions from '../data/weather-conditions.json';
                 frame.className = 'radar-frame';
                 frame.style.cssText = `
                   position: absolute;
-                  top: 0; left: 0; width: 100%; height: 100%;
-                  background-size: calc(${RADAR_ZOOM_LEFT} * 100%) auto;
+                  width: 200%; height: 200%;
+                  left: ${gridLeftPct}%;
+                  top: ${gridTopPct}%;
+                  background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%, 0% 0%, 100% 0%, 0% 100%, 100% 100%;
+                  background-size: 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%;
                   background-repeat: no-repeat;
-                  background-position: calc(50% + ${RADAR_OFFSET_X_LEFT}) calc(50% + ${RADAR_OFFSET_Y_LEFT});
                   opacity: ${i === 0 ? 1 : 0};
                   transition: opacity var(--radar-fade-duration, 400ms) ease-in-out;
+                  filter: none !important;
                 `;
                 descImageLeftEl.appendChild(frame);
                 framesLeft.push(frame);
               }
+            } else {
+              framesLeft.forEach(frame => {
+                frame.style.left = `${gridLeftPct}%`;
+                frame.style.top = `${gridTopPct}%`;
+              });
             }
+          } else {
+            descImageLeftEl.classList.remove('radar-mode');
+            descImageLeftEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
+            
+            // Set standard background image
+            const imgPreload = new Image();
+            imgPreload.onload = () => {
+              descImageLeftEl.style.backgroundImage = `url('${primaryImgPath}')`;
+            };
+            imgPreload.onerror = () => {
+              if (isNight) {
+                const dayPreload = new Image();
+                dayPreload.onload = () => { descImageLeftEl.style.backgroundImage = `url('${dayImgPath}')`; };
+                dayPreload.onerror = () => { descImageLeftEl.style.backgroundImage = `url('${fallbackPath}')`; };
+                dayPreload.src = dayImgPath;
+              } else {
+                descImageLeftEl.style.backgroundImage = `url('${fallbackPath}')`;
+              }
+            };
+            imgPreload.src = primaryImgPath;
           }
+        }
 
-          const timeParam = Math.floor(Date.now() / 1200000);
-          for (let i = 0; i < 4; i++) {
-            const frameNum = 3 - i;
-            const url = `https://radar.weather.gov/ridge/standard/${currentRadarStation}_${frameNum}.gif?t=${timeParam}`;
-            if (descImageEl && framesRight[i]) {
-              framesRight[i].style.backgroundImage = `url('${url}')`;
-              framesRight[i].style.backgroundSize = `calc(${RADAR_ZOOM_RIGHT} * 100%) auto`;
-              framesRight[i].style.backgroundPosition = `calc(50% + ${RADAR_OFFSET_X_RIGHT}) calc(50% + ${RADAR_OFFSET_Y_RIGHT})`;
-              framesRight[i].style.transition = `opacity var(--radar-fade-duration, 400ms) ease-in-out`;
-            }
-            if (descImageLeftEl && framesLeft[i]) {
+        const timeParam = Math.floor(Date.now() / 1200000);
+        
+        // Pre-calculate slippy parameters for LEFT (Zoom 6)
+        const coordsLeft = getTileCoords(LAT, LON, RAINVIEWER_ZOOM_LEFT);
+        const x0Left = Math.floor(coordsLeft.x);
+        const y0Left = Math.floor(coordsLeft.y);
+        const dXLeft = coordsLeft.x - x0Left;
+        const dYLeft = coordsLeft.y - y0Left;
+        const x_startLeft = (dXLeft < 0.5) ? x0Left - 1 : x0Left;
+        const y_startLeft = (dYLeft < 0.5) ? y0Left - 1 : y0Left;
+
+        // Pre-calculate slippy parameters for RIGHT (Zoom 7)
+        const coordsRight = getTileCoords(LAT, LON, RAINVIEWER_ZOOM_RIGHT);
+        const x0Right = Math.floor(coordsRight.x);
+        const y0Right = Math.floor(coordsRight.y);
+        const dXRight = coordsRight.x - x0Right;
+        const dYRight = coordsRight.y - y0Right;
+        const x_startRight = (dXRight < 0.5) ? x0Right - 1 : x0Right;
+        const y_startRight = (dYRight < 0.5) ? y0Right - 1 : y0Right;
+
+        for (let i = 0; i < 4; i++) {
+          const frameNum = 3 - i;
+          
+          // Left circle (RainViewer Zoom 6)
+          if (SHOW_DOPPLER_RADAR_LEFT && descImageLeftEl && framesLeft[i]) {
+            if (latestRainViewerData && latestRainViewerData.radar && latestRainViewerData.radar.past) {
+              const pastFrames = latestRainViewerData.radar.past;
+              const frameIndex = pastFrames.length - 1 - frameNum;
+              const rvFrame = pastFrames[frameIndex] || pastFrames[pastFrames.length - 1];
+              const host = latestRainViewerData.host || 'https://tilecache.rainviewer.com';
+              const path = rvFrame.path;
+              
+              const rvTiles = [
+                `${host}${path}/${RAINVIEWER_TILE_SIZE}/${RAINVIEWER_ZOOM_LEFT}/${x_startLeft}/${y_startLeft}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`,
+                `${host}${path}/${RAINVIEWER_TILE_SIZE}/${RAINVIEWER_ZOOM_LEFT}/${x_startLeft+1}/${y_startLeft}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`,
+                `${host}${path}/${RAINVIEWER_TILE_SIZE}/${RAINVIEWER_ZOOM_LEFT}/${x_startLeft}/${y_startLeft+1}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`,
+                `${host}${path}/${RAINVIEWER_TILE_SIZE}/${RAINVIEWER_ZOOM_LEFT}/${x_startLeft+1}/${y_startLeft+1}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`
+              ];
+              
+              const baseTiles = [
+                `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_LEFT}/${x_startLeft}/${y_startLeft}.png`,
+                `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_LEFT}/${x_startLeft+1}/${y_startLeft}.png`,
+                `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_LEFT}/${x_startLeft}/${y_startLeft+1}.png`,
+                `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_LEFT}/${x_startLeft+1}/${y_startLeft+1}.png`
+              ];
+              
+              framesLeft[i].style.backgroundImage = `
+                url('${rvTiles[0]}'), url('${rvTiles[1]}'), url('${rvTiles[2]}'), url('${rvTiles[3]}'),
+                url('${baseTiles[0]}'), url('${baseTiles[1]}'), url('${baseTiles[2]}'), url('${baseTiles[3]}')
+              `;
+            } else {
               const conusUrl = `https://radar.weather.gov/ridge/standard/CONUS_${frameNum}.gif?t=${timeParam}`;
               framesLeft[i].style.backgroundImage = `url('${conusUrl}')`;
               framesLeft[i].style.backgroundSize = `calc(${RADAR_ZOOM_LEFT} * 100%) auto`;
               framesLeft[i].style.backgroundPosition = `calc(50% + ${RADAR_OFFSET_X_LEFT}) calc(50% + ${RADAR_OFFSET_Y_LEFT})`;
-              framesLeft[i].style.transition = `opacity var(--radar-fade-duration, 400ms) ease-in-out`;
             }
           }
 
-          startRadarLoop(descImageEl ? framesRight : null, descImageLeftEl ? framesLeft : null);
+          // Right circle (RainViewer Zoom 7)
+          if (SHOW_DOPPLER_RADAR_RIGHT && descImageEl && framesRight[i]) {
+            if (latestRainViewerData && latestRainViewerData.radar && latestRainViewerData.radar.past) {
+              const pastFrames = latestRainViewerData.radar.past;
+              const frameIndex = pastFrames.length - 1 - frameNum;
+              const rvFrame = pastFrames[frameIndex] || pastFrames[pastFrames.length - 1];
+              const host = latestRainViewerData.host || 'https://tilecache.rainviewer.com';
+              const path = rvFrame.path;
+              
+              const rvTiles = [
+                `${host}${path}/${RAINVIEWER_TILE_SIZE}/${RAINVIEWER_ZOOM_RIGHT}/${x_startRight}/${y_startRight}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`,
+                `${host}${path}/${RAINVIEWER_TILE_SIZE}/${RAINVIEWER_ZOOM_RIGHT}/${x_startRight+1}/${y_startRight}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`,
+                `${host}${path}/${RAINVIEWER_TILE_SIZE}/${RAINVIEWER_ZOOM_RIGHT}/${x_startRight}/${y_startRight+1}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`,
+                `${host}${path}/${RAINVIEWER_TILE_SIZE}/${RAINVIEWER_ZOOM_RIGHT}/${x_startRight+1}/${y_startRight+1}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`
+              ];
+              
+              const baseTiles = [
+                `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_RIGHT}/${x_startRight}/${y_startRight}.png`,
+                `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_RIGHT}/${x_startRight+1}/${y_startRight}.png`,
+                `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_RIGHT}/${x_startRight}/${y_startRight+1}.png`,
+                `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_RIGHT}/${x_startRight+1}/${y_startRight+1}.png`
+              ];
+              
+              framesRight[i].style.backgroundImage = `
+                url('${rvTiles[0]}'), url('${rvTiles[1]}'), url('${rvTiles[2]}'), url('${rvTiles[3]}'),
+                url('${baseTiles[0]}'), url('${baseTiles[1]}'), url('${baseTiles[2]}'), url('${baseTiles[3]}')
+              `;
+            } else {
+              const url = `https://radar.weather.gov/ridge/standard/${currentRadarStation}_${frameNum}.gif?t=${timeParam}`;
+              framesRight[i].style.backgroundImage = `url('${url}')`;
+              framesRight[i].style.backgroundSize = `calc(${RADAR_ZOOM_RIGHT} * 100%) auto`;
+              framesRight[i].style.backgroundPosition = `calc(50% + ${RADAR_OFFSET_X_RIGHT}) calc(50% + ${RADAR_OFFSET_Y_RIGHT})`;
+            }
+          }
+        }
+
+        if (SHOW_DOPPLER_RADAR_RIGHT || SHOW_DOPPLER_RADAR_LEFT) {
+          startRadarLoop(
+            SHOW_DOPPLER_RADAR_RIGHT ? framesRight : null,
+            SHOW_DOPPLER_RADAR_LEFT ? framesLeft : null
+          );
         } else {
           if (radarLoopIntervalId) {
             clearInterval(radarLoopIntervalId);
             radarLoopIntervalId = null;
           }
-          if (descImageEl) {
-            descImageEl.classList.remove('radar-mode');
-            descImageEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
-          }
-          if (descImageLeftEl) {
-            descImageLeftEl.classList.remove('radar-mode');
-            descImageLeftEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
-          }
-          
-          // Determine if it is currently night time
-          const now = Math.floor(Date.now() / 1000);
-          const sunrise = data?.current?.sunrise || data?.daily?.[0]?.sunrise;
-          const sunset = data?.current?.sunset || data?.daily?.[0]?.sunset;
-          let isNight = false;
-          if (sunrise && sunset) {
-            isNight = now < sunrise || now >= sunset;
-          }
-
-          const baseFileName = 'desc-' + description.toLowerCase().replace(/\s+/g, '-') + '.jpg';
-          const dayImgPath = 'img/' + baseFileName;
-          const nightImgPath = 'img/dark-' + baseFileName;
-          const fallbackPath = 'img/desc-rem.jpg';
-          
-          const primaryImgPath = isNight ? nightImgPath : dayImgPath;
-          
-          const imgPreload = new Image();
-          imgPreload.onload = () => {
-            if (descImageEl) descImageEl.style.backgroundImage = `url('${primaryImgPath}')`;
-            if (descImageLeftEl) descImageLeftEl.style.backgroundImage = `url('${primaryImgPath}')`;
-          };
-          imgPreload.onerror = () => {
-            if (isNight) {
-              // If the dark image is missing, gracefully fall back to the standard day image
-              const dayPreload = new Image();
-              dayPreload.onload = () => {
-                if (descImageEl) descImageEl.style.backgroundImage = `url('${dayImgPath}')`;
-                if (descImageLeftEl) descImageLeftEl.style.backgroundImage = `url('${dayImgPath}')`;
-              };
-              dayPreload.onerror = () => {
-                if (descImageEl) descImageEl.style.backgroundImage = `url('${fallbackPath}')`;
-                if (descImageLeftEl) descImageLeftEl.style.backgroundImage = `url('${fallbackPath}')`;
-                recordMissingAsset(dayImgPath);
-              };
-              dayPreload.src = dayImgPath;
-            } else {
-              if (descImageEl) descImageEl.style.backgroundImage = `url('${fallbackPath}')`;
-              if (descImageLeftEl) descImageLeftEl.style.backgroundImage = `url('${fallbackPath}')`;
-              recordMissingAsset(primaryImgPath);
-            }
-          };
-          imgPreload.src = primaryImgPath;
         }
       }
       
@@ -4042,7 +4194,7 @@ import weatherConditions from '../data/weather-conditions.json';
       if (dewpoint !== null) {
         const dewF = Math.round(dewpoint);
         let displayStr = '';
-        const degSuffix = `<span style="font-size: 0.67em; font-family: 'medium', sans-serif;">°</span>`;
+        const degSuffix = '°';
         if (displayUnit === 'BOTH') {
           const dewC = Math.round((dewF - 32) * 5 / 9);
           displayStr = `${dewF}${formatSlash()}${dewC}${degSuffix}`;
@@ -4847,7 +4999,7 @@ import weatherConditions from '../data/weather-conditions.json';
       if (dewpoint !== null) {
         const dewF = Math.round(dewpoint);
         let displayStr = '';
-        const degSuffix = `<span style="font-size: 0.67em; font-family: 'medium', sans-serif;">°</span>`;
+        const degSuffix = '°';
         if (displayUnit === 'BOTH') {
           const dewC = Math.round((dewF - 32) * 5 / 9);
           displayStr = `${dewF}${formatSlash()}${dewC}${degSuffix}`;
@@ -6895,101 +7047,127 @@ import weatherConditions from '../data/weather-conditions.json';
    * Checks the latest radar image for precipitation color activity.
    * Returns a promise resolving to true if precipitation exceeds the threshold, or false.
    */
-  async function checkRadarPrecipitationActivity(stationId) {
-    return new Promise((resolve) => {
-      // Build the URL for the latest frame (frameNum = 0)
-      const timeParam = Math.floor(Date.now() / 600000); // 10 minutes cache bust
-      const rawUrl = `https://radar.weather.gov/ridge/standard/${stationId}_0.gif?t=${timeParam}`;
-      const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(rawUrl)}`;
+  async function checkRadarPrecipitationActivity(zoomLevel) {
+    if (!latestRainViewerData || !latestRainViewerData.radar || !latestRainViewerData.radar.past || latestRainViewerData.radar.past.length === 0) {
+      console.log('📡 RainViewer: No RainViewer data cached, fallback to false.');
+      return false;
+    }
 
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
+    return new Promise(async (resolve) => {
+      try {
+        const pastFrames = latestRainViewerData.radar.past;
+        const latestFrame = pastFrames[pastFrames.length - 1];
+        const host = latestRainViewerData.host || 'https://tilecache.rainviewer.com';
+        const path = latestFrame.path;
 
-      // Set a safety timeout of 5 seconds for image loading
-      const timeoutId = setTimeout(() => {
-        console.warn('⚠️ Radar pixel check timed out.');
-        img.src = '';
-        resolve(null); // Resolve with null to indicate failure
-      }, 5000);
+        // Calculate coordinates and offsets dynamically to center the RainViewer map on LAT/LON
+        const coords = getTileCoords(LAT, LON, zoomLevel);
+        const x0 = Math.floor(coords.x);
+        const y0 = Math.floor(coords.y);
+        const dX = coords.x - x0;
+        const dY = coords.y - y0;
+        
+        const x_start = (dX < 0.5) ? x0 - 1 : x0;
+        const y_start = (dY < 0.5) ? y0 - 1 : y0;
+        const dX_new = coords.x - x_start;
+        const dY_new = coords.y - y_start;
+        
+        const gridLeftPct = (0.5 - dX_new) * 100;
+        const gridTopPct = (0.5 - dY_new) * 100;
 
-      img.onload = () => {
-        clearTimeout(timeoutId);
-        try {
-          // Downscale the image on canvas for speed and noise filtering
-          const canvas = document.createElement('canvas');
-          const size = 80; // downscale to 80x80 pixels
-          canvas.width = size;
-          canvas.height = size;
-          const ctx = canvas.getContext('2d');
-          if (!ctx) {
-            resolve(null);
-            return;
-          }
-          
-          ctx.drawImage(img, 0, 0, size, size);
-          const imgData = ctx.getImageData(0, 0, size, size);
-          const pixels = imgData.data;
+        const tileUrls = [
+          `${host}${path}/${RAINVIEWER_TILE_SIZE}/${zoomLevel}/${x_start}/${y_start}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`,
+          `${host}${path}/${RAINVIEWER_TILE_SIZE}/${zoomLevel}/${x_start+1}/${y_start}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`,
+          `${host}${path}/${RAINVIEWER_TILE_SIZE}/${zoomLevel}/${x_start}/${y_start+1}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`,
+          `${host}${path}/${RAINVIEWER_TILE_SIZE}/${zoomLevel}/${x_start+1}/${y_start+1}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`
+        ];
 
-          let precipitationPixelCount = 0;
-
-          // Helper to convert RGB to HSL
-          const getHsl = (r, g, b) => {
-            r /= 255; g /= 255; b /= 255;
-            const max = Math.max(r, g, b), min = Math.min(r, g, b);
-            let h, s, l = (max + min) / 2;
-            if (max === min) {
-              h = s = 0;
-            } else {
-              const d = max - min;
-              s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-              switch (max) {
-                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-                case g: h = (b - r) / d + 2; break;
-                case b: h = (r - g) / d + 4; break;
-              }
-              h /= 6;
-            }
-            return [h * 360, s * 100, l * 100];
+        // Load all 4 images using promises (treating 404 or load errors as empty transparent tiles)
+        const loadImage = (url) => new Promise((resImg) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => resImg(img);
+          img.onerror = () => {
+            // Log as info since 404 is standard for no-rain tiles on RainViewer
+            console.log(`📡 RainViewer Info: Empty or missing tile (loaded as empty): ${url}`);
+            resImg(null);
           };
+          img.src = url;
+        });
 
-          for (let y = 10; y < 68; y++) { // Crop out top header text (0-9) and bottom legend bar (68-79)
-            for (let x = 0; x < size; x++) {
+        // Safety timeout for loading the tiles (6 seconds)
+        const timeoutId = setTimeout(() => {
+          console.error('❌ RainViewer pixel check timed out.');
+          resolve(false);
+        }, 6000);
+
+        const images = await Promise.all(tileUrls.map(loadImage));
+        clearTimeout(timeoutId);
+
+        // Perform offscreen drawing
+        const canvas = document.createElement('canvas');
+        const size = 128; // downscale for scanning performance
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(false);
+          return;
+        }
+
+        // Draw the 2x2 grid onto the canvas matching the exact layout of the widget (skipping empty tiles)
+        const gridLeft = (gridLeftPct / 100) * size;
+        const gridTop = (gridTopPct / 100) * size;
+        const tileSize = size;
+
+        if (images[0]) ctx.drawImage(images[0], gridLeft, gridTop, tileSize, tileSize);
+        if (images[1]) ctx.drawImage(images[1], gridLeft + tileSize, gridTop, tileSize, tileSize);
+        if (images[2]) ctx.drawImage(images[2], gridLeft, gridTop + tileSize, tileSize, tileSize);
+        if (images[3]) ctx.drawImage(images[3], gridLeft + tileSize, gridTop + tileSize, tileSize, tileSize);
+
+        // Scan pixels within the circular viewport (centered at size/2, size/2 with radius size/2)
+        const imgData = ctx.getImageData(0, 0, size, size);
+        const pixels = imgData.data;
+        const radius = size / 2;
+        const cx = size / 2;
+        const cy = size / 2;
+
+        let precipitationPixelCount = 0;
+
+        for (let y = 0; y < size; y++) {
+          for (let x = 0; x < size; x++) {
+            // Check if pixel is within the circular bounds
+            const dx = x - cx;
+            const dy = y - cy;
+            if (dx * dx + dy * dy <= radius * radius) {
               const idx = (y * size + x) * 4;
-              const r = pixels[idx];
-              const g = pixels[idx + 1];
-              const b = pixels[idx + 2];
-              const a = pixels[idx + 3];
-
-              if (a < 50) continue; // skip transparent pixels
-
-              const [h, s, l] = getHsl(r, g, b);
-
-              // Filter out base map elements (which have low saturation or extreme lightness)
-              // Rain and radar echoes are highly saturated (S > 45%) and mid-lightness (L between 20% and 85%).
-              if (s > 45 && l > 20 && l < 85) {
+              const a = pixels[idx + 3]; // alpha channel
+              // Since tiles have transparent background, any non-transparent pixel (alpha > 50) is precipitation
+              if (a > 50) {
                 precipitationPixelCount++;
               }
             }
           }
-
-          // Crop boundary contains 58 rows * 80 cols = 4640 pixels.
-          // Threshold of RADAR_PRECIPITATION_PIXEL_THRESHOLD defines the trigger point.
-          const threshold = RADAR_PRECIPITATION_PIXEL_THRESHOLD; 
-          console.log(`📡 Radar Pixel Check [${stationId}]: Found ${precipitationPixelCount} precipitation pixels (Threshold is ${threshold})`);
-          resolve(precipitationPixelCount >= threshold);
-        } catch (e) {
-          console.warn('⚠️ Radar pixel check failed during analysis:', e);
-          resolve(null);
         }
-      };
 
-      img.onerror = (e) => {
-        clearTimeout(timeoutId);
-        console.warn('⚠️ Radar pixel check failed to load image:', e);
-        resolve(null);
-      };
+        // Read threshold dynamically from CSS variables, falling back to JS constants
+        let threshold = 300;
+        const rootStyle = getComputedStyle(document.documentElement);
+        if (zoomLevel === RAINVIEWER_ZOOM_LEFT) {
+          const cssVal = rootStyle.getPropertyValue('--radar-threshold-left').trim();
+          threshold = cssVal ? parseInt(cssVal, 10) : RAINVIEWER_PRECIPITATION_PIXEL_THRESHOLD_LEFT;
+        } else {
+          const cssVal = rootStyle.getPropertyValue('--radar-threshold-right').trim();
+          threshold = cssVal ? parseInt(cssVal, 10) : RAINVIEWER_PRECIPITATION_PIXEL_THRESHOLD_RIGHT;
+        }
 
-      img.src = proxyUrl;
+        console.log(`📡 RainViewer Pixel Check (Zoom ${zoomLevel} Circle): Found ${precipitationPixelCount} active pixels (Threshold is ${threshold})`);
+        
+        resolve(precipitationPixelCount >= threshold);
+      } catch (e) {
+        console.error('❌ RainViewer pixel check failed during analysis:', e);
+        resolve(false);
+      }
     });
   }
 
@@ -7038,37 +7216,23 @@ import weatherConditions from '../data/weather-conditions.json';
     return false;
   }
 
-  /**
-   * Coordinator: Determines if the Doppler radar loop should be enabled.
-   * Runs the radar pixel analysis, falling back to OpenWeather data on failure/clear skies.
-   */
   async function determineRadarStatus(data) {
-    if (currentRadarStation) {
-      const radarActive = await checkRadarPrecipitationActivity(currentRadarStation);
-      if (radarActive !== null) {
-        // Radar check succeeded!
-        if (radarActive) {
-          console.log(`📡 Dynamic Radar: Radar check detected precipitation pixels.`);
-          return true;
-        } else {
-          // Radar check is clear. Only activate if it is actively raining right now or severe alerts are active.
-          // We do NOT override a clear radar check just for low-probability hourly forecasts.
-          const activeNow = isPrecipitationActiveNow(data);
-          if (activeNow) {
-            console.log(`📡 Dynamic Radar: Radar image clear, but current rain/alerts at home triggered activation.`);
-            return true;
-          }
-          return false;
-        }
-      }
+    if (FORCE_DOPPLER_RADAR) {
+      console.log(`📡 Dynamic Radar: FORCE_DOPPLER_RADAR is enabled.`);
+      return { left: true, right: true };
     }
-
-    // Fallback entirely to OpenWeather data if radar check failed or timed out
-    console.log(`📡 Dynamic Radar: Radar check failed or timed out. Falling back to OpenWeather data...`);
-    if (isPrecipitationActiveNow(data)) return true;
-
+    
+    // Check Left Circle (Zoom 6)
+    const leftActive = await checkRadarPrecipitationActivity(RAINVIEWER_ZOOM_LEFT);
+    
+    // Check Right Circle (Zoom 7)
+    const rightActive = await checkRadarPrecipitationActivity(RAINVIEWER_ZOOM_RIGHT);
+    
+    // Fallback checks (current precipitation active now)
+    const activeNow = isPrecipitationActiveNow(data);
+    
+    let fallbackHourly = false;
     // Check hourly forecast for the next 3 hours (hours 0, 1, 2)
-    // Require a higher probability (pop > 30%) and rain/snow forecasted to trigger
     const hourly = data.hourly || [];
     for (let i = 0; i < Math.min(3, hourly.length); i++) {
       const hour = hourly[i];
@@ -7078,12 +7242,15 @@ import weatherConditions from '../data/weather-conditions.json';
       const hourSnow = hour.snow?.['1h'] || hour.snow || 0;
 
       if (hourId && (hourId >= 200 && hourId < 700) && (hourPop > 0.30 || hourRain > 0.1 || hourSnow > 0.1)) {
-        console.log(`🌧️ Fallback: Hourly forecast indicates upcoming precipitation (Pop: ${hourPop}, Rain: ${hourRain}).`);
-        return true;
+        fallbackHourly = true;
+        break;
       }
     }
-
-    return false;
+    
+    const finalLeft = leftActive || activeNow || fallbackHourly;
+    const finalRight = rightActive || activeNow || fallbackHourly;
+    
+    return { left: finalLeft, right: finalRight };
   }
 
   // Expose diagnostic tool to browser console
@@ -7206,6 +7373,20 @@ import weatherConditions from '../data/weather-conditions.json';
       // Resolve the local NWS radar station ID dynamically for coordinates
       await updateRadarStation(LAT, LON);
 
+      // Fetch RainViewer map data asynchronously
+      try {
+        console.log('Fetching RainViewer map data...');
+        const rvRes = await fetch('https://api.rainviewer.com/public/weather-maps.json');
+        if (rvRes.ok) {
+          latestRainViewerData = await rvRes.json();
+          console.log('RainViewer map data fetched successfully.');
+        } else {
+          console.warn(`RainViewer API returned status: ${rvRes.status}`);
+        }
+      } catch (e) {
+        console.warn('Failed to fetch RainViewer map data:', e);
+      }
+
       // We removed the double-fetch block! The OneCall API fetches what it needs directly.
       const url = getUrl();
       console.log(`Fetching weather for LAT: ${LAT}, LON: ${LON}`);
@@ -7215,11 +7396,14 @@ import weatherConditions from '../data/weather-conditions.json';
 
       // Determine if radar mode should be active based on canvas check and/or OpenWeather data
       try {
-        SHOW_DOPPLER_RADAR = await determineRadarStatus(data);
-        console.log(`📡 Dynamic Radar Status decided: ${SHOW_DOPPLER_RADAR ? 'ENABLED' : 'DISABLED'}`);
+        const radarStatus = await determineRadarStatus(data);
+        SHOW_DOPPLER_RADAR_LEFT = radarStatus.left;
+        SHOW_DOPPLER_RADAR_RIGHT = radarStatus.right;
+        console.log(`📡 Dynamic Radar Status decided - Left: ${SHOW_DOPPLER_RADAR_LEFT ? 'ENABLED' : 'DISABLED'}, Right: ${SHOW_DOPPLER_RADAR_RIGHT ? 'ENABLED' : 'DISABLED'}`);
       } catch (e) {
         console.warn('Error determining dynamic radar status, defaulting to false:', e);
-        SHOW_DOPPLER_RADAR = false;
+        SHOW_DOPPLER_RADAR_LEFT = false;
+        SHOW_DOPPLER_RADAR_RIGHT = false;
       }
       
       // Store data for resize repositioning and component styling (like clock hands)
@@ -7872,3 +8056,11 @@ import weatherConditions from '../data/weather-conditions.json';
 
   // STAGE 2: Test banner turned OFF. App is now using live weather data!
   // setTimeout(testAlertBanner, 2000);
+
+  function getTileCoords(lat, lon, zoom) {
+    const latRad = lat * Math.PI / 180;
+    const n = Math.pow(2, zoom);
+    const x = n * ((lon + 180) / 360);
+    const y = n * (1 - (Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI)) / 2;
+    return { x, y };
+  }

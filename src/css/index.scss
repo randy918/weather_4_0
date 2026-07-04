@@ -1108,6 +1108,23 @@ main {
 // Responsive layout: 7-dial row is for tablet/desktop only; 4-dial rows are for phone only
 :root {
     --clock-inner-label-size: var(--clock-grid-inner-label-font-size-desktop, 2.2vw);
+    --radar-threshold-left: 150;
+    --radar-threshold-right: 300;
+
+    /* Doppler Radar Experiment: "Lighten Only" HUD overlay on the page background */
+    /* Option A: Lighten HUD Overlay on page background (Default) */
+    --radar-blend-mode: lighten;
+    --radar-bg-color: transparent;
+    --radar-bg-image: none;
+    --radar-animation: none;
+
+    /* Option B: Solid Dark Map (To revert, uncomment below and comment out Option A) */
+    /*
+    --radar-blend-mode: normal;
+    --radar-bg-color: black;
+    --radar-bg-image: none;
+    --radar-animation: none;
+    */
 }
 
 @media (max-width: 767px) {
