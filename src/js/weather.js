@@ -1429,6 +1429,28 @@ import weatherConditions from '../data/weather-conditions.json';
     // Create rain forecast banner container immediately after alerts
     initRainBannerContainer();
 
+    // Inject the SVG filter for removing blue haze on startup
+    if (!document.getElementById('remove-blue-haze-svg')) {
+      const svgFilterHtml = `
+        <svg id="remove-blue-haze-svg" style="position: absolute; width: 0; height: 0; overflow: hidden;" aria-hidden="true">
+          <defs>
+            <filter id="remove-blue-haze" color-interpolation-filters="sRGB">
+              <feColorMatrix type="matrix" values="
+                1   0   0   0   0
+                0   1   0   0   0
+                0   0   1   0   0
+                10.0 0.0 0.0 1.0 -9.5
+              "/>
+              <feComponentTransfer>
+                <feFuncA type="linear" slope="10" intercept="-4"/>
+              </feComponentTransfer>
+            </filter>
+          </defs>
+        </svg>
+      `;
+      document.body.insertAdjacentHTML('beforeend', svgFilterHtml);
+    }
+
     // Create the 16:9 placeholder element
     if (!document.getElementById('weather-desc-image')) {
       const descImg = document.createElement('div');
@@ -2496,7 +2518,7 @@ import weatherConditions from '../data/weather-conditions.json';
                   background-repeat: no-repeat;
                   opacity: ${i === 0 ? 1 : 0};
                   transition: opacity var(--radar-fade-duration, 400ms) ease-in-out;
-                  filter: none !important;
+                  filter: url(#remove-blue-haze) !important;
                 `;
                 descImageEl.appendChild(frame);
                 framesRight.push(frame);
@@ -2569,7 +2591,7 @@ import weatherConditions from '../data/weather-conditions.json';
                   background-repeat: no-repeat;
                   opacity: ${i === 0 ? 1 : 0};
                   transition: opacity var(--radar-fade-duration, 400ms) ease-in-out;
-                  filter: none !important;
+                  filter: url(#remove-blue-haze) !important;
                 `;
                 descImageLeftEl.appendChild(frame);
                 framesLeft.push(frame);
@@ -6975,7 +6997,6 @@ import weatherConditions from '../data/weather-conditions.json';
     const currentLoopToken = ++radarLoopCounter;
 
     let speed = RADAR_LOOP_SPEED_MS;
-    let fadeDuration = RADAR_FADE_DURATION_MS;
     const descImageEl = document.getElementById('weather-desc-image');
     if (descImageEl) {
       const computedSpeed = getComputedStyle(descImageEl).getPropertyValue('--radar-loop-speed').trim();
@@ -6983,13 +7004,6 @@ import weatherConditions from '../data/weather-conditions.json';
         const parsed = parseFloat(computedSpeed);
         if (!isNaN(parsed) && parsed > 0) {
           speed = computedSpeed.endsWith('ms') ? parsed : parsed * 1000;
-        }
-      }
-      const computedFade = getComputedStyle(descImageEl).getPropertyValue('--radar-fade-duration').trim();
-      if (computedFade) {
-        const parsed = parseFloat(computedFade);
-        if (!isNaN(parsed) && parsed > 0) {
-          fadeDuration = computedFade.endsWith('ms') ? parsed : parsed * 1000;
         }
       }
     }
@@ -7006,40 +7020,25 @@ import weatherConditions from '../data/weather-conditions.json';
       });
     }
 
-    // Set overlap delay (75% of fade-in duration, capped at 80% of speed)
-    const overlapDelay = Math.min(fadeDuration * 0.75, speed * 0.8);
-
     radarLoopIntervalId = setInterval(() => {
+      // Prevent action if a new loop instance has started
+      if (currentLoopToken !== radarLoopCounter) {
+        clearInterval(radarLoopIntervalId);
+        return;
+      }
+
       currentRadarFrameIndex = (currentRadarFrameIndex + 1) % 4;
 
-      // 1. Immediately start fading in the new active frame
-      if (framesRight && framesRight[currentRadarFrameIndex]) {
-        framesRight[currentRadarFrameIndex].style.opacity = '1';
+      if (framesRight) {
+        framesRight.forEach((frame, idx) => {
+          frame.style.opacity = idx === currentRadarFrameIndex ? '1' : '0';
+        });
       }
-      if (framesLeft && framesLeft[currentRadarFrameIndex]) {
-        framesLeft[currentRadarFrameIndex].style.opacity = '1';
+      if (framesLeft) {
+        framesLeft.forEach((frame, idx) => {
+          frame.style.opacity = idx === currentRadarFrameIndex ? '1' : '0';
+        });
       }
-
-      // 2. Keep the previous frame visible during the overlap window, then fade it out
-      setTimeout(() => {
-        // Prevent action if a new loop instance has started
-        if (currentLoopToken !== radarLoopCounter) return;
-
-        if (framesRight) {
-          framesRight.forEach((frame, idx) => {
-            if (idx !== currentRadarFrameIndex) {
-              frame.style.opacity = '0';
-            }
-          });
-        }
-        if (framesLeft) {
-          framesLeft.forEach((frame, idx) => {
-            if (idx !== currentRadarFrameIndex) {
-              frame.style.opacity = '0';
-            }
-          });
-        }
-      }, overlapDelay);
     }, speed);
   }
 
