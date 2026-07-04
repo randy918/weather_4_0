@@ -2260,6 +2260,8 @@ import weatherConditions from '../data/weather-conditions.json';
       line-height: 1.1;
       padding: 0.5vw;
       box-sizing: border-box;
+      position: relative;
+      overflow: hidden;
     `;
     
     // Only add text if there's measurable rain
@@ -2270,6 +2272,8 @@ import weatherConditions from '../data/weather-conditions.json';
         font-weight: normal;
         font-size: ${RAIN_BANNER_FONT_SIZE_HOUR};
         color: white;
+        position: relative;
+        z-index: 2;
       `;
       hourLine.textContent = hourText;
       
@@ -2279,9 +2283,25 @@ import weatherConditions from '../data/weather-conditions.json';
         font-weight: 900;
         font-size: ${RAIN_BANNER_FONT_SIZE_PERCENT};
         color: white;
+        position: relative;
+        z-index: 2;
       `;
       percentLine.textContent = `${hour.rainDisplay}`;
+
+      // Create a darkening top shadow (starts at 65% opacity and fades down 2vw to 0)
+      const topShadow = document.createElement('div');
+      topShadow.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2vw;
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.65), transparent);
+        pointer-events: none;
+        z-index: 1;
+      `;
       
+      cell.appendChild(topShadow);
       cell.appendChild(hourLine);
       cell.appendChild(percentLine);
       cell.title = `${hour.rainDisplay} of rain at ${hourText}`;
