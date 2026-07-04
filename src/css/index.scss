@@ -1027,6 +1027,7 @@ main {
     .grid-dewpoint-text {
         transform: translate(-50%, calc(-50% + var(--item-current-size) * 0.07)) !important;
         line-height: 0.5 !important;
+        font-size: var(--grid-dewpoint-font-size, calc(var(--item-current-size) * 0.35)) !important;
     }
 
     .grid-sun-text {
@@ -1116,6 +1117,10 @@ main {
 
     .grid-wind-speed-text {
         transform: translate(-50%, calc(-50% + var(--item-current-size) * 0.07 + var(--wind-number-y-offset-mobile, 0vw))) !important;
+    }
+    
+    .grid-dewpoint-text {
+        font-size: var(--grid-dewpoint-font-size, calc(var(--item-current-size) * 0.30)) !important;
     }
     
     .clockGridContainer7,

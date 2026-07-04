@@ -6,8 +6,10 @@ import weatherConditions from '../data/weather-conditions.json';
   let LAT = 36.10336; // Tulsa exact home Latitude (now mutable via Weather.setLatLon)
   let LON = -95.92734; // Tulsa exact home Longitude
 
-  // Global toggle for Temperature Display Unit ('F' or 'C')
   let displayUnit = 'F';
+
+  // Helper to render dual temperature slash in light font style with tight horizontal margin spacing
+  const formatSlash = () => `<span style="font-family: 'light', sans-serif; margin: 0 -0.06em;">/</span>`;
 
   // Dynamic NWS radar station identifier (defaults to Tulsa's KINX)
   let currentRadarStation = 'KINX';
@@ -302,7 +304,7 @@ import weatherConditions from '../data/weather-conditions.json';
         const f = Math.round(v);
         const c = Math.round((f - 32) * 5 / 9);
         return displayUnit === 'BOTH' 
-          ? `<span class="fc-mode-text">${f}/${c}hi</span>`
+          ? `<span class="fc-mode-text">${f}${formatSlash()}${c}hi</span>`
           : `<span class="fc-mode-text">${displayUnit === 'C' ? c : f}hi</span>`;
       },
       placeholder: '--°H'
@@ -315,7 +317,7 @@ import weatherConditions from '../data/weather-conditions.json';
         const f = Math.round(v);
         const c = Math.round((f - 32) * 5 / 9);
         return displayUnit === 'BOTH' 
-          ? `<span class="fc-mode-text">${f}/${c}</span>`
+          ? `<span class="fc-mode-text">${f}${formatSlash()}${c}</span>`
           : `<span class="fc-mode-text">${displayUnit === 'C' ? c : f}${displayUnit === 'C' ? 'C' : 'F'}</span>`;
       },
       placeholder: '--°F'
@@ -332,7 +334,7 @@ import weatherConditions from '../data/weather-conditions.json';
         const f = Math.round(v);
         const c = Math.round((f - 32) * 5 / 9);
         return displayUnit === 'BOTH'
-          ? `<span class="fc-mode-text">${f}/${c}lo</span>`
+          ? `<span class="fc-mode-text">${f}${formatSlash()}${c}lo</span>`
           : `<span class="fc-mode-text">${displayUnit === 'C' ? c : f}lo</span>`;
       },
       placeholder: '--°lo'
@@ -2210,13 +2212,13 @@ import weatherConditions from '../data/weather-conditions.json';
         const feelsLikeHtml = `<span style="font-family: 'light', sans-serif; font-weight: normal; font-size: ${FEELS_LIKE_TEXT_SIZE_DUAL}; letter-spacing: ${FEELS_LIKE_LETTER_SPACING_DUAL}; margin-left: ${FEELS_LIKE_MARGIN_LEFT_DUAL}; margin-right: ${FEELS_LIKE_MARGIN_RIGHT_DUAL}; color: inherit;">feels like</span>`;
         const fF = Math.round(feelsLike);
         const fC = Math.round((feelsLike - 32) * 5 / 9);
-        const dualFeels = `<span class="fc-mode-text ${glowClass}" style="${glowStyle} font-family: 'boldcond', sans-serif; font-size: ${FEELS_LIKE_TEMP_SIZE_DUAL}; color: ${dynamicColor} !important; transition: color 0.5s ease;">${fF}/${fC}</span>`;
+        const dualFeels = `<span class="fc-mode-text ${glowClass}" style="${glowStyle} font-family: 'boldcond', sans-serif; font-size: ${FEELS_LIKE_TEMP_SIZE_DUAL}; color: ${dynamicColor} !important; transition: color 0.5s ease;">${fF}${formatSlash()}${fC}</span>`;
         
         if (typeof currentTemp === 'number') {
           const cF = Math.round(currentTemp);
           const cC = Math.round((currentTemp - 32) * 5 / 9);
           const currClr = tempToColor(currentTemp) || 'white';
-          el.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${FEELS_LIKE_TEMP_SIZE_DUAL}; color: ${currClr} !important;">${cF}/${cC}</span>${feelsLikeHtml}${dualFeels}`;
+          el.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${FEELS_LIKE_TEMP_SIZE_DUAL}; color: ${currClr} !important;">${cF}${formatSlash()}${cC}</span>${feelsLikeHtml}${dualFeels}`;
         } else {
           el.innerHTML = `${feelsLikeHtml}${dualFeels}`;
         }
@@ -3385,7 +3387,14 @@ import weatherConditions from '../data/weather-conditions.json';
         }
 
         if (i === 3 && data && data.current && typeof data.current.dew_point === 'number') {
-           titleText = `Dew Pt ${Math.round(data.current.dew_point)}°`;
+           const dewF = Math.round(data.current.dew_point);
+           if (displayUnit === 'BOTH') {
+              const dewC = Math.round((dewF - 32) * 5 / 9);
+              titleText = `Dew Pt ${dewF}${formatSlash()}${dewC}°`;
+           } else {
+              const dewDisplay = displayUnit === 'C' ? Math.round((dewF - 32) * 5 / 9) : dewF;
+              titleText = `Dew Pt ${dewDisplay}°`;
+           }
         }
         
         if (i === 5 && data && data.daily && data.daily[0]) {
@@ -3491,7 +3500,14 @@ import weatherConditions from '../data/weather-conditions.json';
 
       const humidityTitle = labelsContainer7.querySelector('.label-title-3');
       if (humidityTitle && data && data.current && typeof data.current.dew_point === 'number') {
-         humidityTitle.innerText = `Dew Pt ${Math.round(data.current.dew_point)}°`;
+         const dewF = Math.round(data.current.dew_point);
+         if (displayUnit === 'BOTH') {
+            const dewC = Math.round((dewF - 32) * 5 / 9);
+            humidityTitle.innerHTML = `Dew Pt ${dewF}${formatSlash()}${dewC}°`;
+         } else {
+            const dewDisplay = displayUnit === 'C' ? Math.round((dewF - 32) * 5 / 9) : dewF;
+            humidityTitle.innerHTML = `Dew Pt ${dewDisplay}°`;
+         }
       }
       
       const sunTitle = labelsContainer7.querySelector('.label-title-5');
@@ -4024,7 +4040,17 @@ import weatherConditions from '../data/weather-conditions.json';
     
     gridDewpointTextEls.forEach(gridDewpointTextEl => {
       if (dewpoint !== null) {
-        gridDewpointTextEl.innerHTML = `${Math.round(dewpoint)}°<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Td</span>`;
+        const dewF = Math.round(dewpoint);
+        let displayStr = '';
+        const degSuffix = `<span style="font-size: 0.67em; font-family: 'medium', sans-serif;">°</span>`;
+        if (displayUnit === 'BOTH') {
+          const dewC = Math.round((dewF - 32) * 5 / 9);
+          displayStr = `${dewF}${formatSlash()}${dewC}${degSuffix}`;
+        } else {
+          const dewDisplay = displayUnit === 'C' ? Math.round((dewF - 32) * 5 / 9) : dewF;
+          displayStr = `${dewDisplay}${degSuffix}`;
+        }
+        gridDewpointTextEl.innerHTML = `${displayStr}<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Td</span>`;
       } else {
         gridDewpointTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Td</span>`;
       }
@@ -4729,7 +4755,7 @@ import weatherConditions from '../data/weather-conditions.json';
       const dewpointF = Math.round(dewpoint);
       if (displayUnit === 'BOTH') {
         const dewpointC = Math.round((dewpointF - 32) * 5 / 9);
-        pill.innerHTML = `<span class="fc-mode-text" style="font-family: 'bold', sans-serif; font-size: inherit; color: inherit;">${dewpointF}/${dewpointC}°</span> Td${trendIconHtml}`;
+        pill.innerHTML = `<span class="fc-mode-text" style="font-family: 'bold', sans-serif; font-size: inherit; color: inherit;">${dewpointF}${formatSlash()}${dewpointC}°</span> Td${trendIconHtml}`;
       } else {
         const dewpointDisplay = displayUnit === 'C' ? Math.round((dewpointF - 32) * 5 / 9) : dewpointF;
         pill.innerHTML = `<span class="fc-mode-text" style="font-family: 'bold', sans-serif; font-size: inherit; color: inherit;">${dewpointDisplay}°</span> Td${trendIconHtml}`;
@@ -4819,7 +4845,17 @@ import weatherConditions from '../data/weather-conditions.json';
     
     if (gridDewpointTextEl) {
       if (dewpoint !== null) {
-        gridDewpointTextEl.innerHTML = `${Math.round(dewpoint)}°<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Td</span>`;
+        const dewF = Math.round(dewpoint);
+        let displayStr = '';
+        const degSuffix = `<span style="font-size: 0.67em; font-family: 'medium', sans-serif;">°</span>`;
+        if (displayUnit === 'BOTH') {
+          const dewC = Math.round((dewF - 32) * 5 / 9);
+          displayStr = `${dewF}${formatSlash()}${dewC}${degSuffix}`;
+        } else {
+          const dewDisplay = displayUnit === 'C' ? Math.round((dewF - 32) * 5 / 9) : dewF;
+          displayStr = `${dewDisplay}${degSuffix}`;
+        }
+        gridDewpointTextEl.innerHTML = `${displayStr}<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Td</span>`;
       } else {
         gridDewpointTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Td</span>`;
       }
@@ -5474,7 +5510,7 @@ import weatherConditions from '../data/weather-conditions.json';
       elLeft.style.alignItems = 'center';
       elLeft.style.gap = '0';
       elLeft.style.color = 'white';
-      elLeft.style.fontSize = '4.37vw'; // Made 20% bigger (from 3.64vw)
+      elLeft.style.fontSize = 'var(--left-time-size, 4.37vw)'; // Made 20% bigger (from 3.64vw)
       elLeft.style.zIndex = '10';
       elLeft.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.6)';
       
@@ -6476,7 +6512,7 @@ import weatherConditions from '../data/weather-conditions.json';
       
       if (displayUnit === 'BOTH') {
         const hiTempC = Math.round((hiTempF - 32) * 5 / 9);
-        item.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; top: ${DUAL_BAR_TOP_OFFSET};">${hiTempF}/${hiTempC}</span>`;
+        item.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; top: ${DUAL_BAR_TOP_OFFSET};">${hiTempF}${formatSlash()}${hiTempC}</span>`;
       } else {
         item.innerHTML = `${hiTempDisplay}°`;
       }
@@ -6489,7 +6525,7 @@ import weatherConditions from '../data/weather-conditions.json';
         
         if (displayUnit === 'BOTH') {
           const loTempC = Math.round((loTempF - 32) * 5 / 9);
-          loItems[index].innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; top: ${DUAL_BAR_TOP_OFFSET};">${loTempF}/${loTempC}</span>`;
+          loItems[index].innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; top: ${DUAL_BAR_TOP_OFFSET};">${loTempF}${formatSlash()}${loTempC}</span>`;
         } else {
           loItems[index].innerHTML = `${loTempDisplay}°`;
         }
@@ -7547,7 +7583,14 @@ import weatherConditions from '../data/weather-conditions.json';
     const minutesStr = minutes < 10 ? '0' + minutes : minutes;
     const secondsStr = seconds < 10 ? '0' + seconds : seconds;
     
-    elLeft.innerHTML = `<span style="font-family: 'bold', sans-serif; letter-spacing: -0.02em;">${hours}:${minutesStr}</span><span style="font-family: 'mono', sans-serif; letter-spacing: -0.02em;">:${secondsStr}</span><span style="font-size: 0.67em; font-family: 'medium', sans-serif; margin-left: 0.1vw;">${ampm}</span>`;
+    elLeft.innerHTML = `
+      <div style="display: flex; align-items: baseline; justify-content: center; gap: 0; line-height: 1;">
+        <span style="font-family: 'bold', sans-serif; font-size: var(--left-time-size, 4.37vw); letter-spacing: -0.02em;">${hours}:${minutesStr}</span>
+        <span style="font-family: 'bold', sans-serif; font-size: var(--left-time-size, 4.37vw); letter-spacing: -0.02em;">:</span>
+        <span style="font-family: 'mono', sans-serif; font-size: var(--left-seconds-size, 4.37vw); letter-spacing: -0.02em;">${secondsStr}</span>
+        <span style="font-family: 'medium', sans-serif; font-size: var(--left-ampm-size, 2.93vw); margin-left: 0.1vw;">${ampm}</span>
+      </div>
+    `;
   }
 
   function startCountdownGauge() {

@@ -91,6 +91,11 @@
     --hadiannaOrangeFour: hsl(25, 63%, 60%);
     --hadiannaSalmonOne: hsl(8, 71%, 65%);
     --hadiannaSalmonFour: hsl(8, 100%, 73%);
+    
+    // Left circle time font size variables (editable)
+    --left-time-size: 4.37vw;
+    --left-seconds-size: 4.37vw;
+    --left-ampm-size: 2.93vw;
 }
 
 //>  ████████████████████████████████████  FONTS
@@ -140,7 +145,7 @@
 
 @font-face {
     font-family: "mono";
-    src: url("../assets/fonts/RobotoMono-Regular.ttf");
+    src: url("../assets/fonts/GT-Pressura-Mono-Light-Web-(15).ttf");
 }
 
 //>  ████████████████████████████████████  RESET
