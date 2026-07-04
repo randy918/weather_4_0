@@ -149,6 +149,8 @@ import weatherConditions from '../data/weather-conditions.json';
   const RADAR_LOOP_SPEED_MS = 500;     // EDITABLE: Time each frame is fully visible (in milliseconds)
   const RADAR_FADE_DURATION_MS = 200;  // EDITABLE: Transition duration for cross-fade (in milliseconds)
   const RADAR_FRAME_COUNT = 12;        // EDITABLE: Number of recent radar frames to loop (default is 6)
+  const RADAR_OUTER_STROKE_WIDTH = '0.6vw'; // EDITABLE: Outer border thickness
+  const RADAR_INNER_STROKE_WIDTH = '0.3vw'; // EDITABLE: Inner coverage circle border thickness (left only)
 
 
   // --- Weather Image Config (Upper Right/Left Circle Cells) ---
@@ -1300,7 +1302,7 @@ import weatherConditions from '../data/weather-conditions.json';
         animation: var(--radar-animation, none) !important;
         mix-blend-mode: var(--radar-blend-mode, normal);
         box-sizing: border-box;
-        border: 0.48vw solid var(--clock-grid-track-color, rgba(255, 255, 255, 0.2));
+        border: ${RADAR_OUTER_STROKE_WIDTH} solid var(--clock-grid-track-color, rgba(255, 255, 255, 0.2));
       }
       #weather-desc-image.radar-mode .radar-frame {
         filter: invert(1) hue-rotate(180deg);
@@ -1338,7 +1340,7 @@ import weatherConditions from '../data/weather-conditions.json';
         animation: var(--radar-animation, none) !important;
         mix-blend-mode: var(--radar-blend-mode, normal);
         box-sizing: border-box;
-        border: 0.48vw solid var(--clock-grid-track-color, rgba(255, 255, 255, 0.2));
+        border: ${RADAR_OUTER_STROKE_WIDTH} solid var(--clock-grid-track-color, rgba(255, 255, 255, 0.2));
       }
       #weather-desc-image-left.radar-mode .radar-frame {
         filter: invert(1) hue-rotate(180deg);
@@ -1355,7 +1357,7 @@ import weatherConditions from '../data/weather-conditions.json';
         height: 50%;
         transform: translate(-50%, -50%);
         box-sizing: border-box;
-        border: 0.24vw solid var(--clock-grid-track-color, rgba(255, 255, 255, 0.2));
+        border: ${RADAR_INNER_STROKE_WIDTH} solid var(--clock-grid-track-color, rgba(255, 255, 255, 0.2));
         border-radius: 50%;
         z-index: 90;
         pointer-events: none;
