@@ -693,7 +693,6 @@ main {
 }
 
 //>  ████████████████████████████████████  CLOCK GRID ROW
-//>  ████████████████████████████████████  CLOCK GRID ROW
 .clockGridContainer {
     --dynamic-item-size: calc((100vw - var(--clock-grid-margin-left, 0vw) - var(--clock-grid-margin-right, 0vw) - 7 * var(--clock-grid-gap, 1vw)) / 8);
 
@@ -702,7 +701,7 @@ main {
     margin-bottom: var(--clock-grid-margin-bottom, 2vw);
     margin-left: var(--clock-grid-margin-left, 0vw);
     margin-right: var(--clock-grid-margin-right, 0vw);
-    display: grid;
+    display: none !important; /* Removed for all versions */
     grid-template-columns: repeat(8, 1fr);
     gap: var(--clock-grid-gap, 1vw);
     justify-items: center;
@@ -717,7 +716,7 @@ main {
     margin-bottom: var(--clock-grid-margin-bottom, 2vw);
     margin-left: var(--clock-grid-margin-left, 0vw);
     margin-right: var(--clock-grid-margin-right, 0vw);
-    display: grid;
+    display: none !important; /* Removed for all versions */
     grid-template-columns: repeat(8, 1fr);
     gap: var(--clock-grid-gap, 1vw);
     justify-items: center;
@@ -739,16 +738,16 @@ main {
             text-transform: uppercase;
         }
 
-        &.clockGridLabel-1 .label-title,
-        &.clockGridLabel-2 .label-title,
-        &.clockGridLabel-3 .label-title,
-        &.clockGridLabel-4 .label-title,
-        &.clockGridLabel-5 .label-title,
-        &.clockGridLabel-6 .label-title,
-        &.clockGridLabel-7 .label-title {
-            text-transform: none; /* Keep natural case for dynamic text */
-            font-family: 'light', sans-serif; /* Light font style */
-            white-space: nowrap;
+        .label-title-1,
+        .label-title-2,
+        .label-title-3,
+        .label-title-4,
+        .label-title-5,
+        .label-title-6,
+        .label-title-7 {
+            text-transform: none !important; /* Keep natural case for dynamic text */
+            font-family: 'light', sans-serif !important;
+            white-space: nowrap !important;
             letter-spacing: calc(var(--label-item-size) * -0.005) !important;
             font-size: calc(var(--label-item-size) * 0.16) !important;
         }
@@ -801,17 +800,81 @@ main {
             text-transform: uppercase;
         }
 
-        &.clockGridLabel7-1 .label-title,
-        &.clockGridLabel7-2 .label-title,
-        &.clockGridLabel7-3 .label-title,
-        &.clockGridLabel7-4 .label-title,
-        &.clockGridLabel7-5 .label-title,
-        &.clockGridLabel7-6 .label-title {
-            text-transform: none; /* Keep natural case for dynamic text */
-            font-family: 'light', sans-serif; /* Light font style */
-            white-space: nowrap;
+        .label-title-1,
+        .label-title-2,
+        .label-title-3,
+        .label-title-4,
+        .label-title-5,
+        .label-title-6,
+        .label-title-7 {
+            text-transform: none !important; /* Keep natural case for dynamic text */
+            font-family: 'light', sans-serif !important;
+            white-space: nowrap !important;
             letter-spacing: calc(var(--label-item-size) * -0.005) !important;
             font-size: calc(var(--label-item-size) * 0.16) !important;
+        }
+    }
+}
+
+// 4-cell Clock Grid Container & Labels
+.clockGridContainer4 {
+    --dynamic-item-size-4: calc((100vw - var(--clock-grid-margin-left, 0vw) - var(--clock-grid-margin-right, 0vw) - 3 * var(--clock-grid-gap, 1vw)) / 4);
+
+    width: auto;
+    margin-top: var(--clock-grid-margin-top, 2vw);
+    margin-bottom: var(--clock-grid-margin-bottom, 2vw);
+    margin-left: var(--clock-grid-margin-left, 0vw);
+    margin-right: var(--clock-grid-margin-right, 0vw);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--clock-grid-gap, 1vw);
+    justify-items: center;
+    align-items: center;
+}
+
+.clockGridLabelsContainer4 {
+    --label-item-size: calc((100vw - var(--clock-grid-margin-left, 0vw) - var(--clock-grid-margin-right, 0vw) - 3 * var(--clock-grid-gap, 1vw)) / 4);
+    --clock-grid-4-label-scale: 0.867; /* EDITABLE: Font size scale factor (scaled up 30% from 0.667) */
+
+    width: auto;
+    margin-top: calc(var(--clock-grid-margin-bottom, 2vw) * -1 + var(--clock-grid-label-margin-top, 0.5vw)); /* Pull up under the grid */
+    margin-bottom: var(--clock-grid-margin-bottom, 2vw);
+    margin-left: var(--clock-grid-margin-left, 0vw);
+    margin-right: var(--clock-grid-margin-right, 0vw);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--clock-grid-gap, 1vw);
+    justify-items: center;
+    align-items: start;
+    
+    .clockGridLabel4 {
+        font-family: 'medium', sans-serif !important;
+        font-size: calc(var(--label-item-size) * 0.18 * var(--clock-grid-4-label-scale, 1)) !important;
+        letter-spacing: calc(var(--label-item-size) * 0.005) !important;
+        color: var(--temp-color, rgba(255,255,255,0.7)); /* Use current temperature color */
+        text-align: center;
+        width: 100%;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        
+        .label-title {
+            text-transform: uppercase;
+        }
+
+        .label-title-1,
+        .label-title-2,
+        .label-title-3,
+        .label-title-4,
+        .label-title-5,
+        .label-title-6,
+        .label-title-7 {
+            text-transform: none !important; /* Keep natural case for dynamic text */
+            font-family: 'medium', sans-serif !important;
+            white-space: nowrap !important;
+            letter-spacing: calc(var(--label-item-size) * -0.005) !important;
+            font-size: calc(var(--label-item-size) * 0.16 * var(--clock-grid-4-label-scale, 1)) !important;
         }
     }
 }
@@ -824,6 +887,9 @@ main {
     }
     .clockGridContainer7 & {
         --item-current-size: var(--dynamic-item-size-7);
+    }
+    .clockGridContainer4 & {
+        --item-current-size: var(--dynamic-item-size-4);
     }
 
     position: relative;
@@ -864,6 +930,11 @@ main {
             stroke-width: var(--clock-grid-stroke-width, 4);
             stroke-dasharray: 289; /* 2 * PI * r(46) */
             stroke-dashoffset: 0; /* Default fully full */
+            stroke-linecap: round;
+        }
+
+        .gust-progress {
+            stroke-width: var(--clock-grid-stroke-width, 4);
             stroke-linecap: round;
         }
     }
@@ -940,7 +1011,7 @@ main {
     }
 
     .grid-wind-speed-text {
-        transform: translate(-50%, calc(-50% + var(--item-current-size) * 0.07)) !important;
+        transform: translate(-50%, calc(-50% + var(--item-current-size) * 0.07 + var(--wind-number-y-offset, 0vw))) !important;
     }
 
     .grid-humidity-text {
@@ -1026,4 +1097,43 @@ main {
 #sun-dots-wrapper,
 #moon-dots-wrapper {
     display: none !important;
+}
+
+// Responsive layout: 7-dial row is for tablet/desktop only; 4-dial rows are for phone only
+@media (max-width: 767px) {
+    .clockGridContainer7,
+    .clockGridLabelsContainer7 {
+        display: none !important;
+    }
+    .clockGridContainer4,
+    .clockGridLabelsContainer4 {
+        display: grid !important;
+    }
+}
+
+@media (min-width: 768px) {
+    .clockGridContainer7,
+    .clockGridLabelsContainer7 {
+        display: grid !important;
+    }
+    .clockGridContainer4,
+    .clockGridLabelsContainer4 {
+        display: none !important;
+    }
+}
+
+@keyframes feelsLikeGlow {
+    0% {
+        text-shadow: 0 0 4px var(--feels-glow-color, currentColor);
+    }
+    50% {
+        text-shadow: 0 0 12px var(--feels-glow-color, currentColor);
+    }
+    100% {
+        text-shadow: 0 0 4px var(--feels-glow-color, currentColor);
+    }
+}
+
+.feels-like-temp-val {
+    animation: feelsLikeGlow 3s ease-in-out infinite !important;
 }

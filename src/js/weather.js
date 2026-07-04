@@ -150,31 +150,53 @@ import weatherConditions from '../data/weather-conditions.json';
   const FRAGILE_ELEMENTS_Y_OFFSET = '2vw'; 
   document.documentElement.style.setProperty('--fragile-y-offset', FRAGILE_ELEMENTS_Y_OFFSET);
 
-  // EDITABLE: Scrolling Gradient Overlay configuration
-  const GRADIENT_OVERLAY_TOP = '30.5vw';    // Adjust starting location from the top
-  document.documentElement.style.setProperty('--gradient-top', GRADIENT_OVERLAY_TOP);
+  // EDITABLE: Scrolling Gradient Overlay configuration (Non-phone version: iPad, desktop)
+  const GRADIENT_NON_PHONE = {
+    top: '30.5vw',
+    height: '45vw',
+    midpoint: '70%',
+    midOpacity: '0.65',
+    lowerTop: '111vw',
+    lowerHeight: '38vw',
+    lowerMidpoint: '90%',
+    lowerMidOpacity: '0.65'
+  };
 
-  const GRADIENT_OVERLAY_HEIGHT = '45vw'; // Adjust the height of the gradient
-  document.documentElement.style.setProperty('--gradient-height', GRADIENT_OVERLAY_HEIGHT);
+  // EDITABLE: Scrolling Gradient Overlay configuration (Phone version only)
+  const GRADIENT_PHONE = {
+    top: '30.5vw',
+    height: '45vw',
+    midpoint: '70%',
+    midOpacity: '0.65',
+    lowerTop: '111vw',
+    lowerHeight: '38vw',
+    lowerMidpoint: '90%',
+    lowerMidOpacity: '0.65'
+  };
 
-  const GRADIENT_OVERLAY_MIDPOINT = '70%'; // SCSS DOM JS variable for the middle solid color position
-  document.documentElement.style.setProperty('--gradient-midpoint', GRADIENT_OVERLAY_MIDPOINT);
+  function applyGradientProperties() {
+    const isPhone = window.innerWidth < 768;
+    const config = isPhone ? GRADIENT_PHONE : GRADIENT_NON_PHONE;
+    
+    document.documentElement.style.setProperty('--gradient-top', config.top);
+    document.documentElement.style.setProperty('--gradient-height', config.height);
+    document.documentElement.style.setProperty('--gradient-midpoint', config.midpoint);
+    document.documentElement.style.setProperty('--gradient-mid-opacity', config.midOpacity);
+    document.documentElement.style.setProperty('--gradient-lower-top', config.lowerTop);
+    document.documentElement.style.setProperty('--gradient-lower-height', config.lowerHeight);
+    document.documentElement.style.setProperty('--gradient-lower-midpoint', config.lowerMidpoint);
+    document.documentElement.style.setProperty('--gradient-lower-mid-opacity', config.lowerMidOpacity);
+  }
 
-  const GRADIENT_OVERLAY_MID_OPACITY = '0.65'; // SCSS DOM JS variable for the middle color opacity (0.0 to 1)
-  document.documentElement.style.setProperty('--gradient-mid-opacity', GRADIENT_OVERLAY_MID_OPACITY);
+  // Initial apply
+  applyGradientProperties();
 
-  // EDITABLE: Lower Scrolling Gradient Overlay configuration
-  const GRADIENT_OVERLAY_LOWER_TOP = '111vw';    // Adjust starting location from the top for lower gradient
-  document.documentElement.style.setProperty('--gradient-lower-top', GRADIENT_OVERLAY_LOWER_TOP);
+  // Re-apply on window resize
+  window.addEventListener('resize', applyGradientProperties);
 
-  const GRADIENT_OVERLAY_LOWER_HEIGHT = '38vw'; // Adjust the height of the lower gradient
-  document.documentElement.style.setProperty('--gradient-lower-height', GRADIENT_OVERLAY_LOWER_HEIGHT);
-
-  const GRADIENT_OVERLAY_LOWER_MIDPOINT = '90%'; // SCSS DOM JS variable for the middle solid color position
-  document.documentElement.style.setProperty('--gradient-lower-midpoint', GRADIENT_OVERLAY_LOWER_MIDPOINT);
-
-  const GRADIENT_OVERLAY_LOWER_MID_OPACITY = '0.65'; // SCSS DOM JS variable for the middle color opacity (0.0 to 1)
-  document.documentElement.style.setProperty('--gradient-lower-mid-opacity', GRADIENT_OVERLAY_LOWER_MID_OPACITY);
+  // EDITABLE: Wind speed text Y-offset adjustment (raise up by 0.5vw)
+  const WIND_NUMBER_Y_OFFSET = '-0.5vw'; // Adjust vertical position of main wind number (negative moves UP, positive moves DOWN)
+  document.documentElement.style.setProperty('--wind-number-y-offset', WIND_NUMBER_Y_OFFSET);
 
   // EDITABLE: Rain forecast banner configuration
   const RAIN_BANNER_HEIGHT_VW = 10; // Height of the rain banner (same as alert banners)
@@ -873,30 +895,63 @@ import weatherConditions from '../data/weather-conditions.json';
       gustValueEl.textContent = Math.round(windGust);
     }
     // Update the wind speed progress and track rings in grid cell #3 (0 to 60 mph scale)
-    const gridWindProgressEls = document.querySelectorAll('.clockGridItem-2 .countdown-progress, .clockGridItem7-2 .countdown-progress');
-    const gridWindTrackEls = document.querySelectorAll('.clockGridItem-2 .countdown-track, .clockGridItem7-2 .countdown-track');
+    const gridWindProgressEls = document.querySelectorAll('.clockGridItem-2 .countdown-progress');
+    const gridWindTrackEls = document.querySelectorAll('.clockGridItem-2 .countdown-track');
     const radius = 46;
     const circumference = 2 * Math.PI * radius; // ~289
     
+    const percentSpeed = Math.max(0, Math.min(1, windSpeed / maxWindMph));
+    const percentGust = Math.max(0, Math.min(1, windGust / maxWindMph));
+
     gridWindProgressEls.forEach(gridWindProgressEl => {
-      const percent = Math.max(0, Math.min(1, windSpeed / maxWindMph));
-      const dashOffset = circumference * (1 - percent);
+      const dashOffset = circumference * (1 - percentSpeed);
       gridWindProgressEl.style.strokeDashoffset = dashOffset;
       if (tempColor) {
         gridWindProgressEl.style.stroke = tempColor;
       }
     });
+
+    // Update fading gust progress arc (from speed to gust)
+    const gridGustProgressEls = document.querySelectorAll('.clockGridItem-2 .gust-progress');
+    gridGustProgressEls.forEach(gridGustProgressEl => {
+      const length = Math.max(0, (percentGust - percentSpeed) * circumference);
+      const dashOffset = - (percentSpeed * circumference);
+      gridGustProgressEl.style.strokeDasharray = `${length}, ${circumference}`;
+      gridGustProgressEl.style.strokeDashoffset = dashOffset;
+    });
+
+    // Calculate dynamic gradient direction coordinates in unrotated SVG space (using absolute viewBox units)
+    const startAngleRad = 2 * Math.PI * percentSpeed;
+    const endAngleRad = 2 * Math.PI * percentGust;
+    const x1 = 50 + radius * Math.cos(startAngleRad);
+    const y1 = 50 + radius * Math.sin(startAngleRad);
+    const x2 = 50 + radius * Math.cos(endAngleRad);
+    const y2 = 50 + radius * Math.sin(endAngleRad);
+
+    const gradIds = ['gust-grad-8', 'gust-grad-7', 'gust-grad-4'];
+    gradIds.forEach(id => {
+      const gradEl = document.getElementById(id);
+      if (gradEl) {
+        gradEl.setAttribute('x1', x1.toFixed(3));
+        gradEl.setAttribute('y1', y1.toFixed(3));
+        gradEl.setAttribute('x2', x2.toFixed(3));
+        gradEl.setAttribute('y2', y2.toFixed(3));
+        const stops = gradEl.querySelectorAll('stop');
+        if (stops.length >= 2 && tempColor) {
+          stops[0].setAttribute('stop-color', tempColor);
+          stops[1].setAttribute('stop-color', tempColor);
+        }
+      }
+    });
     
     gridWindTrackEls.forEach(gridWindTrackEl => {
-      const percent = Math.max(0, Math.min(1, windGust / maxWindMph));
-      const trackLength = circumference * (1 - percent);
-      // Only draw the track from windGust up to 60 mph (leaving a blank gap from windSpeed to windGust)
+      const trackLength = circumference * (1 - percentGust);
       gridWindTrackEl.style.strokeDasharray = `${trackLength}, ${circumference}`;
-      gridWindTrackEl.style.strokeDashoffset = - (circumference * percent);
+      gridWindTrackEl.style.strokeDashoffset = - (circumference * percentGust);
     });
 
     // Update the gust-dot positioning at the point indicating gust speed
-    const gustDotEls = document.querySelectorAll('.clockGridItem-2 .gust-dot, .clockGridItem7-2 .gust-dot');
+    const gustDotEls = document.querySelectorAll('.clockGridItem-2 .gust-dot');
     gustDotEls.forEach(gustDotEl => {
       if (typeof windGust === 'number') {
         const percent = Math.max(0, Math.min(1, windGust / maxWindMph));
@@ -918,7 +973,7 @@ import weatherConditions from '../data/weather-conditions.json';
       }
     });
     
-    const gridWindSpeedTextEls = document.querySelectorAll('.clockGridItem-2 .grid-wind-speed-text, .clockGridItem7-2 .grid-wind-speed-text');
+    const gridWindSpeedTextEls = document.querySelectorAll('.clockGridItem-2 .grid-wind-speed-text');
     gridWindSpeedTextEls.forEach(gridWindSpeedTextEl => {
       gridWindSpeedTextEl.innerHTML = `
         <span style="position: relative; display: inline-block;">${Math.round(windSpeed)}</span>
@@ -2105,11 +2160,40 @@ import weatherConditions from '../data/weather-conditions.json';
 
       const dynamicColor = tempToColor(feelsLike) || 'inherit';
       
+      // Check difference based on rounded display values (10+ degrees above or below)
+      let isHotGlow = false;
+      if (typeof currentTemp === 'number') {
+        if (displayUnit === 'BOTH') {
+          isHotGlow = Math.abs(Math.round(feelsLike) - Math.round(currentTemp)) >= 10;
+        } else {
+          const displayFeelsLike = displayUnit === 'C' ? (feelsLike - 32) * 5 / 9 : feelsLike;
+          const displayCurrent = displayUnit === 'C' ? (currentTemp - 32) * 5 / 9 : currentTemp;
+          isHotGlow = Math.abs(Math.round(displayFeelsLike) - Math.round(displayCurrent)) >= 10;
+        }
+      }
+      
+      const glowClass = isHotGlow ? 'feels-like-temp-val' : '';
+      
+      // Derive a brighter color for the glow to ensure high visibility on a dark background
+      let glowColor = dynamicColor;
+      if (isHotGlow && dynamicColor.startsWith('hsl(')) {
+        const match = dynamicColor.match(/hsl\(([\d.]+),\s*([\d.]+)%,\s*([\d.]+)%\)/);
+        if (match) {
+          const h = parseFloat(match[1]);
+          const s = parseFloat(match[2]);
+          const l = parseFloat(match[3]);
+          const glowL = Math.max(l, 62); // Ensure at least 62% lightness for bright neon contrast
+          glowColor = `hsl(${h.toFixed(1)}, ${s.toFixed(1)}%, ${glowL.toFixed(1)}%)`;
+        }
+      }
+      
+      const glowStyle = isHotGlow ? `--feels-glow-color: ${glowColor};` : '';
+      
       if (displayUnit === 'BOTH') {
         const feelsLikeHtml = `<span style="font-family: 'light', sans-serif; font-weight: normal; font-size: ${FEELS_LIKE_TEXT_SIZE_DUAL}; letter-spacing: ${FEELS_LIKE_LETTER_SPACING_DUAL}; margin-left: ${FEELS_LIKE_MARGIN_LEFT_DUAL}; margin-right: ${FEELS_LIKE_MARGIN_RIGHT_DUAL}; color: inherit;">feels like</span>`;
         const fF = Math.round(feelsLike);
         const fC = Math.round((feelsLike - 32) * 5 / 9);
-        const dualFeels = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${FEELS_LIKE_TEMP_SIZE_DUAL}; color: ${dynamicColor} !important; transition: color 0.5s ease;">${fF}/${fC}</span>`;
+        const dualFeels = `<span class="fc-mode-text ${glowClass}" style="${glowStyle} font-family: 'boldcond', sans-serif; font-size: ${FEELS_LIKE_TEMP_SIZE_DUAL}; color: ${dynamicColor} !important; transition: color 0.5s ease;">${fF}/${fC}</span>`;
         
         if (typeof currentTemp === 'number') {
           const cF = Math.round(currentTemp);
@@ -2127,9 +2211,9 @@ import weatherConditions from '../data/weather-conditions.json';
         if (typeof currentTemp === 'number') {
           const roundedCurrent = Math.round(displayCurrent);
           const currClr = tempToColor(currentTemp) || 'white';
-          el.innerHTML = `<span style="font-family: 'bold', sans-serif; font-size: ${FEELS_LIKE_TEXT_SIZE_DEFAULT}; color: ${currClr} !important;">${roundedCurrent}°</span>${feelsLikeHtml}<span style="font-family: 'bold', sans-serif; font-size: ${FEELS_LIKE_TEXT_SIZE_DEFAULT}; color: ${dynamicColor} !important; transition: color 0.5s ease;">${rounded}°</span>`;
+          el.innerHTML = `<span style="font-family: 'bold', sans-serif; font-size: ${FEELS_LIKE_TEXT_SIZE_DEFAULT}; color: ${currClr} !important;">${roundedCurrent}°</span>${feelsLikeHtml}<span class="${glowClass}" style="${glowStyle} font-family: 'bold', sans-serif; font-size: ${FEELS_LIKE_TEXT_SIZE_DEFAULT}; color: ${dynamicColor} !important; transition: color 0.5s ease;">${rounded}°</span>`;
         } else {
-          el.innerHTML = `${feelsLikeHtml}<span style="font-family: 'bold', sans-serif; font-size: ${FEELS_LIKE_TEXT_SIZE_DEFAULT}; color: ${dynamicColor} !important; transition: color 0.5s ease;">${rounded}°</span>`;
+          el.innerHTML = `${feelsLikeHtml}<span class="${glowClass}" style="${glowStyle} font-family: 'bold', sans-serif; font-size: ${FEELS_LIKE_TEXT_SIZE_DEFAULT}; color: ${dynamicColor} !important; transition: color 0.5s ease;">${rounded}°</span>`;
         }
       }
       el.style.color = tempToColor(currentTemp) || 'inherit';
@@ -2828,8 +2912,15 @@ import weatherConditions from '../data/weather-conditions.json';
           // Cell #3: Wind direction gauge with standard countdown circle track and progress, a wind hand matching clock style, and wind speed number centered
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
+              <defs>
+                <linearGradient id="gust-grad-8" gradientUnits="userSpaceOnUse" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="var(--temp-color)" stop-opacity="0.62" />
+                  <stop offset="100%" stop-color="var(--temp-color)" stop-opacity="0" />
+                </linearGradient>
+              </defs>
               <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
               <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+              <circle class="gust-progress" cx="50" cy="50" r="46" fill="none" stroke="url(#gust-grad-8)" />
               <circle class="gust-dot" r="1.75" />
             </svg>
             <div class="clock-face">
@@ -2872,9 +2963,9 @@ import weatherConditions from '../data/weather-conditions.json';
           // Cell #6: Sun dial showing daytime period
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
-              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
-              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
-              <circle class="celestial-dot" cx="50" cy="4" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
+              <circle class="countdown-track" cx="50" cy="50" r="42.5" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="42.5" fill="none" />
+              <circle class="celestial-dot" cx="50" cy="7.5" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
             </svg>
             <div class="grid-sun-text"></div>
           `;
@@ -2882,9 +2973,9 @@ import weatherConditions from '../data/weather-conditions.json';
           // Cell #7: Moon dial showing moonrise period
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
-              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
-              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
-              <circle class="celestial-dot" cx="50" cy="4" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
+              <circle class="countdown-track" cx="50" cy="50" r="42.5" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="42.5" fill="none" />
+              <circle class="celestial-dot" cx="50" cy="7.5" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
             </svg>
             <div class="grid-moon-text"></div>
           `;
@@ -3161,8 +3252,15 @@ import weatherConditions from '../data/weather-conditions.json';
         } else if (i === 2) {
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
+              <defs>
+                <linearGradient id="gust-grad-7" gradientUnits="userSpaceOnUse" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="var(--temp-color)" stop-opacity="0.62" />
+                  <stop offset="100%" stop-color="var(--temp-color)" stop-opacity="0" />
+                </linearGradient>
+              </defs>
               <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
               <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+              <circle class="gust-progress" cx="50" cy="50" r="46" fill="none" stroke="url(#gust-grad-7)" />
               <circle class="gust-dot" r="1.75" />
             </svg>
             <div class="clock-face">
@@ -3193,18 +3291,18 @@ import weatherConditions from '../data/weather-conditions.json';
         } else if (i === 5) {
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
-              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
-              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
-              <circle class="celestial-dot" cx="50" cy="4" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
+              <circle class="countdown-track" cx="50" cy="50" r="42.5" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="42.5" fill="none" />
+              <circle class="celestial-dot" cx="50" cy="7.5" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
             </svg>
             <div class="grid-sun-text"></div>
           `;
         } else if (i === 6) {
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
-              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
-              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
-              <circle class="celestial-dot" cx="50" cy="4" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
+              <circle class="countdown-track" cx="50" cy="50" r="42.5" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="42.5" fill="none" />
+              <circle class="celestial-dot" cx="50" cy="7.5" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
             </svg>
             <div class="grid-moon-text"></div>
           `;
@@ -3456,6 +3554,397 @@ import weatherConditions from '../data/weather-conditions.json';
          }
       }
     }
+
+    // --- 4-cell grid layout & labels (Row 1: 0-3) ---
+    const indices4_1 = [0, 1, 2, 3];
+    const containerId4_1 = 'clock-grid-container-4-1';
+    let container4_1 = document.getElementById(containerId4_1);
+
+    if (!container4_1) {
+      container4_1 = document.createElement('div');
+      container4_1.id = containerId4_1;
+      container4_1.className = 'clockGridContainer4';
+
+      for (let j = 0; j < 4; j++) {
+        const i = indices4_1[j];
+        const item = document.createElement('div');
+        item.className = `clockGridItem clockGridItem4 clockGridItem-${i} clockGridItem4-1-${j}`;
+
+        let innerHtml = '';
+        if (i === 1) {
+          innerHtml = `<div class="moon-phase-display grid-moon-phase" role="img" aria-label="Moon Phase"></div>`;
+        } else if (i === 2) {
+          innerHtml = `
+            <svg class="clock-timer-svg" viewBox="0 0 100 100">
+              <defs>
+                <linearGradient id="gust-grad-4" gradientUnits="userSpaceOnUse" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="var(--temp-color)" stop-opacity="0.62" />
+                  <stop offset="100%" stop-color="var(--temp-color)" stop-opacity="0" />
+                </linearGradient>
+              </defs>
+              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+              <circle class="gust-progress" cx="50" cy="50" r="46" fill="none" stroke="url(#gust-grad-4)" />
+              <circle class="gust-dot" r="1.75" />
+            </svg>
+            <div class="clock-face">
+              <div class="clock-hand clock-hand-wind-direction"></div>
+              <div class="clock-center-dot"></div>
+            </div>
+            <div class="grid-wind-speed-text"></div>
+          `;
+        } else if (i === 3) {
+          innerHtml = `
+            <svg class="clock-timer-svg" viewBox="0 0 100 100">
+              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+            </svg>
+            <div class="grid-humidity-text"></div>
+          `;
+        } else {
+          innerHtml = `
+            <svg class="clock-timer-svg" viewBox="0 0 100 100">
+              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+            </svg>
+          `;
+          if (i === 0) {
+            innerHtml += `
+              <div class="clock-face">
+                <div class="clock-hour-hand"></div>
+                <div class="clock-minute-hand"></div>
+                <div class="clock-center-dot"></div>
+              </div>
+            `;
+          }
+        }
+
+        item.innerHTML = innerHtml;
+        container4_1.appendChild(item);
+      }
+
+      const labelsContainer7 = document.getElementById('clock-grid-labels-container-7');
+      if (labelsContainer7 && labelsContainer7.parentNode) {
+        labelsContainer7.parentNode.insertBefore(container4_1, labelsContainer7.nextSibling);
+      } else {
+        (document.querySelector('main.content') || document.body).appendChild(container4_1);
+      }
+    }
+
+    const labelsContainerId4_1 = 'clock-grid-labels-container-4-1';
+    let labelsContainer4_1 = document.getElementById(labelsContainerId4_1);
+    if (!labelsContainer4_1) {
+      labelsContainer4_1 = document.createElement('div');
+      labelsContainer4_1.id = labelsContainerId4_1;
+      labelsContainer4_1.className = 'clockGridLabelsContainer4';
+
+      for (let j = 0; j < 4; j++) {
+        const i = indices4_1[j];
+        const item = document.createElement('div');
+        item.className = `clockGridLabel clockGridLabel4 clockGridLabel4-1-${j}`;
+        
+        if (data && data.current && typeof data.current.temp === 'number') {
+           const tempColorLocal = tempToColor(data.current.temp);
+           if(tempColorLocal) {
+              item.style.color = tempColorLocal;
+           }
+        }
+
+        let titleText = CLOCK_GRID_LABELS[i] || '';
+
+        if (i === 1 && data && data.daily && data.daily[0] && typeof data.daily[0].moon_phase === 'number') {
+           titleText = getMoonPhaseName(data.daily[0].moon_phase);
+        }
+        
+        if (i === 2 && data && data.current) {
+           const windSpeed = data.current.wind_speed || 0;
+           const windGust = data.current.wind_gust || windSpeed;
+           titleText = `Gust ${Math.round(windGust)} mph`;
+        }
+
+        item.innerHTML = `
+          <span class="label-title label-title-${i}" id="clock-grid-val-4-1-${j}">${titleText}</span>
+        `;
+        labelsContainer4_1.appendChild(item);
+      }
+
+      container4_1.parentNode.insertBefore(labelsContainer4_1, container4_1.nextSibling);
+    } else {
+      if (data && data.current && typeof data.current.temp === 'number') {
+        const tempColorLocal = tempToColor(data.current.temp);
+        if (tempColorLocal) {
+          const labels = labelsContainer4_1.querySelectorAll('.clockGridLabel4');
+          labels.forEach(label => label.style.color = tempColorLocal);
+        }
+      }
+
+      const phaseTitle = labelsContainer4_1.querySelector('.label-title-1');
+      if (phaseTitle && data && data.daily && data.daily[0] && typeof data.daily[0].moon_phase === 'number') {
+         phaseTitle.innerText = getMoonPhaseName(data.daily[0].moon_phase);
+      }
+      
+      const windTitle = labelsContainer4_1.querySelector('.label-title-2');
+      if (windTitle && data && data.current) {
+         const windSpeed = data.current.wind_speed || 0;
+         const windGust = data.current.wind_gust || windSpeed;
+         windTitle.innerText = `Gust ${Math.round(windGust)} mph`;
+      }
+    }
+
+    // --- 4-cell grid layout & labels (Row 2: 4-7) ---
+    const indices4_2 = [4, 5, 6, 7];
+    const containerId4_2 = 'clock-grid-container-4-2';
+    let container4_2 = document.getElementById(containerId4_2);
+
+    if (!container4_2) {
+      container4_2 = document.createElement('div');
+      container4_2.id = containerId4_2;
+      container4_2.className = 'clockGridContainer4';
+
+      for (let j = 0; j < 4; j++) {
+        const i = indices4_2[j];
+        const item = document.createElement('div');
+        item.className = `clockGridItem clockGridItem4 clockGridItem-${i} clockGridItem4-2-${j}`;
+
+        let innerHtml = '';
+        if (i === 7) {
+          innerHtml = `
+            <div class="barometric-pressure-display grid-barometric-pressure">
+              <svg class="barometric-gauge-svg" viewBox="0 0 100 100">
+                <circle class="barometric-track" cx="50" cy="50" r="46" fill="none" />
+                <circle class="barometric-fill" cx="50" cy="50" r="46" fill="none" />
+                <line class="barometric-needle" x1="50" y1="50" x2="50" y2="15" stroke-linecap="round" />
+              </svg>
+              <div class="barometric-text"></div>
+            </div>
+          `;
+        } else if (i === 5) {
+          innerHtml = `
+            <svg class="clock-timer-svg" viewBox="0 0 100 100">
+              <circle class="countdown-track" cx="50" cy="50" r="42.5" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="42.5" fill="none" />
+              <circle class="celestial-dot" cx="50" cy="7.5" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
+            </svg>
+            <div class="grid-sun-text"></div>
+          `;
+        } else if (i === 6) {
+          innerHtml = `
+            <svg class="clock-timer-svg" viewBox="0 0 100 100">
+              <circle class="countdown-track" cx="50" cy="50" r="42.5" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="42.5" fill="none" />
+              <circle class="celestial-dot" cx="50" cy="7.5" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
+            </svg>
+            <div class="grid-moon-text"></div>
+          `;
+        } else {
+          innerHtml = `
+            <svg class="clock-timer-svg" viewBox="0 0 100 100">
+              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+            </svg>
+            <div class="grid-dewpoint-text"></div>
+          `;
+        }
+
+        item.innerHTML = innerHtml;
+        container4_2.appendChild(item);
+      }
+
+      if (labelsContainer4_1 && labelsContainer4_1.parentNode) {
+        labelsContainer4_1.parentNode.insertBefore(container4_2, labelsContainer4_1.nextSibling);
+      } else {
+        (document.querySelector('main.content') || document.body).appendChild(container4_2);
+      }
+    }
+
+    const labelsContainerId4_2 = 'clock-grid-labels-container-4-2';
+    let labelsContainer4_2 = document.getElementById(labelsContainerId4_2);
+    if (!labelsContainer4_2) {
+      labelsContainer4_2 = document.createElement('div');
+      labelsContainer4_2.id = labelsContainerId4_2;
+      labelsContainer4_2.className = 'clockGridLabelsContainer4';
+
+      for (let j = 0; j < 4; j++) {
+        const i = indices4_2[j];
+        const item = document.createElement('div');
+        item.className = `clockGridLabel clockGridLabel4 clockGridLabel4-2-${j}`;
+        
+        if (data && data.current && typeof data.current.temp === 'number') {
+           const tempColorLocal = tempToColor(data.current.temp);
+           if(tempColorLocal) {
+              item.style.color = tempColorLocal;
+           }
+        }
+
+        let titleText = CLOCK_GRID_LABELS[i] || '';
+
+        if (i === 5 && data && data.daily && data.daily[0]) {
+           const now = Date.now() / 1000;
+           const sunrise = data.daily[0].sunrise;
+           const sunset = data.daily[0].sunset;
+           let oppEventTime = null;
+           let oppEventLabel = '';
+           
+           if (typeof sunrise === 'number' && typeof sunset === 'number') {
+              if (now < sunrise) {
+                 oppEventTime = sunset;
+                 oppEventLabel = 'Sunset';
+              } else if (now < sunset) {
+                 oppEventTime = data.daily[1]?.sunrise || (sunrise + 86400);
+                 oppEventLabel = 'Sunrise';
+              } else {
+                 oppEventTime = data.daily[1]?.sunset || (sunset + 86400);
+                 oppEventLabel = 'Sunset';
+              }
+              
+              const oppDate = new Date(oppEventTime * 1000);
+              let oppHours = oppDate.getHours();
+              const oppMinutes = oppDate.getMinutes();
+              const oppAmPm = oppHours >= 12 ? 'p' : 'a';
+              oppHours = oppHours % 12 || 12;
+              const oppMinutesStr = oppMinutes < 10 ? '0' + oppMinutes : oppMinutes;
+              
+              titleText = `${oppEventLabel} ${oppHours}:${oppMinutesStr}${oppAmPm}`;
+           }
+        }
+        
+        if (i === 6 && data && data.daily && data.daily[0]) {
+           const now = Date.now() / 1000;
+           const moonrise = data.daily[0].moonrise;
+           const moonset = data.daily[0].moonset;
+           let oppEventTime = null;
+           let oppEventLabel = '';
+           
+           if (typeof moonrise === 'number' && typeof moonset === 'number') {
+              if (moonrise < moonset) {
+                 if (now < moonrise) {
+                    oppEventTime = moonset;
+                    oppEventLabel = 'Moonset';
+                 } else if (now < moonset) {
+                    oppEventTime = data.daily[1]?.moonrise || (moonrise + 86400);
+                    oppEventLabel = 'Moonrise';
+                 } else {
+                    oppEventTime = data.daily[1]?.moonset || (moonset + 86400);
+                    oppEventLabel = 'Moonset';
+                 }
+              } else {
+                 if (now < moonset) {
+                    oppEventTime = moonrise;
+                    oppEventLabel = 'Moonrise';
+                 } else if (now < moonrise) {
+                    oppEventTime = data.daily[1]?.moonset || (moonset + 86400);
+                    oppEventLabel = 'Moonset';
+                 } else {
+                    gridMoonRiseTime = moonrise; // Fallback
+                    oppEventTime = data.daily[1]?.moonrise || (moonrise + 86400);
+                    oppEventLabel = 'Moonrise';
+                 }
+              }
+              
+              const oppDate = new Date(oppEventTime * 1000);
+              let oppHours = oppDate.getHours();
+              const oppMinutes = oppDate.getMinutes();
+              const oppAmPm = oppHours >= 12 ? 'p' : 'a';
+              oppHours = oppHours % 12 || 12;
+              const oppMinutesStr = oppMinutes < 10 ? '0' + oppMinutes : oppMinutes;
+              
+              titleText = `${oppEventLabel} ${oppHours}:${oppMinutesStr}${oppAmPm}`;
+           }
+        }
+
+        item.innerHTML = `
+          <span class="label-title label-title-${i}" id="clock-grid-val-4-2-${j}">${titleText}</span>
+        `;
+        labelsContainer4_2.appendChild(item);
+      }
+
+      container4_2.parentNode.insertBefore(labelsContainer4_2, container4_2.nextSibling);
+    } else {
+      if (data && data.current && typeof data.current.temp === 'number') {
+        const tempColorLocal = tempToColor(data.current.temp);
+        if (tempColorLocal) {
+          const labels = labelsContainer4_2.querySelectorAll('.clockGridLabel4');
+          labels.forEach(label => label.style.color = tempColorLocal);
+        }
+      }
+
+      const sunTitle = labelsContainer4_2.querySelector('.label-title-5');
+      if (sunTitle && data && data.daily && data.daily[0]) {
+         const now = Date.now() / 1000;
+         const sunrise = data.daily[0].sunrise;
+         const sunset = data.daily[0].sunset;
+         
+         if (typeof sunrise === 'number' && typeof sunset === 'number') {
+            let oppEventTime = null;
+            let oppEventLabel = '';
+            
+            if (now < sunrise) {
+               oppEventTime = sunset;
+               oppEventLabel = 'Sunset';
+            } else if (now < sunset) {
+               oppEventTime = data.daily[1]?.sunrise || (sunrise + 86400);
+               oppEventLabel = 'Sunrise';
+            } else {
+               oppEventTime = data.daily[1]?.sunset || (sunset + 86400);
+               oppEventLabel = 'Sunset';
+            }
+            
+            const oppDate = new Date(oppEventTime * 1000);
+            let oppHours = oppDate.getHours();
+            const oppMinutes = oppDate.getMinutes();
+            const oppAmPm = oppHours >= 12 ? 'p' : 'a';
+            oppHours = oppHours % 12 || 12;
+            const oppMinutesStr = oppMinutes < 10 ? '0' + oppMinutes : oppMinutes;
+            
+            sunTitle.innerText = `${oppEventLabel} ${oppHours}:${oppMinutesStr}${oppAmPm}`;
+         }
+      }
+      
+      const moonTitle = labelsContainer4_2.querySelector('.label-title-6');
+      if (moonTitle && data && data.daily && data.daily[0]) {
+         const now = Date.now() / 1000;
+         const moonrise = data.daily[0].moonrise;
+         const moonset = data.daily[0].moonset;
+         
+         if (typeof moonrise === 'number' && typeof moonset === 'number') {
+            let oppEventTime = null;
+            let oppEventLabel = '';
+            
+            if (moonrise < moonset) {
+               if (now < moonrise) {
+                  oppEventTime = moonset;
+                  oppEventLabel = 'Moonset';
+               } else if (now < moonset) {
+                  oppEventTime = data.daily[1]?.moonrise || (moonrise + 86400);
+                  oppEventLabel = 'Moonrise';
+               } else {
+                  oppEventTime = data.daily[1]?.moonset || (moonset + 86400);
+                  oppEventLabel = 'Moonset';
+               }
+            } else {
+               if (now < moonset) {
+                  oppEventTime = moonrise;
+                  oppEventLabel = 'Moonrise';
+               } else if (now < moonrise) {
+                  oppEventTime = data.daily[1]?.moonset || (moonset + 86400);
+                  oppEventLabel = 'Moonset';
+               } else {
+                  oppEventTime = data.daily[1]?.moonrise || (moonrise + 86400);
+                  oppEventLabel = 'Moonrise';
+               }
+            }
+            
+            const oppDate = new Date(oppEventTime * 1000);
+            let oppHours = oppDate.getHours();
+            const oppMinutes = oppDate.getMinutes();
+            const oppAmPm = oppHours >= 12 ? 'p' : 'a';
+            oppHours = oppHours % 12 || 12;
+            const oppMinutesStr = oppMinutes < 10 ? '0' + oppMinutes : oppMinutes;
+            
+            moonTitle.innerText = `${oppEventLabel} ${oppHours}:${oppMinutesStr}${oppAmPm}`;
+         }
+      }
+    }
   }
 
   // Update the humidity dial in grid cell #4 (index 3)
@@ -3468,8 +3957,8 @@ import weatherConditions from '../data/weather-conditions.json';
     const activeColor = getDotsColors(currentTemp).active;
     const finalColor = tempColor || activeColor;
     
-    const gridHumidityProgressEls = document.querySelectorAll('.clockGridItem-3 .countdown-progress, .clockGridItem7-3 .countdown-progress');
-    const gridHumidityTextEls = document.querySelectorAll('.clockGridItem-3 .grid-humidity-text, .clockGridItem7-3 .grid-humidity-text');
+    const gridHumidityProgressEls = document.querySelectorAll('.clockGridItem-3 .countdown-progress');
+    const gridHumidityTextEls = document.querySelectorAll('.clockGridItem-3 .grid-humidity-text');
     const radius = 46;
     const circumference = 2 * Math.PI * radius; // ~289.0265
     
@@ -3498,12 +3987,12 @@ import weatherConditions from '../data/weather-conditions.json';
     const dewpointColor = dewpoint !== null ? tempToColor(dewpoint) : 'hsl(120, 80%, 40%)';
     const finalColor = tempColor || dewpointColor;
     
-    const gridDewpointProgressEl = document.querySelector('.clockGridItem-4 .countdown-progress');
-    const gridDewpointTextEl = document.querySelector('.clockGridItem-4 .grid-dewpoint-text');
+    const gridDewpointProgressEls = document.querySelectorAll('.clockGridItem-4 .countdown-progress');
+    const gridDewpointTextEls = document.querySelectorAll('.clockGridItem-4 .grid-dewpoint-text');
     const radius = 46;
     const circumference = 2 * Math.PI * radius; // ~289.0265
     
-    if (gridDewpointProgressEl) {
+    gridDewpointProgressEls.forEach(gridDewpointProgressEl => {
       if (dewpoint !== null) {
         const percent = Math.max(0, Math.min(1, dewpoint / 100));
         const dashOffset = circumference * (1 - percent);
@@ -3514,9 +4003,9 @@ import weatherConditions from '../data/weather-conditions.json';
       } else {
         gridDewpointProgressEl.style.strokeDashoffset = circumference;
       }
-    }
+    });
     
-    if (gridDewpointTextEl) {
+    gridDewpointTextEls.forEach(gridDewpointTextEl => {
       if (dewpoint !== null) {
         gridDewpointTextEl.innerHTML = `${Math.round(dewpoint)}°<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">Td</span>`;
       } else {
@@ -3525,7 +4014,7 @@ import weatherConditions from '../data/weather-conditions.json';
       if (finalColor) {
         gridDewpointTextEl.style.color = finalColor;
       }
-    }
+    });
   }
 
   // Update the sun dial in grid cell #6 (index 5)
@@ -3563,7 +4052,7 @@ import weatherConditions from '../data/weather-conditions.json';
     const fSunrise = Math.max(0, Math.min(1, sunriseSec / 86400));
     const fSunset = Math.max(0, Math.min(1, sunsetSec / 86400));
     
-    const radius = 46;
+    const radius = 42.5;
     const circumference = 2 * Math.PI * radius; // ~289.0265
     
     const length = (fSunset - fSunrise) * circumference;
@@ -3668,7 +4157,7 @@ import weatherConditions from '../data/weather-conditions.json';
     const fMoonrise = Math.max(0, Math.min(1, moonriseSec / 86400));
     const fMoonset = Math.max(0, Math.min(1, moonsetSec / 86400));
     
-    const radius = 46;
+    const radius = 42.5;
     const circumference = 2 * Math.PI * radius; // ~289.0265
     
     gridMoonProgressEls.forEach(gridMoonProgressEl => {
@@ -6904,7 +7393,7 @@ import weatherConditions from '../data/weather-conditions.json';
 
   function updateCountdownGauge() {
     const progressEl = document.querySelector('#analog-clock .countdown-progress');
-    const gridProgressEls = document.querySelectorAll('.clockGridItem-0 .countdown-progress, .clockGridItem7-0 .countdown-progress');
+    const gridProgressEls = document.querySelectorAll('.clockGridItem-0 .countdown-progress');
     if ((!progressEl && gridProgressEls.length === 0) || !nextRefreshAt) return;
     
     const now = Date.now();
@@ -6929,11 +7418,12 @@ import weatherConditions from '../data/weather-conditions.json';
   // Clock hands update
   function updateClockHands() {
     const container = document.querySelector('.clock-hands-container');
-    const gridItem0 = document.querySelector('.clockGridItem-0');
-    const gridItem0_7 = document.querySelector('.clockGridItem7-0');
+    const gridItem0s = document.querySelectorAll('.clockGridItem-0');
     const gridRow = document.getElementById('clock-grid-container');
     const gridRow7 = document.getElementById('clock-grid-container-7');
-    if (!container && !gridItem0 && !gridItem0_7 && !gridRow && !gridRow7) return;
+    const gridRow4_1 = document.getElementById('clock-grid-container-4-1');
+    const gridRow4_2 = document.getElementById('clock-grid-container-4-2');
+    if (!container && gridItem0s.length === 0 && !gridRow && !gridRow7 && !gridRow4_1 && !gridRow4_2) return;
     
     const now = new Date();
     const hours = now.getHours() % 12;
@@ -6960,14 +7450,38 @@ import weatherConditions from '../data/weather-conditions.json';
       }
     }
 
-    if (gridItem0) {
+    // Direct JS update of Time dial hands and dot to ensure they rotate and color match
+    const hourHands = document.querySelectorAll('.clockGridItem-0 .clock-hour-hand');
+    const minuteHands = document.querySelectorAll('.clockGridItem-0 .clock-minute-hand');
+    const centerDots = document.querySelectorAll('.clockGridItem-0 .clock-center-dot');
+
+    hourHands.forEach(hand => {
+      hand.style.transform = `translateX(-50%) rotate(${hourRotation}deg)`;
+      if (currentColor) {
+        hand.style.backgroundColor = currentColor;
+      }
+    });
+
+    minuteHands.forEach(hand => {
+      hand.style.transform = `translateX(-50%) rotate(${minuteRotation}deg)`;
+      if (currentColor) {
+        hand.style.backgroundColor = currentColor;
+      }
+    });
+
+    centerDots.forEach(dot => {
+      if (currentColor) {
+        dot.style.backgroundColor = currentColor;
+      }
+    });
+
+    gridItem0s.forEach(gridItem0 => {
       gridItem0.style.setProperty('--hour-rotation', `${hourRotation}deg`);
       gridItem0.style.setProperty('--minute-rotation', `${minuteRotation}deg`);
-    }
-    if (gridItem0_7) {
-      gridItem0_7.style.setProperty('--hour-rotation', `${hourRotation}deg`);
-      gridItem0_7.style.setProperty('--minute-rotation', `${minuteRotation}deg`);
-    }
+      if (currentColor) {
+        gridItem0.style.setProperty('--clock-hands-color', currentColor);
+      }
+    });
 
     if (gridRow && currentColor) {
       gridRow.style.setProperty('--clock-hands-color', currentColor);
@@ -6975,18 +7489,20 @@ import weatherConditions from '../data/weather-conditions.json';
     if (gridRow7 && currentColor) {
       gridRow7.style.setProperty('--clock-hands-color', currentColor);
     }
+    if (gridRow4_1 && currentColor) {
+      gridRow4_1.style.setProperty('--clock-hands-color', currentColor);
+    }
+    if (gridRow4_2 && currentColor) {
+      gridRow4_2.style.setProperty('--clock-hands-color', currentColor);
+    }
     
     // Dynamically update the 'TIME' label on the clock grid to military time (e.g. "15:17")
-    const timeLabelVal = document.getElementById('clock-grid-val-0'); // index 0 is TIME dial
-    const timeLabelVal7 = document.getElementById('clock-grid-val-7-0');
     const militaryHours = now.getHours().toString().padStart(2, '0');
     const militaryMinutes = minutes.toString().padStart(2, '0');
-    if (timeLabelVal) {
-       timeLabelVal.innerText = `${militaryHours}:${militaryMinutes}`;
-    }
-    if (timeLabelVal7) {
-       timeLabelVal7.innerText = `${militaryHours}:${militaryMinutes}`;
-    }
+    const timeLabelVals = document.querySelectorAll('.label-title-0');
+    timeLabelVals.forEach(val => {
+       val.innerText = `${militaryHours}:${militaryMinutes}`;
+    });
   }
 
   // Dynamic digital time display with seconds for left circle cell (replaces date)
@@ -7217,15 +7733,15 @@ import weatherConditions from '../data/weather-conditions.json';
       }
 
       // Sync the rotated wind direction hand inside grid cell #3 (index 2)
-      const gridWindHands = document.querySelectorAll('.clockGridItem-2 .clock-hand-wind-direction, .clockGridItem7-2 .clock-hand-wind-direction');
+      const gridWindHands = document.querySelectorAll('.clockGridItem-2 .clock-hand-wind-direction');
       gridWindHands.forEach(gridWindHand => {
         gridWindHand.style.transform = `translateX(-50%) rotate(${displayDeg}deg)`;
         if (color) {
-          gridWindHand.style.backgroundColor = color;
+          gridWindHand.style.background = `linear-gradient(to top, transparent 50%, ${color} 50%)`;
         }
       });
       
-      const gridWindCenterDots = document.querySelectorAll('.clockGridItem-2 .clock-center-dot, .clockGridItem7-2 .clock-center-dot');
+      const gridWindCenterDots = document.querySelectorAll('.clockGridItem-2 .clock-center-dot');
       gridWindCenterDots.forEach(gridWindCenterDot => {
         if (color) {
           gridWindCenterDot.style.backgroundColor = color;
