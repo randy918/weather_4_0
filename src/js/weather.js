@@ -1258,6 +1258,7 @@ import weatherConditions from '../data/weather-conditions.json';
         background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), transparent), linear-gradient(to bottom, var(--prev-banner-color), transparent);
         pointer-events: none;
         z-index: 10;
+        opacity: 0.5;
       }
       .alert-banner-bottom-shadow {
         position: absolute;
@@ -1268,6 +1269,7 @@ import weatherConditions from '../data/weather-conditions.json';
         background: linear-gradient(to bottom, rgba(0, 0, 0, 0.65), transparent);
         pointer-events: none;
         z-index: 10;
+        opacity: 0.5;
       }
       .alert-text {
         font-size: 3.5vw;
