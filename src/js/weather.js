@@ -1221,16 +1221,53 @@ import weatherConditions from '../data/weather-conditions.json';
       .alert-banner {
         width: 100vw;
         height: 10vw;
-        background-color: rgba(220, 38, 38, 0.75); /* Translucent glass effect */
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
         display: flex;
         align-items: center;
         justify-content: center;
         box-sizing: border-box;
         gap: 3vw;
-        border-bottom: 0.2vw solid rgba(255, 255, 255, 0.2);
         flex-shrink: 0;
+        position: relative; /* Position context for children shadows */
+        background-color: transparent;
+      }
+      .alert-banner-bg {
+        position: absolute;
+        inset: 0;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-bottom: 0.2vw solid rgba(255, 255, 255, 0.2);
+        z-index: 1;
+      }
+      .alert-banner-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3vw;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+      .alert-banner-top-shadow {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2vw;
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), transparent), linear-gradient(to bottom, var(--prev-banner-color), transparent);
+        pointer-events: none;
+        z-index: 10;
+      }
+      .alert-banner-bottom-shadow {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        height: 2vw;
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), transparent), linear-gradient(to bottom, var(--banner-color, rgba(220, 38, 38, 0.75)), transparent);
+        pointer-events: none;
+        z-index: 10;
       }
       .alert-text {
         font-size: 3.5vw;
@@ -1873,6 +1910,7 @@ import weatherConditions from '../data/weather-conditions.json';
     if (alerts.length === 0) {
       const isAlreadyCollapsed = !container.style.height || container.style.height === '0vw';
       if (isAlreadyCollapsed) return; // Prevent unnecessary DOM updates
+      container.style.overflow = 'hidden';
       container.style.height = '0vw';
       // Update fragile elements immediately as animation starts
       updateFragileElementsPosition();
@@ -1886,12 +1924,14 @@ import weatherConditions from '../data/weather-conditions.json';
     
     container.innerHTML = ''; // clear old alerts
     
-    // Handle simultaneous banners by stacking them
-    alerts.forEach(alert => {
+    let prevBannerColor = null;
+    
+    alerts.forEach((alert, index) => {
       console.log('Alert data:', alert); // Debug: see what properties are available
       
       const banner = document.createElement('div');
       banner.className = 'alert-banner';
+      banner.style.zIndex = 100 - index; // Ensure correct paint order for overlays
       
       // Determine background color based on alert name
       const eventName = alert.event.toUpperCase().trim();
@@ -1911,7 +1951,13 @@ import weatherConditions from '../data/weather-conditions.json';
           break;
         }
       }
-      banner.style.backgroundColor = bannerColor;
+
+      // Create the sibling background layer
+      const bannerBg = document.createElement('div');
+      bannerBg.className = 'alert-banner-bg';
+      bannerBg.style.backgroundColor = bannerColor;
+      banner.appendChild(bannerBg);
+
       banner.style.cursor = 'pointer';
       banner.addEventListener('click', () => openAlertModal(alert, bannerColor, bannerIcon));
       
@@ -1922,6 +1968,10 @@ import weatherConditions from '../data/weather-conditions.json';
         <img src="${bannerIcon}" style="width: ${svgSize}; height: ${svgSize}; flex-shrink: 0;" alt="Alert">
       `;
       
+      // Create the content container (sits above background)
+      const bannerContent = document.createElement('div');
+      bannerContent.className = 'alert-banner-content';
+
       const textWrapper = document.createElement('div');
       textWrapper.style.display = 'flex';
       textWrapper.style.flexDirection = 'column';
@@ -1982,9 +2032,27 @@ import weatherConditions from '../data/weather-conditions.json';
         textWrapper.appendChild(subtext);
       }
 
-      banner.innerHTML = svgIcon;
-      banner.appendChild(textWrapper);
+      bannerContent.innerHTML = svgIcon;
+      bannerContent.appendChild(textWrapper);
+      banner.appendChild(bannerContent);
+
+      // Add top shadow (multiplies previous banner color inside this banner context)
+      if (index > 0 && prevBannerColor) {
+        const topShadow = document.createElement('div');
+        topShadow.className = 'alert-banner-top-shadow';
+        topShadow.style.setProperty('--prev-banner-color', prevBannerColor);
+        banner.appendChild(topShadow);
+      }
+      
+      // Add bottom shadow (projects downwards for overlapping below)
+      const bottomShadow = document.createElement('div');
+      bottomShadow.className = 'alert-banner-bottom-shadow';
+      bottomShadow.style.setProperty('--banner-color', bannerColor);
+      banner.appendChild(bottomShadow);
+      
       container.appendChild(banner);
+      
+      prevBannerColor = bannerColor;
     });
 
     if (currentHeight !== targetHeight) {
@@ -2008,7 +2076,8 @@ import weatherConditions from '../data/weather-conditions.json';
       if (gradientUpper) gradientUpper.style.setProperty('--alert-push', startPushValue);
       if (gradientLower) gradientLower.style.setProperty('--alert-push', startPushValue);
       
-      // Ensure starting height is explicitly set so it animates properly
+      // Ensure starting height is explicitly set so it animates properly and hide overflow during transition
+      container.style.overflow = 'hidden';
       container.style.height = `${currentHeight}vw`;
 
       // Use a tiny delay to guarantee the browser has painted the newly inserted HTML 
@@ -2017,7 +2086,16 @@ import weatherConditions from '../data/weather-conditions.json';
         container.style.height = `${targetHeight}vw`;
         // Update fragile elements to final position as animation starts
         updateFragileElementsPosition();
+        
+        // After height animation is complete, make overflow visible so shadows show
+        setTimeout(() => {
+          if (parseFloat(container.style.height) > 0) {
+            container.style.overflow = 'visible';
+          }
+        }, ALERT_ANIMATION_MS);
       }, 50);
+    } else {
+      container.style.overflow = 'visible';
     }
   }
 
