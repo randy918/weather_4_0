@@ -58,12 +58,24 @@ import weatherConditions from '../data/weather-conditions.json';
   const CLOCK_GRID_CELESTIAL_DOT_STROKE_WIDTH = 2; // EDITABLE: Stroke width for the celestial dots (using SVG native viewBox units)
   const CLOCK_GRID_CELESTIAL_DOT_FILL = 'rgba(0,0,0,0.5)'; // EDITABLE: Fill color for the celestial dots
   const CLOCK_GRID_WIND_SPEED_TEXT_SHADOW = '2px 2px 0px black)'; // EDITABLE: Text shadow for wind speed number (offset-x offset-y blur color)
+  const CLOCK_GRID_ROW2_MARGIN_TOP = '2vw'; // EDITABLE: Margin top for the 2nd row of 4x2 dials
 
   // Inject these config variables into CSS properties immediately
   const CLOCK_GRID_LABEL_FONT_SIZE = '1.8vw';     // EDITABLE: Font size for the labels beneath the dials
   const CLOCK_GRID_LABEL_FONT_FAMILY = 'light';   // EDITABLE: Font family for the dial labels
   const CLOCK_GRID_LABEL_MARGIN_TOP = '0.5vw';    // EDITABLE: Space between dial and its label
   const CLOCK_GRID_LABEL_LETTER_SPACING = '-0.05vw'; // EDITABLE: Letter spacing (kerning) for the labels
+  
+  // EDITABLE: Styling for the inner unit text below the number (e.g. "RH", "Td", "Day", "Moon", "hPa") inside the dials
+  const CLOCK_GRID_INNER_LABEL_FONT_SIZE_DESKTOP = '2.2vw'; // EDITABLE: Desktop size of the inner label
+  const CLOCK_GRID_INNER_LABEL_FONT_SIZE_MOBILE = '4vw'; // EDITABLE: Mobile size of the inner label
+  
+  const CLOCK_GRID_INNER_LABEL_Y_OFFSET = '0.75vw'; // EDITABLE: Space above the inner label
+  const CLOCK_GRID_INNER_LABEL_FONT_FAMILY = "'medium', sans-serif"; // EDITABLE: Font family style ('light', 'medium', 'bold')
+
+  document.documentElement.style.setProperty('--clock-grid-inner-label-font-size-desktop', CLOCK_GRID_INNER_LABEL_FONT_SIZE_DESKTOP);
+  document.documentElement.style.setProperty('--clock-grid-inner-label-font-size-mobile', CLOCK_GRID_INNER_LABEL_FONT_SIZE_MOBILE);
+
   const CLOCK_GRID_LABELS = ['TIME', 'PHASE', 'WIND', 'Humidity', 'Dew Pt', 'SUN', 'MOON', 'Barometer']; // EDITABLE: Labels for the 8 dials
   
   document.documentElement.style.setProperty('--clock-grid-label-font-size', CLOCK_GRID_LABEL_FONT_SIZE);
@@ -92,6 +104,7 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--grid-celestial-dot-stroke-width', CLOCK_GRID_CELESTIAL_DOT_STROKE_WIDTH);
   document.documentElement.style.setProperty('--grid-celestial-dot-fill', CLOCK_GRID_CELESTIAL_DOT_FILL);
   document.documentElement.style.setProperty('--grid-wind-speed-text-shadow', CLOCK_GRID_WIND_SPEED_TEXT_SHADOW);
+  document.documentElement.style.setProperty('--clock-grid-row2-margin-top', CLOCK_GRID_ROW2_MARGIN_TOP);
 
   // Removed lastBarometricPressure as we now use future predictive trend
 
@@ -152,11 +165,11 @@ import weatherConditions from '../data/weather-conditions.json';
 
   // EDITABLE: Scrolling Gradient Overlay configuration (Non-phone version: iPad, desktop)
   const GRADIENT_NON_PHONE = {
-    top: '30.5vw',
+    top: '40.5vw',
     height: '45vw',
     midpoint: '70%',
     midOpacity: '0.65',
-    lowerTop: '111vw',
+    lowerTop: '116vw',
     lowerHeight: '38vw',
     lowerMidpoint: '90%',
     lowerMidOpacity: '0.65'
@@ -164,11 +177,11 @@ import weatherConditions from '../data/weather-conditions.json';
 
   // EDITABLE: Scrolling Gradient Overlay configuration (Phone version only)
   const GRADIENT_PHONE = {
-    top: '30.5vw',
+    top: '80.5vw',
     height: '45vw',
     midpoint: '70%',
     midOpacity: '0.65',
-    lowerTop: '111vw',
+    lowerTop: '158vw',
     lowerHeight: '38vw',
     lowerMidpoint: '90%',
     lowerMidOpacity: '0.65'
@@ -194,9 +207,12 @@ import weatherConditions from '../data/weather-conditions.json';
   // Re-apply on window resize
   window.addEventListener('resize', applyGradientProperties);
 
-  // EDITABLE: Wind speed text Y-offset adjustment (raise up by 0.5vw)
-  const WIND_NUMBER_Y_OFFSET = '-0.5vw'; // Adjust vertical position of main wind number (negative moves UP, positive moves DOWN)
-  document.documentElement.style.setProperty('--wind-number-y-offset', WIND_NUMBER_Y_OFFSET);
+  // EDITABLE: Wind speed text Y-offset adjustment
+  const WIND_NUMBER_Y_OFFSET_DESKTOP = '-1vw'; // EDITABLE: Desktop vertical position of main wind number (negative moves UP)
+  const WIND_NUMBER_Y_OFFSET_MOBILE = '-2vw';    // EDITABLE: Mobile vertical position of main wind number (negative moves UP)
+  
+  document.documentElement.style.setProperty('--wind-number-y-offset-desktop', WIND_NUMBER_Y_OFFSET_DESKTOP);
+  document.documentElement.style.setProperty('--wind-number-y-offset-mobile', WIND_NUMBER_Y_OFFSET_MOBILE);
 
   // EDITABLE: Rain forecast banner configuration
   const RAIN_BANNER_HEIGHT_VW = 10; // Height of the rain banner (same as alert banners)
@@ -945,9 +961,10 @@ import weatherConditions from '../data/weather-conditions.json';
     });
     
     gridWindTrackEls.forEach(gridWindTrackEl => {
+      const gapLength = percentGust * circumference;
       const trackLength = circumference * (1 - percentGust);
-      gridWindTrackEl.style.strokeDasharray = `${trackLength}, ${circumference}`;
-      gridWindTrackEl.style.strokeDashoffset = - (circumference * percentGust);
+      gridWindTrackEl.style.strokeDasharray = `0, ${gapLength.toFixed(3)}, ${trackLength.toFixed(3)}, ${circumference.toFixed(3)}`;
+      gridWindTrackEl.style.strokeDashoffset = '0';
     });
 
     // Update the gust-dot positioning at the point indicating gust speed
@@ -1033,7 +1050,7 @@ import weatherConditions from '../data/weather-conditions.json';
       // Scale dynamic inner elements if it's placed inside the smaller grid circle!
       const isGrid = el.closest('.grid-barometric-pressure') !== null;
       const unitFontSize = isGrid ? '1.1vw' : '1.5vw';
-      el.innerHTML = `${trendHtml}${Math.round(pressure)}<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">hPa</span>`;
+      el.innerHTML = `${trendHtml}${Math.round(pressure)}<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">hPa</span>`;
     });
 
     if (pressureFills.length > 0) {
@@ -3972,7 +3989,7 @@ import weatherConditions from '../data/weather-conditions.json';
     });
     
     gridHumidityTextEls.forEach(gridHumidityTextEl => {
-      gridHumidityTextEl.innerHTML = `${Math.round(humidity)}%<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">RH</span>`;
+      gridHumidityTextEl.innerHTML = `${Math.round(humidity)}%<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">RH</span>`;
       if (finalColor) {
         gridHumidityTextEl.style.color = finalColor;
       }
@@ -4007,9 +4024,9 @@ import weatherConditions from '../data/weather-conditions.json';
     
     gridDewpointTextEls.forEach(gridDewpointTextEl => {
       if (dewpoint !== null) {
-        gridDewpointTextEl.innerHTML = `${Math.round(dewpoint)}°<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">Td</span>`;
+        gridDewpointTextEl.innerHTML = `${Math.round(dewpoint)}°<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Td</span>`;
       } else {
-        gridDewpointTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">Td</span>`;
+        gridDewpointTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Td</span>`;
       }
       if (finalColor) {
         gridDewpointTextEl.style.color = finalColor;
@@ -4036,7 +4053,7 @@ import weatherConditions from '../data/weather-conditions.json';
         gridSunProgressEl.style.strokeDashoffset = circumference; // hide progress
       });
       gridSunTextEls.forEach(gridSunTextEl => {
-        gridSunTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">Day</span>`;
+        gridSunTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Day</span>`;
       });
       return;
     }
@@ -4115,7 +4132,7 @@ import weatherConditions from '../data/weather-conditions.json';
     const formattedTime = `${hours}:${minutesStr}<span style="font-size: 0.67em; font-family: 'medium', sans-serif;">${ampm}</span>`;
     
     gridSunTextEls.forEach(gridSunTextEl => {
-      gridSunTextEl.innerHTML = `${formattedTime}<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">${nextEventLabel}</span>`;
+      gridSunTextEl.innerHTML = `${formattedTime}<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">${nextEventLabel}</span>`;
       if (tempColor) {
         gridSunTextEl.style.color = tempColor;
       }
@@ -4141,7 +4158,7 @@ import weatherConditions from '../data/weather-conditions.json';
         gridMoonProgressEl.style.strokeDashoffset = circumference; // hide progress
       });
       gridMoonTextEls.forEach(gridMoonTextEl => {
-        gridMoonTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">Moon</span>`;
+        gridMoonTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Moon</span>`;
       });
       return;
     }
@@ -4252,7 +4269,7 @@ import weatherConditions from '../data/weather-conditions.json';
     const formattedTime = `${hours}:${minutesStr}<span style="font-size: 0.67em; font-family: 'medium', sans-serif;">${ampm}</span>`;
     
     gridMoonTextEls.forEach(gridMoonTextEl => {
-      gridMoonTextEl.innerHTML = `${formattedTime}<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">${nextEventLabel}</span>`;
+      gridMoonTextEl.innerHTML = `${formattedTime}<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">${nextEventLabel}</span>`;
       if (tempColor) {
         gridMoonTextEl.style.color = tempColor;
       }
@@ -4597,7 +4614,7 @@ import weatherConditions from '../data/weather-conditions.json';
     }
     
     if (gridHumidityTextEl) {
-      gridHumidityTextEl.innerHTML = `${Math.round(humidity)}%<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">RH</span>`;
+      gridHumidityTextEl.innerHTML = `${Math.round(humidity)}%<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">RH</span>`;
       if (finalColor) {
         gridHumidityTextEl.style.color = finalColor;
       }
@@ -4802,9 +4819,9 @@ import weatherConditions from '../data/weather-conditions.json';
     
     if (gridDewpointTextEl) {
       if (dewpoint !== null) {
-        gridDewpointTextEl.innerHTML = `${Math.round(dewpoint)}°<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">Td</span>`;
+        gridDewpointTextEl.innerHTML = `${Math.round(dewpoint)}°<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Td</span>`;
       } else {
-        gridDewpointTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(0.5vw); font-size: 2.2vw; opacity: 1; font-family: 'light', sans-serif;">Td</span>`;
+        gridDewpointTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Td</span>`;
       }
       if (finalColor) {
         gridDewpointTextEl.style.color = finalColor;
@@ -7394,6 +7411,7 @@ import weatherConditions from '../data/weather-conditions.json';
   function updateCountdownGauge() {
     const progressEl = document.querySelector('#analog-clock .countdown-progress');
     const gridProgressEls = document.querySelectorAll('.clockGridItem-0 .countdown-progress');
+    const gridTrackEls = document.querySelectorAll('.clockGridItem-0 .countdown-track');
     if ((!progressEl && gridProgressEls.length === 0) || !nextRefreshAt) return;
     
     const now = Date.now();
@@ -7408,6 +7426,14 @@ import weatherConditions from '../data/weather-conditions.json';
     if (progressEl) progressEl.style.strokeDashoffset = dashOffset;
     gridProgressEls.forEach(el => {
       el.style.strokeDashoffset = dashOffset;
+    });
+
+    // Update the background track to only draw the inactive part (no overlap under progress)
+    gridTrackEls.forEach(el => {
+      const gapLength = percent * CIRCLE_CIRCUMFERENCE;
+      const trackLength = CIRCLE_CIRCUMFERENCE * (1 - percent);
+      el.style.strokeDasharray = `0, ${gapLength.toFixed(3)}, ${trackLength.toFixed(3)}, ${CIRCLE_CIRCUMFERENCE.toFixed(3)}`;
+      el.style.strokeDashoffset = '0';
     });
   }
 

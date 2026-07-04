@@ -832,6 +832,10 @@ main {
     align-items: center;
 }
 
+#clock-grid-container-4-2 {
+    margin-top: var(--clock-grid-row2-margin-top, 2vw);
+}
+
 .clockGridLabelsContainer4 {
     --label-item-size: calc((100vw - var(--clock-grid-margin-left, 0vw) - var(--clock-grid-margin-right, 0vw) - 3 * var(--clock-grid-gap, 1vw)) / 4);
     --clock-grid-4-label-scale: 0.867; /* EDITABLE: Font size scale factor (scaled up 30% from 0.667) */
@@ -1011,7 +1015,8 @@ main {
     }
 
     .grid-wind-speed-text {
-        transform: translate(-50%, calc(-50% + var(--item-current-size) * 0.07 + var(--wind-number-y-offset, 0vw))) !important;
+        // Desktop default, mobile override below
+        transform: translate(-50%, calc(-50% + var(--item-current-size) * 0.07 + var(--wind-number-y-offset-desktop, 0vw))) !important;
     }
 
     .grid-humidity-text {
@@ -1100,7 +1105,19 @@ main {
 }
 
 // Responsive layout: 7-dial row is for tablet/desktop only; 4-dial rows are for phone only
+:root {
+    --clock-inner-label-size: var(--clock-grid-inner-label-font-size-desktop, 2.2vw);
+}
+
 @media (max-width: 767px) {
+    :root {
+        --clock-inner-label-size: var(--clock-grid-inner-label-font-size-mobile, 4vw);
+    }
+
+    .grid-wind-speed-text {
+        transform: translate(-50%, calc(-50% + var(--item-current-size) * 0.07 + var(--wind-number-y-offset-mobile, 0vw))) !important;
+    }
+    
     .clockGridContainer7,
     .clockGridLabelsContainer7 {
         display: none !important;
