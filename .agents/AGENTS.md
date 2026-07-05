@@ -24,3 +24,14 @@ When displaying RainViewer Doppler radar data in this workspace, follow these co
 
 3. **No Dilation/Morphology**:
    - Avoid using `<feMorphology>` dilate/erode or other pixel-expanding filters on the radar layers, as they cause blocky, aliased, pixelated shapes and distort color channels (causing colors like white/pink to swallow red/yellow).
+
+4. **Subtle Map Details**:
+   - Set the `.radar-map-bg` opacity to a subtle level (e.g. `0.15`) so that base map county lines and labels remain perfectly sharp and readable, but are faint enough not to clutter the screen or distract from the storm cores.
+
+5. **Smooth Sweep Line (iPad/Safari optimization)**:
+   - Always animate the `.radar-sweep-line` rotation using CSS `@keyframes` rather than high-frequency JS timers (`requestAnimationFrame` or short `setInterval` intervals). This keeps animation on the GPU compositor thread and prevents WebKit from throttling the rotation to a freeze during idle periods.
+   - Set a solid color background on the `.radar-sweep-line` (rather than a linear-gradient) to prevent subpixel antialiasing distortion or wobblying during WebKit rotation.
+   - Synchronize the CSS animation inline in JS when initiating the loop by resetting it (e.g., toggling `style.animation = 'none'`, forcing offsetWidth reflow, and setting `style.animation = ...` with the correct duration).
+
+6. **Preserve Radar Sizing, Zoom, and Offsets**:
+   - Never alter the zoom constants (`RAINVIEWER_ZOOM_LEFT`, `RAINVIEWER_ZOOM_RIGHT`, `RADAR_ZOOM_LEFT`, `RADAR_ZOOM_RIGHT`) or circle coverage diameters (e.g., `RADAR_INNER_CIRCLE_DIAMETER`), as these are calibrated to ensure the coordinate ratios and maps line up perfectly.

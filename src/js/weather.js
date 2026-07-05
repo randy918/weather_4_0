@@ -120,7 +120,7 @@ import weatherConditions from '../data/weather-conditions.json';
   let SHOW_DOPPLER_RADAR_RIGHT = false;
 
   // Set to true to force SHOW_DOPPLER_RADAR = true for testing (otherwise depends on active rain).
-  const FORCE_DOPPLER_RADAR = false;
+  const FORCE_DOPPLER_RADAR = true;
 
   // --- RainViewer Config for Left and Right Circle Cells ---
   const RAINVIEWER_ZOOM_LEFT = 5;       // Zoom level for far view (e.g. 5 = ~600 miles)
@@ -148,6 +148,7 @@ import weatherConditions from '../data/weather-conditions.json';
   // --- Doppler Radar Playback Config ---
   const RADAR_LOOP_SPEED_MS = 500;     // EDITABLE: Time each frame is fully visible (in milliseconds)
   const RADAR_FADE_DURATION_MS = 200;  // EDITABLE: Transition duration for cross-fade (in milliseconds)
+  const RADAR_LAST_FRAME_FADE_MS = 1500; // EDITABLE: Time the last frame takes to slowly fade out on loop restart (in ms)
   const RADAR_FRAME_COUNT = 12;        // EDITABLE: Number of recent radar frames to loop (default is 6)
   const RADAR_OUTER_STROKE_WIDTH = '0.7vw'; // EDITABLE: Outer border thickness
   const RADAR_INNER_STROKE_WIDTH = '0.3vw'; // EDITABLE: Inner coverage circle border thickness (left only)
@@ -161,6 +162,7 @@ import weatherConditions from '../data/weather-conditions.json';
   const RADAR_SWEEP_LINE_WIDTH = '0.48vw';     // EDITABLE: Thickness of the twirling radar sweep line (double standard 0.24vw)
   const RADAR_FADE_TRANSITION_TIMING = 'ease-in-out'; // EDITABLE: Easing curve for cross-fade transition
   const RADAR_GPU_ACCELERATION = false; // EDITABLE: Set to true to force GPU hardware acceleration for smooth fades
+  const RADAR_BLUR_AMOUNT = '0vw';              // EDITABLE: Set to '0vw' to disable blur entirely, or e.g. '0.04vw' to smooth edges
 
 
   // --- Weather Image Config (Upper Right/Left Circle Cells) ---
@@ -183,6 +185,7 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--radar-center-dot-size', RADAR_CENTER_DOT_SIZE);
   document.documentElement.style.setProperty('--radar-sweep-duration', `${RADAR_FRAME_COUNT * RADAR_LOOP_SPEED_MS}ms`);
   document.documentElement.style.setProperty('--radar-fade-timing', RADAR_FADE_TRANSITION_TIMING);
+  document.documentElement.style.setProperty('--radar-blur-amount', RADAR_BLUR_AMOUNT);
   document.documentElement.style.setProperty('--radar-zoom-ratio', String(RADAR_ZOOM_RATIO));
   document.documentElement.style.setProperty('--radar-scale-factor', String(RADAR_SCALE_FACTOR));
   document.documentElement.style.setProperty('--radar-inner-circle-diameter', RADAR_INNER_CIRCLE_DIAMETER);
@@ -1359,17 +1362,17 @@ import weatherConditions from '../data/weather-conditions.json';
         opacity: 0; /* Hide initially to prevent page load flash */
       }
       #weather-desc-image.radar-mode {
-        background-color: var(--radar-bg-color, black);
+        background-color: var(--radar-bg-color, transparent);
         background-image: var(--radar-bg-image, none);
         background-size: cover;
         background-repeat: no-repeat;
         animation: var(--radar-animation, none) !important;
-        mix-blend-mode: var(--radar-blend-mode, normal);
+        mix-blend-mode: var(--radar-blend-mode, lighten);
         box-sizing: border-box;
         border: ${RADAR_OUTER_STROKE_WIDTH} solid var(--clock-grid-track-color, rgba(255, 255, 255, 0.2));
       }
       #weather-desc-image.radar-mode .radar-frame {
-        filter: invert(1) hue-rotate(180deg);
+        /* Filter removal per workspace storm core isolation rules */
       }
       #weather-desc-image.radar-mode #simple-month {
         display: none !important;
@@ -1397,20 +1400,31 @@ import weatherConditions from '../data/weather-conditions.json';
         opacity: 0; /* Hide initially to prevent page load flash */
       }
       #weather-desc-image-left.radar-mode {
-        background-color: var(--radar-bg-color, black);
+        background-color: var(--radar-bg-color, transparent);
         background-image: var(--radar-bg-image, none);
         background-size: cover;
         background-repeat: no-repeat;
         animation: var(--radar-animation, none) !important;
-        mix-blend-mode: var(--radar-blend-mode, normal);
+        mix-blend-mode: var(--radar-blend-mode, lighten);
         box-sizing: border-box;
         border: ${RADAR_OUTER_STROKE_WIDTH} solid var(--clock-grid-track-color, rgba(255, 255, 255, 0.2));
       }
       #weather-desc-image-left.radar-mode .radar-frame {
-        filter: invert(1) hue-rotate(180deg);
+        /* Filter removal per workspace storm core isolation rules */
       }
       #weather-desc-image-left.radar-mode #simple-month-left {
         display: none !important;
+      }
+      @keyframes radar-sweep {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      .radar-sweep-line {
+        background: var(--clock-grid-track-color, rgba(255, 255, 255, 0.2)) !important;
+        will-change: transform;
+      }
+      .radar-map-bg {
+        opacity: 0.15;
       }
       .radar-ring-25-right {
         position: absolute;
@@ -2718,6 +2732,36 @@ import weatherConditions from '../data/weather-conditions.json';
             if (framesRight.length !== RADAR_FRAME_COUNT) {
               descImageEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
               descImageEl.querySelectorAll('.radar-sweep-line').forEach(l => l.remove());
+              descImageEl.querySelectorAll('.radar-frames-container').forEach(c => c.remove());
+              descImageEl.querySelectorAll('.radar-map-bg').forEach(m => m.remove());
+              
+              const mapBg = document.createElement('div');
+              mapBg.className = 'radar-map-bg';
+              mapBg.style.cssText = `
+                position: absolute;
+                width: 200%; height: 200%;
+                left: ${gridLeftPct}%;
+                top: ${gridTopPct}%;
+                background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%;
+                background-size: 50% 50%, 50% 50%, 50% 50%, 50% 50%;
+                background-repeat: no-repeat;
+                z-index: 1;
+                pointer-events: none;
+              `;
+              descImageEl.appendChild(mapBg);
+
+              const framesContainer = document.createElement('div');
+              framesContainer.className = 'radar-frames-container';
+              framesContainer.style.cssText = `
+                position: absolute;
+                top: 0; left: 0;
+                width: 100%; height: 100%;
+                pointer-events: none;
+                z-index: 2;
+                filter: blur(var(--radar-blur-amount, 1.2px));
+              `;
+              descImageEl.appendChild(framesContainer);
+              
               framesRight = [];
               for (let i = RADAR_FRAME_COUNT - 1; i >= 0; i--) {
                 const frame = document.createElement('div');
@@ -2727,15 +2771,15 @@ import weatherConditions from '../data/weather-conditions.json';
                   width: 200%; height: 200%;
                   left: ${gridLeftPct}%;
                   top: ${gridTopPct}%;
-                  background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%, 0% 0%, 100% 0%, 0% 100%, 100% 100%;
-                  background-size: 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%;
+                  background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%;
+                  background-size: 50% 50%, 50% 50%, 50% 50%, 50% 50%;
                   background-repeat: no-repeat;
                   opacity: ${i === 0 ? 1 : 0};
                   transition: opacity var(--radar-fade-duration, 400ms) var(--radar-fade-timing, ease-in-out);
-                  filter: url(#remove-blue-haze) blur(1.2px) !important;
-                  will-change: ${RADAR_GPU_ACCELERATION ? 'opacity' : 'auto'};
+                  filter: url(#remove-blue-haze) !important;
+                  will-change: opacity, transform;
                 `;
-                descImageEl.appendChild(frame);
+                framesContainer.appendChild(frame);
                 framesRight.push(frame);
               }
               // Create the sweep line element
@@ -2747,6 +2791,11 @@ import weatherConditions from '../data/weather-conditions.json';
                 frame.style.left = `${gridLeftPct}%`;
                 frame.style.top = `${gridTopPct}%`;
               });
+              const mapBg = descImageEl.querySelector('.radar-map-bg');
+              if (mapBg) {
+                mapBg.style.left = `${gridLeftPct}%`;
+                mapBg.style.top = `${gridTopPct}%`;
+              }
             }
             
             // Append 25mi and 50mi range rings dynamically if not present
@@ -2764,6 +2813,7 @@ import weatherConditions from '../data/weather-conditions.json';
             descImageEl.classList.remove('radar-mode');
             descImageEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
             descImageEl.querySelectorAll('.radar-sweep-line').forEach(l => l.remove());
+            descImageEl.querySelectorAll('.radar-frames-container').forEach(c => c.remove());
             descImageEl.querySelectorAll('.radar-ring-25-right').forEach(r => r.remove());
             descImageEl.querySelectorAll('.radar-ring-50-right').forEach(r => r.remove());
             
@@ -2812,6 +2862,36 @@ import weatherConditions from '../data/weather-conditions.json';
             if (framesLeft.length !== RADAR_FRAME_COUNT) {
               descImageLeftEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
               descImageLeftEl.querySelectorAll('.radar-sweep-line').forEach(l => l.remove());
+              descImageLeftEl.querySelectorAll('.radar-frames-container').forEach(c => c.remove());
+              descImageLeftEl.querySelectorAll('.radar-map-bg').forEach(m => m.remove());
+              
+              const mapBg = document.createElement('div');
+              mapBg.className = 'radar-map-bg';
+              mapBg.style.cssText = `
+                position: absolute;
+                width: ${200 * RADAR_SCALE_FACTOR}%; height: ${200 * RADAR_SCALE_FACTOR}%;
+                left: ${frameLeftPct}%;
+                top: ${frameTopPct}%;
+                background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%;
+                background-size: 50% 50%, 50% 50%, 50% 50%, 50% 50%;
+                background-repeat: no-repeat;
+                z-index: 1;
+                pointer-events: none;
+              `;
+              descImageLeftEl.appendChild(mapBg);
+
+              const framesContainer = document.createElement('div');
+              framesContainer.className = 'radar-frames-container';
+              framesContainer.style.cssText = `
+                position: absolute;
+                top: 0; left: 0;
+                width: 100%; height: 100%;
+                pointer-events: none;
+                z-index: 2;
+                filter: blur(var(--radar-blur-amount, 1.2px));
+              `;
+              descImageLeftEl.appendChild(framesContainer);
+              
               framesLeft = [];
               for (let i = RADAR_FRAME_COUNT - 1; i >= 0; i--) {
                 const frame = document.createElement('div');
@@ -2821,15 +2901,15 @@ import weatherConditions from '../data/weather-conditions.json';
                   width: ${200 * RADAR_SCALE_FACTOR}%; height: ${200 * RADAR_SCALE_FACTOR}%;
                   left: ${frameLeftPct}%;
                   top: ${frameTopPct}%;
-                  background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%, 0% 0%, 100% 0%, 0% 100%, 100% 100%;
-                  background-size: 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%;
+                  background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%;
+                  background-size: 50% 50%, 50% 50%, 50% 50%, 50% 50%;
                   background-repeat: no-repeat;
                   opacity: ${i === 0 ? 1 : 0};
                   transition: opacity var(--radar-fade-duration, 400ms) var(--radar-fade-timing, ease-in-out);
-                  filter: url(#remove-blue-haze) blur(1.2px) !important;
-                  will-change: ${RADAR_GPU_ACCELERATION ? 'opacity' : 'auto'};
+                  filter: url(#remove-blue-haze) !important;
+                  will-change: opacity, transform;
                 `;
-                descImageLeftEl.appendChild(frame);
+                framesContainer.appendChild(frame);
                 framesLeft.push(frame);
               }
               // Create the sweep line element
@@ -2841,11 +2921,18 @@ import weatherConditions from '../data/weather-conditions.json';
                 frame.style.left = `${frameLeftPct}%`;
                 frame.style.top = `${frameTopPct}%`;
               });
+              const mapBg = descImageLeftEl.querySelector('.radar-map-bg');
+              if (mapBg) {
+                mapBg.style.left = `${frameLeftPct}%`;
+                mapBg.style.top = `${frameTopPct}%`;
+              }
             }
           } else {
             descImageLeftEl.classList.remove('radar-mode');
             descImageLeftEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
             descImageLeftEl.querySelectorAll('.radar-sweep-line').forEach(l => l.remove());
+            descImageLeftEl.querySelectorAll('.radar-frames-container').forEach(c => c.remove());
+            descImageLeftEl.querySelectorAll('.radar-map-bg').forEach(m => m.remove());
             
             // Set standard background image
             const imgPreload = new Image();
@@ -2886,6 +2973,41 @@ import weatherConditions from '../data/weather-conditions.json';
         const x_startRight = (dXRight < 0.5) ? x0Right - 1 : x0Right;
         const y_startRight = (dYRight < 0.5) ? y0Right - 1 : y0Right;
 
+        // Set static map backgrounds once (CartoDB dark matter)
+        const mapBgLeft = descImageLeftEl ? descImageLeftEl.querySelector('.radar-map-bg') : null;
+        if (SHOW_DOPPLER_RADAR_LEFT && mapBgLeft && latestRainViewerData) {
+          const baseTilesLeft = [
+            `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_LEFT}/${x_startLeft}/${y_startLeft}.png`,
+            `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_LEFT}/${x_startLeft+1}/${y_startLeft}.png`,
+            `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_LEFT}/${x_startLeft}/${y_startLeft+1}.png`,
+            `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_LEFT}/${x_startLeft+1}/${y_startLeft+1}.png`
+          ];
+          mapBgLeft.style.backgroundImage = `
+            url('${baseTilesLeft[0]}'), url('${baseTilesLeft[1]}'), url('${baseTilesLeft[2]}'), url('${baseTilesLeft[3]}')
+          `;
+          mapBgLeft.style.display = 'block';
+        } else if (mapBgLeft) {
+          mapBgLeft.style.backgroundImage = 'none';
+          mapBgLeft.style.display = 'none';
+        }
+
+        const mapBgRight = descImageEl ? descImageEl.querySelector('.radar-map-bg') : null;
+        if (SHOW_DOPPLER_RADAR_RIGHT && mapBgRight && latestRainViewerData) {
+          const baseTilesRight = [
+            `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_RIGHT}/${x_startRight}/${y_startRight}.png`,
+            `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_RIGHT}/${x_startRight+1}/${y_startRight}.png`,
+            `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_RIGHT}/${x_startRight}/${y_startRight+1}.png`,
+            `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_RIGHT}/${x_startRight+1}/${y_startRight+1}.png`
+          ];
+          mapBgRight.style.backgroundImage = `
+            url('${baseTilesRight[0]}'), url('${baseTilesRight[1]}'), url('${baseTilesRight[2]}'), url('${baseTilesRight[3]}')
+          `;
+          mapBgRight.style.display = 'block';
+        } else if (mapBgRight) {
+          mapBgRight.style.backgroundImage = 'none';
+          mapBgRight.style.display = 'none';
+        }
+
         for (let i = 0; i < RADAR_FRAME_COUNT; i++) {
           const frameNum = (RADAR_FRAME_COUNT - 1) - i;
           
@@ -2905,17 +3027,11 @@ import weatherConditions from '../data/weather-conditions.json';
                 `${host}${path}/${RAINVIEWER_TILE_SIZE}/${RAINVIEWER_ZOOM_LEFT}/${x_startLeft+1}/${y_startLeft+1}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`
               ];
               
-              const baseTiles = [
-                `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_LEFT}/${x_startLeft}/${y_startLeft}.png`,
-                `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_LEFT}/${x_startLeft+1}/${y_startLeft}.png`,
-                `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_LEFT}/${x_startLeft}/${y_startLeft+1}.png`,
-                `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_LEFT}/${x_startLeft+1}/${y_startLeft+1}.png`
-              ];
-              
               framesLeft[i].style.backgroundImage = `
-                url('${rvTiles[0]}'), url('${rvTiles[1]}'), url('${rvTiles[2]}'), url('${rvTiles[3]}'),
-                url('${baseTiles[0]}'), url('${baseTiles[1]}'), url('${baseTiles[2]}'), url('${baseTiles[3]}')
+                url('${rvTiles[0]}'), url('${rvTiles[1]}'), url('${rvTiles[2]}'), url('${rvTiles[3]}')
               `;
+              framesLeft[i].style.backgroundPosition = '0% 0%, 100% 0%, 0% 100%, 100% 100%';
+              framesLeft[i].style.backgroundSize = '50% 50%, 50% 50%, 50% 50%, 50% 50%';
             } else {
               const fallbackFrameNum = Math.min(3, frameNum);
               const conusUrl = `https://radar.weather.gov/ridge/standard/CONUS_${fallbackFrameNum}.gif?t=${timeParam}`;
@@ -2941,17 +3057,11 @@ import weatherConditions from '../data/weather-conditions.json';
                 `${host}${path}/${RAINVIEWER_TILE_SIZE}/${RAINVIEWER_ZOOM_RIGHT}/${x_startRight+1}/${y_startRight+1}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`
               ];
               
-              const baseTiles = [
-                `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_RIGHT}/${x_startRight}/${y_startRight}.png`,
-                `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_RIGHT}/${x_startRight+1}/${y_startRight}.png`,
-                `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_RIGHT}/${x_startRight}/${y_startRight+1}.png`,
-                `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_RIGHT}/${x_startRight+1}/${y_startRight+1}.png`
-              ];
-              
               framesRight[i].style.backgroundImage = `
-                url('${rvTiles[0]}'), url('${rvTiles[1]}'), url('${rvTiles[2]}'), url('${rvTiles[3]}'),
-                url('${baseTiles[0]}'), url('${baseTiles[1]}'), url('${baseTiles[2]}'), url('${baseTiles[3]}')
+                url('${rvTiles[0]}'), url('${rvTiles[1]}'), url('${rvTiles[2]}'), url('${rvTiles[3]}')
               `;
+              framesRight[i].style.backgroundPosition = '0% 0%, 100% 0%, 0% 100%, 100% 100%';
+              framesRight[i].style.backgroundSize = '50% 50%, 50% 50%, 50% 50%, 50% 50%';
             } else {
               const fallbackFrameNum = Math.min(3, frameNum);
               const url = `https://radar.weather.gov/ridge/standard/${currentRadarStation}_${fallbackFrameNum}.gif?t=${timeParam}`;
@@ -7243,6 +7353,7 @@ import weatherConditions from '../data/weather-conditions.json';
     }
     if (radarSweepIntervalId) {
       clearInterval(radarSweepIntervalId);
+      radarSweepIntervalId = null;
     }
     const currentLoopToken = ++radarLoopCounter;
 
@@ -7274,6 +7385,14 @@ import weatherConditions from '../data/weather-conditions.json';
     const sweepDuration = totalFrames * speed;
     const sweepStartTime = Date.now();
 
+    // Synchronize and apply the GPU-accelerated CSS keyframe animation
+    document.querySelectorAll('.radar-sweep-line').forEach(line => {
+      line.style.animation = 'none';
+      void line.offsetWidth; // Force WebKit reflow to guarantee animation starts from 0 degrees
+      line.style.animation = `radar-sweep ${sweepDuration}ms linear infinite`;
+    });
+
+    // Run a low-frequency timer (every 50ms) to handle active frame opacity changes
     radarSweepIntervalId = setInterval(() => {
       if (currentLoopToken !== radarLoopCounter) {
         clearInterval(radarSweepIntervalId);
@@ -7282,15 +7401,7 @@ import weatherConditions from '../data/weather-conditions.json';
       
       const elapsed = Date.now() - sweepStartTime;
       const progress = (elapsed % sweepDuration) / sweepDuration;
-      const angle = progress * 360;
-      
-      // Calculate active frame index synchronously from the sweep progress
       const frameIndex = Math.floor(progress * totalFrames);
-      
-      // Update the sweep line rotation
-      document.querySelectorAll('.radar-sweep-line').forEach(line => {
-        line.style.transform = `rotate(${angle}deg)`;
-      });
       
       // Update opacity changes only when the frame index actually rolls over
       if (frameIndex !== currentRadarFrameIndex) {
@@ -7298,16 +7409,56 @@ import weatherConditions from '../data/weather-conditions.json';
         
         if (framesRight) {
           framesRight.forEach((frame, idx) => {
-            frame.style.opacity = idx === currentRadarFrameIndex ? '1' : '0';
+            if (idx === currentRadarFrameIndex) {
+              frame.style.zIndex = '5';
+              frame.style.transitionDuration = `${RADAR_FADE_DURATION_MS}ms`;
+              frame.style.opacity = '1';
+            } else {
+              const isLastFrameFading = (idx === totalFrames - 1) && (currentRadarFrameIndex < Math.ceil(RADAR_LAST_FRAME_FADE_MS / RADAR_LOOP_SPEED_MS));
+              const isPrevFrame = (idx === (currentRadarFrameIndex - 1 + totalFrames) % totalFrames);
+              
+              if (isLastFrameFading || isPrevFrame) {
+                frame.style.zIndex = '10';
+              } else {
+                frame.style.zIndex = '1';
+              }
+              
+              if (idx === totalFrames - 1) {
+                frame.style.transitionDuration = `${RADAR_LAST_FRAME_FADE_MS}ms`;
+              } else {
+                frame.style.transitionDuration = `${RADAR_FADE_DURATION_MS}ms`;
+              }
+              frame.style.opacity = '0';
+            }
           });
         }
         if (framesLeft) {
           framesLeft.forEach((frame, idx) => {
-            frame.style.opacity = idx === currentRadarFrameIndex ? '1' : '0';
+            if (idx === currentRadarFrameIndex) {
+              frame.style.zIndex = '5';
+              frame.style.transitionDuration = `${RADAR_FADE_DURATION_MS}ms`;
+              frame.style.opacity = '1';
+            } else {
+              const isLastFrameFading = (idx === totalFrames - 1) && (currentRadarFrameIndex < Math.ceil(RADAR_LAST_FRAME_FADE_MS / RADAR_LOOP_SPEED_MS));
+              const isPrevFrame = (idx === (currentRadarFrameIndex - 1 + totalFrames) % totalFrames);
+              
+              if (isLastFrameFading || isPrevFrame) {
+                frame.style.zIndex = '10';
+              } else {
+                frame.style.zIndex = '1';
+              }
+              
+              if (idx === totalFrames - 1) {
+                frame.style.transitionDuration = `${RADAR_LAST_FRAME_FADE_MS}ms`;
+              } else {
+                frame.style.transitionDuration = `${RADAR_FADE_DURATION_MS}ms`;
+              }
+              frame.style.opacity = '0';
+            }
           });
         }
       }
-    }, 16); // 60 FPS smooth rotation and lock-step frame switching
+    }, 50);
   }
 
   /**
