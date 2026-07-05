@@ -8185,8 +8185,8 @@ import weatherConditions from '../data/weather-conditions.json';
     if (SHOW_DOPPLER_RADAR_LEFT) {
       const displayHours = now.getHours() % 12 || 12;
       const displayMinutes = minutes.toString().padStart(2, '0');
-      const ampm = now.getHours() >= 12 ? 'pm' : 'am';
-      timeText = `${displayHours}:${displayMinutes} ${ampm}`;
+      const ampm = now.getHours() >= 12 ? 'p' : 'a';
+      timeText = `${displayHours}:${displayMinutes}${ampm}`;
     } else {
       const militaryHours = now.getHours().toString().padStart(2, '0');
       const militaryMinutes = minutes.toString().padStart(2, '0');
