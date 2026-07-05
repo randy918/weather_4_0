@@ -42,7 +42,7 @@ import weatherConditions from '../data/weather-conditions.json';
   // --- CONFIG: Clock Grid (8 Countdown Circles Row) ---
   const CLOCK_GRID_SIZE = '11vw';         // EDITABLE: Width and height of each circle widget
   const CLOCK_GRID_GAP = '1vw';          // EDITABLE: Gap between cells
-  const CLOCK_GRID_MARGIN_TOP = '-3vw';   // EDITABLE: Top margin of the row
+  const CLOCK_GRID_MARGIN_TOP = '0vw';   // EDITABLE: Top margin of the row
   const CLOCK_GRID_MARGIN_BOTTOM = '2vw';// EDITABLE: Bottom margin of the row
   const CLOCK_GRID_MARGIN_LEFT = '2vw';  // EDITABLE: Left margin for the row as a whole
   const CLOCK_GRID_MARGIN_RIGHT = '2vw'; // EDITABLE: Right margin for the row as a whole
@@ -1415,16 +1415,15 @@ import weatherConditions from '../data/weather-conditions.json';
       #weather-desc-image-left.radar-mode #simple-month-left {
         display: none !important;
       }
+      .radar-map-bg {
+        opacity: 0.15;
+      }
       @keyframes radar-sweep {
         from { transform: rotate(0deg); }
         to { transform: rotate(360deg); }
       }
       .radar-sweep-line {
-        background: var(--clock-grid-track-color, rgba(255, 255, 255, 0.2)) !important;
-        will-change: transform;
-      }
-      .radar-map-bg {
-        opacity: 0.15;
+        animation: radar-sweep var(--radar-sweep-duration, 6000ms) linear infinite !important;
       }
       .radar-ring-25-right {
         position: absolute;
@@ -1582,12 +1581,12 @@ import weatherConditions from '../data/weather-conditions.json';
     if (!document.getElementById('remove-blue-haze-svg')) {
       const rootStyles = getComputedStyle(document.documentElement);
       const mR = rootStyles.getPropertyValue('--radar-matrix-r').trim() || '3.0';
-      const mG = rootStyles.getPropertyValue('--radar-matrix-g').trim() || '3.0';
+      const mG = rootStyles.getPropertyValue('--radar-matrix-g').trim() || '0.0';
       const mB = rootStyles.getPropertyValue('--radar-matrix-b').trim() || '-5.0';
-      const mOffset = rootStyles.getPropertyValue('--radar-matrix-offset').trim() || '-0.1';
+      const mOffset = rootStyles.getPropertyValue('--radar-matrix-offset').trim() || '-0.6';
       
       const svgFilterHtml = `
-        <svg id="remove-blue-haze-svg" style="position: absolute; width: 0; height: 0; overflow: hidden;" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" id="remove-blue-haze-svg" style="position: absolute; top: -9999px; left: -9999px; visibility: hidden;" aria-hidden="true">
           <defs>
             <filter id="remove-blue-haze" color-interpolation-filters="sRGB">
               <feColorMatrix type="matrix" values="
@@ -2377,9 +2376,9 @@ import weatherConditions from '../data/weather-conditions.json';
 
   // --- Feels Like Margin Config ---
   const FEELS_LIKE_TOP_MARGIN = '0vw';    // EDITABLE: Gap ABOVE the whole "feels like" line
-  const FEELS_LIKE_BOTTOM_MARGIN = '0vw';   // EDITABLE: Gap BELOW the whole "feels like" line
+  const FEELS_LIKE_BOTTOM_MARGIN = '0vw';   // EDInpm run buildTABLE: Gap BELOW the whole "feels like" line
   const FEELS_LIKE_Y_OFFSET = '0vw';        // EDITABLE: Tight vertical nudge (positive = down, negative = up)
-  const FEELS_LIKE_VAL_Y_OFFSET = '.75vw';    // EDITABLE: Tight vertical nudge for ONLY the feels-like temp value
+  const FEELS_LIKE_VAL_Y_OFFSET = '0vw';    // EDITABLE: Tight vertical nudge for ONLY the feels-like temp value
   
   const FEELS_LIKE_TEXT_SIZE_DEFAULT = '5vw';   // EDITABLE: Standard size of the feels-like label text (single mode)
   const FEELS_LIKE_TEMP_SIZE_DEFAULT = '7.25vw'; // EDITABLE: ENLARGED size of feels-like temp (single mode) when diff >= 10
@@ -2776,7 +2775,7 @@ import weatherConditions from '../data/weather-conditions.json';
                   background-repeat: no-repeat;
                   opacity: ${i === 0 ? 1 : 0};
                   transition: opacity var(--radar-fade-duration, 400ms) var(--radar-fade-timing, ease-in-out);
-                  filter: url(#remove-blue-haze) !important;
+                  filter: url(\${window.location.href.split('#')[0]}#remove-blue-haze) !important;
                   will-change: opacity, transform;
                 `;
                 framesContainer.appendChild(frame);
@@ -2906,7 +2905,7 @@ import weatherConditions from '../data/weather-conditions.json';
                   background-repeat: no-repeat;
                   opacity: ${i === 0 ? 1 : 0};
                   transition: opacity var(--radar-fade-duration, 400ms) var(--radar-fade-timing, ease-in-out);
-                  filter: url(#remove-blue-haze) !important;
+                  filter: url(\${window.location.href.split('#')[0]}#remove-blue-haze) !important;
                   will-change: opacity, transform;
                 `;
                 framesContainer.appendChild(frame);
@@ -7385,11 +7384,14 @@ import weatherConditions from '../data/weather-conditions.json';
     const sweepDuration = totalFrames * speed;
     const sweepStartTime = Date.now();
 
-    // Synchronize and apply the GPU-accelerated CSS keyframe animation
+    // Set the duration CSS variable
+    document.documentElement.style.setProperty('--radar-sweep-duration', `${sweepDuration}ms`);
+
+    // Synchronize and reset the GPU-accelerated CSS keyframe animation
     document.querySelectorAll('.radar-sweep-line').forEach(line => {
       line.style.animation = 'none';
       void line.offsetWidth; // Force WebKit reflow to guarantee animation starts from 0 degrees
-      line.style.animation = `radar-sweep ${sweepDuration}ms linear infinite`;
+      line.style.animation = ''; // Fallback to stylesheet rule to start animation cleanly
     });
 
     // Run a low-frequency timer (every 50ms) to handle active frame opacity changes
@@ -7550,6 +7552,12 @@ import weatherConditions from '../data/weather-conditions.json';
         const cx = size / 2;
         const cy = size / 2;
 
+        const rootStyle = getComputedStyle(document.documentElement);
+        const mR_val = parseFloat(rootStyle.getPropertyValue('--radar-matrix-r').trim() || '3.0');
+        const mG_val = parseFloat(rootStyle.getPropertyValue('--radar-matrix-g').trim() || '0.0');
+        const mB_val = parseFloat(rootStyle.getPropertyValue('--radar-matrix-b').trim() || '-5.0');
+        const mOffset_val = parseFloat(rootStyle.getPropertyValue('--radar-matrix-offset').trim() || '-0.6');
+
         let precipitationPixelCount = 0;
 
         for (let y = 0; y < size; y++) {
@@ -7566,7 +7574,7 @@ import weatherConditions from '../data/weather-conditions.json';
               
               // Apply the exact SVG "remove-blue-haze" filter matrix and transfer math in JS
               // to only count pixels that are visible to the user (isolating yellow/orange/red storm cores)
-              const a_prime = 3.0 * r_val + 3.0 * g_val - 5.0 * b_val + 1.0 * a_val - 0.1;
+              const a_prime = mR_val * r_val + mG_val * g_val + mB_val * b_val + 1.0 * a_val + mOffset_val;
               const a_double_prime = a_prime * 10.0 - 4.0;
               
               if (a_double_prime > 0.1) {
@@ -7578,7 +7586,6 @@ import weatherConditions from '../data/weather-conditions.json';
 
         // Read threshold dynamically from CSS variables, falling back to JS constants
         let threshold = 300;
-        const rootStyle = getComputedStyle(document.documentElement);
         if (zoomLevel === RAINVIEWER_ZOOM_LEFT) {
           const cssVal = rootStyle.getPropertyValue('--radar-threshold-left').trim();
           threshold = cssVal ? parseInt(cssVal, 10) : RAINVIEWER_PRECIPITATION_PIXEL_THRESHOLD_LEFT;
