@@ -129,8 +129,8 @@ import weatherConditions from '../data/weather-conditions.json';
   const RAINVIEWER_COLOR_SCHEME = 1;    // Color scheme (1 is Universal Blue, free personal use standard)
 
   // Default precipitation thresholds (minimum active pixels inside viewport circle)
-  const RAINVIEWER_PRECIPITATION_PIXEL_THRESHOLD_LEFT = 150;
-  const RAINVIEWER_PRECIPITATION_PIXEL_THRESHOLD_RIGHT = 300;
+  const RAINVIEWER_PRECIPITATION_PIXEL_THRESHOLD_LEFT = 300;
+  const RAINVIEWER_PRECIPITATION_PIXEL_THRESHOLD_RIGHT = 1200;
 
   let latestRainViewerData = null;
 
@@ -149,7 +149,7 @@ import weatherConditions from '../data/weather-conditions.json';
   const RADAR_LOOP_SPEED_MS = 500;     // EDITABLE: Time each frame is fully visible (in milliseconds)
   const RADAR_FADE_DURATION_MS = 200;  // EDITABLE: Transition duration for cross-fade (in milliseconds)
   const RADAR_FRAME_COUNT = 12;        // EDITABLE: Number of recent radar frames to loop (default is 6)
-  const RADAR_OUTER_STROKE_WIDTH = '0.6vw'; // EDITABLE: Outer border thickness
+  const RADAR_OUTER_STROKE_WIDTH = '0.7vw'; // EDITABLE: Outer border thickness
   const RADAR_INNER_STROKE_WIDTH = '0.3vw'; // EDITABLE: Inner coverage circle border thickness (left only)
 
 
@@ -2313,6 +2313,8 @@ import weatherConditions from '../data/weather-conditions.json';
   // --- Feels Like Margin Config ---
   const FEELS_LIKE_TOP_MARGIN = '2.5vw';    // EDITABLE: Gap ABOVE the whole "feels like" line
   const FEELS_LIKE_BOTTOM_MARGIN = '0vw';   // EDITABLE: Gap BELOW the whole "feels like" line
+  const FEELS_LIKE_Y_OFFSET = '0vw';        // EDITABLE: Tight vertical nudge (positive = down, negative = up)
+  const FEELS_LIKE_VAL_Y_OFFSET = '.5vw';    // EDITABLE: Tight vertical nudge for ONLY the feels-like temp value
 
   // Create and update "Feels like" element
   function updateFeelsLike(data) {
@@ -2349,6 +2351,9 @@ import weatherConditions from '../data/weather-conditions.json';
     // Use padding instead of top-margin to prevent pushing the entire parent grid
     el.style.margin = `0 auto ${FEELS_LIKE_BOTTOM_MARGIN}`;
     el.style.paddingTop = FEELS_LIKE_TOP_MARGIN;
+    el.style.setProperty('--feels-like-y-offset', FEELS_LIKE_Y_OFFSET);
+    el.style.setProperty('--feels-like-val-y-offset', FEELS_LIKE_VAL_Y_OFFSET);
+    el.style.transform = `translateY(var(--feels-like-y-offset, 0vw))`;
     
     const feelsLike = data?.current?.feels_like;
     const currentTemp = data?.current?.temp;
@@ -2356,30 +2361,22 @@ import weatherConditions from '../data/weather-conditions.json';
       // --- EDITABLE: "feels like" text styles ---
       // Default View (Single Temp)
       const FEELS_LIKE_TEXT_SIZE_DEFAULT = '5vw';
+      const FEELS_LIKE_TEMP_SIZE_DEFAULT = '6.25vw'; // EDITABLE: Enlarge temperature numbers/degree by 25% (from 5vw)
       const FEELS_LIKE_LETTER_SPACING_DEFAULT = '-.225vw';
       const FEELS_LIKE_MARGIN_LEFT_DEFAULT = '.5vw';  // EDITABLE: Space BEFORE "feels like"
       const FEELS_LIKE_MARGIN_RIGHT_DEFAULT = '1.25vw'; // EDITABLE: Space AFTER "feels like"
       
       // F&C View (Dual Temp)
-      const FEELS_LIKE_TEXT_SIZE_DUAL = '4vw'; // Try '3.5vw' if it looks too large next to the squished numbers
-      const FEELS_LIKE_TEMP_SIZE_DUAL = '5vw'; // EDITABLE: Size for temperature numbers in dual mode (larger than text)
+      const FEELS_LIKE_TEXT_SIZE_DUAL = '4vw';
+      const FEELS_LIKE_TEMP_SIZE_DUAL = '6.25vw'; // EDITABLE: Enlarge temperature numbers in dual mode by 25% (from 5vw)
       const FEELS_LIKE_LETTER_SPACING_DUAL = '-.225vw';
       const FEELS_LIKE_MARGIN_LEFT_DUAL = '1vw';  // EDITABLE: Space BEFORE "feels like"
       const FEELS_LIKE_MARGIN_RIGHT_DUAL = '1vw'; // EDITABLE: Space AFTER "feels like"
 
       const dynamicColor = tempToColor(feelsLike) || 'inherit';
       
-      // Check difference based on rounded display values (10+ degrees above or below)
+      // Check difference based on rounded display values (Disabled: glow turned off as requested)
       let isHotGlow = false;
-      if (typeof currentTemp === 'number') {
-        if (displayUnit === 'BOTH') {
-          isHotGlow = Math.abs(Math.round(feelsLike) - Math.round(currentTemp)) >= 10;
-        } else {
-          const displayFeelsLike = displayUnit === 'C' ? (feelsLike - 32) * 5 / 9 : feelsLike;
-          const displayCurrent = displayUnit === 'C' ? (currentTemp - 32) * 5 / 9 : currentTemp;
-          isHotGlow = Math.abs(Math.round(displayFeelsLike) - Math.round(displayCurrent)) >= 10;
-        }
-      }
       
       const glowClass = isHotGlow ? 'feels-like-temp-val' : '';
       
@@ -2402,13 +2399,13 @@ import weatherConditions from '../data/weather-conditions.json';
         const feelsLikeHtml = `<span style="font-family: 'light', sans-serif; font-weight: normal; font-size: ${FEELS_LIKE_TEXT_SIZE_DUAL}; letter-spacing: ${FEELS_LIKE_LETTER_SPACING_DUAL}; margin-left: ${FEELS_LIKE_MARGIN_LEFT_DUAL}; margin-right: ${FEELS_LIKE_MARGIN_RIGHT_DUAL}; color: inherit;">feels like</span>`;
         const fF = Math.round(feelsLike);
         const fC = Math.round((feelsLike - 32) * 5 / 9);
-        const dualFeels = `<span class="fc-mode-text ${glowClass}" style="${glowStyle} font-family: 'boldcond', sans-serif; font-size: ${FEELS_LIKE_TEMP_SIZE_DUAL}; color: ${dynamicColor} !important; transition: color 0.5s ease;">${fF}${formatSlash()}${fC}</span>`;
+        const dualFeels = `<span class="fc-mode-text ${glowClass}" style="${glowStyle} display: inline-block; transform: translateY(var(--feels-like-val-y-offset, 0vw)); font-family: 'boldcond', sans-serif; font-size: ${FEELS_LIKE_TEMP_SIZE_DUAL}; color: ${dynamicColor} !important; transition: color 0.5s ease;">${fF}${formatSlash()}${fC}</span>`;
         
         if (typeof currentTemp === 'number') {
           const cF = Math.round(currentTemp);
           const cC = Math.round((currentTemp - 32) * 5 / 9);
           const currClr = tempToColor(currentTemp) || 'white';
-          el.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${FEELS_LIKE_TEMP_SIZE_DUAL}; color: ${currClr} !important;">${cF}${formatSlash()}${cC}</span>${feelsLikeHtml}${dualFeels}`;
+          el.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: 5vw; color: ${currClr} !important;">${cF}${formatSlash()}${cC}</span>${feelsLikeHtml}${dualFeels}`;
         } else {
           el.innerHTML = `${feelsLikeHtml}${dualFeels}`;
         }
@@ -2420,9 +2417,9 @@ import weatherConditions from '../data/weather-conditions.json';
         if (typeof currentTemp === 'number') {
           const roundedCurrent = Math.round(displayCurrent);
           const currClr = tempToColor(currentTemp) || 'white';
-          el.innerHTML = `<span style="font-family: 'bold', sans-serif; font-size: ${FEELS_LIKE_TEXT_SIZE_DEFAULT}; color: ${currClr} !important;">${roundedCurrent}°</span>${feelsLikeHtml}<span class="${glowClass}" style="${glowStyle} font-family: 'bold', sans-serif; font-size: ${FEELS_LIKE_TEXT_SIZE_DEFAULT}; color: ${dynamicColor} !important; transition: color 0.5s ease;">${rounded}°</span>`;
+          el.innerHTML = `<span style="font-family: 'bold', sans-serif; font-size: ${FEELS_LIKE_TEXT_SIZE_DEFAULT}; color: ${currClr} !important;">${roundedCurrent}°</span>${feelsLikeHtml}<span class="${glowClass}" style="${glowStyle} display: inline-block; transform: translateY(var(--feels-like-val-y-offset, 0vw)); font-family: 'bold', sans-serif; font-size: ${FEELS_LIKE_TEMP_SIZE_DEFAULT}; color: ${dynamicColor} !important; transition: color 0.5s ease;">${rounded}°</span>`;
         } else {
-          el.innerHTML = `${feelsLikeHtml}<span class="${glowClass}" style="${glowStyle} font-family: 'bold', sans-serif; font-size: ${FEELS_LIKE_TEXT_SIZE_DEFAULT}; color: ${dynamicColor} !important; transition: color 0.5s ease;">${rounded}°</span>`;
+          el.innerHTML = `${feelsLikeHtml}<span class="${glowClass}" style="${glowStyle} display: inline-block; transform: translateY(var(--feels-like-val-y-offset, 0vw)); font-family: 'bold', sans-serif; font-size: ${FEELS_LIKE_TEMP_SIZE_DEFAULT}; color: ${dynamicColor} !important; transition: color 0.5s ease;">${rounded}°</span>`;
         }
       }
       el.style.color = tempToColor(currentTemp) || 'inherit';
@@ -2670,7 +2667,7 @@ import weatherConditions from '../data/weather-conditions.json';
                   background-repeat: no-repeat;
                   opacity: ${i === 0 ? 1 : 0};
                   transition: opacity var(--radar-fade-duration, 400ms) ease-in-out;
-                  filter: url(#remove-blue-haze) !important;
+                  filter: url(#remove-blue-haze) blur(1.2px) !important;
                 `;
                 descImageEl.appendChild(frame);
                 framesRight.push(frame);
@@ -2749,7 +2746,7 @@ import weatherConditions from '../data/weather-conditions.json';
                   background-repeat: no-repeat;
                   opacity: ${i === 0 ? 1 : 0};
                   transition: opacity var(--radar-fade-duration, 400ms) ease-in-out;
-                  filter: url(#remove-blue-haze) !important;
+                  filter: url(#remove-blue-haze) blur(1.2px) !important;
                 `;
                 descImageLeftEl.appendChild(frame);
                 framesLeft.push(frame);
@@ -5662,14 +5659,14 @@ import weatherConditions from '../data/weather-conditions.json';
     const appBuildDate = typeof __APP_BUILD_DATE__ !== 'undefined' ? __APP_BUILD_DATE__ : 'Local Dev Mode';
 
     if (span) {
-      span.innerHTML = `Weather last updated: ${text}<br>App last updated: ${appBuildDate}`;
+      span.innerHTML = `Weather last updated: ${text}<br>App last updated: ${appBuildDate}<br>Radar data from RainViewer • Weather data from OpenWeather`;
       span.style.fontSize = '1.6875vw';
       span.style.color = 'white';
       span.style.opacity = '1';
     } else {
       span = document.createElement('div');
       span.id = id;
-      span.innerHTML = `Weather last updated: ${text}<br>App last updated: ${appBuildDate}`;
+      span.innerHTML = `Weather last updated: ${text}<br>App last updated: ${appBuildDate}<br>Radar data from RainViewer • Weather data from OpenWeather`;
       span.style.position = 'relative'; // Normal document flow
       span.style.margin = '0 auto'; // 0 top (earth spacer handles the 4vw above)
       span.style.paddingBottom = '4vw'; // Use padding instead of margin to prevent collapse
@@ -5796,7 +5793,7 @@ import weatherConditions from '../data/weather-conditions.json';
       el.style.alignItems = 'center';
       el.style.gap = '0'; // Gap removed here, space is now handled via margin on the month span
       el.style.color = 'white';
-      el.style.fontSize = '4.16vw'; // Made 30% bigger (from 3.20vw)
+      el.style.fontSize = '5.20vw'; // Made 25% bigger (from 4.16vw)
       el.style.zIndex = '10';
       el.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.6)';
       
@@ -5917,7 +5914,7 @@ import weatherConditions from '../data/weather-conditions.json';
       
       const el = document.getElementById('simple-month');
       if (el) {
-        el.innerHTML = `<span style="font-family: 'light', sans-serif; font-weight: normal; color: white; letter-spacing: -0.06em; margin-right: 0.75vw;">${month}</span><span style="font-family: 'bold', sans-serif; font-weight: normal; color: white;">${day}</span><span style="font-family: 'light', sans-serif; font-weight: normal; color: white; letter-spacing: -0.06em;">${dayOfWeek}</span>`;
+        el.innerHTML = `<span style="font-family: 'light', sans-serif; font-weight: normal; color: white; letter-spacing: -0.06em;">${month}</span><span style="font-family: 'bold', sans-serif; font-weight: normal; color: white;">${day}</span><span style="font-family: 'light', sans-serif; font-weight: normal; color: white; letter-spacing: -0.06em;">${dayOfWeek}</span>`;
       }
       // Left circle date update removed as it now displays the current digital time with seconds instead.
     } catch (e) { /* noop */ }
@@ -7192,7 +7189,8 @@ import weatherConditions from '../data/weather-conditions.json';
       });
     }
 
-    const sweepDuration = RADAR_FRAME_COUNT * RADAR_LOOP_SPEED_MS;
+    const totalFrames = (framesRight && framesRight.length) || (framesLeft && framesLeft.length) || RADAR_FRAME_COUNT;
+    const sweepDuration = totalFrames * speed;
     const sweepStartTime = Date.now();
 
     radarSweepIntervalId = setInterval(() => {
@@ -7200,35 +7198,35 @@ import weatherConditions from '../data/weather-conditions.json';
         clearInterval(radarSweepIntervalId);
         return;
       }
-      const elapsed = (Date.now() - sweepStartTime) % sweepDuration;
-      const angle = (elapsed / sweepDuration) * 360;
       
+      const elapsed = Date.now() - sweepStartTime;
+      const progress = (elapsed % sweepDuration) / sweepDuration;
+      const angle = progress * 360;
+      
+      // Calculate active frame index synchronously from the sweep progress
+      const frameIndex = Math.floor(progress * totalFrames);
+      
+      // Update the sweep line rotation
       document.querySelectorAll('.radar-sweep-line').forEach(line => {
         line.style.transform = `rotate(${angle}deg)`;
       });
-    }, 16); // 60 FPS smooth rotation
-
-    radarLoopIntervalId = setInterval(() => {
-      // Prevent action if a new loop instance has started
-      if (currentLoopToken !== radarLoopCounter) {
-        clearInterval(radarLoopIntervalId);
-        return;
+      
+      // Update opacity changes only when the frame index actually rolls over
+      if (frameIndex !== currentRadarFrameIndex) {
+        currentRadarFrameIndex = frameIndex;
+        
+        if (framesRight) {
+          framesRight.forEach((frame, idx) => {
+            frame.style.opacity = idx === currentRadarFrameIndex ? '1' : '0';
+          });
+        }
+        if (framesLeft) {
+          framesLeft.forEach((frame, idx) => {
+            frame.style.opacity = idx === currentRadarFrameIndex ? '1' : '0';
+          });
+        }
       }
-
-      const totalFrames = (framesRight && framesRight.length) || (framesLeft && framesLeft.length) || RADAR_FRAME_COUNT;
-      currentRadarFrameIndex = (currentRadarFrameIndex + 1) % totalFrames;
-
-      if (framesRight) {
-        framesRight.forEach((frame, idx) => {
-          frame.style.opacity = idx === currentRadarFrameIndex ? '1' : '0';
-        });
-      }
-      if (framesLeft) {
-        framesLeft.forEach((frame, idx) => {
-          frame.style.opacity = idx === currentRadarFrameIndex ? '1' : '0';
-        });
-      }
-    }, speed);
+    }, 16); // 60 FPS smooth rotation and lock-step frame switching
   }
 
   /**
@@ -7329,9 +7327,17 @@ import weatherConditions from '../data/weather-conditions.json';
             const dy = y - cy;
             if (dx * dx + dy * dy <= radius * radius) {
               const idx = (y * size + x) * 4;
-              const a = pixels[idx + 3]; // alpha channel
-              // Since tiles have transparent background, any non-transparent pixel (alpha > 50) is precipitation
-              if (a > 50) {
+              const r_val = pixels[idx] / 255;
+              const g_val = pixels[idx + 1] / 255;
+              const b_val = pixels[idx + 2] / 255;
+              const a_val = pixels[idx + 3] / 255;
+              
+              // Apply the exact SVG "remove-blue-haze" filter matrix and transfer math in JS
+              // to only count pixels that are visible to the user (isolating yellow/orange/red storm cores)
+              const a_prime = 3.0 * r_val + 3.0 * g_val - 5.0 * b_val + 1.0 * a_val - 0.1;
+              const a_double_prime = a_prime * 10.0 - 4.0;
+              
+              if (a_double_prime > 0.1) {
                 precipitationPixelCount++;
               }
             }
