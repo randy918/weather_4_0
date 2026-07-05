@@ -1029,6 +1029,12 @@ import weatherConditions from '../data/weather-conditions.json';
       if (tempColor) {
         gridWindSpeedTextEl.style.color = tempColor;
       }
+
+      if (windSpeed >= 25) {
+        gridWindSpeedTextEl.style.setProperty('font-size', 'calc(var(--item-current-size) * 0.70)', 'important');
+      } else {
+        gridWindSpeedTextEl.style.removeProperty('font-size');
+      }
     });
     
     console.log(`Wind updated: Speed ${Math.round(windSpeed)} mph (${speedPercent.toFixed(1)}%), Gust ${Math.round(windGust)} mph (${gustPercent.toFixed(1)}%)`);
@@ -2311,7 +2317,7 @@ import weatherConditions from '../data/weather-conditions.json';
   }
 
   // --- Feels Like Margin Config ---
-  const FEELS_LIKE_TOP_MARGIN = '2.5vw';    // EDITABLE: Gap ABOVE the whole "feels like" line
+  const FEELS_LIKE_TOP_MARGIN = '0vw';    // EDITABLE: Gap ABOVE the whole "feels like" line
   const FEELS_LIKE_BOTTOM_MARGIN = '0vw';   // EDITABLE: Gap BELOW the whole "feels like" line
   const FEELS_LIKE_Y_OFFSET = '0vw';        // EDITABLE: Tight vertical nudge (positive = down, negative = up)
   const FEELS_LIKE_VAL_Y_OFFSET = '.5vw';    // EDITABLE: Tight vertical nudge for ONLY the feels-like temp value
@@ -7073,7 +7079,7 @@ import weatherConditions from '../data/weather-conditions.json';
     const CITY_FONT_SIZE = '5vw';
     const CITY_FONT_FAMILY = "'light', sans-serif"; // e.g., 'light', 'bold', 'Weather'
     const CITY_MARGIN_TOP = '2vw';    // Space above the city name
-    const CITY_MARGIN_BOTTOM = '-3.5vw'; // Space below the city name
+    const CITY_MARGIN_BOTTOM = '-4.5vw'; // Space below the city name
     const CITY_LETTER_SPACING = '-0.05vw'; // Gap between letters (e.g., '0.1vw', '-0.05vw', 'normal')
 
     if (!el) {
