@@ -151,7 +151,16 @@ import weatherConditions from '../data/weather-conditions.json';
   const RADAR_FRAME_COUNT = 12;        // EDITABLE: Number of recent radar frames to loop (default is 6)
   const RADAR_OUTER_STROKE_WIDTH = '0.7vw'; // EDITABLE: Outer border thickness
   const RADAR_INNER_STROKE_WIDTH = '0.3vw'; // EDITABLE: Inner coverage circle border thickness (left only)
-  const RADAR_ZOOM_RATIO = 4;          // EDITABLE: Zoom ratio between Left (Far) and Right (Closeup) Doppler (e.g. 2 for 2x, 4 for 4x)
+  const RADAR_ZOOM_RATIO = 1.5;          // EDITABLE: Zoom ratio between Left (Far) and Right (Closeup) Doppler (e.g. 2 for 2x, 3 for 3x)
+  const RADAR_SCALE_FACTOR = 2 / RADAR_ZOOM_RATIO; // CSS scale factor for left frame (e.g. 0.6667 for 3x zoom ratio)
+  const RADAR_INNER_CIRCLE_DIAMETER = '39%'; // EDITABLE: Size of the inner coverage/reference circle on the far radar (e.g. '33.33%' for 3x zoom, '50%' for 2x zoom)
+  const RADAR_RING_25_DIAMETER_RIGHT = '31.85%'; // EDITABLE: Size of the 25-mile range circle on the right radar (25mi radius / 78.5mi total radius)
+  const RADAR_RING_50_DIAMETER_RIGHT = '63.69%'; // EDITABLE: Size of the 50-mile range circle on the right radar (50mi radius / 78.5mi total radius)
+  const RADAR_RING_25_STROKE_RIGHT = '0.3vw';  // Thickness of the 25-mile range circle on the right radar
+  const RADAR_RING_50_STROKE_RIGHT = '0.3vw';  // Thickness of the 50-mile range circle on the right radar
+  const RADAR_SWEEP_LINE_WIDTH = '0.48vw';     // EDITABLE: Thickness of the twirling radar sweep line (double standard 0.24vw)
+  const RADAR_FADE_TRANSITION_TIMING = 'ease-in-out'; // EDITABLE: Easing curve for cross-fade transition
+  const RADAR_GPU_ACCELERATION = false; // EDITABLE: Set to true to force GPU hardware acceleration for smooth fades
 
 
   // --- Weather Image Config (Upper Right/Left Circle Cells) ---
@@ -173,7 +182,15 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--circle-cell-margin-bottom', CIRCLE_CELL_MARGIN_BOTTOM);
   document.documentElement.style.setProperty('--radar-center-dot-size', RADAR_CENTER_DOT_SIZE);
   document.documentElement.style.setProperty('--radar-sweep-duration', `${RADAR_FRAME_COUNT * RADAR_LOOP_SPEED_MS}ms`);
+  document.documentElement.style.setProperty('--radar-fade-timing', RADAR_FADE_TRANSITION_TIMING);
   document.documentElement.style.setProperty('--radar-zoom-ratio', String(RADAR_ZOOM_RATIO));
+  document.documentElement.style.setProperty('--radar-scale-factor', String(RADAR_SCALE_FACTOR));
+  document.documentElement.style.setProperty('--radar-inner-circle-diameter', RADAR_INNER_CIRCLE_DIAMETER);
+  document.documentElement.style.setProperty('--radar-ring-25-diameter-right', RADAR_RING_25_DIAMETER_RIGHT);
+  document.documentElement.style.setProperty('--radar-ring-50-diameter-right', RADAR_RING_50_DIAMETER_RIGHT);
+  document.documentElement.style.setProperty('--radar-ring-25-stroke-right', RADAR_RING_25_STROKE_RIGHT);
+  document.documentElement.style.setProperty('--radar-ring-50-stroke-right', RADAR_RING_50_STROKE_RIGHT);
+  document.documentElement.style.setProperty('--radar-sweep-line-width', RADAR_SWEEP_LINE_WIDTH);
 
   const WEATHER_IMAGE_WIDTH = CIRCLE_CELL_SIZE;
   const WEATHER_IMAGE_HEIGHT = CIRCLE_CELL_SIZE;
@@ -1395,13 +1412,39 @@ import weatherConditions from '../data/weather-conditions.json';
       #weather-desc-image-left.radar-mode #simple-month-left {
         display: none !important;
       }
+      .radar-ring-25-right {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: var(--radar-ring-25-diameter-right, 31.85%);
+        height: var(--radar-ring-25-diameter-right, 31.85%);
+        transform: translate(-50%, -50%);
+        box-sizing: border-box;
+        border: var(--radar-ring-25-stroke-right, 0.15vw) solid var(--clock-grid-track-color, rgba(255, 255, 255, 0.2));
+        border-radius: 50%;
+        z-index: 90;
+        pointer-events: none;
+      }
+      .radar-ring-50-right {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: var(--radar-ring-50-diameter-right, 63.69%);
+        height: var(--radar-ring-50-diameter-right, 63.69%);
+        transform: translate(-50%, -50%);
+        box-sizing: border-box;
+        border: var(--radar-ring-50-stroke-right, 0.15vw) solid var(--clock-grid-track-color, rgba(255, 255, 255, 0.2));
+        border-radius: 50%;
+        z-index: 90;
+        pointer-events: none;
+      }
       #weather-desc-image-left.radar-mode::before {
         content: '';
         position: absolute;
         top: 50%;
         left: 50%;
-        width: calc(100% / var(--radar-zoom-ratio, 3));
-        height: calc(100% / var(--radar-zoom-ratio, 3));
+        width: var(--radar-inner-circle-diameter, 33.33%);
+        height: var(--radar-inner-circle-diameter, 33.33%);
         transform: translate(-50%, -50%);
         box-sizing: border-box;
         border: ${RADAR_INNER_STROKE_WIDTH} solid var(--clock-grid-track-color, rgba(255, 255, 255, 0.2));
@@ -2322,7 +2365,12 @@ import weatherConditions from '../data/weather-conditions.json';
   const FEELS_LIKE_TOP_MARGIN = '0vw';    // EDITABLE: Gap ABOVE the whole "feels like" line
   const FEELS_LIKE_BOTTOM_MARGIN = '0vw';   // EDITABLE: Gap BELOW the whole "feels like" line
   const FEELS_LIKE_Y_OFFSET = '0vw';        // EDITABLE: Tight vertical nudge (positive = down, negative = up)
-  const FEELS_LIKE_VAL_Y_OFFSET = '.5vw';    // EDITABLE: Tight vertical nudge for ONLY the feels-like temp value
+  const FEELS_LIKE_VAL_Y_OFFSET = '.75vw';    // EDITABLE: Tight vertical nudge for ONLY the feels-like temp value
+  
+  const FEELS_LIKE_TEXT_SIZE_DEFAULT = '5vw';   // EDITABLE: Standard size of the feels-like label text (single mode)
+  const FEELS_LIKE_TEMP_SIZE_DEFAULT = '7.25vw'; // EDITABLE: ENLARGED size of feels-like temp (single mode) when diff >= 10
+  const FEELS_LIKE_TEXT_SIZE_DUAL = '4vw';      // EDITABLE: Standard size of the feels-like label text (dual mode)
+  const FEELS_LIKE_TEMP_SIZE_DUAL = '6.25vw';    // EDITABLE: ENLARGED size of feels-like temp (dual mode) when diff >= 10
 
   // Create and update "Feels like" element
   function updateFeelsLike(data) {
@@ -2355,28 +2403,37 @@ import weatherConditions from '../data/weather-conditions.json';
       }
     }
     
+    const feelsLike = data?.current?.feels_like;
+    const currentTemp = data?.current?.temp;
+
+    // Determine active size based on whether feels-like is 10+ degrees away from current temp
+    let activeTempSizeDefault = FEELS_LIKE_TEXT_SIZE_DEFAULT;
+    let activeTempSizeDual = FEELS_LIKE_TEXT_SIZE_DUAL;
+    if (typeof feelsLike === 'number' && typeof currentTemp === 'number') {
+      const diff = Math.abs(Math.round(feelsLike) - Math.round(currentTemp));
+      if (diff >= 10) {
+        activeTempSizeDefault = FEELS_LIKE_TEMP_SIZE_DEFAULT;
+        activeTempSizeDual = FEELS_LIKE_TEMP_SIZE_DUAL;
+      }
+    }
+    
     // Always apply styling so hot-reloading works
-    // Use padding instead of top-margin to prevent pushing the entire parent grid
     el.style.margin = `0 auto ${FEELS_LIKE_BOTTOM_MARGIN}`;
     el.style.paddingTop = FEELS_LIKE_TOP_MARGIN;
     el.style.setProperty('--feels-like-y-offset', FEELS_LIKE_Y_OFFSET);
     el.style.setProperty('--feels-like-val-y-offset', FEELS_LIKE_VAL_Y_OFFSET);
+    el.style.setProperty('--feels-like-temp-size-default', activeTempSizeDefault);
+    el.style.setProperty('--feels-like-temp-size-dual', activeTempSizeDual);
     el.style.transform = `translateY(var(--feels-like-y-offset, 0vw))`;
     
-    const feelsLike = data?.current?.feels_like;
-    const currentTemp = data?.current?.temp;
     if (typeof feelsLike === 'number') {
       // --- EDITABLE: "feels like" text styles ---
       // Default View (Single Temp)
-      const FEELS_LIKE_TEXT_SIZE_DEFAULT = '5vw';
-      const FEELS_LIKE_TEMP_SIZE_DEFAULT = '6.25vw'; // EDITABLE: Enlarge temperature numbers/degree by 25% (from 5vw)
       const FEELS_LIKE_LETTER_SPACING_DEFAULT = '-.225vw';
       const FEELS_LIKE_MARGIN_LEFT_DEFAULT = '.5vw';  // EDITABLE: Space BEFORE "feels like"
       const FEELS_LIKE_MARGIN_RIGHT_DEFAULT = '1.25vw'; // EDITABLE: Space AFTER "feels like"
       
       // F&C View (Dual Temp)
-      const FEELS_LIKE_TEXT_SIZE_DUAL = '4vw';
-      const FEELS_LIKE_TEMP_SIZE_DUAL = '6.25vw'; // EDITABLE: Enlarge temperature numbers in dual mode by 25% (from 5vw)
       const FEELS_LIKE_LETTER_SPACING_DUAL = '-.225vw';
       const FEELS_LIKE_MARGIN_LEFT_DUAL = '1vw';  // EDITABLE: Space BEFORE "feels like"
       const FEELS_LIKE_MARGIN_RIGHT_DUAL = '1vw'; // EDITABLE: Space AFTER "feels like"
@@ -2407,7 +2464,7 @@ import weatherConditions from '../data/weather-conditions.json';
         const feelsLikeHtml = `<span style="font-family: 'light', sans-serif; font-weight: normal; font-size: ${FEELS_LIKE_TEXT_SIZE_DUAL}; letter-spacing: ${FEELS_LIKE_LETTER_SPACING_DUAL}; margin-left: ${FEELS_LIKE_MARGIN_LEFT_DUAL}; margin-right: ${FEELS_LIKE_MARGIN_RIGHT_DUAL}; color: inherit;">feels like</span>`;
         const fF = Math.round(feelsLike);
         const fC = Math.round((feelsLike - 32) * 5 / 9);
-        const dualFeels = `<span class="fc-mode-text ${glowClass}" style="${glowStyle} display: inline-block; transform: translateY(var(--feels-like-val-y-offset, 0vw)); font-family: 'boldcond', sans-serif; font-size: ${FEELS_LIKE_TEMP_SIZE_DUAL}; color: ${dynamicColor} !important; transition: color 0.5s ease;">${fF}${formatSlash()}${fC}</span>`;
+        const dualFeels = `<span class="fc-mode-text ${glowClass}" style="${glowStyle} display: inline-block; transform: translateY(var(--feels-like-val-y-offset, 0vw)); font-family: 'boldcond', sans-serif; font-size: var(--feels-like-temp-size-dual, 6.25vw); color: ${dynamicColor} !important; transition: color 0.5s ease;">${fF}${formatSlash()}${fC}</span>`;
         
         if (typeof currentTemp === 'number') {
           const cF = Math.round(currentTemp);
@@ -2425,9 +2482,9 @@ import weatherConditions from '../data/weather-conditions.json';
         if (typeof currentTemp === 'number') {
           const roundedCurrent = Math.round(displayCurrent);
           const currClr = tempToColor(currentTemp) || 'white';
-          el.innerHTML = `<span style="font-family: 'bold', sans-serif; font-size: ${FEELS_LIKE_TEXT_SIZE_DEFAULT}; color: ${currClr} !important;">${roundedCurrent}°</span>${feelsLikeHtml}<span class="${glowClass}" style="${glowStyle} display: inline-block; transform: translateY(var(--feels-like-val-y-offset, 0vw)); font-family: 'bold', sans-serif; font-size: ${FEELS_LIKE_TEMP_SIZE_DEFAULT}; color: ${dynamicColor} !important; transition: color 0.5s ease;">${rounded}°</span>`;
+          el.innerHTML = `<span style="font-family: 'bold', sans-serif; font-size: ${FEELS_LIKE_TEXT_SIZE_DEFAULT}; color: ${currClr} !important;">${roundedCurrent}°</span>${feelsLikeHtml}<span class="${glowClass}" style="${glowStyle} display: inline-block; transform: translateY(var(--feels-like-val-y-offset, 0vw)); font-family: 'bold', sans-serif; font-size: var(--feels-like-temp-size-default, 6.25vw); color: ${dynamicColor} !important; transition: color 0.5s ease;">${rounded}°</span>`;
         } else {
-          el.innerHTML = `${feelsLikeHtml}<span class="${glowClass}" style="${glowStyle} display: inline-block; transform: translateY(var(--feels-like-val-y-offset, 0vw)); font-family: 'bold', sans-serif; font-size: ${FEELS_LIKE_TEMP_SIZE_DEFAULT}; color: ${dynamicColor} !important; transition: color 0.5s ease;">${rounded}°</span>`;
+          el.innerHTML = `${feelsLikeHtml}<span class="${glowClass}" style="${glowStyle} display: inline-block; transform: translateY(var(--feels-like-val-y-offset, 0vw)); font-family: 'bold', sans-serif; font-size: var(--feels-like-temp-size-default, 6.25vw); color: ${dynamicColor} !important; transition: color 0.5s ease;">${rounded}°</span>`;
         }
       }
       el.style.color = tempToColor(currentTemp) || 'inherit';
@@ -2674,8 +2731,9 @@ import weatherConditions from '../data/weather-conditions.json';
                   background-size: 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%;
                   background-repeat: no-repeat;
                   opacity: ${i === 0 ? 1 : 0};
-                  transition: opacity var(--radar-fade-duration, 400ms) ease-in-out;
+                  transition: opacity var(--radar-fade-duration, 400ms) var(--radar-fade-timing, ease-in-out);
                   filter: url(#remove-blue-haze) blur(1.2px) !important;
+                  will-change: ${RADAR_GPU_ACCELERATION ? 'opacity' : 'auto'};
                 `;
                 descImageEl.appendChild(frame);
                 framesRight.push(frame);
@@ -2690,10 +2748,24 @@ import weatherConditions from '../data/weather-conditions.json';
                 frame.style.top = `${gridTopPct}%`;
               });
             }
+            
+            // Append 25mi and 50mi range rings dynamically if not present
+            if (!descImageEl.querySelector('.radar-ring-25-right')) {
+              const r25 = document.createElement('div');
+              r25.className = 'radar-ring-25-right';
+              descImageEl.appendChild(r25);
+            }
+            if (!descImageEl.querySelector('.radar-ring-50-right')) {
+              const r50 = document.createElement('div');
+              r50.className = 'radar-ring-50-right';
+              descImageEl.appendChild(r50);
+            }
           } else {
             descImageEl.classList.remove('radar-mode');
             descImageEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
             descImageEl.querySelectorAll('.radar-sweep-line').forEach(l => l.remove());
+            descImageEl.querySelectorAll('.radar-ring-25-right').forEach(r => r.remove());
+            descImageEl.querySelectorAll('.radar-ring-50-right').forEach(r => r.remove());
             
             // Set standard background image
             const imgPreload = new Image();
@@ -2734,8 +2806,8 @@ import weatherConditions from '../data/weather-conditions.json';
             const dX_new = coords.x - x_start;
             const dY_new = coords.y - y_start;
             
-            const gridLeftPct = (0.5 - dX_new) * 100;
-            const gridTopPct = (0.5 - dY_new) * 100;
+            const frameLeftPct = 50 - dX_new * 100 * RADAR_SCALE_FACTOR;
+            const frameTopPct = 50 - dY_new * 100 * RADAR_SCALE_FACTOR;
 
             if (framesLeft.length !== RADAR_FRAME_COUNT) {
               descImageLeftEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
@@ -2746,15 +2818,16 @@ import weatherConditions from '../data/weather-conditions.json';
                 frame.className = 'radar-frame';
                 frame.style.cssText = `
                   position: absolute;
-                  width: 200%; height: 200%;
-                  left: ${gridLeftPct}%;
-                  top: ${gridTopPct}%;
+                  width: ${200 * RADAR_SCALE_FACTOR}%; height: ${200 * RADAR_SCALE_FACTOR}%;
+                  left: ${frameLeftPct}%;
+                  top: ${frameTopPct}%;
                   background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%, 0% 0%, 100% 0%, 0% 100%, 100% 100%;
                   background-size: 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%;
                   background-repeat: no-repeat;
                   opacity: ${i === 0 ? 1 : 0};
-                  transition: opacity var(--radar-fade-duration, 400ms) ease-in-out;
+                  transition: opacity var(--radar-fade-duration, 400ms) var(--radar-fade-timing, ease-in-out);
                   filter: url(#remove-blue-haze) blur(1.2px) !important;
+                  will-change: ${RADAR_GPU_ACCELERATION ? 'opacity' : 'auto'};
                 `;
                 descImageLeftEl.appendChild(frame);
                 framesLeft.push(frame);
@@ -2765,8 +2838,8 @@ import weatherConditions from '../data/weather-conditions.json';
               descImageLeftEl.appendChild(sweepLine);
             } else {
               framesLeft.forEach(frame => {
-                frame.style.left = `${gridLeftPct}%`;
-                frame.style.top = `${gridTopPct}%`;
+                frame.style.left = `${frameLeftPct}%`;
+                frame.style.top = `${frameTopPct}%`;
               });
             }
           } else {
@@ -7948,12 +8021,22 @@ import weatherConditions from '../data/weather-conditions.json';
       gridRow4_2.style.setProperty('--clock-hands-color', currentColor);
     }
     
-    // Dynamically update the 'TIME' label on the clock grid to military time (e.g. "15:17")
-    const militaryHours = now.getHours().toString().padStart(2, '0');
-    const militaryMinutes = minutes.toString().padStart(2, '0');
+    // Dynamically update the 'TIME' label on the clock grid to military time (e.g. "15:17"),
+    // or switch to standard 12-hour time with "am/pm" if the Left Doppler (Far view) is active.
+    let timeText = '';
+    if (SHOW_DOPPLER_RADAR_LEFT) {
+      const displayHours = now.getHours() % 12 || 12;
+      const displayMinutes = minutes.toString().padStart(2, '0');
+      const ampm = now.getHours() >= 12 ? 'pm' : 'am';
+      timeText = `${displayHours}:${displayMinutes} ${ampm}`;
+    } else {
+      const militaryHours = now.getHours().toString().padStart(2, '0');
+      const militaryMinutes = minutes.toString().padStart(2, '0');
+      timeText = `${militaryHours}:${militaryMinutes}`;
+    }
     const timeLabelVals = document.querySelectorAll('.label-title-0');
     timeLabelVals.forEach(val => {
-       val.innerText = `${militaryHours}:${militaryMinutes}`;
+       val.innerText = timeText;
     });
   }
 

@@ -1186,8 +1186,8 @@ main {
 .radar-sweep-line {
     position: absolute;
     top: 0;
-    left: calc(50% - 0.12vw);
-    width: 0.24vw;
+    width: var(--radar-sweep-line-width, 0.24vw);
+    left: calc(50% - var(--radar-sweep-line-width, 0.24vw) / 2);
     height: 50%;
     background: linear-gradient(to top, transparent 5%, var(--clock-grid-track-color, rgba(255, 255, 255, 0.2)) 5%);
     transform-origin: 50% 100%;
