@@ -123,7 +123,7 @@ import weatherConditions from '../data/weather-conditions.json';
   const FORCE_DOPPLER_RADAR = false;
 
   // --- RainViewer Config for Left and Right Circle Cells ---
-  const RAINVIEWER_ZOOM_LEFT = 6;       // Zoom level for far view (e.g. 6 = ~300 miles)
+  const RAINVIEWER_ZOOM_LEFT = 5;       // Zoom level for far view (e.g. 5 = ~600 miles)
   const RAINVIEWER_ZOOM_RIGHT = 7;      // Zoom level for close-up view (e.g. 7 = ~150 miles)
   const RAINVIEWER_TILE_SIZE = 512;     // Tile size for RainViewer tiles (256 or 512)
   const RAINVIEWER_COLOR_SCHEME = 1;    // Color scheme (1 is Universal Blue, free personal use standard)
@@ -151,6 +151,7 @@ import weatherConditions from '../data/weather-conditions.json';
   const RADAR_FRAME_COUNT = 12;        // EDITABLE: Number of recent radar frames to loop (default is 6)
   const RADAR_OUTER_STROKE_WIDTH = '0.7vw'; // EDITABLE: Outer border thickness
   const RADAR_INNER_STROKE_WIDTH = '0.3vw'; // EDITABLE: Inner coverage circle border thickness (left only)
+  const RADAR_ZOOM_RATIO = 4;          // EDITABLE: Zoom ratio between Left (Far) and Right (Closeup) Doppler (e.g. 2 for 2x, 4 for 4x)
 
 
   // --- Weather Image Config (Upper Right/Left Circle Cells) ---
@@ -172,6 +173,7 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--circle-cell-margin-bottom', CIRCLE_CELL_MARGIN_BOTTOM);
   document.documentElement.style.setProperty('--radar-center-dot-size', RADAR_CENTER_DOT_SIZE);
   document.documentElement.style.setProperty('--radar-sweep-duration', `${RADAR_FRAME_COUNT * RADAR_LOOP_SPEED_MS}ms`);
+  document.documentElement.style.setProperty('--radar-zoom-ratio', String(RADAR_ZOOM_RATIO));
 
   const WEATHER_IMAGE_WIDTH = CIRCLE_CELL_SIZE;
   const WEATHER_IMAGE_HEIGHT = CIRCLE_CELL_SIZE;
@@ -1398,8 +1400,8 @@ import weatherConditions from '../data/weather-conditions.json';
         position: absolute;
         top: 50%;
         left: 50%;
-        width: 50%;
-        height: 50%;
+        width: calc(100% / var(--radar-zoom-ratio, 3));
+        height: calc(100% / var(--radar-zoom-ratio, 3));
         transform: translate(-50%, -50%);
         box-sizing: border-box;
         border: ${RADAR_INNER_STROKE_WIDTH} solid var(--clock-grid-track-color, rgba(255, 255, 255, 0.2));
