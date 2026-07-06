@@ -8270,8 +8270,8 @@ import weatherConditions from '../data/weather-conditions.json';
       <div style="display: flex; align-items: baseline; justify-content: center; gap: 0; line-height: 1;">
         <span style="font-family: 'bold', sans-serif; font-size: var(--left-time-size, 4.37vw); letter-spacing: -0.02em;">${hours}:${minutesStr}</span>
         <span style="font-family: 'light', sans-serif; font-size: var(--left-time-size, 4.37vw); letter-spacing: -0.02em;">:</span>
-        <span style="font-family: 'mono', sans-serif; font-size: var(--left-seconds-size, 4.27vw); letter-spacing: -0.02em;">${secondsStr}</span>
-        <span style="font-family: 'medium', sans-serif; font-size: var(--left-ampm-size, 2.93vw); margin-left: 0.1vw;">${ampm}</span>
+        <span style="font-family: 'mono', sans-serif; font-size: var(--left-seconds-size, 4.27vw); letter-spacing: -0.06em;">${secondsStr}</span>
+        <span style="font-family: 'medium', sans-serif; font-size: var(--left-ampm-size, 2.93vw); margin-left: -0.05vw; letter-spacing: -0.05em;">${ampm}</span>
       </div>
     `;
   }
