@@ -1455,6 +1455,12 @@ import weatherConditions from '../data/weather-conditions.json';
         z-index: 90;
         pointer-events: none;
       }
+      .radar-frame,
+      .radar-sweep-line,
+      .radar-frames-container,
+      .radar-map-bg {
+        pointer-events: none !important;
+      }
       #weather-desc-image-left.radar-mode::before {
         content: '';
         position: absolute;
@@ -6033,9 +6039,6 @@ import weatherConditions from '../data/weather-conditions.json';
     });
   }
 
-  /* --- Simple month label helpers (minimal & easy to edit) ---
-    Inserts a 3-letter lowercase month above the high box and colors it using tempToColor
-  */
   function createSimpleMonthIfMissing() {
     if (!document.getElementById('simple-month')) {
       const el = document.createElement('div');
@@ -6058,37 +6061,50 @@ import weatherConditions from '../data/weather-conditions.json';
       el.style.zIndex = '10';
       el.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.6)';
       
-      // Make it a clickable button that resets the 5-minute timer and forces a refresh
-      el.style.cursor = 'pointer';
-      el.style.pointerEvents = 'auto';
-      el.addEventListener('click', (e) => {
-        e.stopPropagation(); // prevent other clicks from triggering
-        console.log('🔄 Date phrase clicked - resetting API timer & forcing refresh...');
-        
-        // Fade to black, then back to target color
-        const applyTransition = (color) => {
-          el.style.setProperty('transition', 'color 0.5s ease-out', 'important');
-          el.style.setProperty('color', color, 'important');
-          const spans = el.querySelectorAll('span');
-          spans.forEach(span => {
-            span.style.setProperty('transition', 'color 0.5s ease-out', 'important');
-            span.style.setProperty('color', color, 'important');
-          });
-        };
-
-        requestAnimationFrame(() => applyTransition('black'));
-        setTimeout(() => {
-          requestAnimationFrame(() => applyTransition(getCurrentTextColor()));
-        }, 500);
-
-        stopAutoRefresh();
-        getLocalWeather();
-        startAutoRefresh(currentRefreshMs, autoRefreshAligned);
-      });
+      // Disable pointer events on clock text overlay so click propagates to parent circle
+      el.style.pointerEvents = 'none';
       
       const descImage = document.getElementById('weather-desc-image');
       if (descImage) {
         descImage.appendChild(el);
+        
+        // Attach click listener to parent container (covers both radar & image modes)
+        descImage.style.cursor = 'pointer';
+        descImage.style.pointerEvents = 'auto';
+        descImage.addEventListener('click', (e) => {
+          e.stopPropagation();
+          console.log('🔄 Right circle clicked - resetting API timer & forcing refresh...');
+          
+          const isRadar = descImage.classList.contains('radar-mode');
+          if (isRadar) {
+            const applyTransition = (opacityVal) => {
+              descImage.style.setProperty('transition', 'opacity 0.5s ease-out', 'important');
+              descImage.style.setProperty('opacity', opacityVal, 'important');
+            };
+            requestAnimationFrame(() => applyTransition('0.15'));
+            setTimeout(() => {
+              requestAnimationFrame(() => applyTransition('1.0'));
+            }, 500);
+          } else {
+            const applyTransition = (color) => {
+              el.style.setProperty('transition', 'color 0.5s ease-out', 'important');
+              el.style.setProperty('color', color, 'important');
+              const spans = el.querySelectorAll('span');
+              spans.forEach(span => {
+                span.style.setProperty('transition', 'color 0.5s ease-out', 'important');
+                span.style.setProperty('color', color, 'important');
+              });
+            };
+            requestAnimationFrame(() => applyTransition('black'));
+            setTimeout(() => {
+              requestAnimationFrame(() => applyTransition(getCurrentTextColor()));
+            }, 500);
+          }
+
+          stopAutoRefresh();
+          getLocalWeather();
+          startAutoRefresh(currentRefreshMs, autoRefreshAligned);
+        });
       } else {
         (document.querySelector('main.content') || document.body).appendChild(el);
       }
@@ -6115,35 +6131,50 @@ import weatherConditions from '../data/weather-conditions.json';
       elLeft.style.zIndex = '10';
       elLeft.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.6)';
       
-      elLeft.style.cursor = 'pointer';
-      elLeft.style.pointerEvents = 'auto';
-      elLeft.addEventListener('click', (e) => {
-        e.stopPropagation();
-        console.log('🔄 Date phrase clicked - resetting API timer & forcing refresh...');
-        
-        const applyTransition = (color) => {
-          elLeft.style.setProperty('transition', 'color 0.5s ease-out', 'important');
-          elLeft.style.setProperty('color', color, 'important');
-          const spans = elLeft.querySelectorAll('span');
-          spans.forEach(span => {
-            span.style.setProperty('transition', 'color 0.5s ease-out', 'important');
-            span.style.setProperty('color', color, 'important');
-          });
-        };
-
-        requestAnimationFrame(() => applyTransition('black'));
-        setTimeout(() => {
-          requestAnimationFrame(() => applyTransition(getCurrentTextColor()));
-        }, 500);
-
-        stopAutoRefresh();
-        getLocalWeather();
-        startAutoRefresh(currentRefreshMs, autoRefreshAligned);
-      });
+      // Disable pointer events on clock text overlay so click propagates to parent circle
+      elLeft.style.pointerEvents = 'none';
       
       const descImageLeft = document.getElementById('weather-desc-image-left');
       if (descImageLeft) {
         descImageLeft.appendChild(elLeft);
+        
+        // Attach click listener to parent container (covers both radar & image modes)
+        descImageLeft.style.cursor = 'pointer';
+        descImageLeft.style.pointerEvents = 'auto';
+        descImageLeft.addEventListener('click', (e) => {
+          e.stopPropagation();
+          console.log('🔄 Left circle clicked - resetting API timer & forcing refresh...');
+          
+          const isRadar = descImageLeft.classList.contains('radar-mode');
+          if (isRadar) {
+            const applyTransition = (opacityVal) => {
+              descImageLeft.style.setProperty('transition', 'opacity 0.5s ease-out', 'important');
+              descImageLeft.style.setProperty('opacity', opacityVal, 'important');
+            };
+            requestAnimationFrame(() => applyTransition('0.15'));
+            setTimeout(() => {
+              requestAnimationFrame(() => applyTransition('1.0'));
+            }, 500);
+          } else {
+            const applyTransition = (color) => {
+              elLeft.style.setProperty('transition', 'color 0.5s ease-out', 'important');
+              elLeft.style.setProperty('color', color, 'important');
+              const spans = elLeft.querySelectorAll('span');
+              spans.forEach(span => {
+                span.style.setProperty('transition', 'color 0.5s ease-out', 'important');
+                span.style.setProperty('color', color, 'important');
+              });
+            };
+            requestAnimationFrame(() => applyTransition('black'));
+            setTimeout(() => {
+              requestAnimationFrame(() => applyTransition(getCurrentTextColor()));
+            }, 500);
+          }
+
+          stopAutoRefresh();
+          getLocalWeather();
+          startAutoRefresh(currentRefreshMs, autoRefreshAligned);
+        });
       }
     }
   }
@@ -7580,24 +7611,38 @@ import weatherConditions from '../data/weather-conditions.json';
         const gridTopPct = (0.5 - dY_new) * 100;
 
         const tileUrls = [
-          `${host}${path}/${RAINVIEWER_TILE_SIZE}/${zoomLevel}/${x_start}/${y_start}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`,
-          `${host}${path}/${RAINVIEWER_TILE_SIZE}/${zoomLevel}/${x_start+1}/${y_start}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`,
-          `${host}${path}/${RAINVIEWER_TILE_SIZE}/${zoomLevel}/${x_start}/${y_start+1}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`,
-          `${host}${path}/${RAINVIEWER_TILE_SIZE}/${zoomLevel}/${x_start+1}/${y_start+1}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`
+          `${host}${path}/${RAINVIEWER_TILE_SIZE}/${zoomLevel}/${x_start}/${y_start}/${RAINVIEWER_COLOR_SCHEME}/0_0.png?cors=true`,
+          `${host}${path}/${RAINVIEWER_TILE_SIZE}/${zoomLevel}/${x_start+1}/${y_start}/${RAINVIEWER_COLOR_SCHEME}/0_0.png?cors=true`,
+          `${host}${path}/${RAINVIEWER_TILE_SIZE}/${zoomLevel}/${x_start}/${y_start+1}/${RAINVIEWER_COLOR_SCHEME}/0_0.png?cors=true`,
+          `${host}${path}/${RAINVIEWER_TILE_SIZE}/${zoomLevel}/${x_start+1}/${y_start+1}/${RAINVIEWER_COLOR_SCHEME}/0_0.png?cors=true`
         ];
 
-        // Load all 4 images using promises (treating 404 or load errors as empty transparent tiles)
-        const loadImage = (url) => new Promise((resImg) => {
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
-          img.onload = () => resImg(img);
-          img.onerror = () => {
-            // Log as info since 404 is standard for no-rain tiles on RainViewer
-            console.log(`📡 RainViewer Info: Empty or missing tile (loaded as empty): ${url}`);
-            resImg(null);
-          };
-          img.src = url;
-        });
+        // Load all 4 images using fetch and Object URLs to bypass Safari CORS/cache issues
+        const loadImage = async (url) => {
+          try {
+            const res = await fetch(url);
+            if (!res.ok) {
+              // 404 is standard for no-rain tiles
+              console.log(`📡 RainViewer Info: Empty or missing tile (status ${res.status}): ${url}`);
+              return null;
+            }
+            const blob = await res.blob();
+            const objectUrl = URL.createObjectURL(blob);
+            
+            return new Promise((resolveImg) => {
+              const img = new Image();
+              img.onload = () => resolveImg({ img, objectUrl });
+              img.onerror = () => {
+                URL.revokeObjectURL(objectUrl);
+                resolveImg(null);
+              };
+              img.src = objectUrl;
+            });
+          } catch (e) {
+            console.log(`📡 RainViewer Fetch Info: Failed to fetch tile (treating as empty): ${url}`, e);
+            return null;
+          }
+        };
 
         // Safety timeout for loading the tiles (6 seconds)
         const timeoutId = setTimeout(() => {
@@ -7605,7 +7650,7 @@ import weatherConditions from '../data/weather-conditions.json';
           resolve(false);
         }, 6000);
 
-        const images = await Promise.all(tileUrls.map(loadImage));
+        const results = await Promise.all(tileUrls.map(loadImage));
         clearTimeout(timeoutId);
 
         // Perform offscreen drawing
@@ -7624,10 +7669,17 @@ import weatherConditions from '../data/weather-conditions.json';
         const gridTop = (gridTopPct / 100) * size;
         const tileSize = size;
 
-        if (images[0]) ctx.drawImage(images[0], gridLeft, gridTop, tileSize, tileSize);
-        if (images[1]) ctx.drawImage(images[1], gridLeft + tileSize, gridTop, tileSize, tileSize);
-        if (images[2]) ctx.drawImage(images[2], gridLeft, gridTop + tileSize, tileSize, tileSize);
-        if (images[3]) ctx.drawImage(images[3], gridLeft + tileSize, gridTop + tileSize, tileSize, tileSize);
+        if (results[0]) ctx.drawImage(results[0].img, gridLeft, gridTop, tileSize, tileSize);
+        if (results[1]) ctx.drawImage(results[1].img, gridLeft + tileSize, gridTop, tileSize, tileSize);
+        if (results[2]) ctx.drawImage(results[2].img, gridLeft, gridTop + tileSize, tileSize, tileSize);
+        if (results[3]) ctx.drawImage(results[3].img, gridLeft + tileSize, gridTop + tileSize, tileSize, tileSize);
+
+        // Revoke the temporary Object URLs immediately to avoid memory leaks
+        results.forEach(res => {
+          if (res && res.objectUrl) {
+            URL.revokeObjectURL(res.objectUrl);
+          }
+        });
 
         // Scan pixels within the circular viewport (centered at size/2, size/2 with radius size/2)
         const imgData = ctx.getImageData(0, 0, size, size);
