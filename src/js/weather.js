@@ -32,6 +32,10 @@ import weatherConditions from '../data/weather-conditions.json';
   // Store last weather data for resize repositioning of temp pointer--
   let lastWeatherData = null;
 
+  // Track daytime/nighttime and base weather image filename for color updates
+  let currentIsNight = false;
+  let currentBaseFileName = '';
+
   // Editable minimum threshold for showing rain amounts (in inches) throughout the app
   const MIN_RAIN_DISPLAY_THRESHOLD = 0.05;
 
@@ -42,7 +46,7 @@ import weatherConditions from '../data/weather-conditions.json';
   // --- CONFIG: Clock Grid (8 Countdown Circles Row) ---
   const CLOCK_GRID_SIZE = '11vw';         // EDITABLE: Width and height of each circle widget
   const CLOCK_GRID_GAP = '1vw';          // EDITABLE: Gap between cells
-  const CLOCK_GRID_MARGIN_TOP = '0vw';   // EDITABLE: Top margin of the row
+  const CLOCK_GRID_MARGIN_TOP = '1.5vw';   // EDITABLE: Top margin of the row
   const CLOCK_GRID_MARGIN_BOTTOM = '2vw';// EDITABLE: Bottom margin of the row
   const CLOCK_GRID_MARGIN_LEFT = '2vw';  // EDITABLE: Left margin for the row as a whole
   const CLOCK_GRID_MARGIN_RIGHT = '2vw'; // EDITABLE: Right margin for the row as a whole
@@ -120,7 +124,7 @@ import weatherConditions from '../data/weather-conditions.json';
   let SHOW_DOPPLER_RADAR_RIGHT = false;
 
   // Set to true to force SHOW_DOPPLER_RADAR = true for testing (otherwise depends on active rain).
-  const FORCE_DOPPLER_RADAR = true;
+  const FORCE_DOPPLER_RADAR = false;
 
   // --- RainViewer Config for Left and Right Circle Cells ---
   const RAINVIEWER_ZOOM_LEFT = 5;       // Zoom level for far view (e.g. 5 = ~600 miles)
@@ -2375,7 +2379,7 @@ import weatherConditions from '../data/weather-conditions.json';
   }
 
   // --- Feels Like Margin Config ---
-  const FEELS_LIKE_TOP_MARGIN = '0vw';    // EDITABLE: Gap ABOVE the whole "feels like" line
+  const FEELS_LIKE_TOP_MARGIN = '1vw';    // EDITABLE: Gap ABOVE the whole "feels like" line
   const FEELS_LIKE_BOTTOM_MARGIN = '0vw';   // EDInpm run buildTABLE: Gap BELOW the whole "feels like" line
   const FEELS_LIKE_Y_OFFSET = '0vw';        // EDITABLE: Tight vertical nudge (positive = down, negative = up)
   const FEELS_LIKE_VAL_Y_OFFSET = '0vw';    // EDITABLE: Tight vertical nudge for ONLY the feels-like temp value
@@ -2701,6 +2705,14 @@ import weatherConditions from '../data/weather-conditions.json';
         }
 
         const baseFileName = 'desc-' + description.toLowerCase().replace(/\s+/g, '-') + '.jpg';
+
+        // Update track variables for color checking
+        currentIsNight = isNight;
+        currentBaseFileName = baseFileName;
+
+        // Update the simple month text colors immediately
+        updateSimpleMonthColors();
+
         const dayImgPath = 'img/' + baseFileName;
         const nightImgPath = 'img/dark-' + baseFileName;
         const fallbackPath = 'img/desc-rem.jpg';
@@ -5962,6 +5974,37 @@ import weatherConditions from '../data/weather-conditions.json';
     el.textContent = `To-Do (Tap to clear): ${cleanNames.join(', ')}`;
   }
 
+  /* --- Helper functions for dynamic text coloring --- */
+  function getCurrentTextColor() {
+    const targetImages = [
+      'desc-broken-clouds.jpg',
+      'desc-clear-sky.jpg',
+      'desc-few-clouds.jpg',
+      'desc-fog.jpg',
+      'desc-haze.jpg',
+      'desc-mist.jpg',
+      'desc-scattered-clouds.jpg'
+    ];
+    if (!currentIsNight && currentBaseFileName && targetImages.includes(currentBaseFileName)) {
+      return 'rgb(33, 57, 157)';
+    }
+    return 'white';
+  }
+
+  function updateSimpleMonthColors() {
+    const color = getCurrentTextColor();
+    
+    const el = document.getElementById('simple-month');
+    if (el) {
+      el.style.color = color;
+    }
+    
+    const elLeft = document.getElementById('simple-month-left');
+    if (elLeft) {
+      elLeft.style.color = color;
+    }
+  }
+
   /* --- Simple month label helpers (minimal & easy to edit) ---
     Inserts a 3-letter lowercase month above the high box and colors it using tempToColor
   */
@@ -5982,7 +6025,7 @@ import weatherConditions from '../data/weather-conditions.json';
       el.style.justifyContent = 'center';
       el.style.alignItems = 'center';
       el.style.gap = '0'; // Gap removed here, space is now handled via margin on the month span
-      el.style.color = 'white';
+      el.style.color = getCurrentTextColor();
       el.style.fontSize = '5.20vw'; // Made 25% bigger (from 4.16vw)
       el.style.zIndex = '10';
       el.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.6)';
@@ -5994,7 +6037,7 @@ import weatherConditions from '../data/weather-conditions.json';
         e.stopPropagation(); // prevent other clicks from triggering
         console.log('🔄 Date phrase clicked - resetting API timer & forcing refresh...');
         
-        // Fade to black, then back to white
+        // Fade to black, then back to target color
         const applyTransition = (color) => {
           el.style.setProperty('transition', 'color 0.5s ease-out', 'important');
           el.style.setProperty('color', color, 'important');
@@ -6007,7 +6050,7 @@ import weatherConditions from '../data/weather-conditions.json';
 
         requestAnimationFrame(() => applyTransition('black'));
         setTimeout(() => {
-          requestAnimationFrame(() => applyTransition('white'));
+          requestAnimationFrame(() => applyTransition(getCurrentTextColor()));
         }, 500);
 
         stopAutoRefresh();
@@ -6039,7 +6082,7 @@ import weatherConditions from '../data/weather-conditions.json';
       elLeft.style.justifyContent = 'center';
       elLeft.style.alignItems = 'center';
       elLeft.style.gap = '0';
-      elLeft.style.color = 'white';
+      elLeft.style.color = getCurrentTextColor();
       elLeft.style.fontSize = 'var(--left-time-size, 4.37vw)'; // Made 20% bigger (from 3.64vw)
       elLeft.style.zIndex = '10';
       elLeft.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.6)';
@@ -6062,7 +6105,7 @@ import weatherConditions from '../data/weather-conditions.json';
 
         requestAnimationFrame(() => applyTransition('black'));
         setTimeout(() => {
-          requestAnimationFrame(() => applyTransition('white'));
+          requestAnimationFrame(() => applyTransition(getCurrentTextColor()));
         }, 500);
 
         stopAutoRefresh();
@@ -6099,12 +6142,18 @@ import weatherConditions from '../data/weather-conditions.json';
       }
       
       const newStr = `${month}${day}${dayOfWeek}`;
-      if (newStr === lastSimpleMonthStr) return; // Only update DOM if the date actually rolled over
-      lastSimpleMonthStr = newStr;
+      const color = getCurrentTextColor();
       
       const el = document.getElementById('simple-month');
       if (el) {
-        el.innerHTML = `<span style="font-family: 'light', sans-serif; font-weight: normal; color: white; letter-spacing: -0.06em;">${month}</span><span style="font-family: 'bold', sans-serif; font-weight: normal; color: white;">${day}</span><span style="font-family: 'light', sans-serif; font-weight: normal; color: white; letter-spacing: -0.06em;">${dayOfWeek}</span>`;
+        el.style.color = color;
+      }
+      
+      if (newStr === lastSimpleMonthStr) return; // Only update DOM if the date actually rolled over
+      lastSimpleMonthStr = newStr;
+      
+      if (el) {
+        el.innerHTML = `<span style="font-family: 'light', sans-serif; font-weight: normal; color: inherit; letter-spacing: -0.06em;">${month}</span><span style="font-family: 'bold', sans-serif; font-weight: normal; color: inherit;">${day}</span><span style="font-family: 'light', sans-serif; font-weight: normal; color: inherit; letter-spacing: -0.06em;">${dayOfWeek}</span>`;
       }
       // Left circle date update removed as it now displays the current digital time with seconds instead.
     } catch (e) { /* noop */ }
@@ -8203,6 +8252,9 @@ import weatherConditions from '../data/weather-conditions.json';
     const elLeft = document.getElementById('simple-month-left');
     if (!elLeft) return;
     
+    // Ensure the color is correct based on the active side-scrolling background image
+    elLeft.style.color = getCurrentTextColor();
+    
     const now = new Date();
     let hours = now.getHours();
     const minutes = now.getMinutes();
@@ -8217,8 +8269,8 @@ import weatherConditions from '../data/weather-conditions.json';
     elLeft.innerHTML = `
       <div style="display: flex; align-items: baseline; justify-content: center; gap: 0; line-height: 1;">
         <span style="font-family: 'bold', sans-serif; font-size: var(--left-time-size, 4.37vw); letter-spacing: -0.02em;">${hours}:${minutesStr}</span>
-        <span style="font-family: 'bold', sans-serif; font-size: var(--left-time-size, 4.37vw); letter-spacing: -0.02em;">:</span>
-        <span style="font-family: 'mono', sans-serif; font-size: var(--left-seconds-size, 4.37vw); letter-spacing: -0.02em;">${secondsStr}</span>
+        <span style="font-family: 'light', sans-serif; font-size: var(--left-time-size, 4.37vw); letter-spacing: -0.02em;">:</span>
+        <span style="font-family: 'mono', sans-serif; font-size: var(--left-seconds-size, 4.27vw); letter-spacing: -0.02em;">${secondsStr}</span>
         <span style="font-family: 'medium', sans-serif; font-size: var(--left-ampm-size, 2.93vw); margin-left: 0.1vw;">${ampm}</span>
       </div>
     `;
