@@ -3550,6 +3550,8 @@ import weatherConditions from '../data/weather-conditions.json';
           
           // Duplicate the main clock face (hands and center dot) in the first cell on the left
           if (i === 0) {
+            item.style.cursor = 'pointer';
+            item.addEventListener('click', handleTimeDialReset);
             innerHtml += `
               <div class="clock-face">
                 <div class="clock-hour-hand"></div>
@@ -3875,6 +3877,8 @@ import weatherConditions from '../data/weather-conditions.json';
             </svg>
           `;
           if (i === 0) {
+            item.style.cursor = 'pointer';
+            item.addEventListener('click', handleTimeDialReset);
             innerHtml += `
               <div class="clock-face">
                 <div class="clock-hour-hand"></div>
@@ -4184,6 +4188,8 @@ import weatherConditions from '../data/weather-conditions.json';
             </svg>
           `;
           if (i === 0) {
+            item.style.cursor = 'pointer';
+            item.addEventListener('click', handleTimeDialReset);
             innerHtml += `
               <div class="clock-face">
                 <div class="clock-hour-hand"></div>
@@ -6005,6 +6011,28 @@ import weatherConditions from '../data/weather-conditions.json';
     }
   }
 
+  function handleTimeDialReset(e) {
+    e.stopPropagation();
+    console.log('🔄 Time dial clicked - resetting API timer & forcing refresh...');
+    
+    stopAutoRefresh();
+    getLocalWeather();
+    startAutoRefresh(currentRefreshMs, autoRefreshAligned);
+    
+    const targets = document.querySelectorAll('.clockGridItem-0, #analog-clock');
+    targets.forEach(target => {
+      const applyTransition = (opacityVal) => {
+        target.style.setProperty('transition', 'opacity 0.5s ease-out', 'important');
+        target.style.setProperty('opacity', opacityVal, 'important');
+      };
+      
+      requestAnimationFrame(() => applyTransition('0.15'));
+      setTimeout(() => {
+        requestAnimationFrame(() => applyTransition('1.0'));
+      }, 500);
+    });
+  }
+
   /* --- Simple month label helpers (minimal & easy to edit) ---
     Inserts a 3-letter lowercase month above the high box and colors it using tempToColor
   */
@@ -6170,6 +6198,13 @@ import weatherConditions from '../data/weather-conditions.json';
   // Ensure the month element exists early and its text is set
   createSimpleMonthIfMissing();
   updateSimpleMonthContent();
+
+  // Add reset listener to analog clock if it exists
+  const mainClock = document.getElementById('analog-clock');
+  if (mainClock) {
+    mainClock.style.cursor = 'pointer';
+    mainClock.addEventListener('click', handleTimeDialReset);
+  }
 
   /* --- Live Earth Image (NOAA GOES satellite) --- */
   function createEarthImageIfMissing() {
