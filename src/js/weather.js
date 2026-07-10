@@ -903,21 +903,23 @@ import weatherConditions from '../data/weather-conditions.json';
     let tempColor = null;
     let darkerBgColor = null;
     let brighterGustColor = null;
+    let gustTempColor = null;
     
     if (currentTemp !== null) {
       tempColor = tempToColor(currentTemp);
+      gustTempColor = tempToColor(currentTemp - 10);
       if (tempColor) {
         const parsed = parseHslString(tempColor);
         if (parsed) {
           const [h, s, l] = parsed;
-      const pair = deriveDarkerPairFromHsl(h, s, l) || [];
-      // Use a shade exactly between the two darker variants so the
-      // gauge tail feels like a true midpoint of the background pair.
-      darkerBgColor = midpointHslColor(pair[0], pair[1]) || pair[0] || pair[1] || null;
-      // Create a brighter variant of the temp color for gusts that
-      // peek out beyond the main wind-speed bar.
-      const brighterL = Math.min(l + 18, 92);
-      brighterGustColor = `hsl(${h.toFixed(1)}, ${s.toFixed(1)}%, ${brighterL.toFixed(1)}%)`;
+          const pair = deriveDarkerPairFromHsl(h, s, l) || [];
+          // Use a shade exactly between the two darker variants so the
+          // gauge tail feels like a true midpoint of the background pair.
+          darkerBgColor = midpointHslColor(pair[0], pair[1]) || pair[0] || pair[1] || null;
+          // Create a brighter variant of the temp color for gusts that
+          // peek out beyond the main wind-speed bar.
+          const brighterL = Math.min(l + 18, 92);
+          brighterGustColor = `hsl(${h.toFixed(1)}, ${s.toFixed(1)}%, ${brighterL.toFixed(1)}%)`;
         }
       }
     }
@@ -990,29 +992,10 @@ import weatherConditions from '../data/weather-conditions.json';
       const dashOffset = - (percentSpeed * circumference);
       gridGustProgressEl.style.strokeDasharray = `${length}, ${circumference}`;
       gridGustProgressEl.style.strokeDashoffset = dashOffset;
-    });
-
-    // Calculate dynamic gradient direction coordinates in unrotated SVG space (using absolute viewBox units)
-    const startAngleRad = 2 * Math.PI * percentSpeed;
-    const endAngleRad = 2 * Math.PI * percentGust;
-    const x1 = 50 + radius * Math.cos(startAngleRad);
-    const y1 = 50 + radius * Math.sin(startAngleRad);
-    const x2 = 50 + radius * Math.cos(endAngleRad);
-    const y2 = 50 + radius * Math.sin(endAngleRad);
-
-    const gradIds = ['gust-grad-8', 'gust-grad-7', 'gust-grad-4'];
-    gradIds.forEach(id => {
-      const gradEl = document.getElementById(id);
-      if (gradEl) {
-        gradEl.setAttribute('x1', x1.toFixed(3));
-        gradEl.setAttribute('y1', y1.toFixed(3));
-        gradEl.setAttribute('x2', x2.toFixed(3));
-        gradEl.setAttribute('y2', y2.toFixed(3));
-        const stops = gradEl.querySelectorAll('stop');
-        if (stops.length >= 2 && tempColor) {
-          stops[0].setAttribute('stop-color', tempColor);
-          stops[1].setAttribute('stop-color', tempColor);
-        }
+      if (gustTempColor) {
+        gridGustProgressEl.style.stroke = gustTempColor;
+      } else if (tempColor) {
+        gridGustProgressEl.style.stroke = tempColor;
       }
     });
     
@@ -1026,24 +1009,7 @@ import weatherConditions from '../data/weather-conditions.json';
     // Update the gust-dot positioning at the point indicating gust speed
     const gustDotEls = document.querySelectorAll('.clockGridItem-2 .gust-dot');
     gustDotEls.forEach(gustDotEl => {
-      if (typeof windGust === 'number') {
-        const percent = Math.max(0, Math.min(1, windGust / maxWindMph));
-        // CSS rotates the parent SVG by 90deg, so we compute in unrotated space (0 starts at 3 o'clock)
-        const angleRad = 2 * Math.PI * percent;
-        const cx = 50 + radius * Math.cos(angleRad);
-        const cy = 50 + radius * Math.sin(angleRad);
-        
-        gustDotEl.setAttribute('cx', cx.toFixed(3));
-        gustDotEl.setAttribute('cy', cy.toFixed(3));
-        // Make the dot larger to stand out (0.8 * stroke width radius, meaning 1.6 * stroke width diameter)
-        gustDotEl.setAttribute('r', (CLOCK_GRID_STROKE_WIDTH * 0.8).toFixed(3));
-        gustDotEl.style.display = 'block';
-        if (tempColor) {
-          gustDotEl.style.fill = tempColor;
-        }
-      } else {
-        gustDotEl.style.display = 'none';
-      }
+      gustDotEl.style.display = 'none';
     });
     
     const gridWindSpeedTextEls = document.querySelectorAll('.clockGridItem-2 .grid-wind-speed-text');
@@ -3106,16 +3072,11 @@ import weatherConditions from '../data/weather-conditions.json';
         }
       }
       
-      // Toggle drop shadow on the white date text ONLY for "overcast clouds"
+      // Clear drop shadow on the white date and time text (removed as requested)
       const simpleMonthEl = document.getElementById('simple-month');
       const simpleMonthLeftEl = document.getElementById('simple-month-left');
-      if (simpleMonthEl || simpleMonthLeftEl) {
-        const descLower = description.toLowerCase();
-        const hasShadow = descLower === 'overcast clouds' || descLower === 'broken clouds';
-        const shadowVal = hasShadow ? '0 2px 4px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.6)' : 'none';
-        if (simpleMonthEl) simpleMonthEl.style.textShadow = shadowVal;
-        if (simpleMonthLeftEl) simpleMonthLeftEl.style.textShadow = shadowVal;
-      }
+      if (simpleMonthEl) simpleMonthEl.style.textShadow = 'none';
+      if (simpleMonthLeftEl) simpleMonthLeftEl.style.textShadow = 'none';
     } else {
       el.textContent = '';
     }
@@ -6059,7 +6020,7 @@ import weatherConditions from '../data/weather-conditions.json';
       el.style.color = getCurrentTextColor();
       el.style.fontSize = '5.20vw'; // Made 25% bigger (from 4.16vw)
       el.style.zIndex = '10';
-      el.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.6)';
+      el.style.textShadow = 'none';
       
       // Disable pointer events on clock text overlay so click propagates to parent circle
       el.style.pointerEvents = 'none';
@@ -6129,7 +6090,7 @@ import weatherConditions from '../data/weather-conditions.json';
       elLeft.style.color = getCurrentTextColor();
       elLeft.style.fontSize = 'var(--left-time-size, 4.37vw)'; // Made 20% bigger (from 3.64vw)
       elLeft.style.zIndex = '10';
-      elLeft.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.6)';
+      elLeft.style.textShadow = 'none';
       
       // Disable pointer events on clock text overlay so click propagates to parent circle
       elLeft.style.pointerEvents = 'none';
@@ -7732,9 +7693,26 @@ import weatherConditions from '../data/weather-conditions.json';
 
         console.log(`📡 RainViewer Pixel Check (Zoom ${zoomLevel} Circle): Found ${precipitationPixelCount} active pixels (Threshold is ${threshold})`);
         
+        if (!window.RadarDebug) {
+          window.RadarDebug = { leftCount: 0, rightCount: 0, leftActive: false, rightActive: false, lastError: 'None', thresholdLeft: 0, thresholdRight: 0 };
+        }
+        if (zoomLevel === RAINVIEWER_ZOOM_LEFT) {
+          window.RadarDebug.leftCount = precipitationPixelCount;
+          window.RadarDebug.leftActive = precipitationPixelCount >= threshold;
+          window.RadarDebug.thresholdLeft = threshold;
+        } else {
+          window.RadarDebug.rightCount = precipitationPixelCount;
+          window.RadarDebug.rightActive = precipitationPixelCount >= threshold;
+          window.RadarDebug.thresholdRight = threshold;
+        }
+
         resolve(precipitationPixelCount >= threshold);
       } catch (e) {
         console.error('❌ RainViewer pixel check failed during analysis:', e);
+        if (!window.RadarDebug) {
+          window.RadarDebug = { leftCount: 0, rightCount: 0, leftActive: false, rightActive: false, lastError: 'None', thresholdLeft: 0, thresholdRight: 0 };
+        }
+        window.RadarDebug.lastError = e.message || String(e);
         resolve(false);
       }
     });
@@ -7817,7 +7795,13 @@ import weatherConditions from '../data/weather-conditions.json';
     }
     
     const finalLeft = leftActive || activeNow || fallbackHourly;
-    const finalRight = rightActive;
+    const finalRight = rightActive || activeNow || fallbackHourly;
+    
+    if (!window.RadarDebug) {
+      window.RadarDebug = { leftCount: 0, rightCount: 0, leftActive: false, rightActive: false, lastError: 'None', thresholdLeft: 0, thresholdRight: 0 };
+    }
+    window.RadarDebug.activeNow = activeNow;
+    window.RadarDebug.fallbackHourly = fallbackHourly;
     
     return { left: finalLeft, right: finalRight };
   }
@@ -8072,6 +8056,9 @@ import weatherConditions from '../data/weather-conditions.json';
           loader.style.setProperty('opacity', '0', 'important');
           setTimeout(() => { loader.style.setProperty('display', 'none', 'important'); }, 1500);
         }
+        
+        // Update visual debug overlay
+        try { updateDebugPanel(data); } catch(e) {}
       }, 150);
 
     } catch (err) {
@@ -8649,4 +8636,38 @@ import weatherConditions from '../data/weather-conditions.json';
     const x = n * ((lon + 180) / 360);
     const y = n * (1 - (Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI)) / 2;
     return { x, y };
+  }
+
+  function updateDebugPanel(data) {
+    let debugEl = document.getElementById('radar-debug-panel');
+    if (!debugEl) {
+      debugEl = document.createElement('div');
+      debugEl.id = 'radar-debug-panel';
+      debugEl.style.cssText = 'position:fixed; bottom:10px; left:10px; background:rgba(0,0,0,0.85); color:#00ff00; font-family:monospace; font-size:10px; padding:10px; border-radius:4px; z-index:999999; border:1px solid #333; pointer-events:auto; cursor:pointer; line-height:1.4;';
+      debugEl.addEventListener('click', () => { debugEl.style.display = 'none'; });
+      document.body.appendChild(debugEl);
+    }
+    const currentId = data?.current?.weather?.[0]?.id || 'N/A';
+    const currentDesc = data?.current?.weather?.[0]?.description || 'N/A';
+    const activeNow = window.RadarDebug?.activeNow ?? 'N/A';
+    const fallbackHourly = window.RadarDebug?.fallbackHourly ?? 'N/A';
+    const leftCount = window.RadarDebug?.leftCount ?? 0;
+    const rightCount = window.RadarDebug?.rightCount ?? 0;
+    const leftActive = window.RadarDebug?.leftActive ?? false;
+    const rightActive = window.RadarDebug?.rightActive ?? false;
+    const thresholdLeft = window.RadarDebug?.thresholdLeft ?? 0;
+    const thresholdRight = window.RadarDebug?.thresholdRight ?? 0;
+    const lastError = window.RadarDebug?.lastError ?? 'None';
+
+    debugEl.innerHTML = `
+      <b>📡 RADAR DEBUG PANEL (Click to dismiss)</b><br/>
+      Location: ${LAT.toFixed(4)}, ${LON.toFixed(4)}<br/>
+      RainViewer Data: ${latestRainViewerData ? 'LOADED' : 'FAILED/NULL'}<br/>
+      Weather: ID ${currentId} (${currentDesc})<br/>
+      activeNow: ${activeNow} | hourly: ${fallbackHourly}<br/>
+      Left Zoom ${RAINVIEWER_ZOOM_LEFT}: Active=${leftActive} (${leftCount}px / limit ${thresholdLeft})<br/>
+      Right Zoom ${RAINVIEWER_ZOOM_RIGHT}: Active=${rightActive} (${rightCount}px / limit ${thresholdRight})<br/>
+      SHOW_LEFT: ${SHOW_DOPPLER_RADAR_LEFT} | SHOW_RIGHT: ${SHOW_DOPPLER_RADAR_RIGHT}<br/>
+      Last Error: ${lastError}
+    `;
   }
