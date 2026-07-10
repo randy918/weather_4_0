@@ -1049,11 +1049,11 @@ main {
         position: absolute !important;
         bottom: 50% !important;
         left: 50% !important;
-        width: calc(var(--item-current-size) * 0.04) !important;
-        height: 42% !important;
-        background: linear-gradient(to top, transparent 50%, var(--clock-hands-color, rgba(255, 255, 255, 0.9)) 50%) !important;
+        width: calc(var(--item-current-size) * 0.02) !important;
+        height: 46% !important;
+        background: var(--clock-hands-color, rgba(255, 255, 255, 0.9)) !important;
         transform-origin: bottom center !important;
-        border-radius: calc(var(--item-current-size) * 0.04) !important;
+        border-radius: calc(var(--item-current-size) * 0.02) !important;
         z-index: 1 !important;
     }
 

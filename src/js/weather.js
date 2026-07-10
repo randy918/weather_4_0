@@ -8516,7 +8516,8 @@ import weatherConditions from '../data/weather-conditions.json';
 
   function updateWindDirectionArrow(temp, windDeg) {
     const arrows = document.querySelectorAll('.wind-direction-display');
-    const color = tempToColor(temp);
+    const tempNum = typeof temp === 'string' ? parseFloat(temp) : temp;
+    const color = tempToColor(tempNum);
     
     if (arrows.length > 0) {
       arrows.forEach(arrow => {
@@ -8560,17 +8561,18 @@ import weatherConditions from '../data/weather-conditions.json';
 
       // Sync the rotated wind direction hand inside grid cell #3 (index 2)
       const gridWindHands = document.querySelectorAll('.clockGridItem-2 .clock-hand-wind-direction');
+      const stemColor = tempToColor(tempNum + 10) || color;
       gridWindHands.forEach(gridWindHand => {
         gridWindHand.style.transform = `translateX(-50%) rotate(${displayDeg}deg)`;
-        if (color) {
-          gridWindHand.style.background = `linear-gradient(to top, transparent 50%, ${color} 50%)`;
+        if (stemColor) {
+          gridWindHand.style.background = stemColor;
         }
       });
       
       const gridWindCenterDots = document.querySelectorAll('.clockGridItem-2 .clock-center-dot');
       gridWindCenterDots.forEach(gridWindCenterDot => {
-        if (color) {
-          gridWindCenterDot.style.backgroundColor = color;
+        if (stemColor) {
+          gridWindCenterDot.style.backgroundColor = stemColor;
         }
       });
       
