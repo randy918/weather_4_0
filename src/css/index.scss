@@ -1051,7 +1051,7 @@ main {
         left: 50% !important;
         width: calc(var(--item-current-size) * 0.02) !important;
         height: 46% !important;
-        background: var(--clock-hands-color, rgba(255, 255, 255, 0.9)) !important;
+        background: var(--clock-hands-color, rgba(255, 255, 255, 0.9));
         transform-origin: bottom center !important;
         border-radius: calc(var(--item-current-size) * 0.02) !important;
         z-index: 1 !important;
@@ -1198,4 +1198,51 @@ main {
     z-index: 95;
     pointer-events: none;
     will-change: transform;
+}
+
+#weather-feels-like {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Odometer rolling number effect */
+.odometer-number {
+    display: inline-flex;
+    align-items: center; /* Center digits and static symbols vertically */
+    justify-content: center;
+    vertical-align: middle;
+}
+
+.odometer-digit {
+    position: relative;
+    display: inline-block;
+    height: 1.1em;
+    line-height: 1.1em;
+    overflow: hidden;
+    vertical-align: middle;
+    /* Soft vertical mask fade on top and bottom of digits */
+    mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+}
+
+.odometer-strip {
+    display: block;
+    transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); /* Elastic spring scroll */
+    will-change: transform;
+    
+    span {
+        display: block;
+        height: 1.1em;
+        line-height: 1.1em;
+        text-align: center;
+    }
+}
+
+.odometer-static {
+    display: inline-block;
+    height: 1.1em;
+    line-height: 1.1em;
+    vertical-align: middle;
 }

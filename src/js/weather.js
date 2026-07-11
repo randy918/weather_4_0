@@ -2361,6 +2361,78 @@ import weatherConditions from '../data/weather-conditions.json';
   const FEELS_LIKE_TEXT_SIZE_DUAL = '4vw';      // EDITABLE: Standard size of the feels-like label text (dual mode)
   const FEELS_LIKE_TEMP_SIZE_DUAL = '6.25vw';    // EDITABLE: ENLARGED size of feels-like temp (dual mode) when diff >= 10
 
+  // Helper function to dynamically update odometer numbers without destroying DOM elements
+  function updateOdometer(container, newStr) {
+    if (!container) return;
+    
+    if (!container.classList.contains('odometer-number')) {
+      container.classList.add('odometer-number');
+    }
+    
+    const chars = Array.from(newStr);
+    const existingChildren = Array.from(container.children);
+    
+    // If the number of characters or structural types don't match, rebuild the DOM
+    let needsRebuild = chars.length !== existingChildren.length;
+    if (!needsRebuild) {
+      for (let i = 0; i < chars.length; i++) {
+        const isDigit = chars[i] >= '0' && chars[i] <= '9';
+        const wasDigit = existingChildren[i].classList.contains('odometer-digit');
+        if (isDigit !== wasDigit) {
+          needsRebuild = true;
+          break;
+        }
+      }
+    }
+    
+    if (needsRebuild) {
+      container.innerHTML = '';
+      chars.forEach(char => {
+        const isDigit = char >= '0' && char <= '9';
+        if (isDigit) {
+          const digit = parseInt(char);
+          const digitEl = document.createElement('span');
+          digitEl.className = 'odometer-digit';
+          digitEl.innerHTML = `<span class="odometer-strip" style="transform: translateY(0%);" data-digit="0">` +
+                              `<span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span>` +
+                              `</span>`;
+          container.appendChild(digitEl);
+          
+          // Force reflow and transition to the target digit
+          void digitEl.offsetHeight;
+          const strip = digitEl.querySelector('.odometer-strip');
+          strip.style.transform = `translateY(-${digit * 10}%)`;
+          strip.setAttribute('data-digit', digit);
+        } else {
+          const staticEl = document.createElement('span');
+          staticEl.className = 'odometer-static';
+          staticEl.textContent = char;
+          container.appendChild(staticEl);
+        }
+      });
+    } else {
+      // Update existing elements
+      chars.forEach((char, i) => {
+        const child = existingChildren[i];
+        if (char >= '0' && char <= '9') {
+          const digit = parseInt(char);
+          const strip = child.querySelector('.odometer-strip');
+          if (strip) {
+            const currentDigit = parseInt(strip.getAttribute('data-digit') || '0');
+            if (currentDigit !== digit) {
+              strip.style.transform = `translateY(-${digit * 10}%)`;
+              strip.setAttribute('data-digit', digit);
+            }
+          }
+        } else {
+          if (child.textContent !== char) {
+            child.textContent = char;
+          }
+        }
+      });
+    }
+  }
+
   // Create and update "Feels like" element
   function updateFeelsLike(data) {
     const id = 'weather-feels-like';
@@ -2431,7 +2503,6 @@ import weatherConditions from '../data/weather-conditions.json';
       
       // Check difference based on rounded display values (Disabled: glow turned off as requested)
       let isHotGlow = false;
-      
       const glowClass = isHotGlow ? 'feels-like-temp-val' : '';
       
       // Derive a brighter color for the glow to ensure high visibility on a dark background
@@ -2449,33 +2520,95 @@ import weatherConditions from '../data/weather-conditions.json';
       
       const glowStyle = isHotGlow ? `--feels-glow-color: ${glowColor};` : '';
       
+      // Ensure sub-containers exist inside el
+      let currentTempContainer = el.querySelector('.feels-like-current-temp');
+      let labelEl = el.querySelector('.feels-like-label');
+      let feelsLikeContainer = el.querySelector('.feels-like-val-container');
+
+      if (!currentTempContainer || !labelEl || !feelsLikeContainer) {
+        el.innerHTML = `
+          <span class="feels-like-current-temp"></span>
+          <span class="feels-like-label"></span>
+          <span class="feels-like-val-container"></span>
+        `;
+        currentTempContainer = el.querySelector('.feels-like-current-temp');
+        labelEl = el.querySelector('.feels-like-label');
+        feelsLikeContainer = el.querySelector('.feels-like-val-container');
+      }
+
+      // Update labelEl
       if (displayUnit === 'BOTH') {
-        const feelsLikeHtml = `<span style="font-family: 'light', sans-serif; font-weight: normal; font-size: ${FEELS_LIKE_TEXT_SIZE_DUAL}; letter-spacing: ${FEELS_LIKE_LETTER_SPACING_DUAL}; margin-left: ${FEELS_LIKE_MARGIN_LEFT_DUAL}; margin-right: ${FEELS_LIKE_MARGIN_RIGHT_DUAL}; color: inherit;">feels like</span>`;
-        const fF = Math.round(feelsLike);
-        const fC = Math.round((feelsLike - 32) * 5 / 9);
-        const dualFeels = `<span class="fc-mode-text ${glowClass}" style="${glowStyle} display: inline-block; transform: translateY(var(--feels-like-val-y-offset, 0vw)); font-family: 'boldcond', sans-serif; font-size: var(--feels-like-temp-size-dual, 6.25vw); color: ${dynamicColor} !important; transition: color 0.5s ease;">${fF}${formatSlash()}${fC}</span>`;
+        labelEl.style.fontFamily = "'light', sans-serif";
+        labelEl.style.fontWeight = 'normal';
+        labelEl.style.fontSize = FEELS_LIKE_TEXT_SIZE_DUAL;
+        labelEl.style.letterSpacing = FEELS_LIKE_LETTER_SPACING_DUAL;
+        labelEl.style.marginLeft = FEELS_LIKE_MARGIN_LEFT_DUAL;
+        labelEl.style.marginRight = FEELS_LIKE_MARGIN_RIGHT_DUAL;
+        labelEl.style.color = 'inherit';
+        labelEl.textContent = 'feels like';
+      } else {
+        labelEl.style.fontFamily = "'light', sans-serif";
+        labelEl.style.fontWeight = 'normal';
+        labelEl.style.fontSize = FEELS_LIKE_TEXT_SIZE_DEFAULT;
+        labelEl.style.letterSpacing = FEELS_LIKE_LETTER_SPACING_DEFAULT;
+        labelEl.style.marginLeft = FEELS_LIKE_MARGIN_LEFT_DEFAULT;
+        labelEl.style.marginRight = FEELS_LIKE_MARGIN_RIGHT_DEFAULT;
+        labelEl.style.color = 'inherit';
+        labelEl.textContent = 'feels like';
+      }
+
+      const currClr = typeof currentTemp === 'number' ? (tempToColor(currentTemp) || 'white') : 'white';
+
+      // Update Current Temp Container
+      if (typeof currentTemp === 'number') {
+        currentTempContainer.style.display = 'inline-flex';
+        currentTempContainer.style.fontFamily = displayUnit === 'BOTH' ? "'boldcond', sans-serif" : "'bold', sans-serif";
+        currentTempContainer.style.fontSize = displayUnit === 'BOTH' ? '5vw' : FEELS_LIKE_TEXT_SIZE_DEFAULT;
+        currentTempContainer.style.color = currClr;
+        currentTempContainer.style.transition = 'color 0.5s ease';
         
-        if (typeof currentTemp === 'number') {
+        let currentText = '';
+        if (displayUnit === 'BOTH') {
           const cF = Math.round(currentTemp);
           const cC = Math.round((currentTemp - 32) * 5 / 9);
-          const currClr = tempToColor(currentTemp) || 'white';
-          el.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: 5vw; color: ${currClr} !important;">${cF}${formatSlash()}${cC}</span>${feelsLikeHtml}${dualFeels}`;
+          currentText = `${cF}${formatSlash()}${cC}`;
         } else {
-          el.innerHTML = `${feelsLikeHtml}${dualFeels}`;
+          const displayCurrent = displayUnit === 'C' ? (currentTemp - 32) * 5 / 9 : currentTemp;
+          currentText = `${Math.round(displayCurrent)}°`;
         }
+        updateOdometer(currentTempContainer, currentText);
       } else {
-        const feelsLikeHtml = `<span style="font-family: 'light', sans-serif; font-weight: normal; font-size: ${FEELS_LIKE_TEXT_SIZE_DEFAULT}; letter-spacing: ${FEELS_LIKE_LETTER_SPACING_DEFAULT}; margin-left: ${FEELS_LIKE_MARGIN_LEFT_DEFAULT}; margin-right: ${FEELS_LIKE_MARGIN_RIGHT_DEFAULT}; color: inherit;">feels like</span>`;
-        const displayFeelsLike = displayUnit === 'C' ? (feelsLike - 32) * 5 / 9 : feelsLike;
-        const displayCurrent = displayUnit === 'C' && typeof currentTemp === 'number' ? (currentTemp - 32) * 5 / 9 : currentTemp;
-        const rounded = Math.round(displayFeelsLike);
-        if (typeof currentTemp === 'number') {
-          const roundedCurrent = Math.round(displayCurrent);
-          const currClr = tempToColor(currentTemp) || 'white';
-          el.innerHTML = `<span style="font-family: 'bold', sans-serif; font-size: ${FEELS_LIKE_TEXT_SIZE_DEFAULT}; color: ${currClr} !important;">${roundedCurrent}°</span>${feelsLikeHtml}<span class="${glowClass}" style="${glowStyle} display: inline-block; transform: translateY(var(--feels-like-val-y-offset, 0vw)); font-family: 'bold', sans-serif; font-size: var(--feels-like-temp-size-default, 6.25vw); color: ${dynamicColor} !important; transition: color 0.5s ease;">${rounded}°</span>`;
-        } else {
-          el.innerHTML = `${feelsLikeHtml}<span class="${glowClass}" style="${glowStyle} display: inline-block; transform: translateY(var(--feels-like-val-y-offset, 0vw)); font-family: 'bold', sans-serif; font-size: var(--feels-like-temp-size-default, 6.25vw); color: ${dynamicColor} !important; transition: color 0.5s ease;">${rounded}°</span>`;
-        }
+        currentTempContainer.style.display = 'none';
+        currentTempContainer.innerHTML = '';
       }
+
+      // Update Feels Like Container
+      feelsLikeContainer.style.display = 'inline-flex';
+      if (glowClass) {
+        if (!feelsLikeContainer.classList.contains(glowClass)) feelsLikeContainer.className = `feels-like-val-container ${glowClass}`;
+      } else {
+        feelsLikeContainer.className = 'feels-like-val-container';
+      }
+      if (glowStyle) {
+        feelsLikeContainer.style.setProperty('--feels-glow-color', glowColor);
+      }
+      feelsLikeContainer.style.transform = `translateY(var(--feels-like-val-y-offset, 0vw))`;
+      feelsLikeContainer.style.fontFamily = displayUnit === 'BOTH' ? "'boldcond', sans-serif" : "'bold', sans-serif";
+      feelsLikeContainer.style.fontSize = displayUnit === 'BOTH' ? 'var(--feels-like-temp-size-dual, 6.25vw)' : 'var(--feels-like-temp-size-default, 6.25vw)';
+      feelsLikeContainer.style.color = dynamicColor;
+      feelsLikeContainer.style.transition = 'color 0.5s ease';
+      
+      let feelsLikeText = '';
+      if (displayUnit === 'BOTH') {
+        const fF = Math.round(feelsLike);
+        const fC = Math.round((feelsLike - 32) * 5 / 9);
+        feelsLikeText = `${fF}${formatSlash()}${fC}`;
+      } else {
+        const displayFeelsLike = displayUnit === 'C' ? (feelsLike - 32) * 5 / 9 : feelsLike;
+        feelsLikeText = `${Math.round(displayFeelsLike)}°`;
+      }
+      updateOdometer(feelsLikeContainer, feelsLikeText);
+
       el.style.color = tempToColor(currentTemp) || 'inherit';
       el.style.marginTop = '1.5vw'; // Unconditionally force the larger top margin
     } else {
@@ -8057,8 +8190,8 @@ import weatherConditions from '../data/weather-conditions.json';
           setTimeout(() => { loader.style.setProperty('display', 'none', 'important'); }, 1500);
         }
         
-        // Update visual debug overlay
-        try { updateDebugPanel(data); } catch(e) {}
+        // Update visual debug overlay (To enable for future debugging, uncomment the line below)
+        // try { updateDebugPanel(data); } catch(e) {}
       }, 150);
 
     } catch (err) {
@@ -8565,7 +8698,7 @@ import weatherConditions from '../data/weather-conditions.json';
       gridWindHands.forEach(gridWindHand => {
         gridWindHand.style.transform = `translateX(-50%) rotate(${displayDeg}deg)`;
         if (stemColor) {
-          gridWindHand.style.background = stemColor;
+          gridWindHand.style.setProperty('background', stemColor, 'important');
         }
       });
       
