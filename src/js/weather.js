@@ -581,7 +581,7 @@ import weatherConditions from '../data/weather-conditions.json';
   // Easily editable list of colors per 10° range
   // Note: MUST use hsl(H, S%, L%) format for compatibility with background animations
   const TEMP_COLORS = [
-    { max: -10,   color: 'rgba(190, 0, 0, 1)' },   // Below 0: red-purple
+    { max: -10,   color: 'rgba(190, 0, 0, 1)' },   // Below -10: red-purple
     { max: 0,   color: 'hsl(320, 90%, 45%)' },   // Below 0: red-purple
     { max: 10,  color: 'hsl(280, 90%, 50%)' },   // 0s: purple
     { max: 20,  color: 'hsl(260, 90%, 60%)' },   // 10s: blue purple
@@ -593,7 +593,7 @@ import weatherConditions from '../data/weather-conditions.json';
     { max: 80,  color: 'hsl(45,  100%, 50%)' },  // 70s: yellow-gold
     { max: 90,  color: 'hsl(30,  100%, 50%)' },  // 80s: orange
     { max: 100, color: 'hsl(0,   90%, 55%)' },   // 90s: red
-    { max: 110, color: 'rgba(190, 0, 0, 1)' },   // 90s: red
+    { max: 110, color: 'rgba(190, 0, 0, 1)' },   // 100s: red
     { max: Infinity, color: 'hsl(320, 90%, 45%))' } // 100+: dark red
   ];
 
@@ -924,7 +924,7 @@ import weatherConditions from '../data/weather-conditions.json';
     
     if (currentTemp !== null) {
       tempColor = tempToColor(currentTemp);
-      gustTempColor = tempToColor(currentTemp - 10);
+      gustTempColor = tempToColor(currentTemp + 10);
       if (tempColor) {
         const parsed = parseHslString(tempColor);
         if (parsed) {
