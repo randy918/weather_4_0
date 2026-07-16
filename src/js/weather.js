@@ -122,6 +122,21 @@ import weatherConditions from '../data/weather-conditions.json';
   // Status of the left and right widgets
   let SHOW_DOPPLER_RADAR_LEFT = false;
   let SHOW_DOPPLER_RADAR_RIGHT = false;
+  
+  // Last resolved automatic status of the left and right widgets
+  let AUTO_DOPPLER_RADAR_LEFT = false;
+  let AUTO_DOPPLER_RADAR_RIGHT = false;
+
+  // User manual overrides: null = follow auto rules, true = force show, false = force hide
+  let USER_DOPPLER_OVERRIDE_LEFT = null;
+  let USER_DOPPLER_OVERRIDE_RIGHT = null;
+
+  // Timer trackers for override duration limits
+  let leftDopplerOverrideTimerId = null;
+  let rightDopplerOverrideTimerId = null;
+
+  // EDITABLE: Time limit (in ms) before override resets to auto (e.g., 60000 = 60 seconds)
+  const DOPPLER_OVERRIDE_DURATION_MS = 60000;
 
   // Set to true to force SHOW_DOPPLER_RADAR = true for testing (otherwise depends on active rain).
   const FORCE_DOPPLER_RADAR = false;
@@ -566,6 +581,7 @@ import weatherConditions from '../data/weather-conditions.json';
   // Easily editable list of colors per 10° range
   // Note: MUST use hsl(H, S%, L%) format for compatibility with background animations
   const TEMP_COLORS = [
+    { max: -10,   color: 'rgba(190, 0, 0, 1)' },   // Below 0: red-purple
     { max: 0,   color: 'hsl(320, 90%, 45%)' },   // Below 0: red-purple
     { max: 10,  color: 'hsl(280, 90%, 50%)' },   // 0s: purple
     { max: 20,  color: 'hsl(260, 90%, 60%)' },   // 10s: blue purple
@@ -577,7 +593,8 @@ import weatherConditions from '../data/weather-conditions.json';
     { max: 80,  color: 'hsl(45,  100%, 50%)' },  // 70s: yellow-gold
     { max: 90,  color: 'hsl(30,  100%, 50%)' },  // 80s: orange
     { max: 100, color: 'hsl(0,   90%, 55%)' },   // 90s: red
-    { max: Infinity, color: 'rgba(190, 0, 0, 1)' } // 100+: dark red
+    { max: 110, color: 'rgba(190, 0, 0, 1)' },   // 90s: red
+    { max: Infinity, color: 'hsl(320, 90%, 45%))' } // 100+: dark red
   ];
 
   function tempToColor(temp) {
@@ -1325,6 +1342,7 @@ import weatherConditions from '../data/weather-conditions.json';
         --radar-fade-duration: ${RADAR_FADE_DURATION_MS}ms;
         animation: scroll-weather-bg ${WEATHER_IMAGE_SCROLL_SPEED_S}s linear infinite !important;
         border-radius: ${WEATHER_IMAGE_BORDER_RADIUS};
+        -webkit-mask-image: -webkit-radial-gradient(white, black);
         transform-origin: top right !important;
         transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw))) !important;
         z-index: 50;
@@ -1339,7 +1357,8 @@ import weatherConditions from '../data/weather-conditions.json';
         animation: var(--radar-animation, none) !important;
         mix-blend-mode: var(--radar-blend-mode, lighten);
         box-sizing: border-box;
-        border: ${RADAR_OUTER_STROKE_WIDTH} solid var(--clock-grid-track-color, rgba(255, 255, 255, 0.2));
+        border: none;
+        box-shadow: inset 0 0 0 ${RADAR_OUTER_STROKE_WIDTH} var(--clock-grid-track-color, rgba(255, 255, 255, 0.2));
       }
       #weather-desc-image.radar-mode .radar-frame {
         /* Filter removal per workspace storm core isolation rules */
@@ -1363,6 +1382,7 @@ import weatherConditions from '../data/weather-conditions.json';
         --radar-fade-duration: ${RADAR_FADE_DURATION_MS}ms;
         animation: scroll-weather-bg ${WEATHER_IMAGE_SCROLL_SPEED_S}s linear infinite !important;
         border-radius: ${WEATHER_IMAGE_BORDER_RADIUS};
+        -webkit-mask-image: -webkit-radial-gradient(white, black);
         transform-origin: top left !important;
         transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw))) !important;
         z-index: 50;
@@ -1377,7 +1397,8 @@ import weatherConditions from '../data/weather-conditions.json';
         animation: var(--radar-animation, none) !important;
         mix-blend-mode: var(--radar-blend-mode, lighten);
         box-sizing: border-box;
-        border: ${RADAR_OUTER_STROKE_WIDTH} solid var(--clock-grid-track-color, rgba(255, 255, 255, 0.2));
+        border: none;
+        box-shadow: inset 0 0 0 ${RADAR_OUTER_STROKE_WIDTH} var(--clock-grid-track-color, rgba(255, 255, 255, 0.2));
       }
       #weather-desc-image-left.radar-mode .radar-frame {
         /* Filter removal per workspace storm core isolation rules */
@@ -2827,6 +2848,8 @@ import weatherConditions from '../data/weather-conditions.json';
         if (descImageEl) {
           if (SHOW_DOPPLER_RADAR_RIGHT) {
             descImageEl.classList.add('radar-mode');
+            descImageEl.style.backgroundImage = '';
+            descImageEl.style.backgroundColor = '';
             descImageEl.style.setProperty('--radar-fade-duration', `${RADAR_FADE_DURATION_MS}ms`);
             framesRight = descImageEl.querySelectorAll('.radar-frame');
             
@@ -2956,6 +2979,8 @@ import weatherConditions from '../data/weather-conditions.json';
         if (descImageLeftEl) {
           if (SHOW_DOPPLER_RADAR_LEFT) {
             descImageLeftEl.classList.add('radar-mode');
+            descImageLeftEl.style.backgroundImage = '';
+            descImageLeftEl.style.backgroundColor = '';
             descImageLeftEl.style.setProperty('--radar-fade-duration', `${RADAR_FADE_DURATION_MS}ms`);
             framesLeft = descImageLeftEl.querySelectorAll('.radar-frame');
             
@@ -6165,39 +6190,26 @@ import weatherConditions from '../data/weather-conditions.json';
         // Attach click listener to parent container (covers both radar & image modes)
         descImage.style.cursor = 'pointer';
         descImage.style.pointerEvents = 'auto';
+        descImage.title = "Toggle Doppler Radar";
         descImage.addEventListener('click', (e) => {
           e.stopPropagation();
-          console.log('🔄 Right circle clicked - resetting API timer & forcing refresh...');
+          SHOW_DOPPLER_RADAR_RIGHT = !SHOW_DOPPLER_RADAR_RIGHT;
+          USER_DOPPLER_OVERRIDE_RIGHT = SHOW_DOPPLER_RADAR_RIGHT;
+          console.log(`🔄 Right circle clicked. Manual Override: ${SHOW_DOPPLER_RADAR_RIGHT ? 'FORCING DOPPLER' : 'FORCING TIME'} (Natural state is: ${AUTO_DOPPLER_RADAR_RIGHT ? 'DOPPLER' : 'TIME'})`);
           
-          const isRadar = descImage.classList.contains('radar-mode');
-          if (isRadar) {
-            const applyTransition = (opacityVal) => {
-              descImage.style.setProperty('transition', 'opacity 0.5s ease-out', 'important');
-              descImage.style.setProperty('opacity', opacityVal, 'important');
-            };
-            requestAnimationFrame(() => applyTransition('0.15'));
-            setTimeout(() => {
-              requestAnimationFrame(() => applyTransition('1.0'));
-            }, 500);
-          } else {
-            const applyTransition = (color) => {
-              el.style.setProperty('transition', 'color 0.5s ease-out', 'important');
-              el.style.setProperty('color', color, 'important');
-              const spans = el.querySelectorAll('span');
-              spans.forEach(span => {
-                span.style.setProperty('transition', 'color 0.5s ease-out', 'important');
-                span.style.setProperty('color', color, 'important');
-              });
-            };
-            requestAnimationFrame(() => applyTransition('black'));
-            setTimeout(() => {
-              requestAnimationFrame(() => applyTransition(getCurrentTextColor()));
-            }, 500);
+          if (rightDopplerOverrideTimerId) {
+            clearTimeout(rightDopplerOverrideTimerId);
           }
-
-          stopAutoRefresh();
-          getLocalWeather();
-          startAutoRefresh(currentRefreshMs, autoRefreshAligned);
+          
+          rightDopplerOverrideTimerId = setTimeout(() => {
+            USER_DOPPLER_OVERRIDE_RIGHT = null;
+            SHOW_DOPPLER_RADAR_RIGHT = AUTO_DOPPLER_RADAR_RIGHT;
+            rightDopplerOverrideTimerId = null;
+            console.log(`⏳ Right circle override expired. Reverting to natural state: ${AUTO_DOPPLER_RADAR_RIGHT ? 'DOPPLER' : 'TIME'}`);
+            updateWeatherDescription(lastWeatherData || {});
+          }, DOPPLER_OVERRIDE_DURATION_MS);
+          
+          updateWeatherDescription(lastWeatherData || {});
         });
       } else {
         (document.querySelector('main.content') || document.body).appendChild(el);
@@ -6235,39 +6247,26 @@ import weatherConditions from '../data/weather-conditions.json';
         // Attach click listener to parent container (covers both radar & image modes)
         descImageLeft.style.cursor = 'pointer';
         descImageLeft.style.pointerEvents = 'auto';
+        descImageLeft.title = "Toggle Doppler Radar";
         descImageLeft.addEventListener('click', (e) => {
           e.stopPropagation();
-          console.log('🔄 Left circle clicked - resetting API timer & forcing refresh...');
+          SHOW_DOPPLER_RADAR_LEFT = !SHOW_DOPPLER_RADAR_LEFT;
+          USER_DOPPLER_OVERRIDE_LEFT = SHOW_DOPPLER_RADAR_LEFT;
+          console.log(`🔄 Left circle clicked. Manual Override: ${SHOW_DOPPLER_RADAR_LEFT ? 'FORCING DOPPLER' : 'FORCING TIME'} (Natural state is: ${AUTO_DOPPLER_RADAR_LEFT ? 'DOPPLER' : 'TIME'})`);
           
-          const isRadar = descImageLeft.classList.contains('radar-mode');
-          if (isRadar) {
-            const applyTransition = (opacityVal) => {
-              descImageLeft.style.setProperty('transition', 'opacity 0.5s ease-out', 'important');
-              descImageLeft.style.setProperty('opacity', opacityVal, 'important');
-            };
-            requestAnimationFrame(() => applyTransition('0.15'));
-            setTimeout(() => {
-              requestAnimationFrame(() => applyTransition('1.0'));
-            }, 500);
-          } else {
-            const applyTransition = (color) => {
-              elLeft.style.setProperty('transition', 'color 0.5s ease-out', 'important');
-              elLeft.style.setProperty('color', color, 'important');
-              const spans = elLeft.querySelectorAll('span');
-              spans.forEach(span => {
-                span.style.setProperty('transition', 'color 0.5s ease-out', 'important');
-                span.style.setProperty('color', color, 'important');
-              });
-            };
-            requestAnimationFrame(() => applyTransition('black'));
-            setTimeout(() => {
-              requestAnimationFrame(() => applyTransition(getCurrentTextColor()));
-            }, 500);
+          if (leftDopplerOverrideTimerId) {
+            clearTimeout(leftDopplerOverrideTimerId);
           }
-
-          stopAutoRefresh();
-          getLocalWeather();
-          startAutoRefresh(currentRefreshMs, autoRefreshAligned);
+          
+          leftDopplerOverrideTimerId = setTimeout(() => {
+            USER_DOPPLER_OVERRIDE_LEFT = null;
+            SHOW_DOPPLER_RADAR_LEFT = AUTO_DOPPLER_RADAR_LEFT;
+            leftDopplerOverrideTimerId = null;
+            console.log(`⏳ Left circle override expired. Reverting to natural state: ${AUTO_DOPPLER_RADAR_LEFT ? 'DOPPLER' : 'TIME'}`);
+            updateWeatherDescription(lastWeatherData || {});
+          }, DOPPLER_OVERRIDE_DURATION_MS);
+          
+          updateWeatherDescription(lastWeatherData || {});
         });
       }
     }
@@ -8087,13 +8086,17 @@ import weatherConditions from '../data/weather-conditions.json';
       // Determine if radar mode should be active based on canvas check and/or OpenWeather data
       try {
         const radarStatus = await determineRadarStatus(data);
-        SHOW_DOPPLER_RADAR_LEFT = radarStatus.left;
-        SHOW_DOPPLER_RADAR_RIGHT = radarStatus.right;
-        console.log(`📡 Dynamic Radar Status decided - Left: ${SHOW_DOPPLER_RADAR_LEFT ? 'ENABLED' : 'DISABLED'}, Right: ${SHOW_DOPPLER_RADAR_RIGHT ? 'ENABLED' : 'DISABLED'}`);
+        AUTO_DOPPLER_RADAR_LEFT = radarStatus.left;
+        AUTO_DOPPLER_RADAR_RIGHT = radarStatus.right;
+        SHOW_DOPPLER_RADAR_LEFT = USER_DOPPLER_OVERRIDE_LEFT !== null ? USER_DOPPLER_OVERRIDE_LEFT : AUTO_DOPPLER_RADAR_LEFT;
+        SHOW_DOPPLER_RADAR_RIGHT = USER_DOPPLER_OVERRIDE_RIGHT !== null ? USER_DOPPLER_OVERRIDE_RIGHT : AUTO_DOPPLER_RADAR_RIGHT;
+        console.log(`📡 Dynamic Radar Status decided - Left: ${SHOW_DOPPLER_RADAR_LEFT ? 'ENABLED' : 'DISABLED'} (Natural/Auto is: ${AUTO_DOPPLER_RADAR_LEFT ? 'DOPPLER' : 'TIME'}, Override is: ${USER_DOPPLER_OVERRIDE_LEFT !== null ? (USER_DOPPLER_OVERRIDE_LEFT ? 'FORCED DOPPLER' : 'FORCED TIME') : 'NONE'}), Right: ${SHOW_DOPPLER_RADAR_RIGHT ? 'ENABLED' : 'DISABLED'} (Natural/Auto is: ${AUTO_DOPPLER_RADAR_RIGHT ? 'DOPPLER' : 'TIME'}, Override is: ${USER_DOPPLER_OVERRIDE_RIGHT !== null ? (USER_DOPPLER_OVERRIDE_RIGHT ? 'FORCED DOPPLER' : 'FORCED TIME') : 'NONE'})`);
       } catch (e) {
         console.warn('Error determining dynamic radar status, defaulting to false:', e);
-        SHOW_DOPPLER_RADAR_LEFT = false;
-        SHOW_DOPPLER_RADAR_RIGHT = false;
+        AUTO_DOPPLER_RADAR_LEFT = false;
+        AUTO_DOPPLER_RADAR_RIGHT = false;
+        SHOW_DOPPLER_RADAR_LEFT = USER_DOPPLER_OVERRIDE_LEFT !== null ? USER_DOPPLER_OVERRIDE_LEFT : false;
+        SHOW_DOPPLER_RADAR_RIGHT = USER_DOPPLER_OVERRIDE_RIGHT !== null ? USER_DOPPLER_OVERRIDE_RIGHT : false;
       }
       
       // Store data for resize repositioning and component styling (like clock hands)
