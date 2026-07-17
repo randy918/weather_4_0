@@ -625,14 +625,14 @@ import weatherConditions from '../data/weather-conditions.json';
   function getMoonPhaseName(phase) {
     if (typeof phase !== 'number') return '';
     // Based on standard OpenWeather API moon_phase values (0..1)
-    if (phase === 0 || phase === 1) return 'New moon';
-    if (phase > 0 && phase < 0.25) return 'Waxing crescent';
-    if (phase === 0.25) return 'First quarter';
-    if (phase > 0.25 && phase < 0.5) return 'Waxing gibbous';
-    if (phase === 0.5) return 'Full moon';
-    if (phase > 0.5 && phase < 0.75) return 'Waning gibbous';
-    if (phase === 0.75) return 'Last quarter';
-    if (phase > 0.75 && phase < 1) return 'Waning crescent';
+    if (phase === 0 || phase === 1) return 'New Moon';
+    if (phase > 0 && phase < 0.25) return 'Waxing Crescent';
+    if (phase === 0.25) return 'First Quarter';
+    if (phase > 0.25 && phase < 0.5) return 'Waxing Gibbous';
+    if (phase === 0.5) return 'Full Moon';
+    if (phase > 0.5 && phase < 0.75) return 'Waning Gibbous';
+    if (phase === 0.75) return 'Last Quarter';
+    if (phase > 0.75 && phase < 1) return 'Waning Crescent';
     return '';
   }
 
@@ -3920,7 +3920,7 @@ import weatherConditions from '../data/weather-conditions.json';
     }
 
     // --- 7-cell grid layout & labels ---
-    const indices7 = [0, 1, 2, 3, 5, 6, 7];
+    const indices7 = [0, 2, 3, 5, 6, 1, 7];
     const containerId7 = 'clock-grid-container-7';
     let container7 = document.getElementById(containerId7);
 
@@ -4735,8 +4735,8 @@ import weatherConditions from '../data/weather-conditions.json';
 
   // Update the sun dial in grid cell #6 (index 5)
   function updateSunDial(data) {
-    const gridSunProgressEls = document.querySelectorAll('.clockGridItem-5 .countdown-progress, .clockGridItem7-4 .countdown-progress');
-    const gridSunTextEls = document.querySelectorAll('.clockGridItem-5 .grid-sun-text, .clockGridItem7-4 .grid-sun-text');
+    const gridSunProgressEls = document.querySelectorAll('.clockGridItem-5 .countdown-progress, .clockGridItem7-3 .countdown-progress');
+    const gridSunTextEls = document.querySelectorAll('.clockGridItem-5 .grid-sun-text, .clockGridItem7-3 .grid-sun-text');
     
     // Get sunrise/sunset times (Unix timestamps)
     const today = data?.daily?.[0];
@@ -4782,7 +4782,7 @@ import weatherConditions from '../data/weather-conditions.json';
       }
     });
     
-    const celestialDotEls = document.querySelectorAll('.clockGridItem-5 .celestial-dot, .clockGridItem7-4 .celestial-dot');
+    const celestialDotEls = document.querySelectorAll('.clockGridItem-5 .celestial-dot, .clockGridItem7-3 .celestial-dot');
     // Current time fraction over 24h
     const nowSec = (Date.now() / 1000) - midnightToday;
     const fNow = Math.max(0, Math.min(1, nowSec / 86400));
@@ -4840,8 +4840,8 @@ import weatherConditions from '../data/weather-conditions.json';
 
   // Update the moon dial in grid cell #7 (index 6)
   function updateMoonDial(data) {
-    const gridMoonProgressEls = document.querySelectorAll('.clockGridItem-6 .countdown-progress, .clockGridItem7-5 .countdown-progress');
-    const gridMoonTextEls = document.querySelectorAll('.clockGridItem-6 .grid-moon-text, .clockGridItem7-5 .grid-moon-text');
+    const gridMoonProgressEls = document.querySelectorAll('.clockGridItem-6 .countdown-progress, .clockGridItem7-4 .countdown-progress');
+    const gridMoonTextEls = document.querySelectorAll('.clockGridItem-6 .grid-moon-text, .clockGridItem7-4 .grid-moon-text');
     
     // Get moonrise/moonset times (Unix timestamps)
     const today = data?.daily?.[0];
@@ -4899,7 +4899,7 @@ import weatherConditions from '../data/weather-conditions.json';
       }
     });
     
-    const celestialDotEls = document.querySelectorAll('.clockGridItem-6 .celestial-dot, .clockGridItem7-5 .celestial-dot');
+    const celestialDotEls = document.querySelectorAll('.clockGridItem-6 .celestial-dot, .clockGridItem7-4 .celestial-dot');
     // Current time fraction over 24h
     const nowSec = (Date.now() / 1000) - midnightToday;
     const fNow = Math.max(0, Math.min(1, nowSec / 86400));
