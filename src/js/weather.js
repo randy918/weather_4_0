@@ -581,7 +581,7 @@ import weatherConditions from '../data/weather-conditions.json';
   // Easily editable list of colors per 10° range
   // Note: MUST use hsl(H, S%, L%) format for compatibility with background animations
   const TEMP_COLORS = [
-    { max: -10,   color: 'rgba(190, 0, 0, 1)' },   // Below -10: red-purple
+    { max: -10, color: 'rgba(190, 0, 0, 1)' },   // Below -10: deep red
     { max: 0,   color: 'hsl(320, 90%, 45%)' },   // Below 0: red-purple
     { max: 10,  color: 'hsl(280, 90%, 50%)' },   // 0s: purple
     { max: 20,  color: 'hsl(260, 90%, 60%)' },   // 10s: blue purple
@@ -6233,7 +6233,7 @@ import weatherConditions from '../data/weather-conditions.json';
       elLeft.style.alignItems = 'center';
       elLeft.style.gap = '0';
       elLeft.style.color = getCurrentTextColor();
-      elLeft.style.fontSize = 'var(--left-time-size, 4.37vw)'; // Made 20% bigger (from 3.64vw)
+      elLeft.style.fontSize = 'var(--left-time-size, 4.81vw)'; // Made 20% bigger (from 3.64vw)
       elLeft.style.zIndex = '10';
       elLeft.style.textShadow = 'none';
       
@@ -8478,10 +8478,10 @@ import weatherConditions from '../data/weather-conditions.json';
     
     elLeft.innerHTML = `
       <div style="display: flex; align-items: baseline; justify-content: center; gap: 0; line-height: 1;">
-        <span style="font-family: 'bold', sans-serif; font-size: var(--left-time-size, 4.37vw); letter-spacing: -0.02em;">${hours}:${minutesStr}</span>
-        <span style="font-family: 'light', sans-serif; font-size: var(--left-time-size, 4.37vw); letter-spacing: -0.02em;">:</span>
-        <span style="font-family: 'mono', sans-serif; font-size: var(--left-seconds-size, 4.27vw); letter-spacing: -0.06em;">${secondsStr}</span>
-        <span style="font-family: 'medium', sans-serif; font-size: var(--left-ampm-size, 2.93vw); margin-left: -0.05vw; letter-spacing: -0.05em;">${ampm}</span>
+        <span style="font-family: 'bold', sans-serif; font-size: var(--left-time-size, 4.81vw); letter-spacing: -0.02em;">${hours}:${minutesStr}</span>
+        <span style="font-family: 'light', sans-serif; font-size: var(--left-time-size, 4.81vw); letter-spacing: -0.02em;">:</span>
+        <span style="font-family: 'mono', sans-serif; font-size: var(--left-seconds-size, 4.70vw); letter-spacing: -0.06em;">${secondsStr}</span>
+        <span style="font-family: 'medium', sans-serif; font-size: var(--left-ampm-size, 3.22vw); margin-left: -0.05vw; letter-spacing: -0.05em;">${ampm}</span>
       </div>
     `;
   }
