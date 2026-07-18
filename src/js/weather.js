@@ -684,11 +684,15 @@ import weatherConditions from '../data/weather-conditions.json';
     
     console.log(`Moon phase: ${moonPhase.toFixed(3)}, raw=${rawIndex}, offset=${MOON_IMAGE_OFFSET} -> 2moon${imgIndexStr}.png`);
 
+    // EDITABLE: Set this to true to force show the track circle for testing/visual verification
+    const DEBUG_FORCE_NEW_MOON_TRACK = true;
+
     const imgEl = document.getElementById('moon-phase-img');
     const gridImgEls = document.querySelectorAll('.grid-moon-phase');
     
     if (imgEl || gridImgEls.length > 0) {
       const moonSrcUrl = `url(img/2moon${imgIndexStr}.png)`;
+      const isNewMoon = (imgIndex === 1) || DEBUG_FORCE_NEW_MOON_TRACK;
       
       if (imgEl) {
         imgEl.style.webkitMaskImage = moonSrcUrl;
@@ -699,6 +703,12 @@ import weatherConditions from '../data/weather-conditions.json';
         gridImgEl.style.webkitMaskImage = moonSrcUrl;
         gridImgEl.style.maskImage = moonSrcUrl;
         gridImgEl.setAttribute('aria-label', `Moon Phase ${imgIndex} (${moonPhase})`);
+        
+        // Show track circle behind new moon (when it is invisible/dark)
+        const trackSvg = gridImgEl.parentNode.querySelector('.grid-moon-track-svg');
+        if (trackSvg) {
+          trackSvg.style.display = isNewMoon ? 'block' : 'none';
+        }
       });
       
       // Check if moon is currently risen (between moonrise and moonset)
@@ -3667,7 +3677,12 @@ Perfect weather to head outdoors and enjoy the day!`
         let innerHtml = '';
         if (i === 1) {
           // Cell #2: Moon phase circle area only (no SVG countdown circle)
-          innerHtml = `<div class="moon-phase-display grid-moon-phase" role="img" aria-label="Moon Phase"></div>`;
+          innerHtml = `
+            <svg class="clock-timer-svg grid-moon-track-svg" viewBox="0 0 100 100" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;">
+              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+            </svg>
+            <div class="moon-phase-display grid-moon-phase" role="img" aria-label="Moon Phase"></div>
+          `;
         } else if (i === 2) {
           // Cell #3: Wind direction gauge with standard countdown circle track and progress, a wind hand matching clock style, and wind speed number centered
           innerHtml = `
@@ -3723,9 +3738,9 @@ Perfect weather to head outdoors and enjoy the day!`
           // Cell #6: Sun dial showing daytime period
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
-              <circle class="countdown-track" cx="50" cy="50" r="42.5" fill="none" />
-              <circle class="countdown-progress" cx="50" cy="50" r="42.5" fill="none" />
-              <circle class="celestial-dot" cx="50" cy="7.5" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
+              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+              <circle class="celestial-dot" cx="50" cy="4" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
             </svg>
             <div class="grid-sun-text"></div>
           `;
@@ -3733,9 +3748,9 @@ Perfect weather to head outdoors and enjoy the day!`
           // Cell #7: Moon dial showing moonrise period
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
-              <circle class="countdown-track" cx="50" cy="50" r="42.5" fill="none" />
-              <circle class="countdown-progress" cx="50" cy="50" r="42.5" fill="none" />
-              <circle class="celestial-dot" cx="50" cy="7.5" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
+              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+              <circle class="celestial-dot" cx="50" cy="4" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
             </svg>
             <div class="grid-moon-text"></div>
           `;
@@ -4010,7 +4025,12 @@ Perfect weather to head outdoors and enjoy the day!`
 
         let innerHtml = '';
         if (i === 1) {
-          innerHtml = `<div class="moon-phase-display grid-moon-phase" role="img" aria-label="Moon Phase"></div>`;
+          innerHtml = `
+            <svg class="clock-timer-svg grid-moon-track-svg" viewBox="0 0 100 100" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;">
+              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+            </svg>
+            <div class="moon-phase-display grid-moon-phase" role="img" aria-label="Moon Phase"></div>
+          `;
         } else if (i === 2) {
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
@@ -4053,18 +4073,18 @@ Perfect weather to head outdoors and enjoy the day!`
         } else if (i === 5) {
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
-              <circle class="countdown-track" cx="50" cy="50" r="42.5" fill="none" />
-              <circle class="countdown-progress" cx="50" cy="50" r="42.5" fill="none" />
-              <circle class="celestial-dot" cx="50" cy="7.5" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
+              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+              <circle class="celestial-dot" cx="50" cy="4" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
             </svg>
             <div class="grid-sun-text"></div>
           `;
         } else if (i === 6) {
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
-              <circle class="countdown-track" cx="50" cy="50" r="42.5" fill="none" />
-              <circle class="countdown-progress" cx="50" cy="50" r="42.5" fill="none" />
-              <circle class="celestial-dot" cx="50" cy="7.5" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
+              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+              <circle class="celestial-dot" cx="50" cy="4" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
             </svg>
             <div class="grid-moon-text"></div>
           `;
@@ -4350,7 +4370,12 @@ Perfect weather to head outdoors and enjoy the day!`
 
         let innerHtml = '';
         if (i === 1) {
-          innerHtml = `<div class="moon-phase-display grid-moon-phase" role="img" aria-label="Moon Phase"></div>`;
+          innerHtml = `
+            <svg class="clock-timer-svg grid-moon-track-svg" viewBox="0 0 100 100" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;">
+              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+            </svg>
+            <div class="moon-phase-display grid-moon-phase" role="img" aria-label="Moon Phase"></div>
+          `;
         } else if (i === 2) {
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
@@ -4501,18 +4526,18 @@ Perfect weather to head outdoors and enjoy the day!`
         } else if (i === 5) {
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
-              <circle class="countdown-track" cx="50" cy="50" r="42.5" fill="none" />
-              <circle class="countdown-progress" cx="50" cy="50" r="42.5" fill="none" />
-              <circle class="celestial-dot" cx="50" cy="7.5" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
+              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+              <circle class="celestial-dot" cx="50" cy="4" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
             </svg>
             <div class="grid-sun-text"></div>
           `;
         } else if (i === 6) {
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
-              <circle class="countdown-track" cx="50" cy="50" r="42.5" fill="none" />
-              <circle class="countdown-progress" cx="50" cy="50" r="42.5" fill="none" />
-              <circle class="celestial-dot" cx="50" cy="7.5" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
+              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+              <circle class="celestial-dot" cx="50" cy="4" r="1.5" style="display: none; fill: var(--grid-celestial-dot-fill); stroke-width: var(--grid-celestial-dot-stroke-width);" />
             </svg>
             <div class="grid-moon-text"></div>
           `;
@@ -4842,8 +4867,8 @@ Perfect weather to head outdoors and enjoy the day!`
     const fSunrise = Math.max(0, Math.min(1, sunriseSec / 86400));
     const fSunset = Math.max(0, Math.min(1, sunsetSec / 86400));
     
-    const radius = 42.5;
-    const circumference = 2 * Math.PI * radius; // ~289.0265
+    const radius = 46;
+    const circumference = 2 * Math.PI * radius;
     
     const length = (fSunset - fSunrise) * circumference;
     const offset = fSunrise * circumference;
@@ -4947,8 +4972,8 @@ Perfect weather to head outdoors and enjoy the day!`
     const fMoonrise = Math.max(0, Math.min(1, moonriseSec / 86400));
     const fMoonset = Math.max(0, Math.min(1, moonsetSec / 86400));
     
-    const radius = 42.5;
-    const circumference = 2 * Math.PI * radius; // ~289.0265
+    const radius = 46;
+    const circumference = 2 * Math.PI * radius;
     
     gridMoonProgressEls.forEach(gridMoonProgressEl => {
       if (moonrise < moonset) {
