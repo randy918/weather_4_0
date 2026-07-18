@@ -507,20 +507,20 @@ import weatherConditions from '../data/weather-conditions.json';
     });
 
     if (popularColor) {
-      // Create a transparent version of the popular color (0% alpha) to blend smoothly
-      // Assumes tempToColor returns format 'hsl(H, S%, L%)'
       const transparentColor = popularColor.replace('hsl(', 'hsla(').replace(')', ', 0)');
       
-      // Create an opacity-adjusted version of the popular color using the CSS variable
-      const overlayMidOpacity = getComputedStyle(document.documentElement).getPropertyValue('--gradient-mid-opacity').trim() || '1';
+      const isPhone = window.innerWidth < 768;
+      const config = isPhone ? GRADIENT_PHONE : GRADIENT_NON_PHONE;
+      const overlayMidOpacity = config.midOpacity;
       const midpointColor = popularColor.replace('hsl(', 'hsla(').replace(')', `, ${overlayMidOpacity})`);
+      const midpointPercent = config.midpoint;
 
       const overlay = document.querySelector('.scrolling-gradient-overlay');
       if (overlay) {
         // Create 3-color gradient: 0% opacity at top, configured setup at midpoint, 0% opacity at bottom
         document.documentElement.style.setProperty('--gradient-overlay-color', popularColor);
         document.documentElement.style.setProperty('--gradient-overlay-transparent', transparentColor);
-        overlay.style.background = `linear-gradient(to bottom, ${transparentColor} 0%, ${midpointColor} var(--gradient-midpoint, 50%), ${transparentColor} 100%)`;
+        overlay.style.backgroundImage = `linear-gradient(to bottom, ${transparentColor} 0%, ${midpointColor} ${midpointPercent}, ${transparentColor} 100%)`;
       }
     }
   }
@@ -568,19 +568,20 @@ import weatherConditions from '../data/weather-conditions.json';
     });
 
     if (popularColor) {
-      // Create a transparent version of the popular color (0% alpha) to blend smoothly
       const transparentColor = popularColor.replace('hsl(', 'hsla(').replace(')', ', 0)');
       
-      // Create an opacity-adjusted version of the popular color using the CSS variable
-      const overlayMidOpacity = getComputedStyle(document.documentElement).getPropertyValue('--gradient-lower-mid-opacity').trim() || '1';
+      const isPhone = window.innerWidth < 768;
+      const config = isPhone ? GRADIENT_PHONE : GRADIENT_NON_PHONE;
+      const overlayMidOpacity = config.lowerMidOpacity;
       const midpointColor = popularColor.replace('hsl(', 'hsla(').replace(')', `, ${overlayMidOpacity})`);
+      const midpointPercent = config.lowerMidpoint;
 
       const overlay = document.querySelector('.scrolling-gradient-overlay-lower');
       if (overlay) {
         // Create 3-color gradient: 0% opacity at top, configured setup at midpoint, 0% opacity at bottom
         document.documentElement.style.setProperty('--gradient-overlay-lower-color', popularColor);
         document.documentElement.style.setProperty('--gradient-overlay-lower-transparent', transparentColor);
-        overlay.style.background = `linear-gradient(to bottom, ${transparentColor} 0%, ${midpointColor} var(--gradient-lower-midpoint, 50%), ${transparentColor} 100%)`;
+        overlay.style.backgroundImage = `linear-gradient(to bottom, ${transparentColor} 0%, ${midpointColor} ${midpointPercent}, ${transparentColor} 100%)`;
       }
     }
   }
@@ -609,7 +610,7 @@ import weatherConditions from '../data/weather-conditions.json';
     { max: 90,  color: 'hsl(30,  100%, 50%)' },  // 80s: orange
     { max: 100, color: 'hsl(0,   90%, 55%)' },   // 90s: red
     { max: 110, color: 'hsl(0, 100%, 37%)' },   // 100s: red
-    { max: Infinity, color: 'hsl(0, 100%, 25%)' } // 110+: dark red
+    { max: Infinity, color: 'hsl(320, 90%, 45%)' } // 110+: red-purple
   ];
 
   function tempToColor(temp) {
