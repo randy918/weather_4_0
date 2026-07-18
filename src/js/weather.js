@@ -318,6 +318,12 @@ import weatherConditions from '../data/weather-conditions.json';
   const TEST_HOURLY_RAIN = false; // STAGE 1: Set to true to see fake passing storm. Set to false for live OpenWeather data.
   const HOURLY_RAIN_FONT_SIZE = '1.72vw'; // Size of the inches text (Matches hourly temperature bar size)
 
+  // EDITABLE: Great Weather Advisory Criteria
+  const GREAT_WEATHER_TEMP_MIN = 68;
+  const GREAT_WEATHER_TEMP_MAX = 80;
+  const GREAT_WEATHER_HUMIDITY_MAX = 70;
+  const GREAT_WEATHER_WIND_MAX = 20;
+
   // EDITABLE: Alert Banner Colors
   // Maps specific alert keywords to their background colors.
   const ALERT_MODAL_LINE_HEIGHT = '3.025vw'; // EDITABLE: Line spacing INSIDE the modal paragraphs
@@ -325,6 +331,7 @@ import weatherConditions from '../data/weather-conditions.json';
 
   const ALERT_COLORS = {
     "DEFAULT": "rgba(0,0,0, 0.75)", // Default translucent red for anything else
+    "GREAT WEATHER ADVISORY": "rgba(46, 204, 113, 0.85)", // Pleasant green
     "DENSE FOG ADVISORY": "rgba(128, 128, 128, 0.85)", // Gray
     "EXTREME HEAT WARNING": "hsl(0, 90%, 35%)", 
     "FLOOD ADVISORY": "hsl(195, 90%, 45%)", // Bright blue-purple
@@ -342,6 +349,7 @@ import weatherConditions from '../data/weather-conditions.json';
   // Maps specific alert keywords to their SVG icons.
   const ALERT_ICONS = {
     "DEFAULT": "img/default-wat.svg",
+    "GREAT WEATHER ADVISORY": "img/sun-wat.svg",
     "DENSE FOG ADVISORY": "img/fog-wat.svg",
     "EXTREME HEAT WARNING": "img/heat-wat.svg",
     "FLOOD ADVISORY": "img/flood-wat.svg",
@@ -1946,6 +1954,46 @@ import weatherConditions from '../data/weather-conditions.json';
         }
       }
     });
+
+    // Check if Great Weathery Advisory conditions are met
+    const currentTemp = data.current?.temp;
+    const humidity = data.current?.humidity;
+    const windSpeed = data.current?.wind_speed;
+    const now = Math.floor(Date.now() / 1000);
+    const sunrise = data.daily?.[0]?.sunrise;
+    const sunset = data.daily?.[0]?.sunset;
+    
+    const isDaytime = (typeof sunrise === 'number' && typeof sunset === 'number') 
+      ? (now >= sunrise && now < sunset) 
+      : true; // fallback to true if sunrise/sunset not available
+
+    if (
+      typeof currentTemp === 'number' && 
+      currentTemp >= GREAT_WEATHER_TEMP_MIN && 
+      currentTemp <= GREAT_WEATHER_TEMP_MAX &&
+      isDaytime &&
+      typeof humidity === 'number' && 
+      humidity < GREAT_WEATHER_HUMIDITY_MAX &&
+      typeof windSpeed === 'number' && 
+      windSpeed < GREAT_WEATHER_WIND_MAX
+    ) {
+      const displayTemp = Math.round(currentTemp);
+      const displayHum = Math.round(humidity);
+      const displayWind = Math.round(windSpeed);
+      alerts.push({
+        event: "GREAT WEATHER ADVISORY",
+        sender_name: "Local Observations",
+        start: now,
+        end: sunset || null,
+        description: `Current conditions are exceptionally pleasant:
+• Temperature: ${displayTemp}°F (Pleasant range: ${GREAT_WEATHER_TEMP_MIN}-${GREAT_WEATHER_TEMP_MAX}°F)
+• Humidity: ${displayHum}% (Target: <${GREAT_WEATHER_HUMIDITY_MAX}%)
+• Wind Speed: ${displayWind} mph (Target: <${GREAT_WEATHER_WIND_MAX} mph)
+• Sunlight: Daytime
+
+Perfect weather to head outdoors and enjoy the day!`
+      });
+    }
     
     const container = document.getElementById('alerts-container');
     
@@ -4752,7 +4800,7 @@ import weatherConditions from '../data/weather-conditions.json';
         gridSunProgressEl.style.strokeDashoffset = circumference; // hide progress
       });
       gridSunTextEls.forEach(gridSunTextEl => {
-        gridSunTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Day</span>`;
+        gridSunTextEl.innerHTML = `<span style="font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Sun</span><br>--<br><span style="font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Day</span>`;
       });
       return;
     }
@@ -4831,7 +4879,7 @@ import weatherConditions from '../data/weather-conditions.json';
     const formattedTime = `${hours}:${minutesStr}<span style="font-size: 0.67em; font-family: 'medium', sans-serif;">${ampm}</span>`;
     
     gridSunTextEls.forEach(gridSunTextEl => {
-      gridSunTextEl.innerHTML = `${formattedTime}<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">${nextEventLabel}</span>`;
+      gridSunTextEl.innerHTML = `<span style="font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Sun</span><br>${formattedTime}<br><span style="font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">${nextEventLabel}</span>`;
       if (tempColor) {
         gridSunTextEl.style.color = tempColor;
       }
@@ -4857,7 +4905,7 @@ import weatherConditions from '../data/weather-conditions.json';
         gridMoonProgressEl.style.strokeDashoffset = circumference; // hide progress
       });
       gridMoonTextEls.forEach(gridMoonTextEl => {
-        gridMoonTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Moon</span>`;
+        gridMoonTextEl.innerHTML = `<span style="font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Moon</span><br>--<br><span style="font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Moon</span>`;
       });
       return;
     }
@@ -4968,7 +5016,7 @@ import weatherConditions from '../data/weather-conditions.json';
     const formattedTime = `${hours}:${minutesStr}<span style="font-size: 0.67em; font-family: 'medium', sans-serif;">${ampm}</span>`;
     
     gridMoonTextEls.forEach(gridMoonTextEl => {
-      gridMoonTextEl.innerHTML = `${formattedTime}<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">${nextEventLabel}</span>`;
+      gridMoonTextEl.innerHTML = `<span style="font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Moon</span><br>${formattedTime}<br><span style="font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">${nextEventLabel}</span>`;
       if (tempColor) {
         gridMoonTextEl.style.color = tempColor;
       }
