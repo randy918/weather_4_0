@@ -892,7 +892,7 @@ import weatherConditions from '../data/weather-conditions.json';
     const currentWindSpeed = data.current?.wind_speed || 0;
     
     if (windArrow) {
-      updateWindDirectionArrow(data.current?.temp, windDeg);
+      updateWindDirectionArrow(data.current?.temp, windDeg, currentWindSpeed);
       
       if (currentWindSpeed >= 25) {
         const baseColor = tempToColor(data.current?.temp) || 'white';
@@ -1143,7 +1143,7 @@ import weatherConditions from '../data/weather-conditions.json';
         const isGrid = fill.closest('.grid-barometric-pressure') !== null;
         const radius = isGrid ? 46 : 45;
         const circumference = 2 * Math.PI * radius; // ~289 or ~283
-        const maxStrokeLength = circumference * 0.75; // ~217 or ~212
+        const maxStrokeLength = circumference;
         const dashOffset = maxStrokeLength * percent;
         
         // Apply fill amount to the dasharray
@@ -8750,7 +8750,7 @@ Perfect weather to head outdoors and enjoy the day!`
   // Update wind direction arrow with spin animation
   let lastWindDirection = null;
 
-  function updateWindDirectionArrow(temp, windDeg) {
+  function updateWindDirectionArrow(temp, windDeg, windSpeed = 0) {
     const arrows = document.querySelectorAll('.wind-direction-display');
     const tempNum = typeof temp === 'string' ? parseFloat(temp) : temp;
     const color = tempToColor(tempNum);
@@ -8798,8 +8798,19 @@ Perfect weather to head outdoors and enjoy the day!`
       // Sync the rotated wind direction hand inside grid cell #3 (index 2)
       const gridWindHands = document.querySelectorAll('.clockGridItem-2 .clock-hand-wind-direction');
       const stemColor = tempToColor(tempNum + 10) || color;
+      
+      // Calculate stem width multiplier: 0-15 mph = 1x, 15.1-60 mph = linear scale up to 4x
+      let stemMultiplier = 1;
+      if (windSpeed > 15) {
+        stemMultiplier = 1 + (windSpeed - 15) / 15;
+        if (stemMultiplier > 4) {
+          stemMultiplier = 4;
+        }
+      }
+
       gridWindHands.forEach(gridWindHand => {
         gridWindHand.style.transform = `translateX(-50%) rotate(${displayDeg}deg)`;
+        gridWindHand.style.setProperty('--wind-stem-multiplier', stemMultiplier.toFixed(3));
         if (stemColor) {
           gridWindHand.style.setProperty('background', stemColor, 'important');
         }

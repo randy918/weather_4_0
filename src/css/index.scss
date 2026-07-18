@@ -260,19 +260,17 @@ $loader-logo-offset-y: 25vw;
         position: absolute;
         width: 100%;
         height: 100%;
-        transform: rotate(135deg); // Positive 135deg correctly puts the gap at the bottom like a speedometer
+        transform: rotate(90deg); // Starts at the bottom (6 o'clock)
         
         .barometric-track {
             stroke: rgba(255, 255, 255, 0.2); // Dimmed background track
             stroke-width: 3; // Same thickness feel as the arrow
-            stroke-dasharray: 212, 283; // Leaves a gap at the bottom (optional style choice)
             stroke-linecap: round;
         }
 
         .barometric-fill {
             stroke: white; // Replaced by JS dynamically to match theme
             stroke-width: 3;
-            stroke-dasharray: 0, 283; // Filled dynamically by JS
             stroke-linecap: round;
             transition: stroke-dasharray 1s ease-in-out, stroke 0.5s ease;
         }
@@ -1049,11 +1047,11 @@ main {
         position: absolute !important;
         bottom: 50% !important;
         left: 50% !important;
-        width: calc(var(--item-current-size) * 0.02) !important;
+        width: calc(var(--item-current-size) * 0.02 * var(--wind-stem-multiplier, 1)) !important;
         height: 46% !important;
         background: var(--clock-hands-color, rgba(255, 255, 255, 0.9));
         transform-origin: bottom center !important;
-        border-radius: calc(var(--item-current-size) * 0.02) !important;
+        border-radius: calc(var(--item-current-size) * 0.02 * var(--wind-stem-multiplier, 1)) !important;
         z-index: 1 !important;
     }
 
@@ -1071,10 +1069,12 @@ main {
         }
 
         .barometric-gauge-svg {
+            transform: rotate(90deg) !important; // Starts at the bottom (6 o'clock)
+            
             .barometric-track {
                 stroke-width: var(--clock-grid-stroke-width, 4) !important;
                 stroke: var(--clock-grid-track-color, rgba(255, 255, 255, 0.2)) !important;
-                stroke-dasharray: 217, 289 !important;
+                stroke-dasharray: none !important;
             }
             .barometric-fill {
                 stroke-width: var(--clock-grid-stroke-width, 4) !important;
