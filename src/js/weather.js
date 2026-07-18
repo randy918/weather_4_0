@@ -4009,7 +4009,7 @@ Perfect weather to head outdoors and enjoy the day!`
     }
 
     // --- 7-cell grid layout & labels ---
-    const indices7 = [0, 2, 3, 5, 6, 1, 7];
+    const indices7 = [0, 2, 7, 3, 5, 6, 1];
     const containerId7 = 'clock-grid-container-7';
     let container7 = document.getElementById(containerId7);
 
@@ -4834,8 +4834,8 @@ Perfect weather to head outdoors and enjoy the day!`
 
   // Update the sun dial in grid cell #6 (index 5)
   function updateSunDial(data) {
-    const gridSunProgressEls = document.querySelectorAll('.clockGridItem-5 .countdown-progress, .clockGridItem7-3 .countdown-progress');
-    const gridSunTextEls = document.querySelectorAll('.clockGridItem-5 .grid-sun-text, .clockGridItem7-3 .grid-sun-text');
+    const gridSunProgressEls = document.querySelectorAll('.clockGridItem-5 .countdown-progress');
+    const gridSunTextEls = document.querySelectorAll('.clockGridItem-5 .grid-sun-text');
     
     // Get sunrise/sunset times (Unix timestamps)
     const today = data?.daily?.[0];
@@ -4843,6 +4843,7 @@ Perfect weather to head outdoors and enjoy the day!`
     const sunset = today?.sunset;
     const currentTemp = (data?.current?.temp !== undefined) ? data.current.temp : null;
     const tempColor = currentTemp !== null ? tempToColor(currentTemp) : null;
+    const celestialColor = currentTemp !== null ? (tempToColor(currentTemp + 10) || tempColor) : null;
     
     if (typeof sunrise !== 'number' || typeof sunset !== 'number') {
       console.log('Sun dial: sunrise/sunset data unavailable');
@@ -4881,7 +4882,7 @@ Perfect weather to head outdoors and enjoy the day!`
       }
     });
     
-    const celestialDotEls = document.querySelectorAll('.clockGridItem-5 .celestial-dot, .clockGridItem7-3 .celestial-dot');
+    const celestialDotEls = document.querySelectorAll('.clockGridItem-5 .celestial-dot');
     // Current time fraction over 24h
     const nowSec = (Date.now() / 1000) - midnightToday;
     const fNow = Math.max(0, Math.min(1, nowSec / 86400));
@@ -4895,11 +4896,11 @@ Perfect weather to head outdoors and enjoy the day!`
       celestialDotEl.setAttribute('cy', cy.toFixed(3));
       celestialDotEl.style.display = 'block';
       celestialDotEl.setAttribute('r', String(CLOCK_GRID_CELESTIAL_DOT_RADIUS));
-      celestialDotEl.style.fill = isUp ? (tempColor || 'white') : '#333333';
+      celestialDotEl.style.fill = isUp ? (celestialColor || 'white') : '#333333';
       celestialDotEl.style.opacity = '1';
       celestialDotEl.style.strokeWidth = 'var(--grid-celestial-dot-stroke-width)';
-      if (tempColor) {
-        celestialDotEl.style.stroke = tempColor;
+      if (celestialColor) {
+        celestialDotEl.style.stroke = isUp ? celestialColor : '#333333';
       }
     });
     
@@ -4939,8 +4940,8 @@ Perfect weather to head outdoors and enjoy the day!`
 
   // Update the moon dial in grid cell #7 (index 6)
   function updateMoonDial(data) {
-    const gridMoonProgressEls = document.querySelectorAll('.clockGridItem-6 .countdown-progress, .clockGridItem7-4 .countdown-progress');
-    const gridMoonTextEls = document.querySelectorAll('.clockGridItem-6 .grid-moon-text, .clockGridItem7-4 .grid-moon-text');
+    const gridMoonProgressEls = document.querySelectorAll('.clockGridItem-6 .countdown-progress');
+    const gridMoonTextEls = document.querySelectorAll('.clockGridItem-6 .grid-moon-text');
     
     // Get moonrise/moonset times (Unix timestamps)
     const today = data?.daily?.[0];
@@ -4948,6 +4949,7 @@ Perfect weather to head outdoors and enjoy the day!`
     const moonset = today?.moonset;
     const currentTemp = (data?.current?.temp !== undefined) ? data.current.temp : null;
     const tempColor = currentTemp !== null ? tempToColor(currentTemp) : null;
+    const celestialColor = currentTemp !== null ? (tempToColor(currentTemp + 10) || tempColor) : null;
     
     if (typeof moonrise !== 'number' || typeof moonset !== 'number') {
       console.log('Moon dial: moonrise/moonset data unavailable');
@@ -4998,7 +5000,7 @@ Perfect weather to head outdoors and enjoy the day!`
       }
     });
     
-    const celestialDotEls = document.querySelectorAll('.clockGridItem-6 .celestial-dot, .clockGridItem7-4 .celestial-dot');
+    const celestialDotEls = document.querySelectorAll('.clockGridItem-6 .celestial-dot');
     // Current time fraction over 24h
     const nowSec = (Date.now() / 1000) - midnightToday;
     const fNow = Math.max(0, Math.min(1, nowSec / 86400));
@@ -5019,11 +5021,11 @@ Perfect weather to head outdoors and enjoy the day!`
       celestialDotEl.setAttribute('cy', cy.toFixed(3));
       celestialDotEl.style.display = 'block';
       celestialDotEl.setAttribute('r', String(CLOCK_GRID_CELESTIAL_DOT_RADIUS));
-      celestialDotEl.style.fill = isUp ? (tempColor || 'white') : '#333333';
+      celestialDotEl.style.fill = isUp ? (celestialColor || 'white') : '#333333';
       celestialDotEl.style.opacity = '1';
       celestialDotEl.style.strokeWidth = 'var(--grid-celestial-dot-stroke-width)';
-      if (tempColor) {
-        celestialDotEl.style.stroke = tempColor;
+      if (celestialColor) {
+        celestialDotEl.style.stroke = isUp ? celestialColor : '#333333';
       }
     });
     
@@ -6289,7 +6291,6 @@ Perfect weather to head outdoors and enjoy the day!`
         // Attach click listener to parent container (covers both radar & image modes)
         descImage.style.cursor = 'pointer';
         descImage.style.pointerEvents = 'auto';
-        descImage.title = "Toggle Doppler Radar";
         descImage.addEventListener('click', (e) => {
           e.stopPropagation();
           SHOW_DOPPLER_RADAR_RIGHT = !SHOW_DOPPLER_RADAR_RIGHT;
@@ -6346,7 +6347,6 @@ Perfect weather to head outdoors and enjoy the day!`
         // Attach click listener to parent container (covers both radar & image modes)
         descImageLeft.style.cursor = 'pointer';
         descImageLeft.style.pointerEvents = 'auto';
-        descImageLeft.title = "Toggle Doppler Radar";
         descImageLeft.addEventListener('click', (e) => {
           e.stopPropagation();
           SHOW_DOPPLER_RADAR_LEFT = !SHOW_DOPPLER_RADAR_LEFT;
