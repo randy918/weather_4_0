@@ -240,6 +240,11 @@ import weatherConditions from '../data/weather-conditions.json';
   const MIDDLE_TEXT_X_OFFSET = '.5vw';
   document.documentElement.style.setProperty('--middle-text-x-offset', MIDDLE_TEXT_X_OFFSET);
 
+  // EDITABLE: Vertical position of the barometric/humidity/wind trend arrow (scaled to dial size)
+  const BAROMETRIC_TREND_TOP_POS = "calc(var(--item-current-size) * -0.28 + 0.25vw)";
+  // EDITABLE: Font size of the barometric/humidity/wind trend arrow (scaled to dial size)
+  const BAROMETRIC_TREND_FONT_SIZE = "calc(var(--item-current-size) * 0.1875)";
+
   // EDITABLE: Scrolling Gradient Overlay configuration (Non-phone version: iPad, desktop)
   const GRADIENT_NON_PHONE = {
     top: '40.5vw',
@@ -941,6 +946,42 @@ import weatherConditions from '../data/weather-conditions.json';
     const windGust = data?.current?.wind_gust || windSpeed; // Default to wind_speed if gust not available
     const currentTemp = data?.current?.temp || null;
     
+    let trendHtml = '';
+    if (data?.hourly && data.hourly.length >= 4) {
+      if (typeof data.hourly[3].wind_speed !== 'undefined') {
+        const futureWind = data.hourly[3].wind_speed;
+        const diff = futureWind - windSpeed;
+        const absDiff = Math.abs(diff);
+        
+        let iconClass = '';
+        if (absDiff < 1.0) {
+          iconClass = "fa-equals"; // Double flatline (stable)
+        } else if (absDiff < 3.0) {
+          iconClass = "fa-minus"; // Flat line (slight change)
+        } else if (diff >= 10.0) {
+          iconClass = "fa-angles-up"; // Double up wedge
+        } else if (diff <= -10.0) {
+          iconClass = "fa-angles-down"; // Double down wedge
+        } else if (diff > 0) {
+          iconClass = "fa-angle-up"; // Up wedge
+        } else {
+          iconClass = "fa-angle-down"; // Down wedge
+        }
+        
+        // Determine whether stem is pointing upwards (above the middle) or downwards (below the middle)
+        const windDeg = parseFloat(data?.current?.wind_deg);
+        const ARROW_OFFSET = -180;
+        const displayDeg = !isNaN(windDeg) ? (windDeg + ARROW_OFFSET) : 0;
+        const normalizedDeg = ((displayDeg % 360) + 360) % 360;
+        const isStemAboveMiddle = (normalizedDeg <= 90 || normalizedDeg >= 270);
+        const positionAttr = isStemAboveMiddle ? 'bottom' : 'top';
+        
+        if (iconClass) {
+          trendHtml = `<div style="position: absolute; ${positionAttr}: ${BAROMETRIC_TREND_TOP_POS}; width: 100%; text-align: center; font-size: ${BAROMETRIC_TREND_FONT_SIZE};"><i class="fa-solid ${iconClass}"></i></div>`;
+        }
+      }
+    }
+    
     // Calculate percentages (0-60 mph scale)
     const maxWindMph = 60;
     const speedPercent = Math.min((windSpeed / maxWindMph) * 100, 100);
@@ -1063,7 +1104,7 @@ import weatherConditions from '../data/weather-conditions.json';
     const gridWindSpeedTextEls = document.querySelectorAll('.clockGridItem-2 .grid-wind-speed-text');
     gridWindSpeedTextEls.forEach(gridWindSpeedTextEl => {
       gridWindSpeedTextEl.innerHTML = `
-        <span style="position: relative; display: inline-block;">${Math.round(windSpeed)}</span>
+        ${trendHtml}<span style="position: relative; display: inline-block;">${Math.round(windSpeed)}</span>
       `;
       
       if (tempColor) {
@@ -1079,11 +1120,6 @@ import weatherConditions from '../data/weather-conditions.json';
     
     console.log(`Wind updated: Speed ${Math.round(windSpeed)} mph (${speedPercent.toFixed(1)}%), Gust ${Math.round(windGust)} mph (${gustPercent.toFixed(1)}%)`);
   }
-
-  // EDITABLE: Vertical position of the barometric trend arrow above the reading (scaled to dial size)
-  const BAROMETRIC_TREND_TOP_POS = "calc(var(--item-current-size) * -0.28 + 0.25vw)";
-  // EDITABLE: Font size of the barometric trend arrow (scaled to dial size)
-  const BAROMETRIC_TREND_FONT_SIZE = "calc(var(--item-current-size) * 0.1875)";
 
   // Update the barometric pressure gauge
   function updateBarometricGauge(data) {
@@ -4762,6 +4798,34 @@ Perfect weather to head outdoors and enjoy the day!`
     const activeColor = getDotsColors(currentTemp).active;
     const finalColor = tempColor || activeColor;
     
+    let trendHtml = '';
+    if (data?.hourly && data.hourly.length >= 4) {
+      if (typeof data.hourly[3].humidity !== 'undefined') {
+        const futureHumidity = data.hourly[3].humidity;
+        const diff = futureHumidity - humidity;
+        const absDiff = Math.abs(diff);
+        
+        let iconClass = '';
+        if (absDiff < 1.0) {
+          iconClass = "fa-equals"; // Double flatline (stable)
+        } else if (absDiff < 5.0) {
+          iconClass = "fa-minus"; // Flat line (slight change)
+        } else if (diff >= 15.0) {
+          iconClass = "fa-angles-up"; // Double up wedge
+        } else if (diff <= -15.0) {
+          iconClass = "fa-angles-down"; // Double down wedge
+        } else if (diff > 0) {
+          iconClass = "fa-angle-up"; // Up wedge
+        } else {
+          iconClass = "fa-angle-down"; // Down wedge
+        }
+        
+        if (iconClass) {
+          trendHtml = `<div style="position: absolute; top: ${BAROMETRIC_TREND_TOP_POS}; width: 100%; text-align: center; font-size: ${BAROMETRIC_TREND_FONT_SIZE};"><i class="fa-solid ${iconClass}"></i></div>`;
+        }
+      }
+    }
+    
     const gridHumidityProgressEls = document.querySelectorAll('.clockGridItem-3 .countdown-progress');
     const gridHumidityTextEls = document.querySelectorAll('.clockGridItem-3 .grid-humidity-text');
     const radius = 46;
@@ -4777,7 +4841,7 @@ Perfect weather to head outdoors and enjoy the day!`
     });
     
     gridHumidityTextEls.forEach(gridHumidityTextEl => {
-      gridHumidityTextEl.innerHTML = `${Math.round(humidity)}%<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">RH</span>`;
+      gridHumidityTextEl.innerHTML = `${trendHtml}${Math.round(humidity)}%<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">RH</span>`;
       if (finalColor) {
         gridHumidityTextEl.style.color = finalColor;
       }
