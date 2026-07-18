@@ -4334,7 +4334,7 @@ Perfect weather to head outdoors and enjoy the day!`
     }
 
     // --- 4-cell grid layout & labels (Row 1: 0-3) ---
-    const indices4_1 = [0, 1, 2, 3];
+    const indices4_1 = [0, 2, 1, 3];
     const containerId4_1 = 'clock-grid-container-4-1';
     let container4_1 = document.getElementById(containerId4_1);
 
