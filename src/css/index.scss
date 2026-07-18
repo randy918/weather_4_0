@@ -1036,13 +1036,13 @@ main {
     .grid-sun-text {
         transform: translate(-50%, -50%) !important;
         line-height: 1.1 !important;
-        font-size: calc(var(--item-current-size) * 0.30) !important; /* Slightly smaller to fit time formatting comfortably */
+        font-size: calc(var(--item-current-size) * 0.27) !important; /* Scaled to 90% of original 0.30 to keep time beautifully centered */
     }
 
     .grid-moon-text {
         transform: translate(-50%, -50%) !important;
         line-height: 1.1 !important;
-        font-size: calc(var(--item-current-size) * 0.30) !important; /* Slightly smaller to fit time formatting comfortably */
+        font-size: calc(var(--item-current-size) * 0.27) !important; /* Scaled to 90% of original 0.30 to keep time beautifully centered */
     }
 
     .clock-hand-wind-direction {

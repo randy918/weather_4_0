@@ -222,6 +222,13 @@ import weatherConditions from '../data/weather-conditions.json';
   // EDITABLE: Side-scrolling speed for weather images (in seconds)
   const WEATHER_IMAGE_SCROLL_SPEED_S = 240;
 
+  // EDITABLE: Sun and Moon dial inner label vertical offsets (in vw)
+  // Positive values move the label DOWN, negative values move it UP
+  const SUNMOON_TOP_LABEL_Y_OFFSET = '.65vw';
+  const SUNMOON_BOTTOM_LABEL_Y_OFFSET = '-1.65vw';
+  document.documentElement.style.setProperty('--sunmoon-top-label-y', SUNMOON_TOP_LABEL_Y_OFFSET);
+  document.documentElement.style.setProperty('--sunmoon-bottom-label-y', SUNMOON_BOTTOM_LABEL_Y_OFFSET);
+
   // EDITABLE: Adjust the vertical position of the "fragile" top-row elements as a set.
   // This moves the Moon Phase, Wind Arrow, and Weather Description Image together.
   // Use negative values to move UP, positive values to move DOWN (e.g., '-1.5vw' or '2vw').
@@ -1962,10 +1969,16 @@ import weatherConditions from '../data/weather-conditions.json';
     const now = Math.floor(Date.now() / 1000);
     const sunrise = data.daily?.[0]?.sunrise;
     const sunset = data.daily?.[0]?.sunset;
+    const weatherId = data.current?.weather?.[0]?.id;
+    const weatherDesc = data.current?.weather?.[0]?.description || '';
     
     const isDaytime = (typeof sunrise === 'number' && typeof sunset === 'number') 
       ? (now >= sunrise && now < sunset) 
       : true; // fallback to true if sunrise/sunset not available
+
+    const hasPrecipitation = (typeof weatherId === 'number' && weatherId >= 200 && weatherId < 700) ||
+                             (data.current?.rain && Object.keys(data.current.rain).length > 0) ||
+                             (data.current?.snow && Object.keys(data.current.snow).length > 0);
 
     if (
       typeof currentTemp === 'number' && 
@@ -1975,7 +1988,9 @@ import weatherConditions from '../data/weather-conditions.json';
       typeof humidity === 'number' && 
       humidity < GREAT_WEATHER_HUMIDITY_MAX &&
       typeof windSpeed === 'number' && 
-      windSpeed < GREAT_WEATHER_WIND_MAX
+      windSpeed < GREAT_WEATHER_WIND_MAX &&
+      weatherDesc.toLowerCase().trim() !== 'clear sky' &&
+      !hasPrecipitation
     ) {
       const displayTemp = Math.round(currentTemp);
       const displayHum = Math.round(humidity);
@@ -4800,7 +4815,7 @@ Perfect weather to head outdoors and enjoy the day!`
         gridSunProgressEl.style.strokeDashoffset = circumference; // hide progress
       });
       gridSunTextEls.forEach(gridSunTextEl => {
-        gridSunTextEl.innerHTML = `<span style="font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Sun</span><br>--<br><span style="font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Day</span>`;
+        gridSunTextEl.innerHTML = `<span style="display: inline-block; transform: translateY(var(--sunmoon-top-label-y, 0vw)); font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Sun</span><br>--<br><span style="display: inline-block; transform: translateY(var(--sunmoon-bottom-label-y, 0vw)); font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Day</span>`;
       });
       return;
     }
@@ -4879,7 +4894,7 @@ Perfect weather to head outdoors and enjoy the day!`
     const formattedTime = `${hours}:${minutesStr}<span style="font-size: 0.67em; font-family: 'medium', sans-serif;">${ampm}</span>`;
     
     gridSunTextEls.forEach(gridSunTextEl => {
-      gridSunTextEl.innerHTML = `<span style="font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Sun</span><br>${formattedTime}<br><span style="font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">${nextEventLabel}</span>`;
+      gridSunTextEl.innerHTML = `<span style="display: inline-block; transform: translateY(var(--sunmoon-top-label-y, 0vw)); font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Sun</span><br>${formattedTime}<br><span style="display: inline-block; transform: translateY(var(--sunmoon-bottom-label-y, 0vw)); font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">${nextEventLabel}</span>`;
       if (tempColor) {
         gridSunTextEl.style.color = tempColor;
       }
@@ -4905,7 +4920,7 @@ Perfect weather to head outdoors and enjoy the day!`
         gridMoonProgressEl.style.strokeDashoffset = circumference; // hide progress
       });
       gridMoonTextEls.forEach(gridMoonTextEl => {
-        gridMoonTextEl.innerHTML = `<span style="font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Moon</span><br>--<br><span style="font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Moon</span>`;
+        gridMoonTextEl.innerHTML = `<span style="display: inline-block; transform: translateY(var(--sunmoon-top-label-y, 0vw)); font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Moon</span><br>--<br><span style="display: inline-block; transform: translateY(var(--sunmoon-bottom-label-y, 0vw)); font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Moon</span>`;
       });
       return;
     }
@@ -5016,7 +5031,7 @@ Perfect weather to head outdoors and enjoy the day!`
     const formattedTime = `${hours}:${minutesStr}<span style="font-size: 0.67em; font-family: 'medium', sans-serif;">${ampm}</span>`;
     
     gridMoonTextEls.forEach(gridMoonTextEl => {
-      gridMoonTextEl.innerHTML = `<span style="font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Moon</span><br>${formattedTime}<br><span style="font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">${nextEventLabel}</span>`;
+      gridMoonTextEl.innerHTML = `<span style="display: inline-block; transform: translateY(var(--sunmoon-top-label-y, 0vw)); font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Moon</span><br>${formattedTime}<br><span style="display: inline-block; transform: translateY(var(--sunmoon-bottom-label-y, 0vw)); font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">${nextEventLabel}</span>`;
       if (tempColor) {
         gridMoonTextEl.style.color = tempColor;
       }
