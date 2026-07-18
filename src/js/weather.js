@@ -235,6 +235,11 @@ import weatherConditions from '../data/weather-conditions.json';
   const FRAGILE_ELEMENTS_Y_OFFSET = '2vw'; 
   document.documentElement.style.setProperty('--fragile-y-offset', FRAGILE_ELEMENTS_Y_OFFSET);
 
+  // EDITABLE: Adjust the horizontal position of the middle four lines of text as a set.
+  // Positive values move the text to the RIGHT, negative values move it to the LEFT (e.g., '.5vw' or '-.5vw').
+  const MIDDLE_TEXT_X_OFFSET = '.5vw';
+  document.documentElement.style.setProperty('--middle-text-x-offset', MIDDLE_TEXT_X_OFFSET);
+
   // EDITABLE: Scrolling Gradient Overlay configuration (Non-phone version: iPad, desktop)
   const GRADIENT_NON_PHONE = {
     top: '40.5vw',
@@ -2570,7 +2575,7 @@ Perfect weather to head outdoors and enjoy the day!`
     el.style.setProperty('--feels-like-val-y-offset', FEELS_LIKE_VAL_Y_OFFSET);
     el.style.setProperty('--feels-like-temp-size-default', activeTempSizeDefault);
     el.style.setProperty('--feels-like-temp-size-dual', activeTempSizeDual);
-    el.style.transform = `translateY(var(--feels-like-y-offset, 0vw))`;
+    el.style.transform = `translate(var(--middle-text-x-offset, 0vw), var(--feels-like-y-offset, 0vw))`;
     
     if (typeof feelsLike === 'number') {
       // --- EDITABLE: "feels like" text styles ---
@@ -2774,6 +2779,11 @@ Perfect weather to head outdoors and enjoy the day!`
       if (el && el.parentNode) {
         el.parentNode.insertBefore(dupEl, el.nextSibling);
       }
+    }
+
+    el.style.transform = 'translateX(var(--middle-text-x-offset, 0vw))';
+    if (dupEl) {
+      dupEl.style.transform = 'translateX(var(--middle-text-x-offset, 0vw))';
     }
     
     const description = data?.current?.weather?.[0]?.description;
@@ -7567,6 +7577,7 @@ Perfect weather to head outdoors and enjoy the day!`
     el.style.marginTop = CITY_MARGIN_TOP;
     el.style.marginBottom = CITY_MARGIN_BOTTOM;
     el.style.letterSpacing = CITY_LETTER_SPACING;
+    el.style.transform = 'translateX(var(--middle-text-x-offset, 0vw))';
 
     // Only fetch if coordinates have changed to save API calls
     if (currentCityLat === lat && currentCityLon === lon) return;
