@@ -1080,10 +1080,10 @@ import weatherConditions from '../data/weather-conditions.json';
     console.log(`Wind updated: Speed ${Math.round(windSpeed)} mph (${speedPercent.toFixed(1)}%), Gust ${Math.round(windGust)} mph (${gustPercent.toFixed(1)}%)`);
   }
 
-  // EDITABLE: Vertical position of the barometric trend arrow above the reading (e.g. "-2vw" or "0px")
-  const BAROMETRIC_TREND_TOP_POS = "-3.5vw";
-  // EDITABLE: Font size of the barometric trend arrow
-  const BAROMETRIC_TREND_FONT_SIZE = "2.4vw";
+  // EDITABLE: Vertical position of the barometric trend arrow above the reading (scaled to dial size)
+  const BAROMETRIC_TREND_TOP_POS = "calc(var(--item-current-size) * -0.28 + 0.25vw)";
+  // EDITABLE: Font size of the barometric trend arrow (scaled to dial size)
+  const BAROMETRIC_TREND_FONT_SIZE = "calc(var(--item-current-size) * 0.1875)";
 
   // Update the barometric pressure gauge
   function updateBarometricGauge(data) {
