@@ -1218,6 +1218,16 @@ main {
     flex-direction: row !important;
     align-items: center !important;
     justify-content: center !important;
+
+    .feels-like-val-container {
+        .odometer-digit {
+            margin-right: var(--feels-like-temp-letter-spacing, 0vw);
+        }
+        .odometer-static {
+            margin-left: var(--feels-like-temp-letter-spacing, 0vw);
+            margin-right: var(--feels-like-temp-letter-spacing, 0vw);
+        }
+    }
 }
 
 /* Odometer rolling number effect */

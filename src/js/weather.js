@@ -338,7 +338,7 @@ import weatherConditions from '../data/weather-conditions.json';
   // EDITABLE: Great Weather Advisory Criteria
   const GREAT_WEATHER_TEMP_MIN = 68;
   const GREAT_WEATHER_TEMP_MAX = 80;
-  const GREAT_WEATHER_HUMIDITY_MAX = 70;
+  const GREAT_WEATHER_HUMIDITY_MAX = 65;
   const GREAT_WEATHER_WIND_MAX = 20;
 
   // EDITABLE: Alert Banner Colors
@@ -617,7 +617,7 @@ import weatherConditions from '../data/weather-conditions.json';
     { max: 60,  color: 'hsl(120, 80%, 35%)' },   // 50s: green
     { max: 70,  color: 'hsl(80,  90%, 40%)' },   // 60s: yellow-green
     { max: 80,  color: 'hsl(45,  100%, 50%)' },  // 70s: yellow-gold
-    { max: 90,  color: 'hsl(30,  100%, 50%)' },  // 80s: orange
+    { max: 90,  color: 'hsl(30,  100%, 50%)' },  // 80s: onpmrange
     { max: 100, color: 'hsl(0,   90%, 55%)' },   // 90s: red
     { max: 110, color: 'hsl(0, 100%, 37%)' },   // 100s: red
     { max: Infinity, color: 'hsl(320, 90%, 45%)' } // 110+: red-purple
@@ -954,9 +954,7 @@ import weatherConditions from '../data/weather-conditions.json';
         const absDiff = Math.abs(diff);
         
         let iconClass = '';
-        if (absDiff < 1.0) {
-          iconClass = "fa-equals"; // Double flatline (stable)
-        } else if (absDiff < 3.0) {
+        if (absDiff < 3.0) {
           iconClass = "fa-minus"; // Flat line (slight change)
         } else if (diff >= 10.0) {
           iconClass = "fa-angles-up"; // Double up wedge
@@ -977,7 +975,8 @@ import weatherConditions from '../data/weather-conditions.json';
         const positionAttr = isStemAboveMiddle ? 'bottom' : 'top';
         
         if (iconClass) {
-          trendHtml = `<div style="position: absolute; ${positionAttr}: ${BAROMETRIC_TREND_TOP_POS}; width: 100%; text-align: center; font-size: ${BAROMETRIC_TREND_FONT_SIZE};"><i class="fa-solid ${iconClass}"></i></div>`;
+          const trendPositionValue = isStemAboveMiddle ? `calc(${BAROMETRIC_TREND_TOP_POS} - 0.5vw)` : BAROMETRIC_TREND_TOP_POS;
+          trendHtml = `<div style="position: absolute; ${positionAttr}: ${trendPositionValue}; width: 100%; text-align: center; font-size: ${BAROMETRIC_TREND_FONT_SIZE};"><i class="fa-solid ${iconClass}"></i></div>`;
         }
       }
     }
@@ -2567,6 +2566,14 @@ Perfect weather to head outdoors and enjoy the day!`
         }
       });
     }
+    
+    // Apply extra kerning if the number starts with 1 and is >= 100
+    const firstChild = container.children[0];
+    if (firstChild && newStr.startsWith('1') && parseInt(newStr) >= 100) {
+      firstChild.style.marginRight = 'var(--hundreds-one-margin-right, -0.25vw)';
+    } else if (firstChild) {
+      firstChild.style.marginRight = '';
+    }
   }
 
   // Create and update "Feels like" element
@@ -2628,12 +2635,16 @@ Perfect weather to head outdoors and enjoy the day!`
       // Default View (Single Temp)
       const FEELS_LIKE_LETTER_SPACING_DEFAULT = '-.225vw';
       const FEELS_LIKE_MARGIN_LEFT_DEFAULT = '.5vw';  // EDITABLE: Space BEFORE "feels like"
-      const FEELS_LIKE_MARGIN_RIGHT_DEFAULT = '1.25vw'; // EDITABLE: Space AFTER "feels like"
+      const FEELS_LIKE_MARGIN_RIGHT_DEFAULT = '0.8vw'; // EDITABLE: Space AFTER "feels like" (before number)
+      const FEELS_LIKE_TEMP_LETTER_SPACING_DEFAULT = '-0.08vw'; // EDITABLE: Kerning for feels-like temp value
+      const FEELS_LIKE_HUNDREDS_ONE_LETTER_SPACING_DEFAULT = '-0.25vw'; // EDITABLE: Additional kerning for the "first 1" in hundreds
       
       // F&C View (Dual Temp)
       const FEELS_LIKE_LETTER_SPACING_DUAL = '-.225vw';
       const FEELS_LIKE_MARGIN_LEFT_DUAL = '1vw';  // EDITABLE: Space BEFORE "feels like"
-      const FEELS_LIKE_MARGIN_RIGHT_DUAL = '1vw'; // EDITABLE: Space AFTER "feels like"
+      const FEELS_LIKE_MARGIN_RIGHT_DUAL = '0.8vw'; // EDITABLE: Space AFTER "feels like" (before number)
+      const FEELS_LIKE_TEMP_LETTER_SPACING_DUAL = '-0.08vw'; // EDITABLE: Kerning for feels-like temp value
+      const FEELS_LIKE_HUNDREDS_ONE_LETTER_SPACING_DUAL = '-0.25vw'; // EDITABLE: Additional kerning for the "first 1" in hundreds
 
       const dynamicColor = tempToColor(feelsLike) || 'inherit';
       
@@ -2662,11 +2673,7 @@ Perfect weather to head outdoors and enjoy the day!`
       let feelsLikeContainer = el.querySelector('.feels-like-val-container');
 
       if (!currentTempContainer || !labelEl || !feelsLikeContainer) {
-        el.innerHTML = `
-          <span class="feels-like-current-temp"></span>
-          <span class="feels-like-label"></span>
-          <span class="feels-like-val-container"></span>
-        `;
+        el.innerHTML = '<span class="feels-like-current-temp"></span><span class="feels-like-label"></span><span class="feels-like-val-container"></span>';
         currentTempContainer = el.querySelector('.feels-like-current-temp');
         labelEl = el.querySelector('.feels-like-label');
         feelsLikeContainer = el.querySelector('.feels-like-val-container');
@@ -2731,6 +2738,14 @@ Perfect weather to head outdoors and enjoy the day!`
       feelsLikeContainer.style.transform = `translateY(var(--feels-like-val-y-offset, 0vw))`;
       feelsLikeContainer.style.fontFamily = displayUnit === 'BOTH' ? "'boldcond', sans-serif" : "'bold', sans-serif";
       feelsLikeContainer.style.fontSize = displayUnit === 'BOTH' ? 'var(--feels-like-temp-size-dual, 6.25vw)' : 'var(--feels-like-temp-size-default, 6.25vw)';
+      
+      const activeSpacing = displayUnit === 'BOTH' ? FEELS_LIKE_TEMP_LETTER_SPACING_DUAL : FEELS_LIKE_TEMP_LETTER_SPACING_DEFAULT;
+      feelsLikeContainer.style.letterSpacing = activeSpacing;
+      el.style.setProperty('--feels-like-temp-letter-spacing', activeSpacing);
+
+      const activeHundredsOneSpacing = displayUnit === 'BOTH' ? FEELS_LIKE_HUNDREDS_ONE_LETTER_SPACING_DUAL : FEELS_LIKE_HUNDREDS_ONE_LETTER_SPACING_DEFAULT;
+      el.style.setProperty('--hundreds-one-margin-right', activeHundredsOneSpacing);
+
       feelsLikeContainer.style.color = dynamicColor;
       feelsLikeContainer.style.transition = 'color 0.5s ease';
       
@@ -4806,9 +4821,7 @@ Perfect weather to head outdoors and enjoy the day!`
         const absDiff = Math.abs(diff);
         
         let iconClass = '';
-        if (absDiff < 1.0) {
-          iconClass = "fa-equals"; // Double flatline (stable)
-        } else if (absDiff < 5.0) {
+        if (absDiff < 5.0) {
           iconClass = "fa-minus"; // Flat line (slight change)
         } else if (diff >= 15.0) {
           iconClass = "fa-angles-up"; // Double up wedge
