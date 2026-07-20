@@ -351,6 +351,7 @@ import weatherConditions from '../data/weather-conditions.json';
     "GREAT WEATHER ADVISORY": "rgba(46, 204, 113, 0.85)", // Pleasant green
     "DENSE FOG ADVISORY": "rgba(128, 128, 128, 0.85)", // Gray
     "EXTREME HEAT WARNING": "hsl(0, 90%, 35%)", 
+    "EXTREME HEAT WATCH": "hsl(0, 90%, 25%)", 
     "FLOOD ADVISORY": "hsl(195, 90%, 45%)", // Bright blue-purple
     "FLOOD WATCH": "hsl(195, 90%, 65%)", // Bright blue-purple
     "HEAT ADVISORY": "rgba(250, 38, 38, 0.85)", // Standard red
@@ -369,6 +370,7 @@ import weatherConditions from '../data/weather-conditions.json';
     "GREAT WEATHER ADVISORY": "img/sun-wat.svg",
     "DENSE FOG ADVISORY": "img/fog-wat.svg",
     "EXTREME HEAT WARNING": "img/heat-wat.svg",
+    "EXTREME HEAT WATCH": "img/heat-wat.svg",
     "FLOOD ADVISORY": "img/flood-wat.svg",
     "FLOOD WATCH": "img/flood-wat.svg",
     "HEAT ADVISORY": "img/heat-wat.svg",
@@ -3869,7 +3871,7 @@ Perfect weather to head outdoors and enjoy the day!`
           if (i === 2 && data && data.current) {
              const windSpeed = data.current.wind_speed || 0;
              const windGust = data.current.wind_gust || windSpeed;
-             titleText = `Gust ${Math.round(windGust)} mph`;
+             titleText = `${Math.round(windGust)} mph Gusts`;
           }
           
           // If this is the "SUN" dial (index 5), show the OPPOSITE event of what's inside the dial
@@ -3975,7 +3977,7 @@ Perfect weather to head outdoors and enjoy the day!`
         if (windTitle && data && data.current) {
            const windSpeed = data.current.wind_speed || 0;
            const windGust = data.current.wind_gust || windSpeed;
-           windTitle.innerText = `Gust ${Math.round(windGust)} mph`;
+           windTitle.innerText = `${Math.round(windGust)} mph Gusts`;
         }
         
         // Also update the sun opposite event text live
@@ -4199,7 +4201,7 @@ Perfect weather to head outdoors and enjoy the day!`
         if (i === 2 && data && data.current) {
            const windSpeed = data.current.wind_speed || 0;
            const windGust = data.current.wind_gust || windSpeed;
-           titleText = `Gust ${Math.round(windGust)} mph`;
+           titleText = `${Math.round(windGust)} mph Gusts`;
         }
 
         if (i === 3 && data && data.current && typeof data.current.dew_point === 'number') {
@@ -4311,7 +4313,7 @@ Perfect weather to head outdoors and enjoy the day!`
       if (windTitle && data && data.current) {
          const windSpeed = data.current.wind_speed || 0;
          const windGust = data.current.wind_gust || windSpeed;
-         windTitle.innerText = `Gust ${Math.round(windGust)} mph`;
+         windTitle.innerText = `${Math.round(windGust)} mph Gusts`;
       }
 
       const humidityTitle = labelsContainer7.querySelector('.label-title-3');
@@ -4515,7 +4517,7 @@ Perfect weather to head outdoors and enjoy the day!`
         if (i === 2 && data && data.current) {
            const windSpeed = data.current.wind_speed || 0;
            const windGust = data.current.wind_gust || windSpeed;
-           titleText = `Gust ${Math.round(windGust)} mph`;
+           titleText = `${Math.round(windGust)} mph Gusts`;
         }
 
         item.innerHTML = `
@@ -4543,7 +4545,7 @@ Perfect weather to head outdoors and enjoy the day!`
       if (windTitle && data && data.current) {
          const windSpeed = data.current.wind_speed || 0;
          const windGust = data.current.wind_gust || windSpeed;
-         windTitle.innerText = `Gust ${Math.round(windGust)} mph`;
+         windTitle.innerText = `${Math.round(windGust)} mph Gusts`;
       }
     }
 
@@ -4691,7 +4693,6 @@ Perfect weather to head outdoors and enjoy the day!`
                     oppEventTime = data.daily[1]?.moonset || (moonset + 86400);
                     oppEventLabel = 'Moonset';
                  } else {
-                    gridMoonRiseTime = moonrise; // Fallback
                     oppEventTime = data.daily[1]?.moonrise || (moonrise + 86400);
                     oppEventLabel = 'Moonrise';
                  }
@@ -7287,9 +7288,12 @@ Perfect weather to head outdoors and enjoy the day!`
       
       if (displayUnit === 'BOTH') {
         const tempC = Math.round((tempF - 32) * 5 / 9);
-        bar.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; display: inline-flex !important; flex-direction: column; align-items: center; justify-content: center; gap: ${DUAL_HOURLY_ROW_GAP}; font-size: ${DUAL_HOURLY_FONT_SIZE} !important; line-height: ${DUAL_HOURLY_LINE_HEIGHT} !important; position: relative; top: ${DUAL_HOURLY_TOP_OFFSET}; left: ${DUAL_HOURLY_LEFT_OFFSET};"><span style="font-size: ${DUAL_HOURLY_FONT_SIZE} !important;">${tempF}</span><span style="font-size: ${DUAL_HOURLY_FONT_SIZE} !important;">${tempC}</span></span>`;
+        const scaleStyle = tempF >= 100 ? 'transform: scaleX(0.7) !important; transform-origin: center;' : '';
+        bar.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; display: inline-flex !important; flex-direction: column; align-items: center; justify-content: center; gap: ${DUAL_HOURLY_ROW_GAP}; font-size: ${DUAL_HOURLY_FONT_SIZE} !important; line-height: ${DUAL_HOURLY_LINE_HEIGHT} !important; position: relative; top: ${DUAL_HOURLY_TOP_OFFSET}; left: ${DUAL_HOURLY_LEFT_OFFSET}; ${scaleStyle}"><span style="font-size: ${DUAL_HOURLY_FONT_SIZE} !important;">${tempF}</span><span style="font-size: ${DUAL_HOURLY_FONT_SIZE} !important;">${tempC}</span></span>`;
       } else {
-        bar.innerHTML = `<span class="fc-mode-text" style="font-family: 'bold', sans-serif; font-size: ${HOURLY_TEMP_FONT_SIZE} !important;">${tempDisplay}</span>`;
+        bar.style.paddingLeft = '0';
+        const scaleStyle = tempF >= 100 ? 'transform: scaleX(0.7) !important; transform-origin: center; display: block !important; width: 100% !important; text-align: center !important; position: relative !important; left: -0.3vw !important;' : 'display: block !important; width: 100% !important; text-align: center !important;';
+        bar.innerHTML = `<span class="fc-mode-text" style="font-family: 'bold', sans-serif; font-size: ${HOURLY_TEMP_FONT_SIZE} !important; ${scaleStyle}">${tempDisplay}</span>`;
       }
       
       barsContainer.appendChild(bar);
