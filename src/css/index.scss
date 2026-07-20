@@ -183,6 +183,20 @@ $loader-logo-offset-y: 25vw;
             box-shadow: 0 0 0.3vw rgba(0,0,0,0.3);
         }
 
+        // Second Hand
+        .clock-second-hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            width: 0.25vw; // Half thickness of hour/minute hand, matching wind pointer scale
+            height: 46%; // Length matching wind pointer
+            background-color: rgba(255, 255, 255, 0.2); // Subtle track color
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(var(--second-rotation, 0deg));
+            border-radius: 0.2vw;
+            z-index: 1;
+        }
+
         // Center Pivot Dot
         .clock-center-dot {
             position: absolute;
@@ -977,6 +991,20 @@ main {
             transform-origin: bottom center;
             transform: translateX(-50%) rotate(var(--minute-rotation, 0deg));
             border-radius: calc(var(--item-current-size) * 0.04);
+        }
+
+        // Second Hand
+        .clock-second-hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            width: calc(var(--item-current-size) * 0.02); // Thin stem matching wind direction pointer
+            height: 46%; // Length matching wind direction pointer
+            background-color: var(--clock-grid-track-color, rgba(255, 255, 255, 0.2)); // Subtle track color
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(var(--second-rotation, 0deg));
+            border-radius: calc(var(--item-current-size) * 0.02);
+            z-index: 1;
         }
 
         // Center Pivot Dot

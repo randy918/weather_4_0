@@ -619,10 +619,10 @@ import weatherConditions from '../data/weather-conditions.json';
     { max: 60,  color: 'hsl(120, 80%, 35%)' },   // 50s: green
     { max: 70,  color: 'hsl(80,  90%, 40%)' },   // 60s: yellow-green
     { max: 80,  color: 'hsl(45,  100%, 50%)' },  // 70s: yellow-gold
-    { max: 90,  color: 'hsl(30,  100%, 50%)' },  // 80s: onpmrange
+    { max: 90,  color: 'hsl(30,  100%, 50%)' },  // 80s: orange
     { max: 100, color: 'hsl(0,   90%, 55%)' },   // 90s: red
     { max: 110, color: 'hsl(0, 100%, 37%)' },   // 100s: red
-    { max: Infinity, color: 'hsl(320, 90%, 45%)' } // 110+: red-purple
+    { max: Infinity, color: 'hsl(0, 100%, 27%)' } // 110+: red-purple
   ];
 
   function tempToColor(temp) {
@@ -3823,6 +3823,7 @@ Perfect weather to head outdoors and enjoy the day!`
               <div class="clock-face">
                 <div class="clock-hour-hand"></div>
                 <div class="clock-minute-hand"></div>
+                <div class="clock-second-hand"></div>
                 <div class="clock-center-dot"></div>
               </div>
             `;
@@ -4155,6 +4156,7 @@ Perfect weather to head outdoors and enjoy the day!`
               <div class="clock-face">
                 <div class="clock-hour-hand"></div>
                 <div class="clock-minute-hand"></div>
+                <div class="clock-second-hand"></div>
                 <div class="clock-center-dot"></div>
               </div>
             `;
@@ -4471,6 +4473,7 @@ Perfect weather to head outdoors and enjoy the day!`
               <div class="clock-face">
                 <div class="clock-hour-hand"></div>
                 <div class="clock-minute-hand"></div>
+                <div class="clock-second-hand"></div>
                 <div class="clock-center-dot"></div>
               </div>
             `;
@@ -7288,11 +7291,13 @@ Perfect weather to head outdoors and enjoy the day!`
       
       if (displayUnit === 'BOTH') {
         const tempC = Math.round((tempF - 32) * 5 / 9);
-        const scaleStyle = tempF >= 100 ? 'transform: scaleX(0.7) !important; transform-origin: center;' : '';
+        const colorStyle = tempF >= 100 ? 'color: hsl(30, 100%, 50%) !important;' : '';
+        const scaleStyle = tempF >= 100 ? `transform: scaleX(0.7) !important; transform-origin: center; ${colorStyle}` : '';
         bar.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; display: inline-flex !important; flex-direction: column; align-items: center; justify-content: center; gap: ${DUAL_HOURLY_ROW_GAP}; font-size: ${DUAL_HOURLY_FONT_SIZE} !important; line-height: ${DUAL_HOURLY_LINE_HEIGHT} !important; position: relative; top: ${DUAL_HOURLY_TOP_OFFSET}; left: ${DUAL_HOURLY_LEFT_OFFSET}; ${scaleStyle}"><span style="font-size: ${DUAL_HOURLY_FONT_SIZE} !important;">${tempF}</span><span style="font-size: ${DUAL_HOURLY_FONT_SIZE} !important;">${tempC}</span></span>`;
       } else {
         bar.style.paddingLeft = '0';
-        const scaleStyle = tempF >= 100 ? 'transform: scaleX(0.7) !important; transform-origin: center; display: block !important; width: 100% !important; text-align: center !important; position: relative !important; left: -0.3vw !important;' : 'display: block !important; width: 100% !important; text-align: center !important;';
+        const colorStyle = tempF >= 100 ? 'color: hsl(30, 100%, 50%) !important;' : '';
+        const scaleStyle = tempF >= 100 ? `transform: scaleX(0.7) !important; transform-origin: center; display: block !important; width: 100% !important; text-align: center !important; position: relative !important; left: -0.3vw !important; ${colorStyle}` : 'display: block !important; width: 100% !important; text-align: center !important;';
         bar.innerHTML = `<span class="fc-mode-text" style="font-family: 'bold', sans-serif; font-size: ${HOURLY_TEMP_FONT_SIZE} !important; ${scaleStyle}">${tempDisplay}</span>`;
       }
       
@@ -7430,9 +7435,11 @@ Perfect weather to head outdoors and enjoy the day!`
       
       if (displayUnit === 'BOTH') {
         const hiTempC = Math.round((hiTempF - 32) * 5 / 9);
-        item.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; top: ${DUAL_BAR_TOP_OFFSET};">${hiTempF}${formatSlash()}${hiTempC}</span>`;
+        const colorStyle = hiTempF >= 100 ? 'color: hsl(30, 100%, 50%) !important;' : '';
+        item.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${hiTempF}${formatSlash()}${hiTempC}</span>`;
       } else {
-        item.innerHTML = `${hiTempDisplay}°`;
+        const colorStyle = hiTempF >= 100 ? ' style="color: hsl(30, 100%, 50%) !important;"' : '';
+        item.innerHTML = `<span${colorStyle}>${hiTempDisplay}°</span>`;
       }
       item.style.backgroundColor = tempToColor(hiTempF) || '';
       item.style.opacity = '1';
@@ -7443,9 +7450,11 @@ Perfect weather to head outdoors and enjoy the day!`
         
         if (displayUnit === 'BOTH') {
           const loTempC = Math.round((loTempF - 32) * 5 / 9);
-          loItems[index].innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; top: ${DUAL_BAR_TOP_OFFSET};">${loTempF}${formatSlash()}${loTempC}</span>`;
+          const colorStyle = loTempF >= 100 ? 'color: hsl(30, 100%, 50%) !important;' : '';
+          loItems[index].innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${loTempF}${formatSlash()}${loTempC}</span>`;
         } else {
-          loItems[index].innerHTML = `${loTempDisplay}°`;
+          const colorStyle = loTempF >= 100 ? ' style="color: hsl(30, 100%, 50%) !important;"' : '';
+          loItems[index].innerHTML = `<span${colorStyle}>${loTempDisplay}°</span>`;
         }
         loItems[index].style.backgroundColor = tempToColor(loTempF) || '';
         loItems[index].style.opacity = '1';
@@ -8552,12 +8561,16 @@ Perfect weather to head outdoors and enjoy the day!`
     const hours = now.getHours() % 12;
     const minutes = now.getMinutes();
     const seconds = now.getSeconds();
+    const milliseconds = now.getMilliseconds();
     
     // Hour hand: 360° / 12 hours = 30° per hour, plus gradual movement from minutes
     const hourRotation = (hours * 30) + (minutes * 0.5);
     
     // Minute hand: 360° / 60 minutes = 6° per minute, plus gradual movement from seconds
     const minuteRotation = (minutes * 6) + (seconds * 0.1);
+    
+    // Second hand: 360° / 60 seconds = 6° per second, plus gradual movement from milliseconds for a smooth sweep
+    const secondRotation = (seconds * 6) + (milliseconds * 0.006);
     
     // Dynamically set clock hands to the current daily temperature color
     let currentColor = null;
@@ -8568,14 +8581,20 @@ Perfect weather to head outdoors and enjoy the day!`
     if (container) {
       container.style.setProperty('--hour-rotation', `${hourRotation}deg`);
       container.style.setProperty('--minute-rotation', `${minuteRotation}deg`);
+      container.style.setProperty('--second-rotation', `${secondRotation}deg`);
       if (currentColor) {
         container.style.setProperty('--clock-hands-color', currentColor);
+      }
+      const mainSecondHand = container.querySelector('.clock-second-hand');
+      if (mainSecondHand) {
+        mainSecondHand.style.transform = `translateX(-50%) rotate(${secondRotation}deg)`;
       }
     }
 
     // Direct JS update of Time dial hands and dot to ensure they rotate and color match
     const hourHands = document.querySelectorAll('.clockGridItem-0 .clock-hour-hand');
     const minuteHands = document.querySelectorAll('.clockGridItem-0 .clock-minute-hand');
+    const secondHands = document.querySelectorAll('.clockGridItem-0 .clock-second-hand');
     const centerDots = document.querySelectorAll('.clockGridItem-0 .clock-center-dot');
 
     hourHands.forEach(hand => {
@@ -8592,6 +8611,10 @@ Perfect weather to head outdoors and enjoy the day!`
       }
     });
 
+    secondHands.forEach(hand => {
+      hand.style.transform = `translateX(-50%) rotate(${secondRotation}deg)`;
+    });
+
     centerDots.forEach(dot => {
       if (currentColor) {
         dot.style.backgroundColor = currentColor;
@@ -8601,6 +8624,7 @@ Perfect weather to head outdoors and enjoy the day!`
     gridItem0s.forEach(gridItem0 => {
       gridItem0.style.setProperty('--hour-rotation', `${hourRotation}deg`);
       gridItem0.style.setProperty('--minute-rotation', `${minuteRotation}deg`);
+      gridItem0.style.setProperty('--second-rotation', `${secondRotation}deg`);
       if (currentColor) {
         gridItem0.style.setProperty('--clock-hands-color', currentColor);
       }
