@@ -622,7 +622,7 @@ import weatherConditions from '../data/weather-conditions.json';
     { max: 90,  color: 'hsl(30,  100%, 50%)' },  // 80s: orange
     { max: 100, color: 'hsl(0,   90%, 55%)' },   // 90s: red
     { max: 110, color: 'hsl(0, 100%, 37%)' },   // 100s: red
-    { max: Infinity, color: 'hsl(0, 100%, 27%)' } // 110+: red-purple
+    { max: Infinity, color: 'hsl(0, 100%, 22%)' } // 110+: red-purple
   ];
 
   function tempToColor(temp) {
@@ -6414,7 +6414,7 @@ Perfect weather to head outdoors and enjoy the day!`
       elLeft.style.alignItems = 'center';
       elLeft.style.gap = '0';
       elLeft.style.color = getCurrentTextColor();
-      elLeft.style.fontSize = 'var(--left-time-size, 4.81vw)'; // Made 20% bigger (from 3.64vw)
+      elLeft.style.fontSize = 'var(--left-time-size, 5.59vw)'; // Made 4% smaller (from 5.82vw)
       elLeft.style.zIndex = '10';
       elLeft.style.textShadow = 'none';
       
@@ -6456,8 +6456,8 @@ Perfect weather to head outdoors and enjoy the day!`
 
   function updateSimpleMonthContent() {
     try {
-      const months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
-      const days = ['sun','mon','tue','wed','thu','fri','sat'];
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
       let month = '';
       let day = 1;
       let dayOfWeek = '';
@@ -6473,7 +6473,7 @@ Perfect weather to head outdoors and enjoy the day!`
         dayOfWeek = days[d.getDay()];
       }
       
-      const newStr = `${month}${day}${dayOfWeek}`;
+      const newStr = `${month} ${day} ${dayOfWeek}`;
       const color = getCurrentTextColor();
       
       const el = document.getElementById('simple-month');
@@ -6485,7 +6485,7 @@ Perfect weather to head outdoors and enjoy the day!`
       lastSimpleMonthStr = newStr;
       
       if (el) {
-        el.innerHTML = `<span style="font-family: 'light', sans-serif; font-weight: normal; color: inherit; letter-spacing: -0.06em;">${month}</span><span style="font-family: 'bold', sans-serif; font-weight: normal; color: inherit;">${day}</span><span style="font-family: 'light', sans-serif; font-weight: normal; color: inherit; letter-spacing: -0.06em;">${dayOfWeek}</span>`;
+        el.innerHTML = `<span style="font-family: 'light', sans-serif; font-weight: normal; color: inherit; letter-spacing: -0.06em; margin-right: 0.18em;">${month}</span><span style="font-family: 'bold', sans-serif; font-weight: normal; color: inherit; margin-right: 0.18em;">${day}</span><span style="font-family: 'light', sans-serif; font-weight: normal; color: inherit; letter-spacing: -0.06em;">${dayOfWeek}</span>`;
       }
       // Left circle date update removed as it now displays the current digital time with seconds instead.
     } catch (e) { /* noop */ }
@@ -8683,10 +8683,10 @@ Perfect weather to head outdoors and enjoy the day!`
     
     elLeft.innerHTML = `
       <div style="display: flex; align-items: baseline; justify-content: center; gap: 0; line-height: 1;">
-        <span style="font-family: 'bold', sans-serif; font-size: var(--left-time-size, 4.81vw); letter-spacing: -0.02em;">${hours}:${minutesStr}</span>
-        <span style="font-family: 'light', sans-serif; font-size: var(--left-time-size, 4.81vw); letter-spacing: -0.02em;">:</span>
-        <span style="font-family: 'mono', sans-serif; font-size: var(--left-seconds-size, 4.70vw); letter-spacing: -0.06em;">${secondsStr}</span>
-        <span style="font-family: 'medium', sans-serif; font-size: var(--left-ampm-size, 3.22vw); margin-left: -0.05vw; letter-spacing: -0.05em;">${ampm}</span>
+        <span style="font-family: 'bold', sans-serif; font-size: var(--left-time-size, 5.59vw); letter-spacing: -0.02em;">${hours}:${minutesStr}</span>
+        <span style="font-family: 'light', sans-serif; font-size: var(--left-time-size, 5.59vw); letter-spacing: -0.02em;">:</span>
+        <span style="font-family: 'mono', sans-serif; font-size: var(--left-seconds-size, 5.46vw); letter-spacing: -0.06em;">${secondsStr}</span>
+        <span style="font-family: 'medium', sans-serif; font-size: var(--left-ampm-size, 3.73vw); margin-left: -0.05vw; letter-spacing: -0.05em;">${ampm}</span>
       </div>
     `;
   }
