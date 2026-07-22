@@ -6485,7 +6485,7 @@ Perfect weather to head outdoors and enjoy the day!`
       lastSimpleMonthStr = newStr;
       
       if (el) {
-        el.innerHTML = `<span style="font-family: 'light', sans-serif; font-weight: normal; color: inherit; letter-spacing: -0.06em; margin-right: 0.18em;">${month}</span><span style="font-family: 'bold', sans-serif; font-weight: normal; color: inherit; margin-right: 0.18em;">${day}</span><span style="font-family: 'light', sans-serif; font-weight: normal; color: inherit; letter-spacing: -0.06em;">${dayOfWeek}</span>`;
+        el.innerHTML = `<span style="font-family: 'light', sans-serif; font-weight: normal; color: inherit; letter-spacing: -0.06em; margin-right: 0.18em;">${month}</span><span style="font-family: 'bold', sans-serif; font-weight: normal; color: inherit; letter-spacing: -0.06em; margin-right: 0.18em;">${day}</span><span style="font-family: 'light', sans-serif; font-weight: normal; color: inherit; letter-spacing: -0.06em;">${dayOfWeek}</span>`;
       }
       // Left circle date update removed as it now displays the current digital time with seconds instead.
     } catch (e) { /* noop */ }
