@@ -942,6 +942,60 @@ import weatherConditions from '../data/weather-conditions.json';
     updateRainBanner(data);
   }
 
+  // Helper function to maintain a rolling timestamped history in localStorage
+  // and retrieve the recorded observation from up to 30 minutes ago (~30 min lookback)
+  function getHistoricalComparisonValue(key, currentValue, maxAgeMs = 30 * 60 * 1000) {
+    if (typeof currentValue !== 'number' || isNaN(currentValue)) return currentValue;
+    const now = Date.now();
+    let history = [];
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        history = JSON.parse(raw);
+        if (!Array.isArray(history)) history = [];
+      }
+    } catch (e) {
+      history = [];
+    }
+
+    // Keep samples up to maxAgeMs (30 mins) + 5 min buffer
+    const maxStorageAgeMs = maxAgeMs + 5 * 60 * 1000;
+    history = history.filter(item => item && typeof item.ts === 'number' && typeof item.val === 'number' && (now - item.ts) <= maxStorageAgeMs);
+
+    // Record current sample if empty or if last sample is at least 30s old
+    const lastSample = history[history.length - 1];
+    if (!lastSample || (now - lastSample.ts) >= 30 * 1000) {
+      history.push({ ts: now, val: currentValue });
+      try {
+        localStorage.setItem(key, JSON.stringify(history));
+      } catch (e) { /* noop */ }
+    }
+
+    // If we only have 1 sample in history, return current value (diff = 0)
+    if (history.length <= 1) {
+      return currentValue;
+    }
+
+    // Find the sample closest to targetTs (now - 30 minutes).
+    // Exclude samples recorded less than 1 minute ago to ensure true lookback.
+    const targetTs = now - maxAgeMs;
+    let bestSample = null;
+    let minDiff = Infinity;
+
+    for (const sample of history) {
+      const age = now - sample.ts;
+      if (age < 60 * 1000 && history.length > 1) continue;
+
+      const diff = Math.abs(sample.ts - targetTs);
+      if (diff < minDiff) {
+        minDiff = diff;
+        bestSample = sample;
+      }
+    }
+
+    return (bestSample && typeof bestSample.val === 'number') ? bestSample.val : currentValue;
+  }
+
   // Update the wind gauge with wind speed and gust data
   function updateWindGauge(data) {
     const windSpeed = data?.current?.wind_speed || 0;
@@ -949,21 +1003,14 @@ import weatherConditions from '../data/weather-conditions.json';
     const currentTemp = data?.current?.temp || null;
     
     let trendHtml = '';
-    const lastWindKey = 'weather_last_wind_speed_raw';
-    const lastWindValStr = localStorage.getItem(lastWindKey);
-    const prevWindVal = (lastWindValStr !== null) ? parseFloat(lastWindValStr) : (data?.hourly?.[0]?.wind_speed ?? windSpeed);
+    const prevWindVal = getHistoricalComparisonValue('weather_history_wind_speed', windSpeed);
     const windDiff = windSpeed - prevWindVal;
     const absWindDiff = Math.abs(windDiff);
     
     let iconClass = '';
-    if (absWindDiff >= 4.0) {
-      iconClass = windDiff > 0 ? "fa-angles-up" : "fa-angles-down";
-    } else if (absWindDiff >= 0.5) {
+    if (absWindDiff >= 0.5) {
       iconClass = windDiff > 0 ? "fa-angle-up" : "fa-angle-down";
     }
-    
-    // Store current wind speed for next comparison
-    localStorage.setItem(lastWindKey, windSpeed);
 
     // Determine whether stem is pointing upwards (above the middle) or downwards (below the middle)
     const windDeg = parseFloat(data?.current?.wind_deg);
@@ -1124,21 +1171,16 @@ import weatherConditions from '../data/weather-conditions.json';
     // OpenWeather provides pressure in hPa. Typical sea level range is 950 to 1050.
     const pressure = data?.current?.pressure || 1013; 
     
-    // Determine trend arrow comparing current to previous recorded observation
+    // Determine trend arrow comparing current to ~30 min historical observation
     let trendHtml = '';
-    const lastPressureKey = 'weather_last_pressure_raw';
-    const lastPressureValStr = localStorage.getItem(lastPressureKey);
-    const prevPressureVal = (lastPressureValStr !== null) ? parseFloat(lastPressureValStr) : (data?.hourly?.[0]?.pressure ?? pressure);
+    const prevPressureVal = getHistoricalComparisonValue('weather_history_pressure', pressure);
     const pressureDiff = pressure - prevPressureVal;
     const absPressureDiff = Math.abs(pressureDiff);
 
     let iconClass = '';
     let transformStyle = '';
 
-    if (absPressureDiff >= 1.0) {
-      iconClass = pressureDiff > 0 ? "fa-angles-up" : "fa-angles-down";
-      transformStyle = "";
-    } else if (absPressureDiff >= 0.2) {
+    if (absPressureDiff >= 0.2) {
       iconClass = pressureDiff > 0 ? "fa-angle-up" : "fa-angle-down";
       transformStyle = "";
     }
@@ -1146,8 +1188,6 @@ import weatherConditions from '../data/weather-conditions.json';
     if (iconClass) {
       trendHtml = `<div style="position: absolute; top: ${BAROMETRIC_TREND_TOP_POS}; width: 100%; text-align: center; font-size: ${BAROMETRIC_TREND_FONT_SIZE};"><i class="fa-solid ${iconClass}" style="${transformStyle}"></i></div>`;
     }
-
-    localStorage.setItem(lastPressureKey, pressure);
 
     pressureEls.forEach(el => {
       // Scale dynamic inner elements if it's placed inside the smaller grid circle!
@@ -4808,24 +4848,18 @@ Perfect weather to head outdoors and enjoy the day!`
     const finalColor = tempColor || activeColor;
     
     let trendHtml = '';
-    const lastHumidityKey = 'weather_last_humidity_raw';
-    const lastHumidityValStr = localStorage.getItem(lastHumidityKey);
-    const prevHumidityVal = (lastHumidityValStr !== null) ? parseFloat(lastHumidityValStr) : (data?.hourly?.[0]?.humidity ?? humidity);
+    const prevHumidityVal = getHistoricalComparisonValue('weather_history_humidity', humidity);
     const humidityDiff = humidity - prevHumidityVal;
     const absHumidityDiff = Math.abs(humidityDiff);
     
     let iconClass = '';
-    if (absHumidityDiff >= 5.0) {
-      iconClass = humidityDiff > 0 ? "fa-angles-up" : "fa-angles-down";
-    } else if (absHumidityDiff >= 1.0) {
+    if (absHumidityDiff >= 0.5) {
       iconClass = humidityDiff > 0 ? "fa-angle-up" : "fa-angle-down";
     }
     
     if (iconClass) {
       trendHtml = `<div style="position: absolute; top: ${BAROMETRIC_TREND_TOP_POS}; width: 100%; text-align: center; font-size: ${BAROMETRIC_TREND_FONT_SIZE};"><i class="fa-solid ${iconClass}"></i></div>`;
     }
-
-    localStorage.setItem(lastHumidityKey, humidity);
     
     const gridHumidityProgressEls = document.querySelectorAll('.clockGridItem-3 .countdown-progress');
     const gridHumidityTextEls = document.querySelectorAll('.clockGridItem-3 .grid-humidity-text');
@@ -5214,18 +5248,14 @@ Perfect weather to head outdoors and enjoy the day!`
       }
     }
     
-    // Determine trend arrow comparing current to previous recorded observation
+    // Determine trend arrow comparing current to ~30 min historical observation
     let trendIconHtml = '';
-    const lastWindKey = 'weather_last_wind_speed_raw';
-    const lastWindValStr = localStorage.getItem(lastWindKey);
-    const prevWindVal = (lastWindValStr !== null) ? parseFloat(lastWindValStr) : (data?.hourly?.[0]?.wind_speed ?? windSpeed);
+    const prevWindVal = getHistoricalComparisonValue('weather_history_wind_speed', windSpeed);
     const windDiff = windSpeed - prevWindVal;
     const absWindDiff = Math.abs(windDiff);
 
     let iconClass = '';
-    if (absWindDiff >= 4.0) {
-      iconClass = windDiff > 0 ? "fa-angles-up" : "fa-angles-down";
-    } else if (absWindDiff >= 0.5) {
+    if (absWindDiff >= 0.5) {
       iconClass = windDiff > 0 ? "fa-angle-up" : "fa-angle-down";
     }
 
@@ -5382,18 +5412,14 @@ Perfect weather to head outdoors and enjoy the day!`
       }
     }
     
-    // Determine trend arrow comparing current to previous recorded observation
+    // Determine trend arrow comparing current to ~30 min historical observation
     let trendIconHtml = '';
-    const lastHumidityKey = 'weather_last_humidity_raw';
-    const lastHumidityValStr = localStorage.getItem(lastHumidityKey);
-    const prevHumidityVal = (lastHumidityValStr !== null) ? parseFloat(lastHumidityValStr) : (data?.hourly?.[0]?.humidity ?? humidity);
+    const prevHumidityVal = getHistoricalComparisonValue('weather_history_humidity', humidity);
     const humidityDiff = humidity - prevHumidityVal;
     const absHumidityDiff = Math.abs(humidityDiff);
 
     let iconClass = '';
-    if (absHumidityDiff >= 5.0) {
-      iconClass = humidityDiff > 0 ? "fa-angles-up" : "fa-angles-down";
-    } else if (absHumidityDiff >= 1.0) {
+    if (absHumidityDiff >= 0.5) {
       iconClass = humidityDiff > 0 ? "fa-angle-up" : "fa-angle-down";
     }
 
@@ -5566,26 +5592,21 @@ Perfect weather to head outdoors and enjoy the day!`
       }
     }
     
-    // Determine trend arrow comparing current to previous recorded observation
+    // Determine trend arrow comparing current to ~30 min historical observation
     let trendIconHtml = '';
     if (dewpoint !== null) {
-      const lastDewpointKey = 'weather_last_dewpoint_raw';
-      const lastDewpointValStr = localStorage.getItem(lastDewpointKey);
-      const prevDewpointVal = (lastDewpointValStr !== null) ? parseFloat(lastDewpointValStr) : (data?.hourly?.[0]?.dew_point ?? dewpoint);
+      const prevDewpointVal = getHistoricalComparisonValue('weather_history_dewpoint', dewpoint);
       const dewpointDiff = dewpoint - prevDewpointVal;
       const absDewpointDiff = Math.abs(dewpointDiff);
 
       let iconClass = '';
-      if (absDewpointDiff >= 2.0) {
-        iconClass = dewpointDiff > 0 ? "fa-angles-up" : "fa-angles-down";
-      } else if (absDewpointDiff >= 0.2) {
+      if (absDewpointDiff >= 0.2) {
         iconClass = dewpointDiff > 0 ? "fa-angle-up" : "fa-angle-down";
       }
 
       if (iconClass) {
         trendIconHtml = ` <i class="fa-solid ${iconClass}" style="opacity: 0.8; font-size: 0.8em; vertical-align: middle;"></i>`;
       }
-      localStorage.setItem(lastDewpointKey, dewpoint);
     }
     
     // Update Pill Text
