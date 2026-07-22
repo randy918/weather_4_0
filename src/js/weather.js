@@ -949,38 +949,33 @@ import weatherConditions from '../data/weather-conditions.json';
     const currentTemp = data?.current?.temp || null;
     
     let trendHtml = '';
-    if (data?.hourly && data.hourly.length >= 4) {
-      if (typeof data.hourly[3].wind_speed !== 'undefined') {
-        const futureWind = data.hourly[3].wind_speed;
-        const diff = futureWind - windSpeed;
-        const absDiff = Math.abs(diff);
-        
-        let iconClass = '';
-        if (absDiff < 3.0) {
-          iconClass = "fa-minus"; // Flat line (slight change)
-        } else if (diff >= 10.0) {
-          iconClass = "fa-angles-up"; // Double up wedge
-        } else if (diff <= -10.0) {
-          iconClass = "fa-angles-down"; // Double down wedge
-        } else if (diff > 0) {
-          iconClass = "fa-angle-up"; // Up wedge
-        } else {
-          iconClass = "fa-angle-down"; // Down wedge
-        }
-        
-        // Determine whether stem is pointing upwards (above the middle) or downwards (below the middle)
-        const windDeg = parseFloat(data?.current?.wind_deg);
-        const ARROW_OFFSET = -180;
-        const displayDeg = !isNaN(windDeg) ? (windDeg + ARROW_OFFSET) : 0;
-        const normalizedDeg = ((displayDeg % 360) + 360) % 360;
-        const isStemAboveMiddle = (normalizedDeg <= 90 || normalizedDeg >= 270);
-        const positionAttr = isStemAboveMiddle ? 'bottom' : 'top';
-        
-        if (iconClass) {
-          const trendPositionValue = isStemAboveMiddle ? `calc(${BAROMETRIC_TREND_TOP_POS} - 0.5vw)` : BAROMETRIC_TREND_TOP_POS;
-          trendHtml = `<div style="position: absolute; ${positionAttr}: ${trendPositionValue}; width: 100%; text-align: center; font-size: ${BAROMETRIC_TREND_FONT_SIZE};"><i class="fa-solid ${iconClass}"></i></div>`;
-        }
-      }
+    const lastWindKey = 'weather_last_wind_speed_raw';
+    const lastWindValStr = localStorage.getItem(lastWindKey);
+    const prevWindVal = (lastWindValStr !== null) ? parseFloat(lastWindValStr) : (data?.hourly?.[0]?.wind_speed ?? windSpeed);
+    const windDiff = windSpeed - prevWindVal;
+    const absWindDiff = Math.abs(windDiff);
+    
+    let iconClass = '';
+    if (absWindDiff >= 4.0) {
+      iconClass = windDiff > 0 ? "fa-angles-up" : "fa-angles-down";
+    } else if (absWindDiff >= 0.5) {
+      iconClass = windDiff > 0 ? "fa-angle-up" : "fa-angle-down";
+    }
+    
+    // Store current wind speed for next comparison
+    localStorage.setItem(lastWindKey, windSpeed);
+
+    // Determine whether stem is pointing upwards (above the middle) or downwards (below the middle)
+    const windDeg = parseFloat(data?.current?.wind_deg);
+    const ARROW_OFFSET = -180;
+    const displayDeg = !isNaN(windDeg) ? (windDeg + ARROW_OFFSET) : 0;
+    const normalizedDeg = ((displayDeg % 360) + 360) % 360;
+    const isStemAboveMiddle = (normalizedDeg <= 90 || normalizedDeg >= 270);
+    const positionAttr = isStemAboveMiddle ? 'bottom' : 'top';
+    
+    if (iconClass) {
+      const trendPositionValue = isStemAboveMiddle ? `calc(${BAROMETRIC_TREND_TOP_POS} - 0.5vw)` : BAROMETRIC_TREND_TOP_POS;
+      trendHtml = `<div style="position: absolute; ${positionAttr}: ${trendPositionValue}; width: 100%; text-align: center; font-size: ${BAROMETRIC_TREND_FONT_SIZE};"><i class="fa-solid ${iconClass}"></i></div>`;
     }
     
     // Calculate percentages (0-60 mph scale)
@@ -1129,35 +1124,30 @@ import weatherConditions from '../data/weather-conditions.json';
     // OpenWeather provides pressure in hPa. Typical sea level range is 950 to 1050.
     const pressure = data?.current?.pressure || 1013; 
     
-    // Determine trend arrow comparing current to +3 hour forecast
+    // Determine trend arrow comparing current to previous recorded observation
     let trendHtml = '';
-    
-    if (data?.hourly && data.hourly.length >= 4) {
-      if (typeof data.hourly[3].pressure !== 'undefined') {
-        const futurePressure = data.hourly[3].pressure;
-        const diff = futurePressure - pressure;
-        const absDiff = Math.abs(diff);
+    const lastPressureKey = 'weather_last_pressure_raw';
+    const lastPressureValStr = localStorage.getItem(lastPressureKey);
+    const prevPressureVal = (lastPressureValStr !== null) ? parseFloat(lastPressureValStr) : (data?.hourly?.[0]?.pressure ?? pressure);
+    const pressureDiff = pressure - prevPressureVal;
+    const absPressureDiff = Math.abs(pressureDiff);
 
-        let iconClass = '';
-        let transformStyle = '';
+    let iconClass = '';
+    let transformStyle = '';
 
-        if (absDiff >= 6.0) {
-          iconClass = diff > 0 ? "fa-angles-up" : "fa-angles-down";
-          transformStyle = "";
-        } else if (absDiff >= 1.0) {
-          iconClass = diff > 0 ? "fa-angle-up" : "fa-angle-down";
-          transformStyle = "";
-        } else {
-          // Steady pressure (less than 1.0hPa change)
-          iconClass = "fa-minus";
-          transformStyle = "";
-        }
-
-        if (iconClass) {
-          trendHtml = `<div style="position: absolute; top: ${BAROMETRIC_TREND_TOP_POS}; width: 100%; text-align: center; font-size: ${BAROMETRIC_TREND_FONT_SIZE};"><i class="fa-solid ${iconClass}" style="${transformStyle}"></i></div>`;
-        }
-      }
+    if (absPressureDiff >= 1.0) {
+      iconClass = pressureDiff > 0 ? "fa-angles-up" : "fa-angles-down";
+      transformStyle = "";
+    } else if (absPressureDiff >= 0.2) {
+      iconClass = pressureDiff > 0 ? "fa-angle-up" : "fa-angle-down";
+      transformStyle = "";
     }
+
+    if (iconClass) {
+      trendHtml = `<div style="position: absolute; top: ${BAROMETRIC_TREND_TOP_POS}; width: 100%; text-align: center; font-size: ${BAROMETRIC_TREND_FONT_SIZE};"><i class="fa-solid ${iconClass}" style="${transformStyle}"></i></div>`;
+    }
+
+    localStorage.setItem(lastPressureKey, pressure);
 
     pressureEls.forEach(el => {
       // Scale dynamic inner elements if it's placed inside the smaller grid circle!
@@ -4818,30 +4808,24 @@ Perfect weather to head outdoors and enjoy the day!`
     const finalColor = tempColor || activeColor;
     
     let trendHtml = '';
-    if (data?.hourly && data.hourly.length >= 4) {
-      if (typeof data.hourly[3].humidity !== 'undefined') {
-        const futureHumidity = data.hourly[3].humidity;
-        const diff = futureHumidity - humidity;
-        const absDiff = Math.abs(diff);
-        
-        let iconClass = '';
-        if (absDiff < 5.0) {
-          iconClass = "fa-minus"; // Flat line (slight change)
-        } else if (diff >= 15.0) {
-          iconClass = "fa-angles-up"; // Double up wedge
-        } else if (diff <= -15.0) {
-          iconClass = "fa-angles-down"; // Double down wedge
-        } else if (diff > 0) {
-          iconClass = "fa-angle-up"; // Up wedge
-        } else {
-          iconClass = "fa-angle-down"; // Down wedge
-        }
-        
-        if (iconClass) {
-          trendHtml = `<div style="position: absolute; top: ${BAROMETRIC_TREND_TOP_POS}; width: 100%; text-align: center; font-size: ${BAROMETRIC_TREND_FONT_SIZE};"><i class="fa-solid ${iconClass}"></i></div>`;
-        }
-      }
+    const lastHumidityKey = 'weather_last_humidity_raw';
+    const lastHumidityValStr = localStorage.getItem(lastHumidityKey);
+    const prevHumidityVal = (lastHumidityValStr !== null) ? parseFloat(lastHumidityValStr) : (data?.hourly?.[0]?.humidity ?? humidity);
+    const humidityDiff = humidity - prevHumidityVal;
+    const absHumidityDiff = Math.abs(humidityDiff);
+    
+    let iconClass = '';
+    if (absHumidityDiff >= 5.0) {
+      iconClass = humidityDiff > 0 ? "fa-angles-up" : "fa-angles-down";
+    } else if (absHumidityDiff >= 1.0) {
+      iconClass = humidityDiff > 0 ? "fa-angle-up" : "fa-angle-down";
     }
+    
+    if (iconClass) {
+      trendHtml = `<div style="position: absolute; top: ${BAROMETRIC_TREND_TOP_POS}; width: 100%; text-align: center; font-size: ${BAROMETRIC_TREND_FONT_SIZE};"><i class="fa-solid ${iconClass}"></i></div>`;
+    }
+
+    localStorage.setItem(lastHumidityKey, humidity);
     
     const gridHumidityProgressEls = document.querySelectorAll('.clockGridItem-3 .countdown-progress');
     const gridHumidityTextEls = document.querySelectorAll('.clockGridItem-3 .grid-humidity-text');
@@ -5230,25 +5214,22 @@ Perfect weather to head outdoors and enjoy the day!`
       }
     }
     
-    // Determine trend arrow comparing current to +3 hour forecast (same as barometer)
+    // Determine trend arrow comparing current to previous recorded observation
     let trendIconHtml = '';
-    if (data?.hourly && data.hourly.length >= 4 && typeof data.hourly[3].wind_speed !== 'undefined') {
-      const futureWindSpeed = data.hourly[3].wind_speed;
-      const diff = futureWindSpeed - windSpeed;
-      const absDiff = Math.abs(diff);
+    const lastWindKey = 'weather_last_wind_speed_raw';
+    const lastWindValStr = localStorage.getItem(lastWindKey);
+    const prevWindVal = (lastWindValStr !== null) ? parseFloat(lastWindValStr) : (data?.hourly?.[0]?.wind_speed ?? windSpeed);
+    const windDiff = windSpeed - prevWindVal;
+    const absWindDiff = Math.abs(windDiff);
 
-      let iconClass = '';
-      if (absDiff >= 10) {
-        // Appreciable increase/decrease (10+ mph)
-        iconClass = diff > 0 ? "fa-angles-up" : "fa-angles-down";
-      } else if (absDiff >= 3) {
-        // Normal increase/decrease (3 to 9 mph)
-        iconClass = diff > 0 ? "fa-angle-up" : "fa-angle-down";
-      } else {
-        // Steady (less than 3 mph change)
-        iconClass = "fa-minus";
-      }
+    let iconClass = '';
+    if (absWindDiff >= 4.0) {
+      iconClass = windDiff > 0 ? "fa-angles-up" : "fa-angles-down";
+    } else if (absWindDiff >= 0.5) {
+      iconClass = windDiff > 0 ? "fa-angle-up" : "fa-angle-down";
+    }
 
+    if (iconClass) {
       trendIconHtml = ` <i class="fa-solid ${iconClass}" style="opacity: 0.8; font-size: 0.8em; vertical-align: middle;"></i>`;
     }
     
@@ -5401,22 +5382,22 @@ Perfect weather to head outdoors and enjoy the day!`
       }
     }
     
-    // Determine trend arrow comparing current to +3 hour forecast
+    // Determine trend arrow comparing current to previous recorded observation
     let trendIconHtml = '';
-    if (data?.hourly && data.hourly.length >= 4 && typeof data.hourly[3].humidity !== 'undefined') {
-      const futureHumidity = data.hourly[3].humidity;
-      const diff = futureHumidity - humidity;
-      const absDiff = Math.abs(diff);
+    const lastHumidityKey = 'weather_last_humidity_raw';
+    const lastHumidityValStr = localStorage.getItem(lastHumidityKey);
+    const prevHumidityVal = (lastHumidityValStr !== null) ? parseFloat(lastHumidityValStr) : (data?.hourly?.[0]?.humidity ?? humidity);
+    const humidityDiff = humidity - prevHumidityVal;
+    const absHumidityDiff = Math.abs(humidityDiff);
 
-      let iconClass = '';
-      if (absDiff >= 15) {
-        iconClass = diff > 0 ? "fa-angles-up" : "fa-angles-down"; // Appreciable change (15%+)
-      } else if (absDiff >= 5) {
-        iconClass = diff > 0 ? "fa-angle-up" : "fa-angle-down"; // Normal change (5-14%)
-      } else {
-        iconClass = "fa-minus"; // Steady
-      }
+    let iconClass = '';
+    if (absHumidityDiff >= 5.0) {
+      iconClass = humidityDiff > 0 ? "fa-angles-up" : "fa-angles-down";
+    } else if (absHumidityDiff >= 1.0) {
+      iconClass = humidityDiff > 0 ? "fa-angle-up" : "fa-angle-down";
+    }
 
+    if (iconClass) {
       trendIconHtml = ` <i class="fa-solid ${iconClass}" style="opacity: 0.8; font-size: 0.8em; vertical-align: middle;"></i>`;
     }
     
@@ -5585,23 +5566,26 @@ Perfect weather to head outdoors and enjoy the day!`
       }
     }
     
-    // Determine trend arrow comparing current to +3 hour forecast
+    // Determine trend arrow comparing current to previous recorded observation
     let trendIconHtml = '';
-    if (dewpoint !== null && data?.hourly && data.hourly.length >= 4 && typeof data.hourly[3].dew_point !== 'undefined') {
-      const futureDewpoint = data.hourly[3].dew_point;
-      const diff = futureDewpoint - dewpoint;
-      const absDiff = Math.abs(diff);
+    if (dewpoint !== null) {
+      const lastDewpointKey = 'weather_last_dewpoint_raw';
+      const lastDewpointValStr = localStorage.getItem(lastDewpointKey);
+      const prevDewpointVal = (lastDewpointValStr !== null) ? parseFloat(lastDewpointValStr) : (data?.hourly?.[0]?.dew_point ?? dewpoint);
+      const dewpointDiff = dewpoint - prevDewpointVal;
+      const absDewpointDiff = Math.abs(dewpointDiff);
 
       let iconClass = '';
-      if (absDiff >= 6) {
-        iconClass = diff > 0 ? "fa-angles-up" : "fa-angles-down"; // Appreciable change (6+ degrees)
-      } else if (absDiff >= 2) {
-        iconClass = diff > 0 ? "fa-angle-up" : "fa-angle-down"; // Normal change (2-5 degrees)
-      } else {
-        iconClass = "fa-minus"; // Steady
+      if (absDewpointDiff >= 2.0) {
+        iconClass = dewpointDiff > 0 ? "fa-angles-up" : "fa-angles-down";
+      } else if (absDewpointDiff >= 0.2) {
+        iconClass = dewpointDiff > 0 ? "fa-angle-up" : "fa-angle-down";
       }
 
-      trendIconHtml = ` <i class="fa-solid ${iconClass}" style="opacity: 0.8; font-size: 0.8em; vertical-align: middle;"></i>`;
+      if (iconClass) {
+        trendIconHtml = ` <i class="fa-solid ${iconClass}" style="opacity: 0.8; font-size: 0.8em; vertical-align: middle;"></i>`;
+      }
+      localStorage.setItem(lastDewpointKey, dewpoint);
     }
     
     // Update Pill Text
