@@ -153,6 +153,59 @@ import weatherConditions from '../data/weather-conditions.json';
 
   let latestRainViewerData = null;
 
+  // Oklahoma state boundary coordinates (143 simplified points in [longitude, latitude] format)
+  const OKLAHOMA_COORDINATES = [
+    [-100.0004,34.7464],[-100.0004,36.4997],[-103.0024,36.5004],[-103.0022,37.0001],
+    [-102.0422,36.9931],[-100.1157,37.0022],[-94.6181,36.9981],[-94.6179,36.4994],
+    [-94.4312,35.3943],[-94.4859,33.6379],[-94.4907,33.6256],[-94.5284,33.616],
+    [-94.661,33.6603],[-94.7351,33.6913],[-94.7606,33.7271],[-94.8225,33.7327],
+    [-94.8693,33.7459],[-95.0395,33.8606],[-95.0673,33.9174],[-95.2194,33.9616],
+    [-95.2311,33.9604],[-95.2529,33.9336],[-95.2482,33.9123],[-95.2555,33.892],
+    [-95.2876,33.8736],[-95.4078,33.8663],[-95.5443,33.8801],[-95.5521,33.8884],
+    [-95.5491,33.9079],[-95.5594,33.9302],[-95.5997,33.9342],[-95.7572,33.8673],
+    [-95.7636,33.848],[-95.8247,33.8377],[-95.9499,33.8575],[-96.0975,33.8475],
+    [-96.1481,33.8378],[-96.1701,33.7692],[-96.1817,33.7585],[-96.2205,33.7474],
+    [-96.3047,33.7459],[-96.3696,33.7168],[-96.4234,33.7764],[-96.448,33.781],
+    [-96.5003,33.7726],[-96.6129,33.8339],[-96.6158,33.8534],[-96.6115,33.8753],
+    [-96.6154,33.8811],[-96.6586,33.9001],[-96.6723,33.8996],[-96.6786,33.8928],
+    [-96.6946,33.85],[-96.7124,33.8316],[-96.7616,33.8244],[-96.8561,33.8475],
+    [-96.883,33.868],[-96.8957,33.8964],[-96.8994,33.9337],[-96.9074,33.95],
+    [-96.9221,33.9596],[-96.9729,33.9357],[-96.9856,33.8865],[-97.048,33.8179],
+    [-97.0924,33.7332],[-97.1072,33.7211],[-97.1211,33.7172],[-97.1513,33.7226],
+    [-97.1722,33.7375],[-97.2048,33.7999],[-97.205,33.8189],[-97.1997,33.8273],
+    [-97.1716,33.8353],[-97.1666,33.8473],[-97.1808,33.8952],[-97.2109,33.9161],
+    [-97.2265,33.9146],[-97.3108,33.8725],[-97.3729,33.8195],[-97.4265,33.8194],
+    [-97.4531,33.8285],[-97.4629,33.8418],[-97.4515,33.8709],[-97.451,33.8914],
+    [-97.4581,33.9016],[-97.4865,33.917],[-97.501,33.9196],[-97.555,33.8973],
+    [-97.5874,33.9025],[-97.5971,33.9179],[-97.5896,33.9536],[-97.6091,33.9681],
+    [-97.6562,33.9895],[-97.6718,33.9914],[-97.6931,33.9837],[-97.7337,33.9364],
+    [-97.7853,33.8907],[-97.8343,33.8577],[-97.8774,33.8502],[-97.9667,33.8819],
+    [-97.9779,33.8899],[-97.9534,33.9364],[-97.9457,33.9898],[-97.9835,34.0016],
+    [-98.0411,33.9935],[-98.0853,34.0033],[-98.1691,34.1142],[-98.2939,34.133],
+    [-98.3254,34.151],[-98.364,34.1571],[-98.3832,34.1478],[-98.4005,34.1218],
+    [-98.4751,34.0643],[-98.5042,34.0724],[-98.5537,34.1337],[-98.5998,34.1606],
+    [-98.6523,34.161],[-98.7002,34.136],[-98.7656,34.1364],[-98.8584,34.1527],
+    [-98.9667,34.2012],[-99.0603,34.2048],[-99.1192,34.2017],[-99.1909,34.2153],
+    [-99.2116,34.2922],[-99.2114,34.3379],[-99.2613,34.4035],[-99.3567,34.4421],
+    [-99.3986,34.3758],[-99.4072,34.3726],[-99.4408,34.3741],[-99.4535,34.3888],
+    [-99.5154,34.4143],[-99.5744,34.4183],[-99.6168,34.3754],[-99.6639,34.3737],
+    [-99.695,34.3783],[-99.7672,34.4305],[-99.8848,34.547],[-99.9232,34.5746],
+    [-99.9546,34.5782],[-100.0004,34.5605],[-100.0004,34.7464]
+  ];
+
+  function generateOklahomaPath(zoom, x_start, y_start) {
+    return OKLAHOMA_COORDINATES.map((pt, i) => {
+      const tileCoords = getTileCoords(pt[1], pt[0], zoom);
+      const x = (tileCoords.x - x_start).toFixed(4);
+      const y = (tileCoords.y - y_start).toFixed(4);
+      return `${i === 0 ? 'M' : 'L'}${x},${y}`;
+    }).join(' ') + ' Z';
+  }
+
+  function isTulsaArea(lat, lon) {
+    return lat >= 35.80 && lat <= 36.40 && lon >= -96.30 && lon <= -95.60;
+  }
+
   // --- Doppler Radar Zoom & Pan Config (Active only when SHOW_DOPPLER_RADAR is true) ---
   // LEFT Circle Cell (Far/Wide View) - Fallback NWS radar config
   const RADAR_ZOOM_LEFT = 3.1;           // EDITABLE: Zoom level for far view (1.0 = covers container, e.g. 1.1 for slight zoom)
@@ -1543,7 +1596,8 @@ import weatherConditions from '../data/weather-conditions.json';
       .radar-frame,
       .radar-sweep-line,
       .radar-frames-container,
-      .radar-map-bg {
+      .radar-map-bg,
+      .radar-oklahoma-outline {
         pointer-events: none !important;
       }
       #weather-desc-image-left.radar-mode::before {
@@ -3040,6 +3094,7 @@ Perfect weather to head outdoors and enjoy the day!`
               descImageEl.querySelectorAll('.radar-sweep-line').forEach(l => l.remove());
               descImageEl.querySelectorAll('.radar-frames-container').forEach(c => c.remove());
               descImageEl.querySelectorAll('.radar-map-bg').forEach(m => m.remove());
+              descImageEl.querySelectorAll('.radar-oklahoma-outline').forEach(o => o.remove());
               
               const mapBg = document.createElement('div');
               mapBg.className = 'radar-map-bg';
@@ -3088,6 +3143,7 @@ Perfect weather to head outdoors and enjoy the day!`
                 framesContainer.appendChild(frame);
                 framesRight.push(frame);
               }
+
               // Create the sweep line element
               const sweepLine = document.createElement('div');
               sweepLine.className = 'radar-sweep-line';
@@ -3102,6 +3158,38 @@ Perfect weather to head outdoors and enjoy the day!`
                 mapBg.style.left = `${gridLeftPct}%`;
                 mapBg.style.top = `${gridTopPct}%`;
               }
+            }
+
+            // Create/update or remove Oklahoma state outline depending on whether current location is Tulsa
+            if (isTulsaArea(LAT, LON)) {
+              let okOutline = descImageEl.querySelector('.radar-oklahoma-outline');
+              if (!okOutline) {
+                okOutline = document.createElement('div');
+                okOutline.className = 'radar-oklahoma-outline';
+                okOutline.style.cssText = `
+                  position: absolute;
+                  width: 200%; height: 200%;
+                  left: ${gridLeftPct}%;
+                  top: ${gridTopPct}%;
+                  pointer-events: none;
+                  z-index: 3;
+                `;
+                okOutline.innerHTML = `
+                  <svg viewBox="0 0 2 2" style="width: 100%; height: 100%; display: block; overflow: visible;">
+                    <path d="${generateOklahomaPath(RAINVIEWER_ZOOM_RIGHT, x_start, y_start)}" fill="none" stroke="var(--clock-grid-track-color, rgba(255, 255, 255, 0.2))" stroke-width="1.2px" vector-effect="non-scaling-stroke" />
+                  </svg>
+                `;
+                descImageEl.appendChild(okOutline);
+              } else {
+                okOutline.style.left = `${gridLeftPct}%`;
+                okOutline.style.top = `${gridTopPct}%`;
+                const pathEl = okOutline.querySelector('path');
+                if (pathEl) {
+                  pathEl.setAttribute('d', generateOklahomaPath(RAINVIEWER_ZOOM_RIGHT, x_start, y_start));
+                }
+              }
+            } else {
+              descImageEl.querySelectorAll('.radar-oklahoma-outline').forEach(o => o.remove());
             }
             
             // Append 25mi and 50mi range rings dynamically if not present
@@ -3120,6 +3208,8 @@ Perfect weather to head outdoors and enjoy the day!`
             descImageEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
             descImageEl.querySelectorAll('.radar-sweep-line').forEach(l => l.remove());
             descImageEl.querySelectorAll('.radar-frames-container').forEach(c => c.remove());
+            descImageEl.querySelectorAll('.radar-map-bg').forEach(m => m.remove());
+            descImageEl.querySelectorAll('.radar-oklahoma-outline').forEach(o => o.remove());
             descImageEl.querySelectorAll('.radar-ring-25-right').forEach(r => r.remove());
             descImageEl.querySelectorAll('.radar-ring-50-right').forEach(r => r.remove());
             
@@ -3172,6 +3262,7 @@ Perfect weather to head outdoors and enjoy the day!`
               descImageLeftEl.querySelectorAll('.radar-sweep-line').forEach(l => l.remove());
               descImageLeftEl.querySelectorAll('.radar-frames-container').forEach(c => c.remove());
               descImageLeftEl.querySelectorAll('.radar-map-bg').forEach(m => m.remove());
+              descImageLeftEl.querySelectorAll('.radar-oklahoma-outline').forEach(o => o.remove());
               
               const mapBg = document.createElement('div');
               mapBg.className = 'radar-map-bg';
@@ -3220,6 +3311,7 @@ Perfect weather to head outdoors and enjoy the day!`
                 framesContainer.appendChild(frame);
                 framesLeft.push(frame);
               }
+
               // Create the sweep line element
               const sweepLine = document.createElement('div');
               sweepLine.className = 'radar-sweep-line';
@@ -3235,12 +3327,45 @@ Perfect weather to head outdoors and enjoy the day!`
                 mapBg.style.top = `${frameTopPct}%`;
               }
             }
+
+            // Create/update or remove Oklahoma state outline depending on whether current location is Tulsa
+            if (isTulsaArea(LAT, LON)) {
+              let okOutlineLeft = descImageLeftEl.querySelector('.radar-oklahoma-outline');
+              if (!okOutlineLeft) {
+                okOutlineLeft = document.createElement('div');
+                okOutlineLeft.className = 'radar-oklahoma-outline';
+                okOutlineLeft.style.cssText = `
+                  position: absolute;
+                  width: ${200 * RADAR_SCALE_FACTOR}%; height: ${200 * RADAR_SCALE_FACTOR}%;
+                  left: ${frameLeftPct}%;
+                  top: ${frameTopPct}%;
+                  pointer-events: none;
+                  z-index: 3;
+                `;
+                okOutlineLeft.innerHTML = `
+                  <svg viewBox="0 0 2 2" style="width: 100%; height: 100%; display: block; overflow: visible;">
+                    <path d="${generateOklahomaPath(RAINVIEWER_ZOOM_LEFT, x_start, y_start)}" fill="none" stroke="var(--clock-grid-track-color, rgba(255, 255, 255, 0.2))" stroke-width="1.2px" vector-effect="non-scaling-stroke" />
+                  </svg>
+                `;
+                descImageLeftEl.appendChild(okOutlineLeft);
+              } else {
+                okOutlineLeft.style.left = `${frameLeftPct}%`;
+                okOutlineLeft.style.top = `${frameTopPct}%`;
+                const pathEl = okOutlineLeft.querySelector('path');
+                if (pathEl) {
+                  pathEl.setAttribute('d', generateOklahomaPath(RAINVIEWER_ZOOM_LEFT, x_start, y_start));
+                }
+              }
+            } else {
+              descImageLeftEl.querySelectorAll('.radar-oklahoma-outline').forEach(o => o.remove());
+            }
           } else {
             descImageLeftEl.classList.remove('radar-mode');
             descImageLeftEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
             descImageLeftEl.querySelectorAll('.radar-sweep-line').forEach(l => l.remove());
             descImageLeftEl.querySelectorAll('.radar-frames-container').forEach(c => c.remove());
             descImageLeftEl.querySelectorAll('.radar-map-bg').forEach(m => m.remove());
+            descImageLeftEl.querySelectorAll('.radar-oklahoma-outline').forEach(o => o.remove());
             
             // Set standard background image
             const imgPreload = new Image();
