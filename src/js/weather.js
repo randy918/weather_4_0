@@ -66,6 +66,15 @@ import weatherConditions from '../data/weather-conditions.json';
   const CLOCK_GRID_CELESTIAL_DOT_FILL = 'rgba(0,0,0,0.5)'; // EDITABLE: Fill color for the celestial dots
   const CLOCK_GRID_WIND_SPEED_TEXT_SHADOW = '2px 2px 0px black)'; // EDITABLE: Text shadow for wind speed number (offset-x offset-y blur color)
   const CLOCK_GRID_ROW2_MARGIN_TOP = '2vw'; // EDITABLE: Margin top for the 2nd row of 4x2 dials
+  // EDITABLE: Moon Phase photo sizing and position inside the dial track ring (DESKTOP)
+  const GRID_MOON_PHASE_SIZE_DESKTOP = '93%';       // EDITABLE: Desktop size of moon phase photo (e.g. '92%', '95%', '100%')
+  const GRID_MOON_PHASE_X_OFFSET_DESKTOP = '0vw';    // EDITABLE: Desktop horizontal offset (e.g. '0vw', '-0.2vw', '0.2vw' - positive moves RIGHT, negative moves LEFT)
+  const GRID_MOON_PHASE_Y_OFFSET_DESKTOP = '0vw';    // EDITABLE: Desktop vertical offset (e.g. '0vw', '-0.2vw', '0.2vw' - positive moves DOWN, negative moves UP)
+
+  // EDITABLE: Moon Phase photo sizing and position inside the dial track ring (MOBILE / PHONE)
+  const GRID_MOON_PHASE_SIZE_MOBILE = '93%';        // EDITABLE: Mobile size of moon phase photo (e.g. '92%', '95%', '100%')
+  const GRID_MOON_PHASE_X_OFFSET_MOBILE = '0vw';     // EDITABLE: Mobile horizontal offset (e.g. '0vw', '-0.2vw', '0.2vw' - positive moves RIGHT, negative moves LEFT)
+  const GRID_MOON_PHASE_Y_OFFSET_MOBILE = '0vw';     // EDITABLE: Mobile vertical offset (e.g. '0vw', '-0.2vw', '0.2vw' - positive moves DOWN, negative moves UP)
 
   // Inject these config variables into CSS properties immediately
   const CLOCK_GRID_LABEL_FONT_SIZE = '1.8vw';     // EDITABLE: Font size for the labels beneath the dials
@@ -112,6 +121,13 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--grid-celestial-dot-fill', CLOCK_GRID_CELESTIAL_DOT_FILL);
   document.documentElement.style.setProperty('--grid-wind-speed-text-shadow', CLOCK_GRID_WIND_SPEED_TEXT_SHADOW);
   document.documentElement.style.setProperty('--clock-grid-row2-margin-top', CLOCK_GRID_ROW2_MARGIN_TOP);
+  document.documentElement.style.setProperty('--grid-moon-phase-size-desktop', GRID_MOON_PHASE_SIZE_DESKTOP);
+  document.documentElement.style.setProperty('--grid-moon-phase-x-offset-desktop', GRID_MOON_PHASE_X_OFFSET_DESKTOP);
+  document.documentElement.style.setProperty('--grid-moon-phase-y-offset-desktop', GRID_MOON_PHASE_Y_OFFSET_DESKTOP);
+
+  document.documentElement.style.setProperty('--grid-moon-phase-size-mobile', GRID_MOON_PHASE_SIZE_MOBILE);
+  document.documentElement.style.setProperty('--grid-moon-phase-x-offset-mobile', GRID_MOON_PHASE_X_OFFSET_MOBILE);
+  document.documentElement.style.setProperty('--grid-moon-phase-y-offset-mobile', GRID_MOON_PHASE_Y_OFFSET_MOBILE);
 
   // Removed lastBarometricPressure as we now use future predictive trend
 
@@ -764,10 +780,10 @@ import weatherConditions from '../data/weather-conditions.json';
         gridImgEl.style.maskImage = moonSrcUrl;
         gridImgEl.setAttribute('aria-label', `Moon Phase ${imgIndex} (${moonPhase})`);
         
-        // Show track circle behind new moon (when it is invisible/dark)
+        // Show track circle around the moon phase photo
         const trackSvg = gridImgEl.parentNode.querySelector('.grid-moon-track-svg');
         if (trackSvg) {
-          trackSvg.style.display = isNewMoon ? 'block' : 'none';
+          trackSvg.style.display = 'block';
         }
       });
       
@@ -3886,7 +3902,7 @@ Perfect weather to head outdoors and enjoy the day!`
         if (i === 1) {
           // Cell #2: Moon phase circle area only (no SVG countdown circle)
           innerHtml = `
-            <svg class="clock-timer-svg grid-moon-track-svg" viewBox="0 0 100 100" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;">
+            <svg class="clock-timer-svg grid-moon-track-svg" viewBox="0 0 100 100" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;">
               <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
             </svg>
             <div class="moon-phase-display grid-moon-phase" role="img" aria-label="Moon Phase"></div>
@@ -4235,7 +4251,7 @@ Perfect weather to head outdoors and enjoy the day!`
         let innerHtml = '';
         if (i === 1) {
           innerHtml = `
-            <svg class="clock-timer-svg grid-moon-track-svg" viewBox="0 0 100 100" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;">
+            <svg class="clock-timer-svg grid-moon-track-svg" viewBox="0 0 100 100" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;">
               <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
             </svg>
             <div class="moon-phase-display grid-moon-phase" role="img" aria-label="Moon Phase"></div>
@@ -4581,7 +4597,7 @@ Perfect weather to head outdoors and enjoy the day!`
         let innerHtml = '';
         if (i === 1) {
           innerHtml = `
-            <svg class="clock-timer-svg grid-moon-track-svg" viewBox="0 0 100 100" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;">
+            <svg class="clock-timer-svg grid-moon-track-svg" viewBox="0 0 100 100" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;">
               <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
             </svg>
             <div class="moon-phase-display grid-moon-phase" role="img" aria-label="Moon Phase"></div>

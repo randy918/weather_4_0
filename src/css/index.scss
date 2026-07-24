@@ -1022,11 +1022,12 @@ main {
     }
 
     .grid-moon-phase {
-        position: relative !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
+        position: absolute !important;
+        top: calc(50% + var(--grid-moon-phase-y-offset, 0vw)) !important;
+        left: calc(50% + var(--grid-moon-phase-x-offset, 0vw)) !important;
+        width: var(--grid-moon-phase-size, 92%) !important;
+        height: var(--grid-moon-phase-size, 92%) !important;
+        transform: translate(-50%, -50%) !important;
         z-index: 1 !important;
     }
 
@@ -1139,6 +1140,9 @@ main {
 // Responsive layout: 7-dial row is for tablet/desktop only; 4-dial rows are for phone only
 :root {
     --clock-inner-label-size: var(--clock-grid-inner-label-font-size-desktop, 2.2vw);
+    --grid-moon-phase-size: var(--grid-moon-phase-size-desktop, 93%);
+    --grid-moon-phase-x-offset: var(--grid-moon-phase-x-offset-desktop, 0vw);
+    --grid-moon-phase-y-offset: var(--grid-moon-phase-y-offset-desktop, 0vw);
     --radar-threshold-left: 150;
     --radar-threshold-right: 300;
 
@@ -1168,6 +1172,9 @@ main {
     :root {
         --clock-inner-label-size: var(--clock-grid-inner-label-font-size-mobile, 4vw);
         --dynamic-item-size-4: calc((100vw - var(--clock-grid-margin-left, 0vw) - var(--clock-grid-margin-right, 0vw) - 3 * var(--clock-grid-gap, 1vw)) / 4);
+        --grid-moon-phase-size: var(--grid-moon-phase-size-mobile, 93%);
+        --grid-moon-phase-x-offset: var(--grid-moon-phase-x-offset-mobile, 0vw);
+        --grid-moon-phase-y-offset: var(--grid-moon-phase-y-offset-mobile, 0vw);
     }
 
     .grid-wind-speed-text {
@@ -1201,6 +1208,11 @@ main {
 }
 
 @media (min-width: 768px) {
+    :root {
+        --grid-moon-phase-size: var(--grid-moon-phase-size-desktop, 93%);
+        --grid-moon-phase-x-offset: var(--grid-moon-phase-x-offset-desktop, 0vw);
+        --grid-moon-phase-y-offset: var(--grid-moon-phase-y-offset-desktop, 0vw);
+    }
     .clockGridContainer7,
     .clockGridLabelsContainer7 {
         display: grid !important;
