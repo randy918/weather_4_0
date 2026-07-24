@@ -6418,19 +6418,103 @@ Perfect weather to head outdoors and enjoy the day!`
   }
 
   /* --- Helper functions for dynamic text coloring --- */
+  // Pre-calculated average image luminance map (0-255 scale) for instant 0-latency lookup
+  const IMAGE_LUMINANCE_MAP = {
+    'dark-desc-broken-clouds.jpg': 38.1,
+    'dark-desc-clear-sky.jpg': 20.3,
+    'dark-desc-light-rain.jpg': 46.0,
+    'dark-desc-moderate-rain.jpg': 26.4,
+    'dark-desc-overcast-clouds.jpg': 75.2,
+    'desc-broken-clouds.jpg': 201.1,
+    'desc-clear-sky.jpg': 141.9,
+    'desc-few-clouds.jpg': 152.2,
+    'desc-fog.jpg': 194.8,
+    'desc-haze.jpg': 194.8,
+    'desc-heavy-intensity-rain.jpg': 61.8,
+    'desc-light-rain.jpg': 139.2,
+    'desc-mist.jpg': 194.8,
+    'desc-moderate-rain.jpg': 130.8,
+    'desc-overcast-clouds.jpg': 179.8,
+    'desc-rem.jpg': 142.0,
+    'desc-scattered-clouds.jpg': 171.6,
+    'desc-thunderstorm-with-heavy-rain.jpg': 61.8,
+    'desc-thunderstorm-with-rain.jpg': 130.8,
+    'desc-thunderstorm.jpg': 90.0,
+    'desc-very-heavy-rain.jpg': 61.8
+  };
+
+  const dynamicLuminanceCache = {};
+
+  // Dynamically analyze luminance of unlisted/custom images via offscreen canvas
+  function analyzeImageLuminance(imagePath, filename) {
+    if (IMAGE_LUMINANCE_MAP[filename] !== undefined || dynamicLuminanceCache[filename] !== undefined) {
+      return;
+    }
+    const img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = 32;
+        canvas.height = 32;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        ctx.drawImage(img, 0, 0, 32, 32);
+        const imgData = ctx.getImageData(0, 0, 32, 32).data;
+        let totalLum = 0;
+        const count = imgData.length / 4;
+        for (let i = 0; i < imgData.length; i += 4) {
+          const r = imgData[i];
+          const g = imgData[i + 1];
+          const b = imgData[i + 2];
+          totalLum += (0.299 * r + 0.587 * g + 0.114 * b);
+        }
+        const avgLum = totalLum / count;
+        dynamicLuminanceCache[filename] = avgLum;
+        console.log(`📸 Dynamic image luminance for ${filename}: ${avgLum.toFixed(1)} / 255 => ${avgLum > 115 ? 'DEEP BLUE' : 'WHITE'}`);
+        updateSimpleMonthColors();
+      } catch (e) {
+        /* CORS or canvas read error fallback */
+      }
+    };
+    img.onerror = () => {
+      // If dark version fails to load for a new condition, fall back to analyzing day version
+      if (filename.startsWith('dark-') && currentBaseFileName && filename !== currentBaseFileName) {
+        analyzeImageLuminance(`img/${currentBaseFileName}`, currentBaseFileName);
+      }
+    };
+    img.src = imagePath;
+  }
+
   function getCurrentTextColor() {
-    const targetImages = [
-      'desc-broken-clouds.jpg',
-      'desc-clear-sky.jpg',
-      'desc-few-clouds.jpg',
-      'desc-fog.jpg',
-      'desc-haze.jpg',
-      'desc-mist.jpg',
-      'desc-scattered-clouds.jpg'
-    ];
-    if (!currentIsNight && currentBaseFileName && targetImages.includes(currentBaseFileName)) {
+    if (!currentBaseFileName) {
+      return 'white';
+    }
+
+    let activeFileName = currentBaseFileName;
+    if (currentIsNight) {
+      activeFileName = 'dark-' + currentBaseFileName;
+    }
+
+    let lum = IMAGE_LUMINANCE_MAP[activeFileName];
+    if (lum === undefined) {
+      lum = dynamicLuminanceCache[activeFileName];
+    }
+
+    if (lum === undefined) {
+      // If not in map or cache, attempt dynamic analysis and check day fallback in the meantime
+      const imgPath = currentIsNight ? `img/dark-${currentBaseFileName}` : `img/${currentBaseFileName}`;
+      analyzeImageLuminance(imgPath, activeFileName);
+      lum = IMAGE_LUMINANCE_MAP[currentBaseFileName];
+    }
+
+    // Threshold 115 / 255 (~45% lightness):
+    // If average brightness is light (> 115), choose deep blue ('rgb(33, 57, 157)')
+    // If average brightness is dark (<= 115), choose white ('white')
+    if (lum !== undefined && lum > 115) {
       return 'rgb(33, 57, 157)';
     }
+
     return 'white';
   }
 
