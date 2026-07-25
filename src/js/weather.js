@@ -414,6 +414,7 @@ import weatherConditions from '../data/weather-conditions.json';
   // Maps specific alert keywords to their background colors.
   const ALERT_MODAL_LINE_HEIGHT = '3.025vw'; // EDITABLE: Line spacing INSIDE the modal paragraphs
   const ALERT_MODAL_TITLE_LINE_HEIGHT = '.95'; // EDITABLE: Line spacing for the uppercase TITLE inside the modal
+  const ALERT_MODAL_BODY_TOP_MARGIN = '3.0vw'; // EDITABLE: Additional linespace above body copy of alert/warning
 
   const ALERT_COLORS = {
     "DEFAULT": "rgba(0,0,0, 0.75)", // Default translucent red for anything else
@@ -1700,6 +1701,7 @@ import weatherConditions from '../data/weather-conditions.json';
         text-align: center; /* Guarantee title is centered */
       }
       .alert-modal-body {
+        margin-top: ${ALERT_MODAL_BODY_TOP_MARGIN}; /* EDITABLE: Linespace above body copy */
         font-size: 2.4vw; /* EDITABLE: Text size (60% of 4vw) */
         color: #ffffff; /* EDITABLE: Pure white text */
         text-align: left; /* EDITABLE: Flush left alignment */
@@ -1715,6 +1717,10 @@ import weatherConditions from '../data/weather-conditions.json';
         padding-left: 2.3vw; /* Indent the whole paragraph */
         text-indent: -2.3vw; /* Pull the bullet point back to the left margin */
         margin-top: -2vw; /* Keep bullets reasonably tight */
+      }
+      .alert-modal-body p:first-child,
+      .alert-modal-body p.alert-bullet:first-child {
+        margin-top: 0 !important; /* Preserves the line space above the body copy */
       }
       .alert-modal-body p.alert-bullet .heavy-bullet {
         font-family: 'bold', sans-serif;
