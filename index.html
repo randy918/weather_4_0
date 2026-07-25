@@ -6,12 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Weather 3.0</title>
   
-<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="img/w2.svg" />
-<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+<link rel="shortcut icon" href="/favicon.ico?v=4" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-<link rel="manifest" href="/site.webmanifest" />  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="icon" href="/favicon.ico?v=3" type="image/x-icon">
+<link rel="manifest" href="/site.webmanifest" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="./src/css/universal.scss">
 
   <!-- Pre-load styles to prevent flash of unstyled content (FOUC) -->
@@ -36,6 +36,7 @@
     #startup-loader img {
       width: 25vw;
       height: 25vw;
+      object-fit: contain;
       margin-bottom: 25vw; /* Fallback offset; index.scss will override this when it loads */
       animation: startup-pulse-simple 1.5s ease-in-out infinite alternate !important;
     }

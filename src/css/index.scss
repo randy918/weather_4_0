@@ -73,6 +73,7 @@ $loader-logo-offset-y: 25vw;
         margin-bottom: $loader-logo-offset-y;
         width: 25vw;
         height: 25vw;
+        object-fit: contain;
         border-radius: 5vw;
         animation: startup-pulse-simple 1.5s ease-in-out infinite alternate !important;
     }
