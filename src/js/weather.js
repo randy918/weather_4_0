@@ -410,6 +410,9 @@ import weatherConditions from '../data/weather-conditions.json';
   const GREAT_WEATHER_HUMIDITY_MAX = 65;
   const GREAT_WEATHER_WIND_MAX = 20;
 
+  // EDITABLE: Temperature Change Advisory Criteria
+  const TEMP_CHANGE_ADVISORY_THRESHOLD = 15; // EDITABLE: Temperature difference threshold (15°F+) between today and tomorrow
+
   // EDITABLE: Alert Banner Colors
   // Maps specific alert keywords to their background colors.
   const ALERT_MODAL_LINE_HEIGHT = '3.025vw'; // EDITABLE: Line spacing INSIDE the modal paragraphs
@@ -419,6 +422,10 @@ import weatherConditions from '../data/weather-conditions.json';
   const ALERT_COLORS = {
     "DEFAULT": "rgba(0,0,0, 0.75)", // Default translucent red for anything else
     "GREAT WEATHER ADVISORY": "rgba(46, 204, 113, 0.85)", // Pleasant green
+    "TEMPERATURE DROP & RISE ADVISORY": "rgba(142, 68, 173, 0.85)", // Purple/Indigo
+    "TEMPERATURE DROP/RISE ADVISORY": "rgba(142, 68, 173, 0.85)", // Purple/Indigo
+    "TEMPERATURE DROP ADVISORY": "rgba(41, 128, 185, 0.85)", // Cool blue
+    "TEMPERATURE RISE ADVISORY": "rgba(230, 126, 34, 0.85)", // Warm orange
     "DENSE FOG ADVISORY": "rgba(128, 128, 128, 0.85)", // Gray
     "EXTREME HEAT WARNING": "hsl(0, 90%, 35%)", 
     "EXTREME HEAT WATCH": "hsl(0, 90%, 25%)", 
@@ -438,6 +445,10 @@ import weatherConditions from '../data/weather-conditions.json';
   const ALERT_ICONS = {
     "DEFAULT": "img/default-wat.svg",
     "GREAT WEATHER ADVISORY": "img/sun-wat.svg",
+    "TEMPERATURE DROP & RISE ADVISORY": "img/heat-wat.svg",
+    "TEMPERATURE DROP/RISE ADVISORY": "img/heat-wat.svg",
+    "TEMPERATURE DROP ADVISORY": "img/heat-wat.svg",
+    "TEMPERATURE RISE ADVISORY": "img/heat-wat.svg",
     "DENSE FOG ADVISORY": "img/fog-wat.svg",
     "EXTREME HEAT WARNING": "img/heat-wat.svg",
     "EXTREME HEAT WATCH": "img/heat-wat.svg",
@@ -723,14 +734,15 @@ import weatherConditions from '../data/weather-conditions.json';
   function getMoonPhaseName(phase) {
     if (typeof phase !== 'number') return '';
     // Based on standard OpenWeather API moon_phase values (0..1)
-    if (phase === 0 || phase === 1) return 'New Moon';
-    if (phase > 0 && phase < 0.25) return 'Waxing Crescent';
-    if (phase === 0.25) return 'First Quarter';
-    if (phase > 0.25 && phase < 0.5) return 'Waxing Gibbous';
-    if (phase === 0.5) return 'Full Moon';
-    if (phase > 0.5 && phase < 0.75) return 'Waning Gibbous';
-    if (phase === 0.75) return 'Last Quarter';
-    if (phase > 0.75 && phase < 1) return 'Waning Crescent';
+    // Primary phases use a range so that "Full Moon", "New Moon", etc. cover full calendar days
+    if (phase < 0.04 || phase > 0.96) return 'New Moon';
+    if (phase >= 0.04 && phase < 0.21) return 'Waxing Crescent';
+    if (phase >= 0.21 && phase <= 0.29) return 'First Quarter';
+    if (phase > 0.29 && phase < 0.45) return 'Waxing Gibbous';
+    if (phase >= 0.45 && phase <= 0.55) return 'Full Moon'; // 3-day window: day before, day of, and day after Full Moon
+    if (phase > 0.55 && phase < 0.71) return 'Waning Gibbous';
+    if (phase >= 0.71 && phase <= 0.79) return 'Last Quarter';
+    if (phase > 0.79 && phase <= 0.96) return 'Waning Crescent';
     return '';
   }
 
@@ -2182,6 +2194,109 @@ Perfect weather to head outdoors and enjoy the day!`
       });
     }
     
+    // Check for Temperature Drop/Rise Advisory (Tomorrow's High/Low differs 15+ from Today's High/Low)
+    const todayDaily = data.daily?.[0];
+    const tomorrowDaily = data.daily?.[1];
+
+    if (todayDaily?.temp && tomorrowDaily?.temp) {
+      const todayHigh = todayDaily.temp.max;
+      const todayLow = todayDaily.temp.min;
+      const tomorrowHigh = tomorrowDaily.temp.max;
+      const tomorrowLow = tomorrowDaily.temp.min;
+
+      if (
+        typeof todayHigh === 'number' && typeof todayLow === 'number' &&
+        typeof tomorrowHigh === 'number' && typeof tomorrowLow === 'number'
+      ) {
+        const diffHigh = tomorrowHigh - todayHigh;
+        const diffLow = tomorrowLow - todayLow;
+
+        const isHighDrop = diffHigh <= -TEMP_CHANGE_ADVISORY_THRESHOLD;
+        const isHighRise = diffHigh >= TEMP_CHANGE_ADVISORY_THRESHOLD;
+        const isLowDrop = diffLow <= -TEMP_CHANGE_ADVISORY_THRESHOLD;
+        const isLowRise = diffLow >= TEMP_CHANGE_ADVISORY_THRESHOLD;
+
+        const hasDrop = isHighDrop || isLowDrop;
+        const hasRise = isHighRise || isLowRise;
+
+        if (hasDrop || hasRise) {
+          let eventTitle = "TEMPERATURE DROP ADVISORY";
+          if (hasDrop && hasRise) {
+            eventTitle = "TEMPERATURE DROP/RISE ADVISORY";
+          } else if (hasRise) {
+            eventTitle = "TEMPERATURE RISE ADVISORY";
+          }
+
+          const changesText = [];
+          if (isHighDrop) {
+            changesText.push(`• High Temperature: Drops by ${Math.abs(Math.round(diffHigh))}°F tomorrow (from ${Math.round(todayHigh)}°F to ${Math.round(tomorrowHigh)}°F)`);
+          } else if (isHighRise) {
+            changesText.push(`• High Temperature: Rises by ${Math.round(diffHigh)}°F tomorrow (from ${Math.round(todayHigh)}°F to ${Math.round(tomorrowHigh)}°F)`);
+          }
+
+          if (isLowDrop) {
+            changesText.push(`• Low Temperature: Drops by ${Math.abs(Math.round(diffLow))}°F tomorrow (from ${Math.round(todayLow)}°F to ${Math.round(tomorrowLow)}°F)`);
+          } else if (isLowRise) {
+            changesText.push(`• Low Temperature: Rises by ${Math.round(diffLow)}°F tomorrow (from ${Math.round(todayLow)}°F to ${Math.round(tomorrowLow)}°F)`);
+          }
+
+          alerts.push({
+            event: eventTitle,
+            sender_name: "24-Hour Forecast Analysis",
+            start: now,
+            end: tomorrowDaily.sunset || (now + 86400),
+            description: `Significant day-to-day temperature change expected tomorrow:
+
+• Today's Forecast: High ${Math.round(todayHigh)}°F / Low ${Math.round(todayLow)}°F
+• Tomorrow's Forecast: High ${Math.round(tomorrowHigh)}°F / Low ${Math.round(tomorrowLow)}°F
+
+Noteworthy Temperature Changes (15°F+ Shift):
+${changesText.join('\n')}
+
+Plan ahead for shifting weather conditions tomorrow!`
+          });
+        }
+      }
+    }
+    
+    // EDITABLE preview mode: set to true to force-show test banners for TEMPERATURE DROP ADVISORY and TEMPERATURE RISE ADVISORY
+    const TEST_SHOW_TEMP_ADVISORIES_PREVIEW = false; // Set to false for normal live operation
+    if (TEST_SHOW_TEMP_ADVISORIES_PREVIEW) {
+      alerts.push({
+        event: "TEMPERATURE DROP ADVISORY",
+        sender_name: "24-Hour Forecast Analysis",
+        start: now,
+        end: now + 86400,
+        description: `Significant day-to-day temperature drop expected tomorrow:
+
+• Today's Forecast: High 88°F / Low 68°F
+• Tomorrow's Forecast: High 66°F / Low 51°F
+
+Noteworthy Temperature Changes (15°F+ Shift):
+• High Temperature: Drops by 22°F tomorrow (from 88°F to 66°F)
+• Low Temperature: Drops by 17°F tomorrow (from 68°F to 51°F)
+
+Plan ahead for significantly colder conditions tomorrow!`
+      });
+
+      alerts.push({
+        event: "TEMPERATURE RISE ADVISORY",
+        sender_name: "24-Hour Forecast Analysis",
+        start: now,
+        end: now + 86400,
+        description: `Significant day-to-day temperature rise expected tomorrow:
+
+• Today's Forecast: High 62°F / Low 45°F
+• Tomorrow's Forecast: High 81°F / Low 62°F
+
+Noteworthy Temperature Changes (15°F+ Shift):
+• High Temperature: Rises by 19°F tomorrow (from 62°F to 81°F)
+• Low Temperature: Rises by 17°F tomorrow (from 45°F to 62°F)
+
+Plan ahead for significantly warmer conditions tomorrow!`
+      });
+    }
+    
     const container = document.getElementById('alerts-container');
     
     // Console logging to debug tornado watch
@@ -2279,9 +2394,11 @@ Perfect weather to head outdoors and enjoy the day!`
       const text = document.createElement('div');
       text.className = 'alert-text';
       
-      // Format: "TORNADO WATCH expires 6:15 am"
+      // Format: "TORNADO WATCH expires 6:15 am" or "TEMPERATURE DROP ADVISORY tomorrow"
       let alertText = alert.event.toUpperCase();
-      if (alert.end) {
+      if (eventName.includes('TEMPERATURE DROP') || eventName.includes('TEMPERATURE RISE')) {
+        alertText += ` <span class="alert-expires">tomorrow</span>`;
+      } else if (alert.end) {
         const endDate = new Date(alert.end * 1000); // Convert Unix timestamp to Date
         const hours = endDate.getHours();
         const minutes = endDate.getMinutes().toString().padStart(2, '0');
