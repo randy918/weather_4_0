@@ -3644,6 +3644,7 @@ Perfect weather to head outdoors and enjoy the day!`
   const EARTH_IMAGE_MARGIN_BOTTOM = '4vw';  // Gap below the Earth image
   const EARTH_MASK_RADIUS = '49.5%'; // EDITABLE: Shrink circle slightly to hide edge artifacts (49.5% = 99% size)
   const EARTH_MASK_POSITION_Y = '50.25%'; // EDITABLE: Shift mask down to crop exactly 0.5% more from the top only
+  const LAST_UPDATED_MARGIN_TOP = '30vw'; // EDITABLE: Top offset pushing App Last Updated note 30vw down into scroll area
 
   // Store the current temperature for use by countdown updates
   let currentTempForDots = null;
@@ -6330,12 +6331,13 @@ Perfect weather to head outdoors and enjoy the day!`
       span.style.fontSize = '1.6875vw';
       span.style.color = 'white';
       span.style.opacity = '1';
+      span.style.marginTop = LAST_UPDATED_MARGIN_TOP;
     } else {
       span = document.createElement('div');
       span.id = id;
       span.innerHTML = `Weather last updated: ${text}<br>App last updated: ${appBuildDate}<br>Radar data from RainViewer • Weather data from OpenWeather`;
       span.style.position = 'relative'; // Normal document flow
-      span.style.margin = '0 auto'; // 0 top (earth spacer handles the 4vw above)
+      span.style.margin = `${LAST_UPDATED_MARGIN_TOP} auto 0`; // Pushes note 30vw down into scrollable region
       span.style.paddingBottom = '4vw'; // Use padding instead of margin to prevent collapse
       span.style.width = '100%';
       span.style.fontSize = '1.6875vw'; // 75% of 2.25vw
