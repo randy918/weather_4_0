@@ -1614,8 +1614,21 @@ import weatherConditions from '../data/weather-conditions.json';
       .radar-sweep-line,
       .radar-frames-container,
       .radar-map-bg,
-      .radar-oklahoma-outline {
+      .radar-oklahoma-outline,
+      .radar-screen {
         pointer-events: none !important;
+      }
+      .radar-screen {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: calc(100% - 2 * ${RADAR_OUTER_STROKE_WIDTH});
+        height: calc(100% - 2 * ${RADAR_OUTER_STROKE_WIDTH});
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        overflow: hidden;
+        -webkit-mask-image: -webkit-radial-gradient(white, black);
+        pointer-events: none;
       }
       #weather-desc-image-left.radar-mode::before {
         content: '';
@@ -3117,7 +3130,14 @@ Perfect weather to head outdoors and enjoy the day!`
               descImageEl.querySelectorAll('.radar-frames-container').forEach(c => c.remove());
               descImageEl.querySelectorAll('.radar-map-bg').forEach(m => m.remove());
               descImageEl.querySelectorAll('.radar-oklahoma-outline').forEach(o => o.remove());
+              descImageEl.querySelectorAll('.radar-ring-25-right').forEach(r => r.remove());
+              descImageEl.querySelectorAll('.radar-ring-50-right').forEach(r => r.remove());
+              descImageEl.querySelectorAll('.radar-screen').forEach(s => s.remove());
               
+              const screenContainer = document.createElement('div');
+              screenContainer.className = 'radar-screen';
+              descImageEl.appendChild(screenContainer);
+
               const mapBg = document.createElement('div');
               mapBg.className = 'radar-map-bg';
               mapBg.style.cssText = `
@@ -3131,7 +3151,7 @@ Perfect weather to head outdoors and enjoy the day!`
                 z-index: 1;
                 pointer-events: none;
               `;
-              descImageEl.appendChild(mapBg);
+              screenContainer.appendChild(mapBg);
 
               const framesContainer = document.createElement('div');
               framesContainer.className = 'radar-frames-container';
@@ -3143,7 +3163,7 @@ Perfect weather to head outdoors and enjoy the day!`
                 z-index: 2;
                 filter: blur(var(--radar-blur-amount, 1.2px));
               `;
-              descImageEl.appendChild(framesContainer);
+              screenContainer.appendChild(framesContainer);
               
               framesRight = [];
               for (let i = RADAR_FRAME_COUNT - 1; i >= 0; i--) {
@@ -3169,7 +3189,7 @@ Perfect weather to head outdoors and enjoy the day!`
               // Create the sweep line element
               const sweepLine = document.createElement('div');
               sweepLine.className = 'radar-sweep-line';
-              descImageEl.appendChild(sweepLine);
+              screenContainer.appendChild(sweepLine);
             } else {
               framesRight.forEach(frame => {
                 frame.style.left = `${gridLeftPct}%`;
@@ -3181,6 +3201,8 @@ Perfect weather to head outdoors and enjoy the day!`
                 mapBg.style.top = `${gridTopPct}%`;
               }
             }
+
+            const targetParentRight = descImageEl.querySelector('.radar-screen') || descImageEl;
 
             // Create/update or remove Oklahoma state outline depending on whether current location is Tulsa
             if (isTulsaArea(LAT, LON)) {
@@ -3201,7 +3223,7 @@ Perfect weather to head outdoors and enjoy the day!`
                     <path d="${generateOklahomaPath(RAINVIEWER_ZOOM_RIGHT, x_start, y_start)}" fill="none" stroke="var(--clock-grid-track-color, rgba(255, 255, 255, 0.2))" stroke-width="1.2px" vector-effect="non-scaling-stroke" />
                   </svg>
                 `;
-                descImageEl.appendChild(okOutline);
+                targetParentRight.appendChild(okOutline);
               } else {
                 okOutline.style.left = `${gridLeftPct}%`;
                 okOutline.style.top = `${gridTopPct}%`;
@@ -3218,12 +3240,12 @@ Perfect weather to head outdoors and enjoy the day!`
             if (!descImageEl.querySelector('.radar-ring-25-right')) {
               const r25 = document.createElement('div');
               r25.className = 'radar-ring-25-right';
-              descImageEl.appendChild(r25);
+              targetParentRight.appendChild(r25);
             }
             if (!descImageEl.querySelector('.radar-ring-50-right')) {
               const r50 = document.createElement('div');
               r50.className = 'radar-ring-50-right';
-              descImageEl.appendChild(r50);
+              targetParentRight.appendChild(r50);
             }
           } else {
             descImageEl.classList.remove('radar-mode');
@@ -3234,6 +3256,7 @@ Perfect weather to head outdoors and enjoy the day!`
             descImageEl.querySelectorAll('.radar-oklahoma-outline').forEach(o => o.remove());
             descImageEl.querySelectorAll('.radar-ring-25-right').forEach(r => r.remove());
             descImageEl.querySelectorAll('.radar-ring-50-right').forEach(r => r.remove());
+            descImageEl.querySelectorAll('.radar-screen').forEach(s => s.remove());
             
             // Set standard background image
             const imgPreload = new Image();
@@ -3285,7 +3308,12 @@ Perfect weather to head outdoors and enjoy the day!`
               descImageLeftEl.querySelectorAll('.radar-frames-container').forEach(c => c.remove());
               descImageLeftEl.querySelectorAll('.radar-map-bg').forEach(m => m.remove());
               descImageLeftEl.querySelectorAll('.radar-oklahoma-outline').forEach(o => o.remove());
+              descImageLeftEl.querySelectorAll('.radar-screen').forEach(s => s.remove());
               
+              const screenLeft = document.createElement('div');
+              screenLeft.className = 'radar-screen';
+              descImageLeftEl.appendChild(screenLeft);
+
               const mapBg = document.createElement('div');
               mapBg.className = 'radar-map-bg';
               mapBg.style.cssText = `
@@ -3299,7 +3327,7 @@ Perfect weather to head outdoors and enjoy the day!`
                 z-index: 1;
                 pointer-events: none;
               `;
-              descImageLeftEl.appendChild(mapBg);
+              screenLeft.appendChild(mapBg);
 
               const framesContainer = document.createElement('div');
               framesContainer.className = 'radar-frames-container';
@@ -3311,7 +3339,7 @@ Perfect weather to head outdoors and enjoy the day!`
                 z-index: 2;
                 filter: blur(var(--radar-blur-amount, 1.2px));
               `;
-              descImageLeftEl.appendChild(framesContainer);
+              screenLeft.appendChild(framesContainer);
               
               framesLeft = [];
               for (let i = RADAR_FRAME_COUNT - 1; i >= 0; i--) {
@@ -3337,7 +3365,7 @@ Perfect weather to head outdoors and enjoy the day!`
               // Create the sweep line element
               const sweepLine = document.createElement('div');
               sweepLine.className = 'radar-sweep-line';
-              descImageLeftEl.appendChild(sweepLine);
+              screenLeft.appendChild(sweepLine);
             } else {
               framesLeft.forEach(frame => {
                 frame.style.left = `${frameLeftPct}%`;
@@ -3349,6 +3377,8 @@ Perfect weather to head outdoors and enjoy the day!`
                 mapBg.style.top = `${frameTopPct}%`;
               }
             }
+
+            const targetParentLeft = descImageLeftEl.querySelector('.radar-screen') || descImageLeftEl;
 
             // Create/update or remove Oklahoma state outline depending on whether current location is Tulsa
             if (isTulsaArea(LAT, LON)) {
@@ -3369,7 +3399,7 @@ Perfect weather to head outdoors and enjoy the day!`
                     <path d="${generateOklahomaPath(RAINVIEWER_ZOOM_LEFT, x_start, y_start)}" fill="none" stroke="var(--clock-grid-track-color, rgba(255, 255, 255, 0.2))" stroke-width="1.2px" vector-effect="non-scaling-stroke" />
                   </svg>
                 `;
-                descImageLeftEl.appendChild(okOutlineLeft);
+                targetParentLeft.appendChild(okOutlineLeft);
               } else {
                 okOutlineLeft.style.left = `${frameLeftPct}%`;
                 okOutlineLeft.style.top = `${frameTopPct}%`;
@@ -3388,6 +3418,7 @@ Perfect weather to head outdoors and enjoy the day!`
             descImageLeftEl.querySelectorAll('.radar-frames-container').forEach(c => c.remove());
             descImageLeftEl.querySelectorAll('.radar-map-bg').forEach(m => m.remove());
             descImageLeftEl.querySelectorAll('.radar-oklahoma-outline').forEach(o => o.remove());
+            descImageLeftEl.querySelectorAll('.radar-screen').forEach(s => s.remove());
             
             // Set standard background image
             const imgPreload = new Image();
