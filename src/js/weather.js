@@ -404,11 +404,19 @@ import weatherConditions from '../data/weather-conditions.json';
   const TEST_HOURLY_RAIN = false; // STAGE 1: Set to true to see fake passing storm. Set to false for live OpenWeather data.
   const HOURLY_RAIN_FONT_SIZE = '1.72vw'; // Size of the inches text (Matches hourly temperature bar size)
 
-  // EDITABLE: Great Weather Advisory Criteria
+  // EDITABLE: Great Weather Advisory Criteria (Personal Ideal: Cloud Shade required, 68-80°F)
   const GREAT_WEATHER_TEMP_MIN = 68;
   const GREAT_WEATHER_TEMP_MAX = 80;
   const GREAT_WEATHER_HUMIDITY_MAX = 65;
   const GREAT_WEATHER_WIND_MAX = 20;
+
+  // EDITABLE: Nice Weather Advisory Criteria (Broader: Clear skies allowed, 60-85°F)
+  const NICE_WEATHER_TEMP_MIN = 60;
+  const NICE_WEATHER_TEMP_MAX = 85;
+  const NICE_WEATHER_HUMIDITY_MAX = 75;
+  const NICE_WEATHER_WIND_MAX = 25;
+
+  const GREAT_WEATHER_DAYLIGHT_BUFFER_HOURS = 1; // EDITABLE: Additional hours before sunrise & after sunset to consider "daylight"
 
   // EDITABLE: Temperature Change Advisory Criteria
   const TEMP_CHANGE_ADVISORY_THRESHOLD = 15; // EDITABLE: Temperature difference threshold (15°F+) between today and tomorrow
@@ -421,7 +429,8 @@ import weatherConditions from '../data/weather-conditions.json';
 
   const ALERT_COLORS = {
     "DEFAULT": "rgba(0,0,0, 0.75)", // Default translucent red for anything else
-    "GREAT WEATHER ADVISORY": "rgba(46, 204, 113, 0.85)", // Pleasant green
+    "GREAT WEATHER ADVISORY": "rgba(110, 170, 35, 0.88)", // Vibrant yellow-green
+    "NICE WEATHER ADVISORY": "rgba(46, 204, 113, 0.75)", // Cool emerald green
     "TEMPERATURE DROP & RISE ADVISORY": "rgba(142, 68, 173, 0.85)", // Purple/Indigo
     "TEMPERATURE DROP/RISE ADVISORY": "rgba(142, 68, 173, 0.85)", // Purple/Indigo
     "TEMPERATURE DROP ADVISORY": "rgba(41, 128, 185, 0.85)", // Cool blue
@@ -445,6 +454,7 @@ import weatherConditions from '../data/weather-conditions.json';
   const ALERT_ICONS = {
     "DEFAULT": "img/default-wat.svg",
     "GREAT WEATHER ADVISORY": "img/sun-wat.svg",
+    "NICE WEATHER ADVISORY": "img/sun-wat.svg",
     "TEMPERATURE DROP & RISE ADVISORY": "img/heat-wat.svg",
     "TEMPERATURE DROP/RISE ADVISORY": "img/heat-wat.svg",
     "TEMPERATURE DROP ADVISORY": "img/heat-wat.svg",
@@ -876,23 +886,17 @@ import weatherConditions from '../data/weather-conditions.json';
 
           // Add trend indicator (+/-) for current temperature
           if (f.name === 'current') {
-            const key = 'weather_last_temp_raw';
-            const lastVal = localStorage.getItem(key);
-            if (lastVal !== null) {
-              const prev = parseFloat(lastVal);
-              if (value > prev) {
-                displayText += '▲';
-                console.log(`Temp increased: ${prev}° → ${value}° (adding ▲)`);
-              } else if (value < prev) {
-                displayText += '▼';
-                console.log(`Temp decreased: ${prev}° → ${value}° (adding ▼)`);
-              } else {
-                console.log(`Temp unchanged: ${value}° (no arrow)`);
-              }
+            const tempRounded = Math.round(value);
+            const trendDir = getPersistentTrendDirection('weather_trend_temp', tempRounded);
+            if (trendDir === 'up') {
+              displayText += '▲';
+              console.log(`Temp trend: ▲ (${tempRounded}°)`);
+            } else if (trendDir === 'down') {
+              displayText += '▼';
+              console.log(`Temp trend: ▼ (${tempRounded}°)`);
             } else {
-              console.log(`First temp reading: ${value}° (no previous value to compare)`);
+              console.log(`Temp trend: blank/off (${tempRounded}°)`);
             }
-            localStorage.setItem(key, value);
           }
 
           el.innerHTML = displayText;
@@ -1024,6 +1028,67 @@ import weatherConditions from '../data/weather-conditions.json';
     updateRainBanner(data);
   }
 
+  // Helper function to persist trend directions (wind, barometer, dewpoint, temp)
+  // Keeps the last direction ('up' or 'down') until an opposite value change occurs.
+  // After 1 hour of identical values, the wedge automatically turns off (returns null).
+  function getPersistentTrendDirection(key, currentValue, expiryMs = 60 * 60 * 1000) {
+    if (typeof currentValue !== 'number' || isNaN(currentValue)) return null;
+
+    const now = Date.now();
+    let state = null;
+
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        state = JSON.parse(raw);
+      }
+    } catch (e) {
+      state = null;
+    }
+
+    if (!state || typeof state.lastValue !== 'number') {
+      state = {
+        lastValue: currentValue,
+        direction: null,
+        lastChangedTs: now
+      };
+      try {
+        localStorage.setItem(key, JSON.stringify(state));
+      } catch (e) {}
+      return null;
+    }
+
+    let direction = state.direction || null;
+    let lastChangedTs = typeof state.lastChangedTs === 'number' ? state.lastChangedTs : now;
+
+    if (currentValue > state.lastValue) {
+      direction = 'up';
+      lastChangedTs = now;
+      state.lastValue = currentValue;
+    } else if (currentValue < state.lastValue) {
+      direction = 'down';
+      lastChangedTs = now;
+      state.lastValue = currentValue;
+    } else {
+      // Value has not changed. Turn off after 1 hour of same value
+      if (now - lastChangedTs >= expiryMs) {
+        direction = null;
+      }
+    }
+
+    const updatedState = {
+      lastValue: state.lastValue,
+      direction: direction,
+      lastChangedTs: lastChangedTs
+    };
+
+    try {
+      localStorage.setItem(key, JSON.stringify(updatedState));
+    } catch (e) {}
+
+    return direction;
+  }
+
   // Helper function to maintain a rolling timestamped history in localStorage
   // and retrieve the recorded observation from up to 30 minutes ago (~30 min lookback)
   function getHistoricalComparisonValue(key, currentValue, maxAgeMs = 30 * 60 * 1000) {
@@ -1085,13 +1150,13 @@ import weatherConditions from '../data/weather-conditions.json';
     const currentTemp = data?.current?.temp || null;
     
     let trendHtml = '';
-    const prevWindVal = getHistoricalComparisonValue('weather_history_wind_speed', windSpeed);
-    const windDiff = windSpeed - prevWindVal;
-    const absWindDiff = Math.abs(windDiff);
-    
+    const windSpeedRounded = Math.round(windSpeed);
+    const windTrend = getPersistentTrendDirection('weather_trend_wind', windSpeedRounded);
     let iconClass = '';
-    if (absWindDiff >= 0.5) {
-      iconClass = windDiff > 0 ? "fa-angle-up" : "fa-angle-down";
+    if (windTrend === 'up') {
+      iconClass = "fa-angle-up";
+    } else if (windTrend === 'down') {
+      iconClass = "fa-angle-down";
     }
 
     // Determine whether stem is pointing upwards (above the middle) or downwards (below the middle)
@@ -1253,18 +1318,18 @@ import weatherConditions from '../data/weather-conditions.json';
     // OpenWeather provides pressure in hPa. Typical sea level range is 950 to 1050.
     const pressure = data?.current?.pressure || 1013; 
     
-    // Determine trend arrow comparing current to ~30 min historical observation
+    // Determine persistent trend arrow for barometer
     let trendHtml = '';
-    const prevPressureVal = getHistoricalComparisonValue('weather_history_pressure', pressure);
-    const pressureDiff = pressure - prevPressureVal;
-    const absPressureDiff = Math.abs(pressureDiff);
+    const pressureRounded = Math.round(pressure);
+    const pressureTrend = getPersistentTrendDirection('weather_trend_barometer', pressureRounded);
 
     let iconClass = '';
     let transformStyle = '';
 
-    if (absPressureDiff >= 0.2) {
-      iconClass = pressureDiff > 0 ? "fa-angle-up" : "fa-angle-down";
-      transformStyle = "";
+    if (pressureTrend === 'up') {
+      iconClass = "fa-angle-up";
+    } else if (pressureTrend === 'down') {
+      iconClass = "fa-angle-down";
     }
 
     if (iconClass) {
@@ -2156,41 +2221,144 @@ import weatherConditions from '../data/weather-conditions.json';
     const weatherId = data.current?.weather?.[0]?.id;
     const weatherDesc = data.current?.weather?.[0]?.description || '';
     
-    const isDaytime = (typeof sunrise === 'number' && typeof sunset === 'number') 
-      ? (now >= sunrise && now < sunset) 
-      : true; // fallback to true if sunrise/sunset not available
+    // Extended daylight rule: Permits activation during daylight plus 1-hr twilight buffer (1hr before sunrise to 1hr after sunset).
+    // Deep night (outside this window) is strictly blocked.
+    const daylightBufferSec = GREAT_WEATHER_DAYLIGHT_BUFFER_HOURS * 3600;
+    const isDaylightOrTwilight = (typeof sunrise === 'number' && typeof sunset === 'number') 
+      ? (now >= (sunrise - daylightBufferSec) && now < (sunset + daylightBufferSec)) 
+      : true; // fallback to true if sunrise/sunset timestamps are unavailable
 
     const hasPrecipitation = (typeof weatherId === 'number' && weatherId >= 200 && weatherId < 700) ||
                              (data.current?.rain && Object.keys(data.current.rain).length > 0) ||
                              (data.current?.snow && Object.keys(data.current.snow).length > 0);
 
-    if (
+    // Exclude fog, haze, smoke, or dust (weather IDs 701-781)
+    const isBadAtmosphere = typeof weatherId === 'number' && weatherId >= 700 && weatherId < 800;
+
+    // 1. GREAT WEATHER ADVISORY (Personal Ideal: Requires Cloud Shade / No harsh total sun)
+    const isGreatWeather = 
       typeof currentTemp === 'number' && 
       currentTemp >= GREAT_WEATHER_TEMP_MIN && 
       currentTemp <= GREAT_WEATHER_TEMP_MAX &&
-      isDaytime &&
+      isDaylightOrTwilight &&
       typeof humidity === 'number' && 
       humidity < GREAT_WEATHER_HUMIDITY_MAX &&
       typeof windSpeed === 'number' && 
       windSpeed < GREAT_WEATHER_WIND_MAX &&
-      weatherDesc.toLowerCase().trim() !== 'clear sky' &&
-      !hasPrecipitation
-    ) {
+      weatherDesc.toLowerCase().trim() !== 'clear sky' && // Personal rule: Require cloud shade
+      !isBadAtmosphere &&
+      !hasPrecipitation;
+
+    // 2. NICE WEATHER ADVISORY (Broader: Permits Clear Skies / Total Sun)
+    const isNiceWeather = 
+      typeof currentTemp === 'number' && 
+      currentTemp >= NICE_WEATHER_TEMP_MIN && 
+      currentTemp <= NICE_WEATHER_TEMP_MAX &&
+      isDaylightOrTwilight &&
+      typeof humidity === 'number' && 
+      humidity <= NICE_WEATHER_HUMIDITY_MAX &&
+      typeof windSpeed === 'number' && 
+      windSpeed <= NICE_WEATHER_WIND_MAX &&
+      !isBadAtmosphere &&
+      !hasPrecipitation;
+
+    // Helper function to scan upcoming hourly forecasts and find when conditions break
+    function getAdvisoryExpirationTimestamp(isGreatMode) {
+      const maxExpiration = (typeof sunset === 'number') ? sunset + daylightBufferSec : null;
+      if (!data.hourly || data.hourly.length === 0) return maxExpiration;
+
+      const tempMin = isGreatMode ? GREAT_WEATHER_TEMP_MIN : NICE_WEATHER_TEMP_MIN;
+      const tempMax = isGreatMode ? GREAT_WEATHER_TEMP_MAX : NICE_WEATHER_TEMP_MAX;
+      const humMax  = isGreatMode ? GREAT_WEATHER_HUMIDITY_MAX : NICE_WEATHER_HUMIDITY_MAX;
+      const windMax = isGreatMode ? GREAT_WEATHER_WIND_MAX : NICE_WEATHER_WIND_MAX;
+
+      // Filter upcoming hourly blocks for today
+      for (const h of data.hourly) {
+        if (!h.dt || h.dt <= now) continue;
+
+        // If forecast hour reaches or exceeds twilight end (sunset + 1hr), cap at twilight end
+        if (maxExpiration && h.dt >= maxExpiration) {
+          return maxExpiration;
+        }
+
+        const hTemp = h.temp;
+        const hHum = h.humidity;
+        const hWind = h.wind_speed;
+        const hWeatherId = h.weather?.[0]?.id;
+        const hWeatherDesc = h.weather?.[0]?.description || '';
+        const hPop = h.pop || 0;
+
+        const hPrecip = (typeof hWeatherId === 'number' && hWeatherId >= 200 && hWeatherId < 700) ||
+                        (h.rain && Object.keys(h.rain).length > 0) ||
+                        (h.snow && Object.keys(h.snow).length > 0) ||
+                        hPop >= 0.3; // 30%+ rain chance counts as incoming rain
+
+        const hBadAtmosphere = typeof hWeatherId === 'number' && hWeatherId >= 700 && hWeatherId < 800;
+
+        let passes = 
+          typeof hTemp === 'number' && hTemp >= tempMin && hTemp <= tempMax &&
+          typeof hHum === 'number' && hHum <= humMax &&
+          typeof hWind === 'number' && hWind <= windMax &&
+          !hBadAtmosphere &&
+          !hPrecip;
+
+        if (isGreatMode && hWeatherDesc.toLowerCase().trim() === 'clear sky') {
+          passes = false;
+        }
+
+        // If conditions break in this upcoming hour, this hour's start time is when the advisory expires!
+        if (!passes) {
+          return h.dt;
+        }
+      }
+
+      return maxExpiration;
+    }
+
+    if (isGreatWeather) {
       const displayTemp = Math.round(currentTemp);
       const displayHum = Math.round(humidity);
       const displayWind = Math.round(windSpeed);
+      const endTimestamp = getAdvisoryExpirationTimestamp(true);
+      const expireStr = endTimestamp
+        ? new Date(endTimestamp * 1000).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+        : 'Sundown';
+
       alerts.push({
         event: "GREAT WEATHER ADVISORY",
         sender_name: "Local Observations",
         start: now,
-        end: sunset || null,
+        end: endTimestamp,
         description: `Current conditions are exceptionally pleasant:
-• Temperature: ${displayTemp}°F (Pleasant range: ${GREAT_WEATHER_TEMP_MIN}-${GREAT_WEATHER_TEMP_MAX}°F)
-• Humidity: ${displayHum}% (Target: <${GREAT_WEATHER_HUMIDITY_MAX}%)
-• Wind Speed: ${displayWind} mph (Target: <${GREAT_WEATHER_WIND_MAX} mph)
-• Sunlight: Daytime
+• Temperature: ${displayTemp}°F
+• Humidity: ${displayHum}%
+• Wind Speed: ${displayWind} mph
+• Sky: Cloud Shade
+• Expires: ${expireStr}
 
-Perfect weather to head outdoors and enjoy the day!`
+Perfect shaded weather to head outdoors and enjoy the day!`
+      });
+    } else if (isNiceWeather) {
+      const displayTemp = Math.round(currentTemp);
+      const displayHum = Math.round(humidity);
+      const displayWind = Math.round(windSpeed);
+      const endTimestamp = getAdvisoryExpirationTimestamp(false);
+      const expireStr = endTimestamp
+        ? new Date(endTimestamp * 1000).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+        : 'Sundown';
+
+      alerts.push({
+        event: "NICE WEATHER ADVISORY",
+        sender_name: "Local Observations",
+        start: now,
+        end: endTimestamp,
+        description: `Current conditions are nice and pleasant:
+• Temperature: ${displayTemp}°F
+• Humidity: ${displayHum}%
+• Wind Speed: ${displayWind} mph
+• Expires: ${expireStr}
+
+Great weather to head outdoors!`
       });
     }
     
@@ -5144,13 +5312,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const finalColor = tempColor || activeColor;
     
     let trendHtml = '';
-    const prevHumidityVal = getHistoricalComparisonValue('weather_history_humidity', humidity);
-    const humidityDiff = humidity - prevHumidityVal;
-    const absHumidityDiff = Math.abs(humidityDiff);
-    
+    const humidityRounded = Math.round(humidity);
+    const humidityTrend = getPersistentTrendDirection('weather_trend_humidity', humidityRounded);
     let iconClass = '';
-    if (absHumidityDiff >= 0.5) {
-      iconClass = humidityDiff > 0 ? "fa-angle-up" : "fa-angle-down";
+    if (humidityTrend === 'up') {
+      iconClass = "fa-angle-up";
+    } else if (humidityTrend === 'down') {
+      iconClass = "fa-angle-down";
     }
     
     if (iconClass) {
@@ -5205,6 +5373,21 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }
     });
     
+    let trendHtml = '';
+    if (dewpoint !== null) {
+      const dewF = Math.round(dewpoint);
+      const dewTrend = getPersistentTrendDirection('weather_trend_dewpoint', dewF);
+      let iconClass = '';
+      if (dewTrend === 'up') {
+        iconClass = "fa-angle-up";
+      } else if (dewTrend === 'down') {
+        iconClass = "fa-angle-down";
+      }
+      if (iconClass) {
+        trendHtml = `<div style="position: absolute; top: ${BAROMETRIC_TREND_TOP_POS}; width: 100%; text-align: center; font-size: ${BAROMETRIC_TREND_FONT_SIZE};"><i class="fa-solid ${iconClass}"></i></div>`;
+      }
+    }
+
     gridDewpointTextEls.forEach(gridDewpointTextEl => {
       if (dewpoint !== null) {
         const dewF = Math.round(dewpoint);
@@ -5217,7 +5400,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           const dewDisplay = displayUnit === 'C' ? Math.round((dewF - 32) * 5 / 9) : dewF;
           displayStr = `${dewDisplay}${degSuffix}`;
         }
-        gridDewpointTextEl.innerHTML = `${displayStr}<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Td</span>`;
+        gridDewpointTextEl.innerHTML = `${trendHtml}${displayStr}<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Td</span>`;
       } else {
         gridDewpointTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Td</span>`;
       }
@@ -5544,15 +5727,15 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }
     }
     
-    // Determine trend arrow comparing current to ~30 min historical observation
+    // Determine persistent trend arrow for wind dots row
     let trendIconHtml = '';
-    const prevWindVal = getHistoricalComparisonValue('weather_history_wind_speed', windSpeed);
-    const windDiff = windSpeed - prevWindVal;
-    const absWindDiff = Math.abs(windDiff);
-
+    const windSpeedRounded = Math.round(windSpeed);
+    const windTrend = getPersistentTrendDirection('weather_trend_wind', windSpeedRounded);
     let iconClass = '';
-    if (absWindDiff >= 0.5) {
-      iconClass = windDiff > 0 ? "fa-angle-up" : "fa-angle-down";
+    if (windTrend === 'up') {
+      iconClass = "fa-angle-up";
+    } else if (windTrend === 'down') {
+      iconClass = "fa-angle-down";
     }
 
     if (iconClass) {
@@ -5708,15 +5891,15 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }
     }
     
-    // Determine trend arrow comparing current to ~30 min historical observation
+    // Determine persistent trend arrow for humidity dots row
     let trendIconHtml = '';
-    const prevHumidityVal = getHistoricalComparisonValue('weather_history_humidity', humidity);
-    const humidityDiff = humidity - prevHumidityVal;
-    const absHumidityDiff = Math.abs(humidityDiff);
-
+    const humidityRounded = Math.round(humidity);
+    const humidityTrend = getPersistentTrendDirection('weather_trend_humidity', humidityRounded);
     let iconClass = '';
-    if (absHumidityDiff >= 0.5) {
-      iconClass = humidityDiff > 0 ? "fa-angle-up" : "fa-angle-down";
+    if (humidityTrend === 'up') {
+      iconClass = "fa-angle-up";
+    } else if (humidityTrend === 'down') {
+      iconClass = "fa-angle-down";
     }
 
     if (iconClass) {
@@ -5888,16 +6071,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }
     }
     
-    // Determine trend arrow comparing current to ~30 min historical observation
+    // Determine persistent trend arrow for dewpoint dots row
     let trendIconHtml = '';
     if (dewpoint !== null) {
-      const prevDewpointVal = getHistoricalComparisonValue('weather_history_dewpoint', dewpoint);
-      const dewpointDiff = dewpoint - prevDewpointVal;
-      const absDewpointDiff = Math.abs(dewpointDiff);
-
+      const dewF = Math.round(dewpoint);
+      const dewTrend = getPersistentTrendDirection('weather_trend_dewpoint', dewF);
       let iconClass = '';
-      if (absDewpointDiff >= 0.2) {
-        iconClass = dewpointDiff > 0 ? "fa-angle-up" : "fa-angle-down";
+      if (dewTrend === 'up') {
+        iconClass = "fa-angle-up";
+      } else if (dewTrend === 'down') {
+        iconClass = "fa-angle-down";
       }
 
       if (iconClass) {
