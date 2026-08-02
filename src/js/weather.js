@@ -5517,8 +5517,19 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (summaryText) {
       el.textContent = summaryText;
       el.style.display = 'block';
+
+      // Dynamically measure summary height + margins to push background gradient overlays down in lockstep
+      requestAnimationFrame(() => {
+        const rect = el.getBoundingClientRect();
+        const style = window.getComputedStyle(el);
+        const mTop = parseFloat(style.marginTop) || 0;
+        const mBottom = parseFloat(style.marginBottom) || 0;
+        const totalPush = rect.height + mTop + mBottom;
+        document.documentElement.style.setProperty('--summary-push', `${totalPush}px`);
+      });
     } else {
       el.style.display = 'none';
+      document.documentElement.style.setProperty('--summary-push', '0px');
     }
 
     // Apply temperature color matching labels
