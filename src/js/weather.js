@@ -5435,19 +5435,19 @@ Plan ahead for significantly warmer conditions tomorrow!`
   }
 
   // --- Daily Weather Summary Line Config (DUAL Desktop & Mobile) ---
-  const DAILY_SUMMARY_WIDTH_DESKTOP = '40%';             // ----EDITABLE Desktop: Width of summary text line (40% centered)
-  const DAILY_SUMMARY_WIDTH_MOBILE = '40%';              // EDITABLE Mobile: Width of summary text line (40% centered)
+  const DAILY_SUMMARY_WIDTH_DESKTOP = '65vw';            // EDITABLE Desktop: Centered block width in vw (e.g. '40vw', '50vw')
+  const DAILY_SUMMARY_WIDTH_MOBILE = '70vw';             // EDITABLE Mobile: Centered block width in vw (e.g. '70vw', '80vw')
 
-  const DAILY_SUMMARY_FONT_SIZE_DESKTOP = '1.6vw';       // E--DITABLE Desktop: Font size (e.g. '1.6vw', '2vw', '1vw')
-  const DAILY_SUMMARY_FONT_SIZE_MOBILE = '4vw';          // EDITABLE Mobile: Font size (e.g. '5vw', '3.5vw', '4vw')
+  const DAILY_SUMMARY_FONT_SIZE_DESKTOP = '3.6vw';       // EDITABLE Desktop: Font size (e.g. '1.6vw', '2vw', '3.6vw')
+  const DAILY_SUMMARY_FONT_SIZE_MOBILE = '4vw';          // EDITABLE Mobile: Font size (e.g. '4vw', '5vw', '3.5vw')
 
   const DAILY_SUMMARY_LETTER_SPACING_DESKTOP = '-0.005em';// EDITABLE Desktop: Kerning matching dial labels
   const DAILY_SUMMARY_LETTER_SPACING_MOBILE = '-.225vw';  // EDITABLE Mobile: Kerning matching top text lines
 
-  const DAILY_SUMMARY_LINE_HEIGHT_DESKTOP = '1.35';     // EDITABLE Desktop: Line height / leading
-  const DAILY_SUMMARY_LINE_HEIGHT_MOBILE = '1.2';      // EDITABLE Mobile: Line height / leading
+  const DAILY_SUMMARY_LINE_HEIGHT_DESKTOP = '1';         // EDITABLE Desktop: Line height / leading
+  const DAILY_SUMMARY_LINE_HEIGHT_MOBILE = '1.2';        // EDITABLE Mobile: Line height / leading
 
-  const DAILY_SUMMARY_MARGIN_TOP_DESKTOP = '-2vw';       // EDITABLE Desktop: Space ABOVE summary line
+  const DAILY_SUMMARY_MARGIN_TOP_DESKTOP = '-2.5vw';       // EDITABLE Desktop: Space ABOVE summary line
   const DAILY_SUMMARY_MARGIN_TOP_MOBILE = '-2vw';        // EDITABLE Mobile: Space ABOVE summary line
 
   const DAILY_SUMMARY_MARGIN_BOTTOM_DESKTOP = '-3.6vw';  // EDITABLE Desktop: Space BELOW summary line
@@ -5532,11 +5532,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
       document.documentElement.style.setProperty('--summary-push', '0px');
     }
 
-    // Apply temperature color matching labels
-    if (data?.current?.temp != null) {
-      const tempColorLocal = tempToColor(data.current.temp);
-      if (tempColorLocal) {
-        el.style.color = tempColorLocal;
+    // Apply color associated strictly with current temperature + 10
+    const currentTemp = data?.current?.temp;
+    if (typeof currentTemp === 'number') {
+      const summaryColor = tempToColor(currentTemp + 10);
+      if (summaryColor) {
+        el.style.color = summaryColor;
       }
     }
   }
