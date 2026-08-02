@@ -41,3 +41,7 @@ When displaying RainViewer Doppler radar data in this workspace, follow these co
    - Avoid over-engineering, complex abstractions, or unnecessary hidden logic.
    - Use straightforward JS constants, CSS variables, and clean DOM manipulation that the user can easily read, tweak, and edit manually.
    - Never run `git commit` or modifying Git commands automatically; leave file changes uncommitted on disk for the user to review and commit on their timeline.
+
+8. **Dual Desktop & Mobile Config Constants**:
+   - Whenever creating or updating UI layout & typography parameters, ALWAYS provide explicit `_DESKTOP` and `_MOBILE` constant pairs (e.g. `FEATURE_WIDTH_DESKTOP`, `FEATURE_WIDTH_MOBILE`, `FEATURE_FONT_SIZE_DESKTOP`, `FEATURE_FONT_SIZE_MOBILE`).
+   - This allows the user to easily read, tweak, and edit separate numbers for desktop and mobile right in the JS/CSS config section.

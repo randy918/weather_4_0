@@ -5434,12 +5434,24 @@ Plan ahead for significantly warmer conditions tomorrow!`
     });
   }
 
-  // --- Daily Weather Summary Line Config ---
-  const DAILY_SUMMARY_WIDTH = '40%';               // EDITABLE: Width of the daily summary text line (40% centered)
-  const DAILY_SUMMARY_FONT_SIZE = '1.6vw';         // EDITABLE: Base font size matching dial labels
-  const DAILY_SUMMARY_LETTER_SPACING = '-0.005em'; // EDITABLE: Kerning matching dial labels
-  const DAILY_SUMMARY_MARGIN_TOP = '-2vw';        // --EDITABLE: Space ABOVE summary line (below Sweltering)
-  const DAILY_SUMMARY_MARGIN_BOTTOM = '-3.6vw';       // EDITABLE: Space BELOW summary line (above first dial row)
+  // --- Daily Weather Summary Line Config (DUAL Desktop & Mobile) ---
+  const DAILY_SUMMARY_WIDTH_DESKTOP = '40%';             // EDITABLE Desktop: Width of summary text line (40% centered)
+  const DAILY_SUMMARY_WIDTH_MOBILE = '40%';              // EDITABLE Mobile: Width of summary text line (40% centered)
+
+  const DAILY_SUMMARY_FONT_SIZE_DESKTOP = '1.6vw';       // EDITABLE Desktop: Font size (e.g. '1.6vw', '2vw', '1vw')
+  const DAILY_SUMMARY_FONT_SIZE_MOBILE = '4vw';          // EDITABLE Mobile: Font size (e.g. '5vw', '3.5vw', '4vw')
+
+  const DAILY_SUMMARY_LETTER_SPACING_DESKTOP = '-0.005em';// EDITABLE Desktop: Kerning matching dial labels
+  const DAILY_SUMMARY_LETTER_SPACING_MOBILE = '-.225vw';  // EDITABLE Mobile: Kerning matching top text lines
+
+  const DAILY_SUMMARY_LINE_HEIGHT_DESKTOP = '1.35';     // EDITABLE Desktop: Line height / leading
+  const DAILY_SUMMARY_LINE_HEIGHT_MOBILE = '1.2';      // EDITABLE Mobile: Line height / leading
+
+  const DAILY_SUMMARY_MARGIN_TOP_DESKTOP = '-2vw';       // EDITABLE Desktop: Space ABOVE summary line
+  const DAILY_SUMMARY_MARGIN_TOP_MOBILE = '-2vw';        // EDITABLE Mobile: Space ABOVE summary line
+
+  const DAILY_SUMMARY_MARGIN_BOTTOM_DESKTOP = '-3.6vw';  // EDITABLE Desktop: Space BELOW summary line
+  const DAILY_SUMMARY_MARGIN_BOTTOM_MOBILE = '1vw';      // EDITABLE Mobile: Space BELOW summary line
 
   // Create and update daily weather summary line between Sweltering and the first dial row
   function updateDailySummary(data) {
@@ -5457,18 +5469,28 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       el.style.textAlign = 'center';
       el.style.fontFamily = "'light', sans-serif";
-      el.style.fontSize = DAILY_SUMMARY_FONT_SIZE;
-      el.style.letterSpacing = DAILY_SUMMARY_LETTER_SPACING;
-      el.style.lineHeight = '1.35';
       el.style.textTransform = 'none';
       el.style.boxSizing = 'border-box';
       el.style.pointerEvents = 'none';
     }
 
-    // Apply width and margins dynamically
-    el.style.width = DAILY_SUMMARY_WIDTH;
-    el.style.maxWidth = DAILY_SUMMARY_WIDTH;
-    el.style.margin = `${DAILY_SUMMARY_MARGIN_TOP} auto ${DAILY_SUMMARY_MARGIN_BOTTOM}`;
+    // Determine current layout (Mobile <= 767px vs Desktop)
+    const isMobile = window.innerWidth <= 767;
+
+    const width = isMobile ? DAILY_SUMMARY_WIDTH_MOBILE : DAILY_SUMMARY_WIDTH_DESKTOP;
+    const fontSize = isMobile ? DAILY_SUMMARY_FONT_SIZE_MOBILE : DAILY_SUMMARY_FONT_SIZE_DESKTOP;
+    const letterSpacing = isMobile ? DAILY_SUMMARY_LETTER_SPACING_MOBILE : DAILY_SUMMARY_LETTER_SPACING_DESKTOP;
+    const lineHeight = isMobile ? DAILY_SUMMARY_LINE_HEIGHT_MOBILE : DAILY_SUMMARY_LINE_HEIGHT_DESKTOP;
+    const marginTop = isMobile ? DAILY_SUMMARY_MARGIN_TOP_MOBILE : DAILY_SUMMARY_MARGIN_TOP_DESKTOP;
+    const marginBottom = isMobile ? DAILY_SUMMARY_MARGIN_BOTTOM_MOBILE : DAILY_SUMMARY_MARGIN_BOTTOM_DESKTOP;
+
+    // Apply DUAL properties dynamically (100% controlled by JS constants)
+    el.style.width = width;
+    el.style.maxWidth = width;
+    el.style.fontSize = fontSize;
+    el.style.letterSpacing = letterSpacing;
+    el.style.lineHeight = lineHeight;
+    el.style.margin = `${marginTop} auto ${marginBottom}`;
 
     // Position directly between Sweltering (#weather-description-duplicate or #weather-description) and the first dial row
     const swelteringTarget = document.getElementById('weather-description-duplicate') ||
