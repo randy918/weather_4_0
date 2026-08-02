@@ -931,6 +931,9 @@ import weatherConditions from '../data/weather-conditions.json';
     // Update clock grid row
     updateClockGridRow(data);
 
+    // Update daily weather summary line
+    updateDailySummary(data);
+
     // Update sun dial
     updateSunDial(data);
 
@@ -2211,8 +2214,8 @@ import weatherConditions from '../data/weather-conditions.json';
       }
     });
 
-    // Check if Great Weathery Advisory conditions are met
-    const currentTemp = data.current?.temp;
+    // Check if Great / Nice Weather Advisory conditions are met (Using "Feels Like" temperature)
+    const currentFeelsLike = data.current?.feels_like ?? data.current?.temp;
     const humidity = data.current?.humidity;
     const windSpeed = data.current?.wind_speed;
     const now = Math.floor(Date.now() / 1000);
@@ -2237,9 +2240,9 @@ import weatherConditions from '../data/weather-conditions.json';
 
     // 1. GREAT WEATHER ADVISORY (Personal Ideal: Requires Cloud Shade / No harsh total sun)
     const isGreatWeather = 
-      typeof currentTemp === 'number' && 
-      currentTemp >= GREAT_WEATHER_TEMP_MIN && 
-      currentTemp <= GREAT_WEATHER_TEMP_MAX &&
+      typeof currentFeelsLike === 'number' && 
+      currentFeelsLike >= GREAT_WEATHER_TEMP_MIN && 
+      currentFeelsLike <= GREAT_WEATHER_TEMP_MAX &&
       isDaylightOrTwilight &&
       typeof humidity === 'number' && 
       humidity < GREAT_WEATHER_HUMIDITY_MAX &&
@@ -2251,9 +2254,9 @@ import weatherConditions from '../data/weather-conditions.json';
 
     // 2. NICE WEATHER ADVISORY (Broader: Permits Clear Skies / Total Sun)
     const isNiceWeather = 
-      typeof currentTemp === 'number' && 
-      currentTemp >= NICE_WEATHER_TEMP_MIN && 
-      currentTemp <= NICE_WEATHER_TEMP_MAX &&
+      typeof currentFeelsLike === 'number' && 
+      currentFeelsLike >= NICE_WEATHER_TEMP_MIN && 
+      currentFeelsLike <= NICE_WEATHER_TEMP_MAX &&
       isDaylightOrTwilight &&
       typeof humidity === 'number' && 
       humidity <= NICE_WEATHER_HUMIDITY_MAX &&
@@ -2281,7 +2284,7 @@ import weatherConditions from '../data/weather-conditions.json';
           return maxExpiration;
         }
 
-        const hTemp = h.temp;
+        const hFeelsLike = h.feels_like ?? h.temp;
         const hHum = h.humidity;
         const hWind = h.wind_speed;
         const hWeatherId = h.weather?.[0]?.id;
@@ -2296,7 +2299,7 @@ import weatherConditions from '../data/weather-conditions.json';
         const hBadAtmosphere = typeof hWeatherId === 'number' && hWeatherId >= 700 && hWeatherId < 800;
 
         let passes = 
-          typeof hTemp === 'number' && hTemp >= tempMin && hTemp <= tempMax &&
+          typeof hFeelsLike === 'number' && hFeelsLike >= tempMin && hFeelsLike <= tempMax &&
           typeof hHum === 'number' && hHum <= humMax &&
           typeof hWind === 'number' && hWind <= windMax &&
           !hBadAtmosphere &&
@@ -2316,7 +2319,7 @@ import weatherConditions from '../data/weather-conditions.json';
     }
 
     if (isGreatWeather) {
-      const displayTemp = Math.round(currentTemp);
+      const displayFeelsLike = Math.round(currentFeelsLike);
       const displayHum = Math.round(humidity);
       const displayWind = Math.round(windSpeed);
       const endTimestamp = getAdvisoryExpirationTimestamp(true);
@@ -2330,7 +2333,7 @@ import weatherConditions from '../data/weather-conditions.json';
         start: now,
         end: endTimestamp,
         description: `Current conditions are exceptionally pleasant:
-• Temperature: ${displayTemp}°F
+• Feels Like: ${displayFeelsLike}°F
 • Humidity: ${displayHum}%
 • Wind Speed: ${displayWind} mph
 • Sky: Cloud Shade
@@ -2339,7 +2342,7 @@ import weatherConditions from '../data/weather-conditions.json';
 Perfect shaded weather to head outdoors and enjoy the day!`
       });
     } else if (isNiceWeather) {
-      const displayTemp = Math.round(currentTemp);
+      const displayFeelsLike = Math.round(currentFeelsLike);
       const displayHum = Math.round(humidity);
       const displayWind = Math.round(windSpeed);
       const endTimestamp = getAdvisoryExpirationTimestamp(false);
@@ -2353,7 +2356,7 @@ Perfect shaded weather to head outdoors and enjoy the day!`
         start: now,
         end: endTimestamp,
         description: `Current conditions are nice and pleasant:
-• Temperature: ${displayTemp}°F
+• Feels Like: ${displayFeelsLike}°F
 • Humidity: ${displayHum}%
 • Wind Speed: ${displayWind} mph
 • Expires: ${expireStr}
@@ -3960,7 +3963,28 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const EARTH_IMAGE_MARGIN_BOTTOM = '4vw';  // Gap below the Earth image
   const EARTH_MASK_RADIUS = '49.5%'; // EDITABLE: Shrink circle slightly to hide edge artifacts (49.5% = 99% size)
   const EARTH_MASK_POSITION_Y = '50.25%'; // EDITABLE: Shift mask down to crop exactly 0.5% more from the top only
-  const LAST_UPDATED_MARGIN_TOP = '30vw'; // EDITABLE: Top offset pushing App Last Updated note 30vw down into scroll area
+
+  // --- EDITABLE: Location Switcher Config (Positioned above Weather Last Updated) ---
+  const LOCATION_SWITCHER_CONFIG = [
+    { name: 'Tulsa', lat: 36.10336, lon: -95.92734 },
+    { name: 'Traverse City', lat: 44.76306, lon: -85.62063 }
+    // Future locations can easily be added here
+  ];
+
+  const LOCATION_GROUP_MARGIN_TOP = '2vw';        // EDITABLE: Top offset pushing the Location group down below grid/earth
+  const LOCATION_GROUP_MARGIN_BOTTOM = '2vw';     // EDITABLE: Space below the Location group (above Weather Last Updated)
+  const LOCATION_ITEM_MARGIN_TOP = '-2vw';       // EDITABLE: Space above each individual city entry
+  const LOCATION_ITEM_MARGIN_BOTTOM = '0.5vw';    // EDITABLE: Space below each individual city entry
+  const LOCATION_TYPESIZE = '5vw';                // EDITABLE: Font size (matches top city word size)
+  const LOCATION_LETTER_SPACING = '-0.05vw';      // EDITABLE: Kerning / letter spacing (matches top city word)
+  const LOCATION_FONT_FAMILY = "'light', sans-serif"; // EDITABLE: Font family / style (matches top city word)
+  const LOCATION_ACTIVE_COLOR = '#ffffff';        // EDITABLE: Color for currently selected active location
+  const LOCATION_ACTIVE_OPACITY = '1.0';          // EDITABLE: Opacity for active location
+  const LOCATION_INACTIVE_COLOR = 'rgba(255, 255, 255, 0.45)'; // EDITABLE: Color for inactive location
+  const LOCATION_INACTIVE_OPACITY = '0.45';      // EDITABLE: Opacity for inactive location
+  const LOCATION_HOVER_OPACITY = '0.85';         // EDITABLE: Hover opacity for inactive locations
+
+  const LAST_UPDATED_MARGIN_TOP = LOCATION_GROUP_MARGIN_BOTTOM; // EDITABLE: Top offset pushing App Last Updated note below location switcher
 
   // Store the current temperature for use by countdown updates
   let currentTempForDots = null;
@@ -5410,6 +5434,80 @@ Plan ahead for significantly warmer conditions tomorrow!`
     });
   }
 
+  // --- Daily Weather Summary Line Config ---
+  const DAILY_SUMMARY_WIDTH = '40%';               // EDITABLE: Width of the daily summary text line (40% centered)
+  const DAILY_SUMMARY_FONT_SIZE = '1.6vw';         // EDITABLE: Base font size matching dial labels
+  const DAILY_SUMMARY_LETTER_SPACING = '-0.005em'; // EDITABLE: Kerning matching dial labels
+  const DAILY_SUMMARY_MARGIN_TOP = '-2vw';        // --EDITABLE: Space ABOVE summary line (below Sweltering)
+  const DAILY_SUMMARY_MARGIN_BOTTOM = '-3.6vw';       // EDITABLE: Space BELOW summary line (above first dial row)
+
+  // Create and update daily weather summary line between Sweltering and the first dial row
+  function updateDailySummary(data) {
+    let summaryText = (data?.daily?.[0]?.summary || '').trim();
+    if (summaryText && !/[.!?]$/.test(summaryText)) {
+      summaryText += '.';
+    }
+    
+    let el = document.getElementById('daily-weather-summary');
+
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'daily-weather-summary';
+      el.className = 'daily-weather-summary';
+
+      el.style.textAlign = 'center';
+      el.style.fontFamily = "'light', sans-serif";
+      el.style.fontSize = DAILY_SUMMARY_FONT_SIZE;
+      el.style.letterSpacing = DAILY_SUMMARY_LETTER_SPACING;
+      el.style.lineHeight = '1.35';
+      el.style.textTransform = 'none';
+      el.style.boxSizing = 'border-box';
+      el.style.pointerEvents = 'none';
+    }
+
+    // Apply width and margins dynamically
+    el.style.width = DAILY_SUMMARY_WIDTH;
+    el.style.maxWidth = DAILY_SUMMARY_WIDTH;
+    el.style.margin = `${DAILY_SUMMARY_MARGIN_TOP} auto ${DAILY_SUMMARY_MARGIN_BOTTOM}`;
+
+    // Position directly between Sweltering (#weather-description-duplicate or #weather-description) and the first dial row
+    const swelteringTarget = document.getElementById('weather-description-duplicate') ||
+                             document.getElementById('weather-description');
+
+    const firstDialRow = document.getElementById('clock-grid-container') ||
+                         document.querySelector('.clockGridContainer7') ||
+                         document.querySelector('.clockGridContainer4') ||
+                         document.querySelector('.clockGridContainer') ||
+                         document.getElementById('refresh-dots-container');
+
+    if (swelteringTarget && swelteringTarget.parentNode) {
+      if (el.previousSibling !== swelteringTarget) {
+        swelteringTarget.parentNode.insertBefore(el, swelteringTarget.nextSibling);
+      }
+    } else if (firstDialRow && firstDialRow.parentNode) {
+      if (el.nextSibling !== firstDialRow) {
+        firstDialRow.parentNode.insertBefore(el, firstDialRow);
+      }
+    } else {
+      (document.querySelector('main.content') || document.body).appendChild(el);
+    }
+
+    if (summaryText) {
+      el.textContent = summaryText;
+      el.style.display = 'block';
+    } else {
+      el.style.display = 'none';
+    }
+
+    // Apply temperature color matching labels
+    if (data?.current?.temp != null) {
+      const tempColorLocal = tempToColor(data.current.temp);
+      if (tempColorLocal) {
+        el.style.color = tempColorLocal;
+      }
+    }
+  }
+
   // Update the sun dial in grid cell #6 (index 5)
   function updateSunDial(data) {
     const gridSunProgressEls = document.querySelectorAll('.clockGridItem-5 .countdown-progress');
@@ -6644,7 +6742,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   // update a small "last-updated" indicator in the DOM (creates it if missing)
   function updateLastUpdated(date) {
-    const container = document.querySelector('main.content') || document.body;
+    const container = document.querySelector('main') || document.body;
     const id = 'weather-last-updated';
     let span = document.getElementById(id);
     
@@ -6657,6 +6755,18 @@ Plan ahead for significantly warmer conditions tomorrow!`
     // Safely grab the timestamp injected by Vite during the build process
     const appBuildDate = typeof __APP_BUILD_DATE__ !== 'undefined' ? __APP_BUILD_DATE__ : 'Local Dev Mode';
 
+    // Render or update the Location Switcher directly below Earth image / spacer
+    updateLocationSwitcherDisplay();
+
+    // Position F/C format buttons directly BELOW location switcher
+    const btnContainer = document.getElementById('temp-format-buttons');
+    const locSwitcher = document.getElementById('weather-location-switcher');
+    if (btnContainer && locSwitcher && locSwitcher.parentNode) {
+      if (locSwitcher.nextSibling !== btnContainer) {
+        locSwitcher.parentNode.insertBefore(btnContainer, locSwitcher.nextSibling);
+      }
+    }
+
     if (span) {
       span.innerHTML = `Weather last updated: ${text}<br>App last updated: ${appBuildDate}<br>Radar data from RainViewer • Weather data from OpenWeather`;
       span.style.fontSize = '1.6875vw';
@@ -6668,8 +6778,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
       span.id = id;
       span.innerHTML = `Weather last updated: ${text}<br>App last updated: ${appBuildDate}<br>Radar data from RainViewer • Weather data from OpenWeather`;
       span.style.position = 'relative'; // Normal document flow
-      span.style.margin = `${LAST_UPDATED_MARGIN_TOP} auto 0`; // Pushes note 30vw down into scrollable region
-      span.style.paddingBottom = '4vw'; // Use padding instead of margin to prevent collapse
+      span.style.margin = `${LAST_UPDATED_MARGIN_TOP} auto 0`;
+      span.style.paddingBottom = '4vw';
       span.style.width = '100%';
       span.style.fontSize = '1.6875vw'; // 75% of 2.25vw
       span.style.fontFamily = "'light', sans-serif";
@@ -6680,16 +6790,114 @@ Plan ahead for significantly warmer conditions tomorrow!`
       span.style.textAlign = 'center';
       span.style.pointerEvents = 'none';
       span.style.zIndex = '10';
-      container.appendChild(span);
     }
 
-    // Reposition the buttons right below the last-updated element
-    const btnContainer = document.getElementById('temp-format-buttons');
-    if (btnContainer) {
-      if (span.nextSibling !== btnContainer) {
-        container.insertBefore(btnContainer, span.nextSibling);
+    // Position #weather-last-updated at the VERY BOTTOM below format buttons / location switcher
+    const bottomTarget = btnContainer || locSwitcher;
+    if (bottomTarget && bottomTarget.parentNode) {
+      if (bottomTarget.nextSibling !== span) {
+        bottomTarget.parentNode.insertBefore(span, bottomTarget.nextSibling);
       }
+    } else if (!span.parentNode) {
+      container.appendChild(span);
     }
+  }
+
+  // Render and update location switcher items (Tulsa, Traverse City, etc.) above Last Updated text
+  function updateLocationSwitcherDisplay() {
+    const id = 'weather-location-switcher';
+    let container = document.getElementById(id);
+    const lastUpdatedEl = document.getElementById('weather-last-updated');
+    const mainContainer = document.querySelector('main') || document.body;
+
+    if (!container) {
+      container = document.createElement('div');
+      container.id = id;
+      container.style.position = 'relative';
+      container.style.width = '100%';
+      container.style.textAlign = 'center';
+      container.style.zIndex = '15';
+      container.style.opacity = '1';
+      container.style.transition = 'opacity 1s ease';
+    } else {
+      container.style.opacity = '1';
+    }
+
+    // Set CSS custom properties for CSS accessibility
+    document.documentElement.style.setProperty('--location-group-margin-top', LOCATION_GROUP_MARGIN_TOP);
+    document.documentElement.style.setProperty('--location-group-margin-bottom', LOCATION_GROUP_MARGIN_BOTTOM);
+    document.documentElement.style.setProperty('--location-item-margin-top', LOCATION_ITEM_MARGIN_TOP);
+    document.documentElement.style.setProperty('--location-item-margin-bottom', LOCATION_ITEM_MARGIN_BOTTOM);
+    document.documentElement.style.setProperty('--location-typesize', LOCATION_TYPESIZE);
+    document.documentElement.style.setProperty('--location-letter-spacing', LOCATION_LETTER_SPACING);
+    document.documentElement.style.setProperty('--location-font-family', LOCATION_FONT_FAMILY);
+    document.documentElement.style.setProperty('--location-active-color', LOCATION_ACTIVE_COLOR);
+    document.documentElement.style.setProperty('--location-inactive-color', LOCATION_INACTIVE_COLOR);
+
+    // Ensure container is inserted below Earth image / spacer in the DOM
+    const earthSpacer = document.getElementById('earth-image-spacer');
+    const earthContainer = document.getElementById('earth-image-container');
+
+    if (earthSpacer && earthSpacer.parentNode) {
+      if (earthSpacer.nextSibling !== container) {
+        earthSpacer.parentNode.insertBefore(container, earthSpacer.nextSibling);
+      }
+    } else if (earthContainer && earthContainer.parentNode) {
+      if (earthContainer.nextSibling !== container) {
+        earthContainer.parentNode.insertBefore(container, earthContainer.nextSibling);
+      }
+    } else if (!container.parentNode) {
+      mainContainer.appendChild(container);
+    }
+
+    container.style.marginTop = LOCATION_GROUP_MARGIN_TOP;
+    container.style.marginBottom = LOCATION_GROUP_MARGIN_BOTTOM;
+
+    // Clear and build location items for high future-proof flexibility
+    container.innerHTML = '';
+    LOCATION_SWITCHER_CONFIG.forEach(loc => {
+      const cityEl = document.createElement('div');
+      cityEl.className = 'location-switcher-item';
+      cityEl.textContent = loc.name;
+
+      // Check if location matches current lat/lon
+      const isActive = Math.abs(LAT - loc.lat) < 0.1 && Math.abs(LON - loc.lon) < 0.1;
+
+      cityEl.style.fontSize = LOCATION_TYPESIZE;
+      cityEl.style.fontFamily = LOCATION_FONT_FAMILY;
+      cityEl.style.letterSpacing = LOCATION_LETTER_SPACING;
+      cityEl.style.marginTop = LOCATION_ITEM_MARGIN_TOP;
+      cityEl.style.marginBottom = LOCATION_ITEM_MARGIN_BOTTOM;
+      cityEl.style.cursor = 'pointer';
+      cityEl.style.transition = 'all 0.25s ease';
+      cityEl.style.color = isActive ? LOCATION_ACTIVE_COLOR : LOCATION_INACTIVE_COLOR;
+      cityEl.style.opacity = isActive ? LOCATION_ACTIVE_OPACITY : LOCATION_INACTIVE_OPACITY;
+
+      cityEl.addEventListener('mouseenter', () => {
+        const currentlyActive = Math.abs(LAT - loc.lat) < 0.1 && Math.abs(LON - loc.lon) < 0.1;
+        if (!currentlyActive) {
+          cityEl.style.opacity = LOCATION_HOVER_OPACITY;
+          cityEl.style.color = 'white';
+        }
+      });
+
+      cityEl.addEventListener('mouseleave', () => {
+        const currentlyActive = Math.abs(LAT - loc.lat) < 0.1 && Math.abs(LON - loc.lon) < 0.1;
+        if (!currentlyActive) {
+          cityEl.style.opacity = LOCATION_INACTIVE_OPACITY;
+          cityEl.style.color = LOCATION_INACTIVE_COLOR;
+        }
+      });
+
+      cityEl.addEventListener('click', () => {
+        console.log(`📍 Switching location to: ${loc.name} (${loc.lat}, ${loc.lon})`);
+        LAT = loc.lat;
+        LON = loc.lon;
+        getLocalWeather(); // Re-fetch weather data & update display
+      });
+
+      container.appendChild(cityEl);
+    });
   }
 
   // Helper to persistently record missing assets to a To-Do list
@@ -7125,12 +7333,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
     spacer.style.height = EARTH_IMAGE_MARGIN_BOTTOM;
     spacer.style.width = '100%';
     
-    // Ensure Earth goes ABOVE the Missing Assets To-Do list or Last Updated text
+    // Ensure Earth goes ABOVE the Cities Location Switcher or Last Updated text
+    const locSwitcher = document.getElementById('weather-location-switcher');
     const missingAssets = document.getElementById('weather-missing-assets');
     const lastUpdated = document.getElementById('weather-last-updated');
     const secondGauge = document.querySelector('.second-gauge-container');
     
-    if (missingAssets && missingAssets.parentNode) {
+    if (locSwitcher && locSwitcher.parentNode) {
+      locSwitcher.parentNode.insertBefore(container, locSwitcher);
+      locSwitcher.parentNode.insertBefore(spacer, locSwitcher);
+    } else if (missingAssets && missingAssets.parentNode) {
       missingAssets.parentNode.insertBefore(container, missingAssets);
       missingAssets.parentNode.insertBefore(spacer, missingAssets);
     } else if (lastUpdated && lastUpdated.parentNode) {
@@ -7140,7 +7352,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       secondGauge.parentNode.insertBefore(container, secondGauge.nextSibling);
       secondGauge.parentNode.insertBefore(spacer, container.nextSibling);
     } else {
-      const parent = document.querySelector('main.content') || document.body;
+      const parent = document.querySelector('main') || document.body;
       parent.appendChild(container);
       parent.appendChild(spacer);
     }
@@ -8004,11 +8216,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
       
       if (displayUnit === 'BOTH') {
         const hiTempC = Math.round((hiTempF - 32) * 5 / 9);
-        const colorStyle = hiTempF >= 100 ? 'color: hsl(30, 100%, 50%) !important;' : '';
-        item.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${hiTempF}${formatSlash()}${hiTempC}</span>`;
+        const colorStyle = hiTempF >= 100 ? 'color: hsl(30, 100%, 50%) !important;' : 'color: var(--theBrown);';
+        item.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: 10; top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${hiTempF}${formatSlash()}${hiTempC}</span>`;
       } else {
-        const colorStyle = hiTempF >= 100 ? ' style="color: hsl(30, 100%, 50%) !important;"' : '';
-        item.innerHTML = `<span${colorStyle}>${hiTempDisplay}°</span>`;
+        const colorStyle = hiTempF >= 100 ? 'style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: 10;"' : 'style="color: var(--theBrown); position: relative; z-index: 10;"';
+        item.innerHTML = `<span ${colorStyle}>${hiTempDisplay}°</span>`;
       }
       item.style.backgroundColor = tempToColor(hiTempF) || '';
       item.style.opacity = '1';
@@ -8019,11 +8231,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
         
         if (displayUnit === 'BOTH') {
           const loTempC = Math.round((loTempF - 32) * 5 / 9);
-          const colorStyle = loTempF >= 100 ? 'color: hsl(30, 100%, 50%) !important;' : '';
-          loItems[index].innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${loTempF}${formatSlash()}${loTempC}</span>`;
+          const colorStyle = loTempF >= 100 ? 'color: hsl(30, 100%, 50%) !important;' : 'color: var(--theBrown);';
+          loItems[index].innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: 10; top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${loTempF}${formatSlash()}${loTempC}</span>`;
         } else {
-          const colorStyle = loTempF >= 100 ? ' style="color: hsl(30, 100%, 50%) !important;"' : '';
-          loItems[index].innerHTML = `<span${colorStyle}>${loTempDisplay}°</span>`;
+          const colorStyle = loTempF >= 100 ? 'style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: 10;"' : 'style="color: var(--theBrown); position: relative; z-index: 10;"';
+          loItems[index].innerHTML = `<span ${colorStyle}>${loTempDisplay}°</span>`;
         }
         loItems[index].style.backgroundColor = tempToColor(loTempF) || '';
         loItems[index].style.opacity = '1';
@@ -8937,6 +9149,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
         if (earth) earth.style.opacity = '1';
         const lastUpd = document.getElementById('weather-last-updated');
         if (lastUpd) lastUpd.style.opacity = '1';
+        const locSwitcher = document.getElementById('weather-location-switcher');
+        if (locSwitcher) locSwitcher.style.opacity = '1';
         
         const descImg = document.getElementById('weather-desc-image');
         if (descImg) descImg.style.opacity = '1';

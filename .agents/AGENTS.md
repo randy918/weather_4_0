@@ -35,3 +35,9 @@ When displaying RainViewer Doppler radar data in this workspace, follow these co
 
 6. **Preserve Radar Sizing, Zoom, and Offsets**:
    - Never alter the zoom constants (`RAINVIEWER_ZOOM_LEFT`, `RAINVIEWER_ZOOM_RIGHT`, `RADAR_ZOOM_LEFT`, `RADAR_ZOOM_RIGHT`) or circle coverage diameters (e.g., `RADAR_INNER_CIRCLE_DIAMETER`), as these are calibrated to ensure the coordinate ratios and maps line up perfectly.
+
+7. **Mundane & Readable Coding Style**:
+   - Keep JS, CSS, and HTML simple, direct, and readable.
+   - Avoid over-engineering, complex abstractions, or unnecessary hidden logic.
+   - Use straightforward JS constants, CSS variables, and clean DOM manipulation that the user can easily read, tweak, and edit manually.
+   - Never run `git commit` or modifying Git commands automatically; leave file changes uncommitted on disk for the user to review and commit on their timeline.

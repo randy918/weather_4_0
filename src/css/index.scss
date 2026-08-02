@@ -612,26 +612,7 @@ main {
     z-index: 1;
 }
 
-.loItem {
-    background-color: transparent; // Start transparent until JS injects the actual temp color
-    opacity: 0; // Hide until JS injects data
-    transition: opacity 0.5s ease; // Smooth fade-in
-    border-width: .5vw;
-    line-height: 1.2;
-    font-family: "bold", sans-serif;
-    font-size: 5vw;
-    color: var(--theBrown);
-
-    // Soft black shadow - easily editable
-    // Format: horizontal vertical blur spread color
-    box-shadow: 0 0.4vw 1.2vw 0 rgba(0, 0, 0, 1);
-
-    // border-style: solid;
-    // border-color: var(--theBrown);
-
-
-}
-
+.loItem,
 .hiItem {
     background-color: transparent; // Start transparent until JS injects the actual temp color
     opacity: 0; // Hide until JS injects data
@@ -640,10 +621,31 @@ main {
     font-family: "bold", sans-serif;
     font-size: 5vw;
     color: var(--theBrown);
-    //     border-width: .5vw;
-    // border-style: solid;
-    // border-color: var(--theBrown);
+    box-shadow: 0 0.4vw 1.2vw 0 rgba(0, 0, 0, 1);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 0.4vw;
+    overflow: visible;
+    text-align: center;
+    box-sizing: border-box;
+    position: relative;
 
+    span {
+        display: block;
+        font-family: "bold", sans-serif;
+        color: var(--theBrown);
+        font-size: inherit;
+        line-height: 1;
+        position: relative;
+        z-index: 10;
+    }
+}
+
+.loItem {
+    align-items: flex-end;
+    padding-top: 0;
+    padding-bottom: 0.4vw;
 }
 
 .dayContainer {
@@ -829,6 +831,21 @@ main {
             font-size: calc(var(--label-item-size) * 0.16) !important;
         }
     }
+}
+
+// Daily Weather Summary Line
+.daily-weather-summary {
+    width: 40%;
+    max-width: 40%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    font-family: 'light', sans-serif !important;
+    font-size: calc(var(--label-item-size, 12vw) * 0.16) !important;
+    letter-spacing: calc(var(--label-item-size, 12vw) * -0.005) !important;
+    color: var(--temp-color, rgba(255, 255, 255, 0.7));
+    line-height: 1.35;
+    text-transform: none !important;
 }
 
 // 4-cell Clock Grid Container & Labels
@@ -1205,6 +1222,13 @@ main {
         width: var(--dynamic-item-size-4) !important;
         height: var(--dynamic-item-size-4) !important;
         right: calc(var(--clock-grid-margin-right, 2vw) + (100vw - var(--clock-grid-margin-left, 2vw) - var(--clock-grid-margin-right, 2vw)) * 0.125 - var(--dynamic-item-size-4) / 2) !important;
+    }
+
+    .daily-weather-summary {
+        font-size: 5vw !important;
+        line-height: 1.2 !important;
+        letter-spacing: -.225vw !important;
+        font-family: 'light', sans-serif !important;
     }
 }
 
