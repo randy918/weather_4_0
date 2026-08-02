@@ -316,8 +316,29 @@ import weatherConditions from '../data/weather-conditions.json';
 
   // --- EDITABLE: Dial Average Baselines Config (6 o'clock start -> 12 o'clock average -> 6 o'clock max) ---
   const HUMIDITY_DIAL_MIN = 30;     // EDITABLE: Humidity minimum (6 o'clock start position)
-  const HUMIDITY_DIAL_AVG = 65;     // EDITABLE: Humidity average baseline (12 o'clock top-center position)
+  const HUMIDITY_MORNING_AVG = 80;  // EDITABLE: Peak morning humidity average baseline (around 6 AM)
+  const HUMIDITY_AFTERNOON_AVG = 50;// EDITABLE: Trough afternoon humidity average baseline (around 4 PM)
   const HUMIDITY_DIAL_MAX = 100;    // EDITABLE: Humidity maximum (6 o'clock end position)
+
+  // Dynamically slides humidity 12 o'clock midpoint smoothly between 80% (6 AM) and 50% (4 PM)
+  function getDynamicHumidityAverage(dtSeconds) {
+    const d = dtSeconds ? new Date(dtSeconds * 1000) : new Date();
+    const hours = d.getHours() + d.getMinutes() / 60;
+    
+    // 6:00 AM (6.0) to 4:00 PM (16.0): Daytime drying transition (80% -> 50%)
+    if (hours >= 6.0 && hours <= 16.0) {
+      const frac = (hours - 6.0) / 10.0;
+      return HUMIDITY_MORNING_AVG - (HUMIDITY_MORNING_AVG - HUMIDITY_AFTERNOON_AVG) * frac;
+    }
+    // 4:00 PM (16.0) to 6:00 AM (6.0 next morning): Night/morning moistening transition (50% -> 80%)
+    let frac = 0;
+    if (hours > 16.0) {
+      frac = (hours - 16.0) / 14.0;
+    } else {
+      frac = (hours + 8.0) / 14.0;
+    }
+    return HUMIDITY_AFTERNOON_AVG + (HUMIDITY_MORNING_AVG - HUMIDITY_AFTERNOON_AVG) * frac;
+  }
 
   const DEWPOINT_DIAL_MIN = 34;     // EDITABLE: Dew point minimum in °F (6 o'clock start position)
   const DEWPOINT_DIAL_AVG = 67;     // EDITABLE: Dew point average baseline in °F (12 o'clock top-center position)
@@ -5374,8 +5395,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const radius = 46;
     const circumference = 2 * Math.PI * radius; // ~289.0265
     
+    const currentHumidityAvg = getDynamicHumidityAverage(data?.current?.dt);
     gridHumidityProgressEls.forEach(gridHumidityProgressEl => {
-      const percent = calcAboveBelowAverageProgress(humidity, HUMIDITY_DIAL_MIN, HUMIDITY_DIAL_AVG, HUMIDITY_DIAL_MAX);
+      const percent = calcAboveBelowAverageProgress(humidity, HUMIDITY_DIAL_MIN, currentHumidityAvg, HUMIDITY_DIAL_MAX);
       const dashOffset = circumference * (1 - percent);
       gridHumidityProgressEl.style.strokeDashoffset = dashOffset;
       if (finalColor) {
@@ -5461,8 +5483,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const DAILY_SUMMARY_FONT_SIZE_DESKTOP = '3.6vw';       // EDITABLE Desktop: Font size (e.g. '1.6vw', '2vw', '3.6vw')
   const DAILY_SUMMARY_FONT_SIZE_MOBILE = '4vw';          // EDITABLE Mobile: Font size (e.g. '4vw', '5vw', '3.5vw')
 
-  const DAILY_SUMMARY_LETTER_SPACING_DESKTOP = '-0.005em';// EDITABLE Desktop: Kerning matching dial labels
-  const DAILY_SUMMARY_LETTER_SPACING_MOBILE = '-.225vw';  // EDITABLE Mobile: Kerning matching top text lines
+  const DAILY_SUMMARY_LETTER_SPACING_DESKTOP = '-0.05em';// EDITABLE Desktop: Kerning matching dial labels
+  const DAILY_SUMMARY_LETTER_SPACING_MOBILE = '0vw';  // EDITABLE Mobile: Kerning matching top text lines
 
   const DAILY_SUMMARY_LINE_HEIGHT_DESKTOP = '1';         // EDITABLE Desktop: Line height / leading
   const DAILY_SUMMARY_LINE_HEIGHT_MOBILE = '1.2';        // EDITABLE Mobile: Line height / leading
