@@ -314,6 +314,32 @@ import weatherConditions from '../data/weather-conditions.json';
   // EDITABLE: Font size of the barometric/humidity/wind trend arrow (scaled to dial size)
   const BAROMETRIC_TREND_FONT_SIZE = "calc(var(--item-current-size) * 0.1875)";
 
+  // --- EDITABLE: Dial Average Baselines Config (6 o'clock start -> 12 o'clock average -> 6 o'clock max) ---
+  const HUMIDITY_DIAL_MIN = 30;     // EDITABLE: Humidity minimum (6 o'clock start position)
+  const HUMIDITY_DIAL_AVG = 65;     // EDITABLE: Humidity average baseline (12 o'clock top-center position)
+  const HUMIDITY_DIAL_MAX = 100;    // EDITABLE: Humidity maximum (6 o'clock end position)
+
+  const DEWPOINT_DIAL_MIN = 34;     // EDITABLE: Dew point minimum in °F (6 o'clock start position)
+  const DEWPOINT_DIAL_AVG = 67;     // EDITABLE: Dew point average baseline in °F (12 o'clock top-center position)
+  const DEWPOINT_DIAL_MAX = 80;     // EDITABLE: Dew point maximum in °F (6 o'clock end position)
+
+  const BAROMETER_DIAL_MIN = 976;   // EDITABLE: Barometer minimum in hPa (6 o'clock start position)
+  const BAROMETER_DIAL_AVG = 1013;  // EDITABLE: Barometer average baseline in hPa (12 o'clock top-center position)
+  const BAROMETER_DIAL_MAX = 1050;  // EDITABLE: Barometer maximum in hPa (6 o'clock end position)
+
+  // Map value to 6 o'clock (0.0) -> 12 o'clock average (0.5) -> 6 o'clock max (1.0)
+  function calcAboveBelowAverageProgress(val, minVal, avgVal, maxVal) {
+    if (typeof val !== 'number' || Number.isNaN(val)) return 0;
+    const clampedVal = Math.max(minVal, Math.min(maxVal, val));
+    if (clampedVal <= avgVal) {
+      if (avgVal === minVal) return 0.5;
+      return 0.5 * ((clampedVal - minVal) / (avgVal - minVal));
+    } else {
+      if (maxVal === avgVal) return 0.5;
+      return 0.5 + 0.5 * ((clampedVal - avgVal) / (maxVal - avgVal));
+    }
+  }
+
   // EDITABLE: Scrolling Gradient Overlay configuration (Non-phone version: iPad, desktop)
   const GRADIENT_NON_PHONE = {
     top: '40.5vw',
@@ -1347,14 +1373,8 @@ import weatherConditions from '../data/weather-conditions.json';
     });
 
     if (pressureFills.length > 0) {
-      // Map pressure range to circle percentage:
-      // Minimum realistic ~950 (0%), Maximum ~1050 (100%)
-      const minPressure = 950;
-      const maxPressure = 1050;
-      let percent = (pressure - minPressure) / (maxPressure - minPressure);
-      
-      // Clamp between 0 and 1
-      percent = Math.max(0, Math.min(1, percent));
+      // Map pressure: 6 o'clock start -> 12 o'clock average -> 6 o'clock max
+      const percent = calcAboveBelowAverageProgress(pressure, BAROMETER_DIAL_MIN, BAROMETER_DIAL_AVG, BAROMETER_DIAL_MAX);
       
       pressureFills.forEach(fill => {
         const isGrid = fill.closest('.grid-barometric-pressure') !== null;
@@ -5355,7 +5375,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const circumference = 2 * Math.PI * radius; // ~289.0265
     
     gridHumidityProgressEls.forEach(gridHumidityProgressEl => {
-      const percent = Math.max(0, Math.min(1, humidity / 100));
+      const percent = calcAboveBelowAverageProgress(humidity, HUMIDITY_DIAL_MIN, HUMIDITY_DIAL_AVG, HUMIDITY_DIAL_MAX);
       const dashOffset = circumference * (1 - percent);
       gridHumidityProgressEl.style.strokeDashoffset = dashOffset;
       if (finalColor) {
@@ -5386,7 +5406,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     
     gridDewpointProgressEls.forEach(gridDewpointProgressEl => {
       if (dewpoint !== null) {
-        const percent = Math.max(0, Math.min(1, dewpoint / 100));
+        const percent = calcAboveBelowAverageProgress(dewpoint, DEWPOINT_DIAL_MIN, DEWPOINT_DIAL_AVG, DEWPOINT_DIAL_MAX);
         const dashOffset = circumference * (1 - percent);
         gridDewpointProgressEl.style.strokeDashoffset = dashOffset;
         if (finalColor) {
@@ -5448,10 +5468,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const DAILY_SUMMARY_LINE_HEIGHT_MOBILE = '1.2';        // EDITABLE Mobile: Line height / leading
 
   const DAILY_SUMMARY_MARGIN_TOP_DESKTOP = '-2.5vw';       // EDITABLE Desktop: Space ABOVE summary line
-  const DAILY_SUMMARY_MARGIN_TOP_MOBILE = '-2vw';        // EDITABLE Mobile: Space ABOVE summary line
+  const DAILY_SUMMARY_MARGIN_TOP_MOBILE = '-1vw';        // EDITABLE Mobile: Space ABOVE summary line
 
   const DAILY_SUMMARY_MARGIN_BOTTOM_DESKTOP = '-3.6vw';  // EDITABLE Desktop: Space BELOW summary line
-  const DAILY_SUMMARY_MARGIN_BOTTOM_MOBILE = '1vw';      // EDITABLE Mobile: Space BELOW summary line
+  const DAILY_SUMMARY_MARGIN_BOTTOM_MOBILE = '-3vw';      // EDITABLE Mobile: Space BELOW summary line
 
   // Create and update daily weather summary line between Sweltering and the first dial row
   function updateDailySummary(data) {
@@ -5517,19 +5537,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (summaryText) {
       el.textContent = summaryText;
       el.style.display = 'block';
-
-      // Dynamically measure summary height + margins to push background gradient overlays down in lockstep
-      requestAnimationFrame(() => {
-        const rect = el.getBoundingClientRect();
-        const style = window.getComputedStyle(el);
-        const mTop = parseFloat(style.marginTop) || 0;
-        const mBottom = parseFloat(style.marginBottom) || 0;
-        const totalPush = rect.height + mTop + mBottom;
-        document.documentElement.style.setProperty('--summary-push', `${totalPush}px`);
-      });
     } else {
       el.style.display = 'none';
-      document.documentElement.style.setProperty('--summary-push', '0px');
     }
 
     // Apply color associated strictly with current temperature + 10
