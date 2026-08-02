@@ -5438,7 +5438,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const DAILY_SUMMARY_WIDTH_DESKTOP = '40%';             // EDITABLE Desktop: Width of summary text line (40% centered)
   const DAILY_SUMMARY_WIDTH_MOBILE = '40%';              // EDITABLE Mobile: Width of summary text line (40% centered)
 
-  const DAILY_SUMMARY_FONT_SIZE_DESKTOP = '1.6vw';       // EDITABLE Desktop: Font size (e.g. '1.6vw', '2vw', '1vw')
+  const DAILY_SUMMARY_FONT_SIZE_DESKTOP = '1.6vw';       // E--DITABLE Desktop: Font size (e.g. '1.6vw', '2vw', '1vw')
   const DAILY_SUMMARY_FONT_SIZE_MOBILE = '4vw';          // EDITABLE Mobile: Font size (e.g. '5vw', '3.5vw', '4vw')
 
   const DAILY_SUMMARY_LETTER_SPACING_DESKTOP = '-0.005em';// EDITABLE Desktop: Kerning matching dial labels
