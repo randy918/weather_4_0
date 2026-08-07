@@ -5528,7 +5528,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
     // Fix robotic 'There will be' -> 'Expect'
     s = s.replace(/^There will be\b/i, 'Expect');
 
-    // Ensure trailing period
+    // Ensure trailing periodnpm run dev
+    
     if (s && !/[.!?]$/.test(s)) {
       s += '.';
     }
