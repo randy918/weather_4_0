@@ -371,6 +371,45 @@ import weatherConditions from '../data/weather-conditions.json';
     }
   }
 
+  // Helper to animate SVG progress dials in two stages on value changes
+  function animateGauge(elements, newVal, prevVal, minVal, avgVal, maxVal, getRadiusFn) {
+    if (!elements || elements.length === 0) return;
+    const hasChange = prevVal !== null && prevVal !== newVal;
+
+    elements.forEach(el => {
+      const radius = getRadiusFn(el);
+      const circumference = 2 * Math.PI * radius;
+      el.style.strokeDasharray = `${circumference}`;
+
+      const newPercent = calcAboveBelowAverageProgress(newVal, minVal, avgVal, maxVal);
+      const targetOffset = circumference * (1 - newPercent);
+
+      if (hasChange) {
+        // Stage 1: Animate clockwise from old value's offset to MAX (strokeDashoffset = 0)
+        const oldPercent = calcAboveBelowAverageProgress(prevVal, minVal, avgVal, maxVal);
+        const startOffset = circumference * (1 - oldPercent);
+
+        el.style.transition = 'none';
+        el.style.strokeDashoffset = startOffset;
+        void el.offsetHeight; // Force reflow
+
+        el.style.transition = 'stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+        setTimeout(() => {
+          el.style.strokeDashoffset = '0';
+        }, 20);
+
+        // Stage 2: Animate counter-clockwise from MAX (0) to new targetOffset
+        setTimeout(() => {
+          el.style.strokeDashoffset = targetOffset;
+        }, 820);
+      } else {
+        // Normal update (no change or initial load)
+        el.style.transition = 'stroke-dashoffset 0.8s cubic-bezier(0.25, 1, 0.5, 1)';
+        el.style.strokeDashoffset = targetOffset;
+      }
+    });
+  }
+
   // EDITABLE: Scrolling Gradient Overlay configuration (Non-phone version: iPad, desktop)
   const GRADIENT_NON_PHONE = {
     top: '40.5vw',
@@ -421,6 +460,12 @@ import weatherConditions from '../data/weather-conditions.json';
   
   document.documentElement.style.setProperty('--wind-number-y-offset-desktop', WIND_NUMBER_Y_OFFSET_DESKTOP);
   document.documentElement.style.setProperty('--wind-number-y-offset-mobile', WIND_NUMBER_Y_OFFSET_MOBILE);
+
+  // EDITABLE: High wind speed text size formatting
+  const WIND_SPEED_HIGH_THRESHOLD_MPH = 25; // EDITABLE: Wind speed threshold (in mph) where text gets enlarged
+  const WIND_SPEED_HIGH_MULTIPLIER = .55; // EDITABLE: Font size multiplier (relative to dial size) when threshold is exceeded
+  
+  document.documentElement.style.setProperty('--wind-speed-high-multiplier', WIND_SPEED_HIGH_MULTIPLIER);
 
   // EDITABLE: Rain forecast banner configuration
   const RAIN_BANNER_HEIGHT_VW = 10; // Height of the rain banner (same as alert banners)
@@ -1367,8 +1412,8 @@ import weatherConditions from '../data/weather-conditions.json';
         gridWindSpeedTextEl.style.color = tempColor;
       }
 
-      if (windSpeed >= 25) {
-        gridWindSpeedTextEl.style.setProperty('font-size', 'calc(var(--item-current-size) * 0.70)', 'important');
+      if (windSpeed >= WIND_SPEED_HIGH_THRESHOLD_MPH) {
+        gridWindSpeedTextEl.style.setProperty('font-size', 'calc(var(--item-current-size) * var(--wind-speed-high-multiplier))', 'important');
       } else {
         gridWindSpeedTextEl.style.removeProperty('font-size');
       }
@@ -1410,27 +1455,9 @@ import weatherConditions from '../data/weather-conditions.json';
     });
 
     if (pressureFills.length > 0) {
-      // Map pressure: 6 o'clock start -> 12 o'clock average -> 6 o'clock max
-      const percent = calcAboveBelowAverageProgress(pressure, BAROMETER_DIAL_MIN, BAROMETER_DIAL_AVG, BAROMETER_DIAL_MAX);
-      
-      // Step 1: Grow to 100% capacity (circumference, circumference)
-      pressureFills.forEach(fill => {
-        const isGrid = fill.closest('.grid-barometric-pressure') !== null;
-        const radius = isGrid ? 46 : 45;
-        const circumference = 2 * Math.PI * radius;
-        fill.style.strokeDasharray = `${circumference}, ${circumference}`;
-      });
-      
-      // Step 2: Shrink to target pressure value after GAUGE_GROW_DURATION_MS
-      setTimeout(() => {
-        pressureFills.forEach(fill => {
-          const isGrid = fill.closest('.grid-barometric-pressure') !== null;
-          const radius = isGrid ? 46 : 45;
-          const circumference = 2 * Math.PI * radius;
-          const dashOffset = circumference * percent;
-          fill.style.strokeDasharray = `${dashOffset}, ${circumference}`;
-        });
-      }, GAUGE_GROW_DURATION_MS);
+      const getRadius = (el) => el.closest('.grid-barometric-pressure') !== null ? 46 : 45;
+      animateGauge(pressureFills, pressure, prevPressure, BAROMETER_DIAL_MIN, BAROMETER_DIAL_AVG, BAROMETER_DIAL_MAX, getRadius);
+      prevPressure = pressure;
       
       // Inherit the color of the current temperature
       const currentTemp = data?.current?.temp;
@@ -5503,18 +5530,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
       if (finalColor) {
         gridHumidityProgressEl.style.stroke = finalColor;
       }
-      // Step 1: Grow to 100% capacity (dashoffset = 0)
-      gridHumidityProgressEl.style.strokeDashoffset = '0';
     });
-    
-    // Step 2: Shrink to target humidity percentage after GAUGE_GROW_DURATION_MS
-    setTimeout(() => {
-      gridHumidityProgressEls.forEach(gridHumidityProgressEl => {
-        const percent = calcAboveBelowAverageProgress(humidity, HUMIDITY_DIAL_MIN, currentHumidityAvg, HUMIDITY_DIAL_MAX);
-        const dashOffset = circumference * (1 - percent);
-        gridHumidityProgressEl.style.strokeDashoffset = dashOffset;
-      });
-    }, GAUGE_GROW_DURATION_MS);
+
+    const getRadius = (el) => 46;
+    animateGauge(gridHumidityProgressEls, humidity, prevHumidity, HUMIDITY_DIAL_MIN, currentHumidityAvg, HUMIDITY_DIAL_MAX, getRadius);
+    prevHumidity = humidity;
     
     gridHumidityTextEls.forEach(gridHumidityTextEl => {
       gridHumidityTextEl.innerHTML = `${trendHtml}${Math.round(humidity)}%<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">RH</span>`;
@@ -5538,17 +5558,21 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const circumference = 2 * Math.PI * radius; // ~289.0265
     
     gridDewpointProgressEls.forEach(gridDewpointProgressEl => {
-      if (dewpoint !== null) {
-        const percent = calcAboveBelowAverageProgress(dewpoint, DEWPOINT_DIAL_MIN, DEWPOINT_DIAL_AVG, DEWPOINT_DIAL_MAX);
-        const dashOffset = circumference * (1 - percent);
-        gridDewpointProgressEl.style.strokeDashoffset = dashOffset;
-        if (finalColor) {
-          gridDewpointProgressEl.style.stroke = finalColor;
-        }
-      } else {
-        gridDewpointProgressEl.style.strokeDashoffset = circumference;
+      if (finalColor) {
+        gridDewpointProgressEl.style.stroke = finalColor;
       }
     });
+
+    if (dewpoint !== null) {
+      const getRadius = (el) => 46;
+      animateGauge(gridDewpointProgressEls, dewpoint, prevDewpoint, DEWPOINT_DIAL_MIN, DEWPOINT_DIAL_AVG, DEWPOINT_DIAL_MAX, getRadius);
+      prevDewpoint = dewpoint;
+    } else {
+      gridDewpointProgressEls.forEach(gridDewpointProgressEl => {
+        gridDewpointProgressEl.style.strokeDashoffset = circumference;
+      });
+      prevDewpoint = null;
+    }
     
     let trendHtml = '';
     if (dewpoint !== null) {
@@ -8436,16 +8460,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const hiRatio = range > 0 ? (hiTempF - tempRangeMin) / range : 0.5;
       const loRatio = range > 0 ? (loTempF - tempRangeMin) / range : 0.5;
 
-      // Check for Day 2 high temperature change animation (Index 1)
-      const shouldAnimateDay2 = index === 1 && (
-        forceDay2HighAnimation || 
-        (prevDay2HighTemp !== null && prevDay2HighTemp !== hiTempF)
-      );
+      // Check for High temperature change animation (Index 0 to 7)
+      const shouldAnimateHigh = prevHighTemps[index] !== null && prevHighTemps[index] !== hiTempF;
 
-      if (shouldAnimateDay2) {
-        
+      if (shouldAnimateHigh) {
         // Stage 1: Animate height DOWN to the level of the corresponding "low" cell
-        const oldHiTemp = prevDay2HighTemp !== null ? prevDay2HighTemp : hiTempF;
+        const oldHiTemp = prevHighTemps[index];
         const oldHiRatio = range > 0 ? (oldHiTemp - tempRangeMin) / range : 0.5;
         const oldHeightStr = `calc(${MIN_TEMP_BAR_HEIGHT_VW}vw + (100% - ${MIN_TEMP_BAR_HEIGHT_VW}vw) * ${oldHiRatio})`;
         const loHeightStr = `calc(${MIN_TEMP_BAR_HEIGHT_VW}vw + (100% - ${MIN_TEMP_BAR_HEIGHT_VW}vw) * ${loRatio})`;
@@ -8516,22 +8536,17 @@ Plan ahead for significantly warmer conditions tomorrow!`
         item.style.opacity = '1';
       }
 
-      // Track the day 2 high temp
-      if (index === 1) {
-        prevDay2HighTemp = hiTempF;
-      }
+      // Track the high temp
+      prevHighTemps[index] = hiTempF;
 
       // Set height, text, and color for Low bars
       const loItem = loItems[index];
       if (loItem) {
-        const shouldAnimateDay2Low = index === 1 && (
-          forceDay2LowAnimation ||
-          (prevDay2LowTemp !== null && prevDay2LowTemp !== loTempF)
-        );
+        const shouldAnimateLow = prevLowTemps[index] !== null && prevLowTemps[index] !== loTempF;
 
-        if (shouldAnimateDay2Low) {
+        if (shouldAnimateLow) {
           // Stage 1: Animate height DOWN to nothing (0px)
-          const oldLoTemp = prevDay2LowTemp !== null ? prevDay2LowTemp : loTempF;
+          const oldLoTemp = prevLowTemps[index];
           const oldLoRatio = range > 0 ? (oldLoTemp - tempRangeMin) / range : 0.5;
           const oldLoHeightStr = `calc(${MIN_TEMP_BAR_HEIGHT_VW}vw + (100% - ${MIN_TEMP_BAR_HEIGHT_VW}vw) * ${oldLoRatio})`;
           const targetLoHeightStr = `calc(${MIN_TEMP_BAR_HEIGHT_VW}vw + (100% - ${MIN_TEMP_BAR_HEIGHT_VW}vw) * ${loRatio})`;
@@ -8604,10 +8619,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
         }
       }
 
-      // Track the day 2 low temp
-      if (index === 1) {
-        prevDay2LowTemp = loTempF;
-      }
+      // Track the low temp
+      prevLowTemps[index] = loTempF;
 
       // Set text for Day items
       if (dayItems[index] && dayData.dt) {
@@ -8615,8 +8628,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
         dayItems[index].innerHTML = `<span class="day-letter" style="font-size: ${DAY_LETTER_FONT_SIZE}; font-family: 'light', sans-serif; opacity: 1; font-weight: normal; color: white;">${dayNames[dateObj.getDay()]}</span> <span style="font-family: 'bold', sans-serif;">${dateObj.getDate()}</span>`;
       }
     });
-    forceDay2HighAnimation = false;
-    forceDay2LowAnimation = false;
   }
 
   // EDITABLE: Update the temperature pointer position based on current temp
@@ -10101,33 +10112,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.querySelectorAll('.hiItem, .loItem').forEach(item => {
       item.style.pointerEvents = 'auto';
     });
-
-    const day2BarHi = document.querySelector('.hiItem-1');
-    const day2BarLo = document.querySelector('.loItem-1');
-    
-    if (day2BarHi) {
-      day2BarHi.style.cursor = 'pointer';
-      day2BarHi.title = "Click to animate Day 2 High Temperature";
-      day2BarHi.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (!lastWeatherData || !lastWeatherData.daily || !lastWeatherData.daily[1]) return;
-        console.log(`🎯 [Simulation] Tomorrow's High Bar clicked: forcing high height animation!`);
-        forceDay2HighAnimation = true;
-        updateOverlappingBarChart(lastWeatherData);
-      });
-    }
-    
-    if (day2BarLo) {
-      day2BarLo.style.cursor = 'pointer';
-      day2BarLo.title = "Click to animate Day 2 Low Temperature";
-      day2BarLo.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (!lastWeatherData || !lastWeatherData.daily || !lastWeatherData.daily[1]) return;
-        console.log(`🎯 [Simulation] Tomorrow's Low Bar clicked: forcing low height animation!`);
-        forceDay2LowAnimation = true;
-        updateOverlappingBarChart(lastWeatherData);
-      });
-    }
   }
 
   // Initialize placeholders immediately, then start auto-refresh
@@ -10181,10 +10165,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   let leftRadarHovered = false;
   let rightRadarHovered = false;
-  let prevDay2HighTemp = null;
-  let prevDay2LowTemp = null;
-  let forceDay2HighAnimation = false;
-  let forceDay2LowAnimation = false;
+  let prevHighTemps = Array(8).fill(null);
+  let prevLowTemps = Array(8).fill(null);
+  let prevHumidity = null;
+  let prevDewpoint = null;
+  let prevPressure = null;
 
   function updateWindDirectionArrow(temp, windDeg, windSpeed = 0) {
     const arrows = document.querySelectorAll('.wind-direction-display');
