@@ -32,6 +32,11 @@ import weatherConditions from '../data/weather-conditions.json';
   const CLOCK_SPIN_DURATION_MS = 1200; // EDITABLE: Reset animation spin duration in milliseconds
   let isClockSpinning = false;
   document.documentElement.style.setProperty('--clock-spin-duration', CLOCK_SPIN_DURATION_MS + 'ms');
+
+  // --- CONFIG: Barometer and RH Gauge Animations ---
+  const GAUGE_TRANSITION_DURATION_MS = 800; // EDITABLE: Animation transition duration in milliseconds
+  const GAUGE_GROW_DURATION_MS = 600;       // EDITABLE: Time in milliseconds to stay/grow at maximum before shrinking
+  document.documentElement.style.setProperty('--gauge-transition-duration', GAUGE_TRANSITION_DURATION_MS + 'ms');
   let refreshTimerId = null;
 
   // Store last weather data for resize repositioning of temp pointer--
@@ -1202,6 +1207,12 @@ import weatherConditions from '../data/weather-conditions.json';
   function updateWindGauge(data) {
     const windSpeed = data?.current?.wind_speed || 0;
     const windGust = data?.current?.wind_gust || windSpeed; // Default to wind_speed if gust not available
+    
+    if (lastWindSpeed !== null && windSpeed !== lastWindSpeed) {
+      triggerWindSpeedSpinAnimation();
+    }
+    lastWindSpeed = windSpeed;
+    
     const currentTemp = data?.current?.temp || null;
     
     let trendHtml = '';
@@ -1402,16 +1413,24 @@ import weatherConditions from '../data/weather-conditions.json';
       // Map pressure: 6 o'clock start -> 12 o'clock average -> 6 o'clock max
       const percent = calcAboveBelowAverageProgress(pressure, BAROMETER_DIAL_MIN, BAROMETER_DIAL_AVG, BAROMETER_DIAL_MAX);
       
+      // Step 1: Grow to 100% capacity (circumference, circumference)
       pressureFills.forEach(fill => {
         const isGrid = fill.closest('.grid-barometric-pressure') !== null;
         const radius = isGrid ? 46 : 45;
-        const circumference = 2 * Math.PI * radius; // ~289 or ~283
-        const maxStrokeLength = circumference;
-        const dashOffset = maxStrokeLength * percent;
-        
-        // Apply fill amount to the dasharray
-        fill.style.strokeDasharray = `${dashOffset}, ${circumference}`;
+        const circumference = 2 * Math.PI * radius;
+        fill.style.strokeDasharray = `${circumference}, ${circumference}`;
       });
+      
+      // Step 2: Shrink to target pressure value after GAUGE_GROW_DURATION_MS
+      setTimeout(() => {
+        pressureFills.forEach(fill => {
+          const isGrid = fill.closest('.grid-barometric-pressure') !== null;
+          const radius = isGrid ? 46 : 45;
+          const circumference = 2 * Math.PI * radius;
+          const dashOffset = circumference * percent;
+          fill.style.strokeDasharray = `${dashOffset}, ${circumference}`;
+        });
+      }, GAUGE_GROW_DURATION_MS);
       
       // Inherit the color of the current temperature
       const currentTemp = data?.current?.temp;
@@ -3484,17 +3503,52 @@ Plan ahead for significantly warmer conditions tomorrow!`
         const fallbackPath = 'img/desc-rem.jpg';
         const primaryImgPath = isNight ? nightImgPath : dayImgPath;
 
+        // Determine effective display mode based on hover (opposite of current mode)
+        const effectiveShowDopplerLeft = leftRadarHovered ? !SHOW_DOPPLER_RADAR_LEFT : SHOW_DOPPLER_RADAR_LEFT;
+        const effectiveShowDopplerRight = rightRadarHovered ? !SHOW_DOPPLER_RADAR_RIGHT : SHOW_DOPPLER_RADAR_RIGHT;
+        
+        // Zoom levels and offsets are fixed constants (Close and Far views)
+        const zoomLeft = RAINVIEWER_ZOOM_LEFT;
+        const zoomRight = RAINVIEWER_ZOOM_RIGHT;
+        
+        const nwsZoomLeft = RADAR_ZOOM_LEFT;
+        const nwsZoomRight = RADAR_ZOOM_RIGHT;
+        
+        const nwsOffsetXLeft = RADAR_OFFSET_X_LEFT;
+        const nwsOffsetYLeft = RADAR_OFFSET_Y_LEFT;
+        
+        const nwsOffsetXRight = RADAR_OFFSET_X_RIGHT;
+        const nwsOffsetYRight = RADAR_OFFSET_Y_RIGHT;
+        
+        // Pre-calculate slippy parameters for LEFT
+        const coordsLeft = getTileCoords(LAT, LON, zoomLeft);
+        const x0Left = Math.floor(coordsLeft.x);
+        const y0Left = Math.floor(coordsLeft.y);
+        const dXLeft = coordsLeft.x - x0Left;
+        const dYLeft = coordsLeft.y - y0Left;
+        const x_startLeft = (dXLeft < 0.5) ? x0Left - 1 : x0Left;
+        const y_startLeft = (dYLeft < 0.5) ? y0Left - 1 : y0Left;
+
+        // Pre-calculate slippy parameters for RIGHT
+        const coordsRight = getTileCoords(LAT, LON, zoomRight);
+        const x0Right = Math.floor(coordsRight.x);
+        const y0Right = Math.floor(coordsRight.y);
+        const dXRight = coordsRight.x - x0Right;
+        const dYRight = coordsRight.y - y0Right;
+        const x_startRight = (dXRight < 0.5) ? x0Right - 1 : x0Right;
+        const y_startRight = (dYRight < 0.5) ? y0Right - 1 : y0Right;
+
         let framesRight = [];
         if (descImageEl) {
-          if (SHOW_DOPPLER_RADAR_RIGHT) {
+          if (effectiveShowDopplerRight) {
             descImageEl.classList.add('radar-mode');
             descImageEl.style.backgroundImage = '';
             descImageEl.style.backgroundColor = '';
             descImageEl.style.setProperty('--radar-fade-duration', `${RADAR_FADE_DURATION_MS}ms`);
             framesRight = descImageEl.querySelectorAll('.radar-frame');
             
-            // Calculate coordinates and offsets dynamically to center the RainViewer map on LAT/LON for the right circle (Zoom 7)
-            const coords = getTileCoords(LAT, LON, RAINVIEWER_ZOOM_RIGHT);
+            // Calculate coordinates and offsets dynamically to center the RainViewer map on LAT/LON for the right circle
+            const coords = getTileCoords(LAT, LON, zoomRight);
             const x0 = Math.floor(coords.x);
             const y0 = Math.floor(coords.y);
             const dX = coords.x - x0;
@@ -3508,7 +3562,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
             const gridLeftPct = (0.5 - dX_new) * 100;
             const gridTopPct = (0.5 - dY_new) * 100;
 
-            if (framesRight.length !== RADAR_FRAME_COUNT) {
+            if (framesRight.length !== RADAR_FRAME_COUNT || descImageEl.getAttribute('data-zoom-level') !== String(zoomRight)) {
+              descImageEl.setAttribute('data-zoom-level', String(zoomRight));
               descImageEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
               descImageEl.querySelectorAll('.radar-sweep-line').forEach(l => l.remove());
               descImageEl.querySelectorAll('.radar-frames-container').forEach(c => c.remove());
@@ -3604,7 +3659,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
                 `;
                 okOutline.innerHTML = `
                   <svg viewBox="0 0 2 2" style="width: 100%; height: 100%; display: block; overflow: visible;">
-                    <path d="${generateOklahomaPath(RAINVIEWER_ZOOM_RIGHT, x_start, y_start)}" fill="none" stroke="var(--clock-grid-track-color, rgba(255, 255, 255, 0.2))" stroke-width="1.2px" vector-effect="non-scaling-stroke" />
+                    <path d="${generateOklahomaPath(zoomRight, x_start, y_start)}" fill="none" stroke="var(--clock-grid-track-color, rgba(255, 255, 255, 0.2))" stroke-width="1.2px" vector-effect="non-scaling-stroke" />
                   </svg>
                 `;
                 targetParentRight.appendChild(okOutline);
@@ -3613,14 +3668,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
                 okOutline.style.top = `${gridTopPct}%`;
                 const pathEl = okOutline.querySelector('path');
                 if (pathEl) {
-                  pathEl.setAttribute('d', generateOklahomaPath(RAINVIEWER_ZOOM_RIGHT, x_start, y_start));
+                  pathEl.setAttribute('d', generateOklahomaPath(zoomRight, x_start, y_start));
                 }
               }
             } else {
               descImageEl.querySelectorAll('.radar-oklahoma-outline').forEach(o => o.remove());
             }
             
-            // Append 25mi and 50mi range rings dynamically if not present
+            // Append 25mi and 50mi range rings dynamically (Right circle is Close view)
             if (!descImageEl.querySelector('.radar-ring-25-right')) {
               const r25 = document.createElement('div');
               r25.className = 'radar-ring-25-right';
@@ -3663,15 +3718,15 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
         let framesLeft = [];
         if (descImageLeftEl) {
-          if (SHOW_DOPPLER_RADAR_LEFT) {
+          if (effectiveShowDopplerLeft) {
             descImageLeftEl.classList.add('radar-mode');
             descImageLeftEl.style.backgroundImage = '';
             descImageLeftEl.style.backgroundColor = '';
             descImageLeftEl.style.setProperty('--radar-fade-duration', `${RADAR_FADE_DURATION_MS}ms`);
             framesLeft = descImageLeftEl.querySelectorAll('.radar-frame');
             
-            // Calculate coordinates and offsets dynamically to center the RainViewer map on LAT/LON for the left circle (Zoom 6)
-            const coords = getTileCoords(LAT, LON, RAINVIEWER_ZOOM_LEFT);
+            // Calculate coordinates and offsets dynamically to center the RainViewer map on LAT/LON for the left circle
+            const coords = getTileCoords(LAT, LON, zoomLeft);
             const x0 = Math.floor(coords.x);
             const y0 = Math.floor(coords.y);
             const dX = coords.x - x0;
@@ -3686,12 +3741,15 @@ Plan ahead for significantly warmer conditions tomorrow!`
             const frameLeftPct = 50 - dX_new * 100 * RADAR_SCALE_FACTOR;
             const frameTopPct = 50 - dY_new * 100 * RADAR_SCALE_FACTOR;
 
-            if (framesLeft.length !== RADAR_FRAME_COUNT) {
+            if (framesLeft.length !== RADAR_FRAME_COUNT || descImageLeftEl.getAttribute('data-zoom-level') !== String(zoomLeft)) {
+              descImageLeftEl.setAttribute('data-zoom-level', String(zoomLeft));
               descImageLeftEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
               descImageLeftEl.querySelectorAll('.radar-sweep-line').forEach(l => l.remove());
               descImageLeftEl.querySelectorAll('.radar-frames-container').forEach(c => c.remove());
               descImageLeftEl.querySelectorAll('.radar-map-bg').forEach(m => m.remove());
               descImageLeftEl.querySelectorAll('.radar-oklahoma-outline').forEach(o => o.remove());
+              descImageLeftEl.querySelectorAll('.radar-ring-25-right').forEach(r => r.remove());
+              descImageLeftEl.querySelectorAll('.radar-ring-50-right').forEach(r => r.remove());
               descImageLeftEl.querySelectorAll('.radar-screen').forEach(s => s.remove());
               
               const screenLeft = document.createElement('div');
@@ -3780,7 +3838,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
                 `;
                 okOutlineLeft.innerHTML = `
                   <svg viewBox="0 0 2 2" style="width: 100%; height: 100%; display: block; overflow: visible;">
-                    <path d="${generateOklahomaPath(RAINVIEWER_ZOOM_LEFT, x_start, y_start)}" fill="none" stroke="var(--clock-grid-track-color, rgba(255, 255, 255, 0.2))" stroke-width="1.2px" vector-effect="non-scaling-stroke" />
+                    <path d="${generateOklahomaPath(zoomLeft, x_start, y_start)}" fill="none" stroke="var(--clock-grid-track-color, rgba(255, 255, 255, 0.2))" stroke-width="1.2px" vector-effect="non-scaling-stroke" />
                   </svg>
                 `;
                 targetParentLeft.appendChild(okOutlineLeft);
@@ -3789,12 +3847,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
                 okOutlineLeft.style.top = `${frameTopPct}%`;
                 const pathEl = okOutlineLeft.querySelector('path');
                 if (pathEl) {
-                  pathEl.setAttribute('d', generateOklahomaPath(RAINVIEWER_ZOOM_LEFT, x_start, y_start));
+                  pathEl.setAttribute('d', generateOklahomaPath(zoomLeft, x_start, y_start));
                 }
               }
             } else {
               descImageLeftEl.querySelectorAll('.radar-oklahoma-outline').forEach(o => o.remove());
             }
+            
+            // Left circle is Far view, so ensure no range rings are appended
+            descImageLeftEl.querySelectorAll('.radar-ring-25-right').forEach(r => r.remove());
+            descImageLeftEl.querySelectorAll('.radar-ring-50-right').forEach(r => r.remove());
           } else {
             descImageLeftEl.classList.remove('radar-mode');
             descImageLeftEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
@@ -3824,33 +3886,15 @@ Plan ahead for significantly warmer conditions tomorrow!`
         }
 
         const timeParam = Math.floor(Date.now() / 1200000);
-        
-        // Pre-calculate slippy parameters for LEFT (Zoom 6)
-        const coordsLeft = getTileCoords(LAT, LON, RAINVIEWER_ZOOM_LEFT);
-        const x0Left = Math.floor(coordsLeft.x);
-        const y0Left = Math.floor(coordsLeft.y);
-        const dXLeft = coordsLeft.x - x0Left;
-        const dYLeft = coordsLeft.y - y0Left;
-        const x_startLeft = (dXLeft < 0.5) ? x0Left - 1 : x0Left;
-        const y_startLeft = (dYLeft < 0.5) ? y0Left - 1 : y0Left;
-
-        // Pre-calculate slippy parameters for RIGHT (Zoom 7)
-        const coordsRight = getTileCoords(LAT, LON, RAINVIEWER_ZOOM_RIGHT);
-        const x0Right = Math.floor(coordsRight.x);
-        const y0Right = Math.floor(coordsRight.y);
-        const dXRight = coordsRight.x - x0Right;
-        const dYRight = coordsRight.y - y0Right;
-        const x_startRight = (dXRight < 0.5) ? x0Right - 1 : x0Right;
-        const y_startRight = (dYRight < 0.5) ? y0Right - 1 : y0Right;
 
         // Set static map backgrounds once (CartoDB dark matter)
         const mapBgLeft = descImageLeftEl ? descImageLeftEl.querySelector('.radar-map-bg') : null;
-        if (SHOW_DOPPLER_RADAR_LEFT && mapBgLeft && latestRainViewerData) {
+        if (effectiveShowDopplerLeft && mapBgLeft && latestRainViewerData) {
           const baseTilesLeft = [
-            `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_LEFT}/${x_startLeft}/${y_startLeft}.png`,
-            `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_LEFT}/${x_startLeft+1}/${y_startLeft}.png`,
-            `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_LEFT}/${x_startLeft}/${y_startLeft+1}.png`,
-            `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_LEFT}/${x_startLeft+1}/${y_startLeft+1}.png`
+            `https://basemaps.cartocdn.com/dark_all/${zoomLeft}/${x_startLeft}/${y_startLeft}.png`,
+            `https://basemaps.cartocdn.com/dark_all/${zoomLeft}/${x_startLeft+1}/${y_startLeft}.png`,
+            `https://basemaps.cartocdn.com/dark_all/${zoomLeft}/${x_startLeft}/${y_startLeft+1}.png`,
+            `https://basemaps.cartocdn.com/dark_all/${zoomLeft}/${x_startLeft+1}/${y_startLeft+1}.png`
           ];
           mapBgLeft.style.backgroundImage = `
             url('${baseTilesLeft[0]}'), url('${baseTilesLeft[1]}'), url('${baseTilesLeft[2]}'), url('${baseTilesLeft[3]}')
@@ -3862,12 +3906,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
         }
 
         const mapBgRight = descImageEl ? descImageEl.querySelector('.radar-map-bg') : null;
-        if (SHOW_DOPPLER_RADAR_RIGHT && mapBgRight && latestRainViewerData) {
+        if (effectiveShowDopplerRight && mapBgRight && latestRainViewerData) {
           const baseTilesRight = [
-            `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_RIGHT}/${x_startRight}/${y_startRight}.png`,
-            `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_RIGHT}/${x_startRight+1}/${y_startRight}.png`,
-            `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_RIGHT}/${x_startRight}/${y_startRight+1}.png`,
-            `https://basemaps.cartocdn.com/dark_all/${RAINVIEWER_ZOOM_RIGHT}/${x_startRight+1}/${y_startRight+1}.png`
+            `https://basemaps.cartocdn.com/dark_all/${zoomRight}/${x_startRight}/${y_startRight}.png`,
+            `https://basemaps.cartocdn.com/dark_all/${zoomRight}/${x_startRight+1}/${y_startRight}.png`,
+            `https://basemaps.cartocdn.com/dark_all/${zoomRight}/${x_startRight}/${y_startRight+1}.png`,
+            `https://basemaps.cartocdn.com/dark_all/${zoomRight}/${x_startRight+1}/${y_startRight+1}.png`
           ];
           mapBgRight.style.backgroundImage = `
             url('${baseTilesRight[0]}'), url('${baseTilesRight[1]}'), url('${baseTilesRight[2]}'), url('${baseTilesRight[3]}')
@@ -3881,8 +3925,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
         for (let i = 0; i < RADAR_FRAME_COUNT; i++) {
           const frameNum = (RADAR_FRAME_COUNT - 1) - i;
           
-          // Left circle (RainViewer Zoom 6)
-          if (SHOW_DOPPLER_RADAR_LEFT && descImageLeftEl && framesLeft[i]) {
+          // Left circle (RainViewer)
+          if (effectiveShowDopplerLeft && descImageLeftEl && framesLeft[i]) {
             if (latestRainViewerData && latestRainViewerData.radar && latestRainViewerData.radar.past) {
               const pastFrames = latestRainViewerData.radar.past;
               const frameIndex = pastFrames.length - 1 - frameNum;
@@ -3891,10 +3935,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
               const path = rvFrame.path;
               
               const rvTiles = [
-                `${host}${path}/${RAINVIEWER_TILE_SIZE}/${RAINVIEWER_ZOOM_LEFT}/${x_startLeft}/${y_startLeft}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`,
-                `${host}${path}/${RAINVIEWER_TILE_SIZE}/${RAINVIEWER_ZOOM_LEFT}/${x_startLeft+1}/${y_startLeft}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`,
-                `${host}${path}/${RAINVIEWER_TILE_SIZE}/${RAINVIEWER_ZOOM_LEFT}/${x_startLeft}/${y_startLeft+1}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`,
-                `${host}${path}/${RAINVIEWER_TILE_SIZE}/${RAINVIEWER_ZOOM_LEFT}/${x_startLeft+1}/${y_startLeft+1}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`
+                `${host}${path}/${RAINVIEWER_TILE_SIZE}/${zoomLeft}/${x_startLeft}/${y_startLeft}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`,
+                `${host}${path}/${RAINVIEWER_TILE_SIZE}/${zoomLeft}/${x_startLeft+1}/${y_startLeft}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`,
+                `${host}${path}/${RAINVIEWER_TILE_SIZE}/${zoomLeft}/${x_startLeft}/${y_startLeft+1}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`,
+                `${host}${path}/${RAINVIEWER_TILE_SIZE}/${zoomLeft}/${x_startLeft+1}/${y_startLeft+1}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`
               ];
               
               framesLeft[i].style.backgroundImage = `
@@ -3906,13 +3950,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
               const fallbackFrameNum = Math.min(3, frameNum);
               const conusUrl = `https://radar.weather.gov/ridge/standard/CONUS_${fallbackFrameNum}.gif?t=${timeParam}`;
               framesLeft[i].style.backgroundImage = `url('${conusUrl}')`;
-              framesLeft[i].style.backgroundSize = `calc(${RADAR_ZOOM_LEFT} * 100%) auto`;
-              framesLeft[i].style.backgroundPosition = `calc(50% + ${RADAR_OFFSET_X_LEFT}) calc(50% + ${RADAR_OFFSET_Y_LEFT})`;
+              framesLeft[i].style.backgroundSize = `calc(${nwsZoomLeft} * 100%) auto`;
+              framesLeft[i].style.backgroundPosition = `calc(50% + ${nwsOffsetXLeft}) calc(50% + ${nwsOffsetYLeft})`;
             }
           }
 
-          // Right circle (RainViewer Zoom 7)
-          if (SHOW_DOPPLER_RADAR_RIGHT && descImageEl && framesRight[i]) {
+          // Right circle (RainViewer)
+          if (effectiveShowDopplerRight && descImageEl && framesRight[i]) {
             if (latestRainViewerData && latestRainViewerData.radar && latestRainViewerData.radar.past) {
               const pastFrames = latestRainViewerData.radar.past;
               const frameIndex = pastFrames.length - 1 - frameNum;
@@ -3921,10 +3965,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
               const path = rvFrame.path;
               
               const rvTiles = [
-                `${host}${path}/${RAINVIEWER_TILE_SIZE}/${RAINVIEWER_ZOOM_RIGHT}/${x_startRight}/${y_startRight}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`,
-                `${host}${path}/${RAINVIEWER_TILE_SIZE}/${RAINVIEWER_ZOOM_RIGHT}/${x_startRight+1}/${y_startRight}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`,
-                `${host}${path}/${RAINVIEWER_TILE_SIZE}/${RAINVIEWER_ZOOM_RIGHT}/${x_startRight}/${y_startRight+1}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`,
-                `${host}${path}/${RAINVIEWER_TILE_SIZE}/${RAINVIEWER_ZOOM_RIGHT}/${x_startRight+1}/${y_startRight+1}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`
+                `${host}${path}/${RAINVIEWER_TILE_SIZE}/${zoomRight}/${x_startRight}/${y_startRight}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`,
+                `${host}${path}/${RAINVIEWER_TILE_SIZE}/${zoomRight}/${x_startRight+1}/${y_startRight}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`,
+                `${host}${path}/${RAINVIEWER_TILE_SIZE}/${zoomRight}/${x_startRight}/${y_startRight+1}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`,
+                `${host}${path}/${RAINVIEWER_TILE_SIZE}/${zoomRight}/${x_startRight+1}/${y_startRight+1}/${RAINVIEWER_COLOR_SCHEME}/0_0.png`
               ];
               
               framesRight[i].style.backgroundImage = `
@@ -3936,16 +3980,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
               const fallbackFrameNum = Math.min(3, frameNum);
               const url = `https://radar.weather.gov/ridge/standard/${currentRadarStation}_${fallbackFrameNum}.gif?t=${timeParam}`;
               framesRight[i].style.backgroundImage = `url('${url}')`;
-              framesRight[i].style.backgroundSize = `calc(${RADAR_ZOOM_RIGHT} * 100%) auto`;
-              framesRight[i].style.backgroundPosition = `calc(50% + ${RADAR_OFFSET_X_RIGHT}) calc(50% + ${RADAR_OFFSET_Y_RIGHT})`;
+              framesRight[i].style.backgroundSize = `calc(${nwsZoomRight} * 100%) auto`;
+              framesRight[i].style.backgroundPosition = `calc(50% + ${nwsOffsetXRight}) calc(50% + ${nwsOffsetYRight})`;
             }
           }
         }
 
-        if (SHOW_DOPPLER_RADAR_RIGHT || SHOW_DOPPLER_RADAR_LEFT) {
+        if (effectiveShowDopplerRight || effectiveShowDopplerLeft) {
           startRadarLoop(
-            SHOW_DOPPLER_RADAR_RIGHT ? framesRight : null,
-            SHOW_DOPPLER_RADAR_LEFT ? framesLeft : null
+            effectiveShowDopplerRight ? framesRight : null,
+            effectiveShowDopplerLeft ? framesLeft : null
           );
         } else {
           if (radarLoopIntervalId) {
@@ -5452,13 +5496,21 @@ Plan ahead for significantly warmer conditions tomorrow!`
     
     const currentHumidityAvg = getDynamicHumidityAverage(data?.current?.dt);
     gridHumidityProgressEls.forEach(gridHumidityProgressEl => {
-      const percent = calcAboveBelowAverageProgress(humidity, HUMIDITY_DIAL_MIN, currentHumidityAvg, HUMIDITY_DIAL_MAX);
-      const dashOffset = circumference * (1 - percent);
-      gridHumidityProgressEl.style.strokeDashoffset = dashOffset;
       if (finalColor) {
         gridHumidityProgressEl.style.stroke = finalColor;
       }
+      // Step 1: Grow to 100% capacity (dashoffset = 0)
+      gridHumidityProgressEl.style.strokeDashoffset = '0';
     });
+    
+    // Step 2: Shrink to target humidity percentage after GAUGE_GROW_DURATION_MS
+    setTimeout(() => {
+      gridHumidityProgressEls.forEach(gridHumidityProgressEl => {
+        const percent = calcAboveBelowAverageProgress(humidity, HUMIDITY_DIAL_MIN, currentHumidityAvg, HUMIDITY_DIAL_MAX);
+        const dashOffset = circumference * (1 - percent);
+        gridHumidityProgressEl.style.strokeDashoffset = dashOffset;
+      });
+    }, GAUGE_GROW_DURATION_MS);
     
     gridHumidityTextEls.forEach(gridHumidityTextEl => {
       gridHumidityTextEl.innerHTML = `${trendHtml}${Math.round(humidity)}%<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">RH</span>`;
@@ -5719,6 +5771,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const cy = 50 + radius * Math.sin(angleRad);
     const isUp = fNow >= fSunrise && fNow <= fSunset;
 
+    if (lastSunIsUp !== null && isUp !== lastSunIsUp) {
+      celestialDotEls.forEach(el => {
+        el.classList.add('celestial-spin');
+        setTimeout(() => el.classList.remove('celestial-spin'), 1200);
+      });
+    }
+    lastSunIsUp = isUp;
+
     celestialDotEls.forEach(celestialDotEl => {
       celestialDotEl.setAttribute('cx', cx.toFixed(3));
       celestialDotEl.setAttribute('cy', cy.toFixed(3));
@@ -5843,6 +5903,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
     } else {
       isUp = fNow <= fMoonset || fNow >= fMoonrise;
     }
+
+    if (lastMoonIsUp !== null && isUp !== lastMoonIsUp) {
+      celestialDotEls.forEach(el => {
+        el.classList.add('celestial-spin');
+        setTimeout(() => el.classList.remove('celestial-spin'), 1200);
+      });
+    }
+    lastMoonIsUp = isUp;
 
     celestialDotEls.forEach(celestialDotEl => {
       celestialDotEl.setAttribute('cx', cx.toFixed(3));
@@ -9529,6 +9597,29 @@ Plan ahead for significantly warmer conditions tomorrow!`
     }, CLOCK_SPIN_DURATION_MS);
   }
 
+  function triggerWindSpeedSpinAnimation() {
+    const progressEls = document.querySelectorAll('.clockGridItem-2 .countdown-progress');
+    const gustEls = document.querySelectorAll('.clockGridItem-2 .gust-progress');
+    
+    console.info('💨 Wind speed segments spin animation triggered!');
+    
+    progressEls.forEach(el => {
+      el.classList.add('spin-clockwise-360');
+    });
+    gustEls.forEach(el => {
+      el.classList.add('spin-counter-clockwise-360');
+    });
+    
+    setTimeout(() => {
+      progressEls.forEach(el => {
+        el.classList.remove('spin-clockwise-360');
+      });
+      gustEls.forEach(el => {
+        el.classList.remove('spin-counter-clockwise-360');
+      });
+    }, 1200);
+  }
+
   // Clock hands update
   function updateClockHands() {
     const container = document.querySelector('.clock-hands-container');
@@ -9815,10 +9906,48 @@ Plan ahead for significantly warmer conditions tomorrow!`
     }
   }
 
+  function initRadarInteractions() {
+    const rightEl = document.getElementById('weather-desc-image');
+    const leftEl = document.getElementById('weather-desc-image-left');
+    
+    if (rightEl) {
+      rightEl.style.cursor = 'pointer';
+      rightEl.addEventListener('mouseenter', () => {
+        rightRadarHovered = true;
+        if (lastWeatherData) {
+          updateWeatherDescription(lastWeatherData);
+        }
+      });
+      rightEl.addEventListener('mouseleave', () => {
+        rightRadarHovered = false;
+        if (lastWeatherData) {
+          updateWeatherDescription(lastWeatherData);
+        }
+      });
+    }
+    
+    if (leftEl) {
+      leftEl.style.cursor = 'pointer';
+      leftEl.addEventListener('mouseenter', () => {
+        leftRadarHovered = true;
+        if (lastWeatherData) {
+          updateWeatherDescription(lastWeatherData);
+        }
+      });
+      leftEl.addEventListener('mouseleave', () => {
+        leftRadarHovered = false;
+        if (lastWeatherData) {
+          updateWeatherDescription(lastWeatherData);
+        }
+      });
+    }
+  }
+
   // Initialize placeholders immediately, then start auto-refresh
   setPlaceholders();
   if (typeof updateMissingAssetsDisplay === 'function') updateMissingAssetsDisplay(); // Show list immediately if it existed from a previous session
   initWeatherWithGeolocation();
+  initRadarInteractions();
   // Add this at the very end of your file
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") {
@@ -9857,6 +9986,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   // Update wind direction arrow with spin animation
   let lastWindDirection = null;
+  let accumWindDirectionRotation = null;
+  let lastWindSpeed = null;
+  let lastSunIsUp = null;
+  let lastMoonIsUp = null;
+
+  let leftRadarHovered = false;
+  let rightRadarHovered = false;
 
   function updateWindDirectionArrow(temp, windDeg, windSpeed = 0) {
     const arrows = document.querySelectorAll('.wind-direction-display');
@@ -9879,8 +10015,23 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const ARROW_OFFSET = -180; // Calibrated so 190° from API shows as 10° on screen
       const displayDeg = deg + ARROW_OFFSET;
       
+      // Calculate or update accumulated rotation for spin effect
+      if (accumWindDirectionRotation === null) {
+        accumWindDirectionRotation = displayDeg;
+      } else {
+        const directionChanged = lastWindDirection !== null && deg !== lastWindDirection;
+        if (directionChanged) {
+          let targetAccum = displayDeg;
+          // Spin forward (clockwise) by at least 360 degrees
+          while (targetAccum < accumWindDirectionRotation + 360) {
+            targetAccum += 360;
+          }
+          accumWindDirectionRotation = targetAccum;
+        }
+      }
+      
       // Store rotation globally for reference
-      currentWindArrowRotation = displayDeg;
+      currentWindArrowRotation = accumWindDirectionRotation;
       
       // Check if direction changed significantly (more than 10 degrees)
       const directionChanged = lastWindDirection === null || Math.abs(deg - lastWindDirection) > 10;
@@ -9897,7 +10048,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           // Set rotation on the color div directly where rotation is applied in SCSS
           const colorDiv = arrow.querySelector('.wind-arrow-color');
           if (colorDiv) {
-            colorDiv.style.setProperty('--wind-rotation', `${displayDeg}deg`);
+            colorDiv.style.setProperty('--wind-rotation', `${accumWindDirectionRotation}deg`);
           }
           arrow.title = `Wind from ${deg}°`;
         });
@@ -9917,7 +10068,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }
 
       gridWindHands.forEach(gridWindHand => {
-        gridWindHand.style.transform = `translateX(-50%) rotate(${displayDeg}deg)`;
+        gridWindHand.style.transform = `translateX(-50%) rotate(${accumWindDirectionRotation}deg)`;
         gridWindHand.style.setProperty('--wind-stem-multiplier', stemMultiplier.toFixed(3));
         if (stemColor) {
           gridWindHand.style.setProperty('background', stemColor, 'important');
