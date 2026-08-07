@@ -27,6 +27,11 @@ import weatherConditions from '../data/weather-conditions.json';
   // Refresh interval (default 5 minutes)
   const DEFAULT_REFRESH_MS = 5 * 60 * 1000;
   let currentRefreshMs = DEFAULT_REFRESH_MS;
+
+  // --- CONFIG: Clock Hands Spin Animation ---
+  const CLOCK_SPIN_DURATION_MS = 1200; // EDITABLE: Reset animation spin duration in milliseconds
+  let isClockSpinning = false;
+  document.documentElement.style.setProperty('--clock-spin-duration', CLOCK_SPIN_DURATION_MS + 'ms');
   let refreshTimerId = null;
 
   // Store last weather data for resize repositioning of temp pointer--
@@ -2956,7 +2961,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   // --- Feels Like Margin Config ---
   const FEELS_LIKE_TOP_MARGIN = '1vw';    // EDITABLE: Gap ABOVE the whole "feels like" line
-  const FEELS_LIKE_BOTTOM_MARGIN = '0vw';   // EDInpm run buildTABLE: Gap BELOW the whole "feels like" line
+  const FEELS_LIKE_BOTTOM_MARGIN = '0vw';   // EDITABLE: Gap BELOW the whole "feels like" line
   const FEELS_LIKE_Y_OFFSET = '0vw';        // EDITABLE: Tight vertical nudge (positive = down, negative = up)
   const FEELS_LIKE_VAL_Y_OFFSET = '0vw';    // EDITABLE: Tight vertical nudge for ONLY the feels-like temp value
   
@@ -2964,6 +2969,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const FEELS_LIKE_TEMP_SIZE_DEFAULT = '7.25vw'; // EDITABLE: ENLARGED size of feels-like temp (single mode) when diff >= 10
   const FEELS_LIKE_TEXT_SIZE_DUAL = '4vw';      // EDITABLE: Standard size of the feels-like label text (dual mode)
   const FEELS_LIKE_TEMP_SIZE_DUAL = '6.25vw';    // EDITABLE: ENLARGED size of feels-like temp (dual mode) when diff >= 10
+
+  // --- Odometer Digit "1" Kerning Config ---
+  const ODOMETER_ONE_MARGIN_LEFT = '-0.06em';  // EDITABLE: Left margin adjustment for digit 1 to tighten kerning
+  const ODOMETER_ONE_MARGIN_RIGHT = '-0.06em'; // EDITABLE: Right margin adjustment for digit 1 to tighten kerning
 
   // Helper function to dynamically update odometer numbers without destroying DOM elements
   function updateOdometer(container, newStr) {
@@ -3036,13 +3045,40 @@ Plan ahead for significantly warmer conditions tomorrow!`
       });
     }
     
-    // Apply extra kerning if the number starts with 1 and is >= 100
-    const firstChild = container.children[0];
-    if (firstChild && newStr.startsWith('1') && parseInt(newStr) >= 100) {
-      firstChild.style.marginRight = 'var(--hundreds-one-margin-right, -0.25vw)';
-    } else if (firstChild) {
-      firstChild.style.marginRight = '';
-    }
+    // Apply digit "1" kerning margins
+    const children = Array.from(container.children);
+    children.forEach((child, i) => {
+      let isOne = false;
+      if (child.classList.contains('odometer-digit')) {
+        const strip = child.querySelector('.odometer-strip');
+        if (strip) {
+          const digitVal = strip.getAttribute('data-digit');
+          isOne = (digitVal === '1');
+        }
+      } else {
+        isOne = (child.textContent === '1');
+      }
+
+      if (isOne) {
+        // Adjust left margin (skip first element to prevent shifting start position)
+        if (i > 0) {
+          child.style.marginLeft = ODOMETER_ONE_MARGIN_LEFT;
+        } else {
+          child.style.marginLeft = '';
+        }
+        
+        // Adjust right margin (skip last element to prevent shifting end position)
+        if (i < children.length - 1) {
+          child.style.marginRight = ODOMETER_ONE_MARGIN_RIGHT;
+        } else {
+          child.style.marginRight = '';
+        }
+      } else {
+        // Reset margins for non-one digits/static characters
+        child.style.marginLeft = '';
+        child.style.marginRight = '';
+      }
+    });
   }
 
   // Create and update "Feels like" element
@@ -5528,7 +5564,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     // Fix robotic 'There will be' -> 'Expect'
     s = s.replace(/^There will be\b/i, 'Expect');
 
-    // Ensure trailing periodnpm run dev
+    // Ensure trailing period
     
     if (s && !/[.!?]$/.test(s)) {
       s += '.';
@@ -7217,6 +7253,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     
     stopAutoRefresh();
     getLocalWeather();
+    triggerClockHandsSpinAnimation();
     startAutoRefresh(currentRefreshMs, autoRefreshAligned);
     
     const targets = document.querySelectorAll('.clockGridItem-0, #analog-clock');
@@ -9345,9 +9382,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
         alignedTimeoutId = null;
         console.info('Aligned timeout fired — running fetch now.');
         getLocalWeather();
+        triggerClockHandsSpinAnimation();
         // schedule regular intervals after the aligned first run
         refreshTimerId = setInterval(() => {
           getLocalWeather();
+          triggerClockHandsSpinAnimation();
           nextRefreshAt = new Date(Date.now() + currentRefreshMs);
         }, currentRefreshMs);
         nextRefreshAt = new Date(Date.now() + currentRefreshMs);
@@ -9361,9 +9400,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
           console.warn('Heartbeat detected missed aligned tick — forcing immediate refresh.');
           if (alignedTimeoutId) { clearTimeout(alignedTimeoutId); alignedTimeoutId = null; }
           getLocalWeather();
+          triggerClockHandsSpinAnimation();
           if (!refreshTimerId) {
             refreshTimerId = setInterval(() => {
               getLocalWeather();
+              triggerClockHandsSpinAnimation();
               nextRefreshAt = new Date(Date.now() + currentRefreshMs);
             }, currentRefreshMs);
           }
@@ -9378,6 +9419,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       getLocalWeather();
       refreshTimerId = setInterval(() => {
         getLocalWeather();
+        triggerClockHandsSpinAnimation();
         nextRefreshAt = new Date(Date.now() + currentRefreshMs);
       }, currentRefreshMs);
       nextRefreshAt = new Date(Date.now() + currentRefreshMs);
@@ -9446,6 +9488,47 @@ Plan ahead for significantly warmer conditions tomorrow!`
     // Disabled intentionally to remove the straight line row of dots timer
   }
 
+  function triggerClockHandsSpinAnimation() {
+    if (isClockSpinning) return;
+    
+    isClockSpinning = true;
+    console.info('🔄 Clock hands spin reset animation triggered!');
+    
+    const now = new Date();
+    const hours = now.getHours() % 12;
+    const minutes = now.getMinutes();
+    
+    // Get their current base rotations (same math as updateClockHands)
+    const hourRotation = (hours * 30) + (minutes * 0.5);
+    const minuteRotation = (minutes * 6) + (now.getSeconds() * 0.1);
+    
+    const hourHands = document.querySelectorAll('.clock-hour-hand');
+    const minuteHands = document.querySelectorAll('.clock-minute-hand');
+    
+    hourHands.forEach(hand => {
+      hand.style.setProperty('--current-rotation', hourRotation + 'deg');
+      hand.classList.add('spin-clockwise-anim');
+    });
+    
+    minuteHands.forEach(hand => {
+      hand.style.setProperty('--current-rotation', minuteRotation + 'deg');
+      hand.classList.add('spin-counter-clockwise-anim');
+    });
+    
+    // Reset back to normal tracking after the animation finishes
+    setTimeout(() => {
+      hourHands.forEach(hand => {
+        hand.classList.remove('spin-clockwise-anim');
+      });
+      minuteHands.forEach(hand => {
+        hand.classList.remove('spin-counter-clockwise-anim');
+      });
+      isClockSpinning = false;
+      // Force immediate update to snap to correct current time without transition
+      updateClockHands();
+    }, CLOCK_SPIN_DURATION_MS);
+  }
+
   // Clock hands update
   function updateClockHands() {
     const container = document.querySelector('.clock-hands-container');
@@ -9478,8 +9561,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
     }
 
     if (container) {
-      container.style.setProperty('--hour-rotation', `${hourRotation}deg`);
-      container.style.setProperty('--minute-rotation', `${minuteRotation}deg`);
+      if (!isClockSpinning) {
+        container.style.setProperty('--hour-rotation', `${hourRotation}deg`);
+        container.style.setProperty('--minute-rotation', `${minuteRotation}deg`);
+      }
       container.style.setProperty('--second-rotation', `${secondRotation}deg`);
       if (currentColor) {
         container.style.setProperty('--clock-hands-color', currentColor);
@@ -9491,20 +9576,24 @@ Plan ahead for significantly warmer conditions tomorrow!`
     }
 
     // Direct JS update of Time dial hands and dot to ensure they rotate and color match
-    const hourHands = document.querySelectorAll('.clockGridItem-0 .clock-hour-hand');
-    const minuteHands = document.querySelectorAll('.clockGridItem-0 .clock-minute-hand');
-    const secondHands = document.querySelectorAll('.clockGridItem-0 .clock-second-hand');
-    const centerDots = document.querySelectorAll('.clockGridItem-0 .clock-center-dot');
+    const hourHands = document.querySelectorAll('.clockGridItem-0 .clock-hour-hand, #analog-clock .clock-hour-hand');
+    const minuteHands = document.querySelectorAll('.clockGridItem-0 .clock-minute-hand, #analog-clock .clock-minute-hand');
+    const secondHands = document.querySelectorAll('.clockGridItem-0 .clock-second-hand, #analog-clock .clock-second-hand');
+    const centerDots = document.querySelectorAll('.clockGridItem-0 .clock-center-dot, #analog-clock .clock-center-dot');
 
     hourHands.forEach(hand => {
-      hand.style.transform = `translateX(-50%) rotate(${hourRotation}deg)`;
+      if (!isClockSpinning) {
+        hand.style.transform = `translateX(-50%) rotate(${hourRotation}deg)`;
+      }
       if (currentColor) {
         hand.style.backgroundColor = currentColor;
       }
     });
 
     minuteHands.forEach(hand => {
-      hand.style.transform = `translateX(-50%) rotate(${minuteRotation}deg)`;
+      if (!isClockSpinning) {
+        hand.style.transform = `translateX(-50%) rotate(${minuteRotation}deg)`;
+      }
       if (currentColor) {
         hand.style.backgroundColor = currentColor;
       }
@@ -9521,8 +9610,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
     });
 
     gridItem0s.forEach(gridItem0 => {
-      gridItem0.style.setProperty('--hour-rotation', `${hourRotation}deg`);
-      gridItem0.style.setProperty('--minute-rotation', `${minuteRotation}deg`);
+      if (!isClockSpinning) {
+        gridItem0.style.setProperty('--hour-rotation', `${hourRotation}deg`);
+        gridItem0.style.setProperty('--minute-rotation', `${minuteRotation}deg`);
+      }
       gridItem0.style.setProperty('--second-rotation', `${secondRotation}deg`);
       if (currentColor) {
         gridItem0.style.setProperty('--clock-hands-color', currentColor);

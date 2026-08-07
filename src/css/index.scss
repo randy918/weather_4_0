@@ -1323,3 +1323,30 @@ main {
     line-height: 1.1em;
     vertical-align: middle;
 }
+
+// Clock Hands Reset Spin Animation
+@keyframes spin-clockwise {
+    from {
+        transform: translateX(-50%) rotate(var(--current-rotation, 0deg));
+    }
+    to {
+        transform: translateX(-50%) rotate(calc(var(--current-rotation, 0deg) + 360deg));
+    }
+}
+
+@keyframes spin-counter-clockwise {
+    from {
+        transform: translateX(-50%) rotate(var(--current-rotation, 0deg));
+    }
+    to {
+        transform: translateX(-50%) rotate(calc(var(--current-rotation, 0deg) - 360deg));
+    }
+}
+
+.spin-clockwise-anim {
+    animation: spin-clockwise var(--clock-spin-duration, 1.2s) cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+}
+
+.spin-counter-clockwise-anim {
+    animation: spin-counter-clockwise var(--clock-spin-duration, 1.2s) cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+}
