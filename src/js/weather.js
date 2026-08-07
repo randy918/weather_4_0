@@ -2239,6 +2239,7 @@ import weatherConditions from '../data/weather-conditions.json';
   // Create and update dynamic alert banners from OpenWeather API
   function updateAlerts(data) {
     const rawAlerts = data.alerts || [];
+    const now = Math.floor(Date.now() / 1000);
     
     // Deduplicate alerts by event name to prevent showing the exact same warning twice
     // (The National Weather Service often issues overlapping polygons for the same storm)
@@ -2246,6 +2247,12 @@ import weatherConditions from '../data/weather-conditions.json';
     const seenEvents = new Set();
     rawAlerts.forEach(alert => {
       if (alert && alert.event) {
+        // Skip alert if it has already expired
+        const expiration = Number(alert.end);
+        if (!isNaN(expiration) && expiration <= now) {
+          return;
+        }
+
         // Force uppercase and strip hidden spaces/newlines to guarantee reliable deduplication
         const normalizedEvent = alert.event.toUpperCase().trim();
         if (!seenEvents.has(normalizedEvent)) {
@@ -2259,7 +2266,6 @@ import weatherConditions from '../data/weather-conditions.json';
     const currentFeelsLike = data.current?.feels_like ?? data.current?.temp;
     const humidity = data.current?.humidity;
     const windSpeed = data.current?.wind_speed;
-    const now = Math.floor(Date.now() / 1000);
     const sunrise = data.daily?.[0]?.sunrise;
     const sunset = data.daily?.[0]?.sunset;
     const weatherId = data.current?.weather?.[0]?.id;
@@ -2612,13 +2618,26 @@ Plan ahead for significantly warmer conditions tomorrow!`
         alertText += ` <span class="alert-expires">tomorrow</span>`;
       } else if (alert.end) {
         const endDate = new Date(alert.end * 1000); // Convert Unix timestamp to Date
+        const today = new Date();
+        const tomorrow = new Date();
+        tomorrow.setDate(today.getDate() + 1);
+
+        let dayLabel = '';
+        if (endDate.toDateString() === today.toDateString()) {
+          dayLabel = ''; // Expired/expires today
+        } else if (endDate.toDateString() === tomorrow.toDateString()) {
+          dayLabel = ' tomorrow';
+        } else {
+          dayLabel = ' ' + endDate.toLocaleDateString('en-US', { weekday: 'short' });
+        }
+
         const hours = endDate.getHours();
         const minutes = endDate.getMinutes().toString().padStart(2, '0');
         const ampm = hours >= 12 ? 'pm' : 'am';
         const displayHours = hours % 12 || 12; // Convert 0 to 12 for midnight
-        const expiresText = `expires ${displayHours}:${minutes} ${ampm}`;
+        const expiresText = `expires ${displayHours}:${minutes} ${ampm}${dayLabel}`;
         alertText += ` <span class="alert-expires">${expiresText}</span>`;
-        console.log(`Alert expires at: ${displayHours}:${minutes} ${ampm}`);
+        console.log(`Alert expires at: ${displayHours}:${minutes} ${ampm}${dayLabel}`);
       } else {
         console.log('Alert has no end property');
       }
@@ -5477,7 +5496,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   }
 
   // --- Daily Weather Summary Line Config (DUAL Desktop & Mobile) ---
-  const DAILY_SUMMARY_WIDTH_DESKTOP = '65vw';            // EDITABLE Desktop: Centered block width in vw (e.g. '40vw', '50vw')
+  const DAILY_SUMMARY_WIDTH_DESKTOP = '55vw';            // EDITABLE Desktop: Centered block width in vw (e.g. '40vw', '50vw')
   const DAILY_SUMMARY_WIDTH_MOBILE = '70vw';             // EDITABLE Mobile: Centered block width in vw (e.g. '70vw', '80vw')
 
   const DAILY_SUMMARY_FONT_SIZE_DESKTOP = '3.6vw';       // EDITABLE Desktop: Font size (e.g. '1.6vw', '2vw', '3.6vw')
@@ -5489,18 +5508,37 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const DAILY_SUMMARY_LINE_HEIGHT_DESKTOP = '1';         // EDITABLE Desktop: Line height / leading
   const DAILY_SUMMARY_LINE_HEIGHT_MOBILE = '1.2';        // EDITABLE Mobile: Line height / leading
 
-  const DAILY_SUMMARY_MARGIN_TOP_DESKTOP = '-2.5vw';       // EDITABLE Desktop: Space ABOVE summary line
-  const DAILY_SUMMARY_MARGIN_TOP_MOBILE = '-1vw';        // EDITABLE Mobile: Space ABOVE summary line
+  const DAILY_SUMMARY_MARGIN_TOP_DESKTOP = '0.5vw';       // EDITABLE Desktop: Space ABOVE summary line
+  const DAILY_SUMMARY_MARGIN_TOP_MOBILE = '0.5vw';        // EDITABLE Mobile: Space ABOVE summary line
 
-  const DAILY_SUMMARY_MARGIN_BOTTOM_DESKTOP = '-3.6vw';  // EDITABLE Desktop: Space BELOW summary line
-  const DAILY_SUMMARY_MARGIN_BOTTOM_MOBILE = '-3vw';      // EDITABLE Mobile: Space BELOW summary line
+  const DAILY_SUMMARY_MARGIN_BOTTOM_DESKTOP = '1vw';  // EDITABLE Desktop: Space BELOW summary line
+  const DAILY_SUMMARY_MARGIN_BOTTOM_MOBILE = '1vw';      // EDITABLE Mobile: Space BELOW summary line
+
+  // Helper to polish machine-generated OpenWeather summaries into natural, smooth English
+  function formatNaturalSummary(text) {
+    if (!text || typeof text !== 'string') return '';
+    let s = text.trim();
+
+    // Fix singular 'clear sky' -> 'clear skies'
+    s = s.replace(/\bclear sky\b/gi, 'clear skies');
+
+    // Fix clunky 'overcast clouds' -> 'overcast skies'
+    s = s.replace(/\bovercast clouds\b/gi, 'overcast skies');
+
+    // Fix robotic 'There will be' -> 'Expect'
+    s = s.replace(/^There will be\b/i, 'Expect');
+
+    // Ensure trailing period
+    if (s && !/[.!?]$/.test(s)) {
+      s += '.';
+    }
+
+    return s;
+  }
 
   // Create and update daily weather summary line between Sweltering and the first dial row
   function updateDailySummary(data) {
-    let summaryText = (data?.daily?.[0]?.summary || '').trim();
-    if (summaryText && !/[.!?]$/.test(summaryText)) {
-      summaryText += '.';
-    }
+    let summaryText = formatNaturalSummary(data?.daily?.[0]?.summary || '');
     
     let el = document.getElementById('daily-weather-summary');
 
@@ -5514,6 +5552,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       el.style.textTransform = 'none';
       el.style.boxSizing = 'border-box';
       el.style.pointerEvents = 'none';
+      el.style.textWrap = 'balance';
     }
 
     // Determine current layout (Mobile <= 767px vs Desktop)
@@ -5559,8 +5598,19 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (summaryText) {
       el.textContent = summaryText;
       el.style.display = 'block';
+
+      // Calculate layout push dynamically (including margins)
+      const marginTopVal = parseFloat(isMobile ? DAILY_SUMMARY_MARGIN_TOP_MOBILE : DAILY_SUMMARY_MARGIN_TOP_DESKTOP) || 0;
+      const marginBottomVal = parseFloat(isMobile ? DAILY_SUMMARY_MARGIN_BOTTOM_MOBILE : DAILY_SUMMARY_MARGIN_BOTTOM_DESKTOP) || 0;
+      const vwToPx = window.innerWidth / 100;
+      const marginTopPx = marginTopVal * vwToPx;
+      const marginBottomPx = marginBottomVal * vwToPx;
+      const pushPx = el.offsetHeight + marginTopPx + marginBottomPx;
+      
+      document.documentElement.style.setProperty('--daily-summary-push', `${pushPx}px`);
     } else {
       el.style.display = 'none';
+      document.documentElement.style.setProperty('--daily-summary-push', '0px');
     }
 
     // Apply color associated strictly with current temperature + 10
@@ -9539,9 +9589,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
     `;
   }
 
+  let alertCheckCounter = 0;
+
   function startCountdownGauge() {
     if (countdownIntervalId) clearInterval(countdownIntervalId);
     
+    alertCheckCounter = 0;
     // Update every 100ms for smooth animation (countdown + clock hands + left circle seconds)
     countdownIntervalId = setInterval(() => {
       updateCountdownGauge();
@@ -9549,6 +9602,15 @@ Plan ahead for significantly warmer conditions tomorrow!`
       updateClockHands();
       updateSimpleMonthContent();
       updateLeftCircleTime();
+      
+      // Periodically refresh alerts every 10 seconds to auto-expire them in real-time
+      alertCheckCounter++;
+      if (alertCheckCounter >= 100) {
+        alertCheckCounter = 0;
+        if (lastWeatherData) {
+          updateAlerts(lastWeatherData);
+        }
+      }
     }, 100);
     updateCountdownGauge();
     updateDotsCountdown();
@@ -9695,6 +9757,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       // Delay to ensure DOM has settled after resize
       setTimeout(() => {
         updateTempPointer(lastWeatherData);
+        updateDailySummary(lastWeatherData);
         // updateWindDotsRow(lastWeatherData); // Reposition wind arrow
       }, 100);
     }
