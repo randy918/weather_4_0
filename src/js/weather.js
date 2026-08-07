@@ -431,7 +431,7 @@ import weatherConditions from '../data/weather-conditions.json';
   const RAIN_BANNER_MAX_OPACITY = 0.95; // Maximum opacity for cells with rain
 
   // EDITABLE: Minimum height for the 8-day forecast temperature bars
-  const MIN_TEMP_BAR_HEIGHT_VW = 5; // The height for the lowest temp of the week
+  const MIN_TEMP_BAR_HEIGHT_VW = 6.5; // The height for the lowest temp of the week
   const DAY_LETTER_FONT_SIZE = 'inherit'; // EDITABLE: Size of the day letters (S, M, T...) under the bars. Try '4.5vw'!
 
   // EDITABLE: Hourly forecast time labels
@@ -1802,6 +1802,10 @@ import weatherConditions from '../data/weather-conditions.json';
         transform: translate(-50%, -50%);
         z-index: 100;
         pointer-events: none;
+      }
+      .hiItem.animating-change,
+      .loItem.animating-change {
+        transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1) !important;
       }
       body.transitions-ready #moon-phase-img {
         transition: transform ${ALERT_ANIMATION_MS}ms ease, filter 0.3s ease !important;
@@ -8432,34 +8436,177 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const hiRatio = range > 0 ? (hiTempF - tempRangeMin) / range : 0.5;
       const loRatio = range > 0 ? (loTempF - tempRangeMin) / range : 0.5;
 
-      // Set height, text, and color for High bars
-      item.style.height = `calc(${MIN_TEMP_BAR_HEIGHT_VW}vw + (100% - ${MIN_TEMP_BAR_HEIGHT_VW}vw) * ${hiRatio})`;
-      
-      if (displayUnit === 'BOTH') {
-        const hiTempC = Math.round((hiTempF - 32) * 5 / 9);
-        const colorStyle = hiTempF >= 100 ? 'color: hsl(30, 100%, 50%) !important;' : 'color: var(--theBrown);';
-        item.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: 10; top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${hiTempF}${formatSlash()}${hiTempC}</span>`;
+      // Check for Day 2 high temperature change animation (Index 1)
+      const shouldAnimateDay2 = index === 1 && (
+        forceDay2HighAnimation || 
+        (prevDay2HighTemp !== null && prevDay2HighTemp !== hiTempF)
+      );
+
+      if (shouldAnimateDay2) {
+        
+        // Stage 1: Animate height DOWN to the level of the corresponding "low" cell
+        const oldHiTemp = prevDay2HighTemp !== null ? prevDay2HighTemp : hiTempF;
+        const oldHiRatio = range > 0 ? (oldHiTemp - tempRangeMin) / range : 0.5;
+        const oldHeightStr = `calc(${MIN_TEMP_BAR_HEIGHT_VW}vw + (100% - ${MIN_TEMP_BAR_HEIGHT_VW}vw) * ${oldHiRatio})`;
+        const loHeightStr = `calc(${MIN_TEMP_BAR_HEIGHT_VW}vw + (100% - ${MIN_TEMP_BAR_HEIGHT_VW}vw) * ${loRatio})`;
+        const targetHeightStr = `calc(${MIN_TEMP_BAR_HEIGHT_VW}vw + (100% - ${MIN_TEMP_BAR_HEIGHT_VW}vw) * ${hiRatio})`;
+
+        // Instantly set to old height and bring high bar to front during animation so text is visible on top
+        item.style.height = oldHeightStr;
+        item.style.zIndex = '10'; // Bring in front of low bar (which is z-index 2)
+        item.classList.add('animating-change');
+        
+        // Populate the OLD temperature text initially
+        const oldHiTempDisplay = displayUnit === 'C' ? Math.round((oldHiTemp - 32) * 5 / 9) : oldHiTemp;
+        if (displayUnit === 'BOTH') {
+          const oldHiTempC = Math.round((oldHiTemp - 32) * 5 / 9);
+          const colorStyle = oldHiTemp >= 100 ? 'color: hsl(30, 100%, 50%) !important;' : 'color: var(--theBrown);';
+          item.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: 10; top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${oldHiTemp}${formatSlash()}${oldHiTempC}</span>`;
+        } else {
+          const colorStyle = oldHiTemp >= 100 ? 'style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: 10;"' : 'style="color: var(--theBrown); position: relative; z-index: 10;"';
+          item.innerHTML = `<span ${colorStyle}>${oldHiTempDisplay}°</span>`;
+        }
+        item.style.backgroundColor = tempToColor(oldHiTemp) || '';
+        item.style.opacity = '1';
+
+        // Force reflow
+        void item.offsetHeight;
+
+        // Step 1: Animate height down to the low cell height (using setTimeout to ensure transition is registered)
+        setTimeout(() => {
+          item.style.height = loHeightStr;
+        }, 20);
+
+        // Step 2: After 800ms, update the temp text/colors and animate back UP to the new temperature
+        setTimeout(() => {
+          // Update colors to match the new high temperature
+          item.style.backgroundColor = tempToColor(hiTempF) || '';
+          
+          if (displayUnit === 'BOTH') {
+            const hiTempC = Math.round((hiTempF - 32) * 5 / 9);
+            const colorStyle = hiTempF >= 100 ? 'color: hsl(30, 100%, 50%) !important;' : 'color: var(--theBrown);';
+            item.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: 10; top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${hiTempF}${formatSlash()}${hiTempC}</span>`;
+          } else {
+            const colorStyle = hiTempF >= 100 ? 'style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: 10;"' : 'style="color: var(--theBrown); position: relative; z-index: 10;"';
+            item.innerHTML = `<span ${colorStyle}>${hiTempDisplay}°</span>`;
+          }
+          
+          // Animate back up to the new high cell height
+          item.style.height = targetHeightStr;
+
+          // Clean up transition property and restore z-index after completion (another 800ms)
+          setTimeout(() => {
+            item.classList.remove('animating-change');
+            item.style.zIndex = ''; // Restore default (underneath low bar)
+          }, 800);
+        }, 820);
+
       } else {
-        const colorStyle = hiTempF >= 100 ? 'style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: 10;"' : 'style="color: var(--theBrown); position: relative; z-index: 10;"';
-        item.innerHTML = `<span ${colorStyle}>${hiTempDisplay}°</span>`;
+        // Normal update (non-animated)
+        item.style.height = `calc(${MIN_TEMP_BAR_HEIGHT_VW}vw + (100% - ${MIN_TEMP_BAR_HEIGHT_VW}vw) * ${hiRatio})`;
+        if (displayUnit === 'BOTH') {
+          const hiTempC = Math.round((hiTempF - 32) * 5 / 9);
+          const colorStyle = hiTempF >= 100 ? 'color: hsl(30, 100%, 50%) !important;' : 'color: var(--theBrown);';
+          item.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: 10; top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${hiTempF}${formatSlash()}${hiTempC}</span>`;
+        } else {
+          const colorStyle = hiTempF >= 100 ? 'style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: 10;"' : 'style="color: var(--theBrown); position: relative; z-index: 10;"';
+          item.innerHTML = `<span ${colorStyle}>${hiTempDisplay}°</span>`;
+        }
+        item.style.backgroundColor = tempToColor(hiTempF) || '';
+        item.style.opacity = '1';
       }
-      item.style.backgroundColor = tempToColor(hiTempF) || '';
-      item.style.opacity = '1';
+
+      // Track the day 2 high temp
+      if (index === 1) {
+        prevDay2HighTemp = hiTempF;
+      }
 
       // Set height, text, and color for Low bars
-      if (loItems[index]) {
-        loItems[index].style.height = `calc(${MIN_TEMP_BAR_HEIGHT_VW}vw + (100% - ${MIN_TEMP_BAR_HEIGHT_VW}vw) * ${loRatio})`;
-        
-        if (displayUnit === 'BOTH') {
-          const loTempC = Math.round((loTempF - 32) * 5 / 9);
-          const colorStyle = loTempF >= 100 ? 'color: hsl(30, 100%, 50%) !important;' : 'color: var(--theBrown);';
-          loItems[index].innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: 10; top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${loTempF}${formatSlash()}${loTempC}</span>`;
+      const loItem = loItems[index];
+      if (loItem) {
+        const shouldAnimateDay2Low = index === 1 && (
+          forceDay2LowAnimation ||
+          (prevDay2LowTemp !== null && prevDay2LowTemp !== loTempF)
+        );
+
+        if (shouldAnimateDay2Low) {
+          // Stage 1: Animate height DOWN to nothing (0px)
+          const oldLoTemp = prevDay2LowTemp !== null ? prevDay2LowTemp : loTempF;
+          const oldLoRatio = range > 0 ? (oldLoTemp - tempRangeMin) / range : 0.5;
+          const oldLoHeightStr = `calc(${MIN_TEMP_BAR_HEIGHT_VW}vw + (100% - ${MIN_TEMP_BAR_HEIGHT_VW}vw) * ${oldLoRatio})`;
+          const targetLoHeightStr = `calc(${MIN_TEMP_BAR_HEIGHT_VW}vw + (100% - ${MIN_TEMP_BAR_HEIGHT_VW}vw) * ${loRatio})`;
+
+          // Instantly set to old height, set overflow to hidden to mask the text, and lift to z-index 11 (on top of high bar's 10)
+          loItem.style.height = oldLoHeightStr;
+          loItem.style.zIndex = '11';
+          loItem.style.overflow = 'hidden';
+          loItem.classList.add('animating-change');
+
+          // Populate the OLD temperature text initially
+          const oldLoTempDisplay = displayUnit === 'C' ? Math.round((oldLoTemp - 32) * 5 / 9) : oldLoTemp;
+          if (displayUnit === 'BOTH') {
+            const oldLoTempC = Math.round((oldLoTemp - 32) * 5 / 9);
+            const colorStyle = oldLoTemp >= 100 ? 'color: hsl(30, 100%, 50%) !important;' : 'color: var(--theBrown);';
+            loItem.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: 10; top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${oldLoTemp}${formatSlash()}${oldLoTempC}</span>`;
+          } else {
+            const colorStyle = oldLoTemp >= 100 ? 'style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: 10;"' : 'style="color: var(--theBrown); position: relative; z-index: 10;"';
+            loItem.innerHTML = `<span ${colorStyle}>${oldLoTempDisplay}°</span>`;
+          }
+          loItem.style.backgroundColor = tempToColor(oldLoTemp) || '';
+          loItem.style.opacity = '1';
+
+          // Force reflow
+          void loItem.offsetHeight;
+
+          // Step 1: Animate height down to 0px (masking the text)
+          setTimeout(() => {
+            loItem.style.height = '0px';
+          }, 20);
+
+          // Step 2: After 800ms, update the temp text/colors and animate back UP to the new temperature
+          setTimeout(() => {
+            loItem.style.backgroundColor = tempToColor(loTempF) || '';
+
+            if (displayUnit === 'BOTH') {
+              const loTempC = Math.round((loTempF - 32) * 5 / 9);
+              const colorStyle = loTempF >= 100 ? 'color: hsl(30, 100%, 50%) !important;' : 'color: var(--theBrown);';
+              loItem.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: 10; top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${loTempF}${formatSlash()}${loTempC}</span>`;
+            } else {
+              const colorStyle = loTempF >= 100 ? 'style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: 10;"' : 'style="color: var(--theBrown); position: relative; z-index: 10;"';
+              loItem.innerHTML = `<span ${colorStyle}>${loTempDisplay}°</span>`;
+            }
+
+            // Animate back up to the new low cell height
+            loItem.style.height = targetLoHeightStr;
+
+            // Clean up transition property, overflow and z-index after completion
+            setTimeout(() => {
+              loItem.classList.remove('animating-change');
+              loItem.style.zIndex = '';
+              loItem.style.overflow = '';
+            }, 800);
+          }, 820);
+
         } else {
-          const colorStyle = loTempF >= 100 ? 'style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: 10;"' : 'style="color: var(--theBrown); position: relative; z-index: 10;"';
-          loItems[index].innerHTML = `<span ${colorStyle}>${loTempDisplay}°</span>`;
+          // Normal update (non-animated)
+          loItem.style.height = `calc(${MIN_TEMP_BAR_HEIGHT_VW}vw + (100% - ${MIN_TEMP_BAR_HEIGHT_VW}vw) * ${loRatio})`;
+          
+          if (displayUnit === 'BOTH') {
+            const loTempC = Math.round((loTempF - 32) * 5 / 9);
+            const colorStyle = loTempF >= 100 ? 'color: hsl(30, 100%, 50%) !important;' : 'color: var(--theBrown);';
+            loItem.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: 10; top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${loTempF}${formatSlash()}${loTempC}</span>`;
+          } else {
+            const colorStyle = loTempF >= 100 ? 'style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: 10;"' : 'style="color: var(--theBrown); position: relative; z-index: 10;"';
+            loItem.innerHTML = `<span ${colorStyle}>${loTempDisplay}°</span>`;
+          }
+          loItem.style.backgroundColor = tempToColor(loTempF) || '';
+          loItem.style.opacity = '1';
         }
-        loItems[index].style.backgroundColor = tempToColor(loTempF) || '';
-        loItems[index].style.opacity = '1';
+      }
+
+      // Track the day 2 low temp
+      if (index === 1) {
+        prevDay2LowTemp = loTempF;
       }
 
       // Set text for Day items
@@ -8468,6 +8615,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
         dayItems[index].innerHTML = `<span class="day-letter" style="font-size: ${DAY_LETTER_FONT_SIZE}; font-family: 'light', sans-serif; opacity: 1; font-weight: normal; color: white;">${dayNames[dateObj.getDay()]}</span> <span style="font-family: 'bold', sans-serif;">${dateObj.getDate()}</span>`;
       }
     });
+    forceDay2HighAnimation = false;
+    forceDay2LowAnimation = false;
   }
 
   // EDITABLE: Update the temperature pointer position based on current temp
@@ -9943,11 +10092,50 @@ Plan ahead for significantly warmer conditions tomorrow!`
     }
   }
 
+  function initBarChartInteractions() {
+    const hiContainer = document.querySelector('.hiContainer');
+    const loContainer = document.querySelector('.loContainer');
+    if (hiContainer) hiContainer.style.pointerEvents = 'none';
+    if (loContainer) loContainer.style.pointerEvents = 'none';
+
+    document.querySelectorAll('.hiItem, .loItem').forEach(item => {
+      item.style.pointerEvents = 'auto';
+    });
+
+    const day2BarHi = document.querySelector('.hiItem-1');
+    const day2BarLo = document.querySelector('.loItem-1');
+    
+    if (day2BarHi) {
+      day2BarHi.style.cursor = 'pointer';
+      day2BarHi.title = "Click to animate Day 2 High Temperature";
+      day2BarHi.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!lastWeatherData || !lastWeatherData.daily || !lastWeatherData.daily[1]) return;
+        console.log(`🎯 [Simulation] Tomorrow's High Bar clicked: forcing high height animation!`);
+        forceDay2HighAnimation = true;
+        updateOverlappingBarChart(lastWeatherData);
+      });
+    }
+    
+    if (day2BarLo) {
+      day2BarLo.style.cursor = 'pointer';
+      day2BarLo.title = "Click to animate Day 2 Low Temperature";
+      day2BarLo.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!lastWeatherData || !lastWeatherData.daily || !lastWeatherData.daily[1]) return;
+        console.log(`🎯 [Simulation] Tomorrow's Low Bar clicked: forcing low height animation!`);
+        forceDay2LowAnimation = true;
+        updateOverlappingBarChart(lastWeatherData);
+      });
+    }
+  }
+
   // Initialize placeholders immediately, then start auto-refresh
   setPlaceholders();
   if (typeof updateMissingAssetsDisplay === 'function') updateMissingAssetsDisplay(); // Show list immediately if it existed from a previous session
   initWeatherWithGeolocation();
   initRadarInteractions();
+  initBarChartInteractions();
   // Add this at the very end of your file
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") {
@@ -9993,6 +10181,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   let leftRadarHovered = false;
   let rightRadarHovered = false;
+  let prevDay2HighTemp = null;
+  let prevDay2LowTemp = null;
+  let forceDay2HighAnimation = false;
+  let forceDay2LowAnimation = false;
 
   function updateWindDirectionArrow(temp, windDeg, windSpeed = 0) {
     const arrows = document.querySelectorAll('.wind-direction-display');
