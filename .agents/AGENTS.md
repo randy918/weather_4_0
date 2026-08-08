@@ -45,3 +45,8 @@ When displaying RainViewer Doppler radar data in this workspace, follow these co
 8. **Dual Desktop & Mobile Config Constants**:
    - Whenever creating or updating UI layout & typography parameters, ALWAYS provide explicit `_DESKTOP` and `_MOBILE` constant pairs (e.g. `FEATURE_WIDTH_DESKTOP`, `FEATURE_WIDTH_MOBILE`, `FEATURE_FONT_SIZE_DESKTOP`, `FEATURE_FONT_SIZE_MOBILE`).
    - This allows the user to easily read, tweak, and edit separate numbers for desktop and mobile right in the JS/CSS config section.
+
+9. **Strong Preference for JS CSS Variables (JS-Driven Configuration)**:
+   - To maximize readability, configuration simplicity, and dynamic responsiveness, ALWAYS define styling variables (such as layout dimensions, margins, paddings, colors, font sizes, transitions, and offsets) as editable JS constants at the top of JS functions/modules.
+   - Inject these configurations into the DOM via `element.style.setProperty('--variable-name', value)` (or on `document.documentElement` for global scope).
+   - In the stylesheet (`.css` / `.scss`), reference these configurations exclusively using `var(--variable-name)`. Avoid hardcoding specific layout, spacing, and color numbers in traditional CSS files so that all configurations remain centralized in JS.
