@@ -374,7 +374,14 @@ import weatherConditions from '../data/weather-conditions.json';
   // Helper to animate SVG progress dials in two stages on value changes
   function animateGauge(elements, newVal, prevVal, minVal, avgVal, maxVal, getRadiusFn) {
     if (!elements || elements.length === 0) return;
-    const hasChange = prevVal !== null && prevVal !== newVal;
+    
+    const originalPrevVal = prevVal;
+    // Default null prevVal to minVal so it runs a clean two-stage animation from empty on load
+    if (prevVal === null) {
+      prevVal = minVal;
+    }
+    
+    const hasChange = originalPrevVal === null || prevVal !== newVal;
 
     elements.forEach(el => {
       const radius = getRadiusFn(el);
@@ -8814,7 +8821,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   }
 
   // Fetch and display the city name from OpenWeather Reverse Geocoding API
-  async function updateCityDisplay(lat, lon) {
+  async function updateCityDisplay(lat, lon, data = null) {
     const id = 'weather-city-name';
     let el = document.getElementById(id);
     
@@ -8855,6 +8862,17 @@ Plan ahead for significantly warmer conditions tomorrow!`
     el.style.marginBottom = CITY_MARGIN_BOTTOM;
     el.style.letterSpacing = CITY_LETTER_SPACING;
     el.style.transform = 'translateX(var(--middle-text-x-offset, 0vw))';
+
+    // Apply color associated strictly with current temperature + 10
+    if (data && data.current && typeof data.current.temp === 'number') {
+      const currentTemp = data.current.temp;
+      const cityColor = tempToColor(currentTemp + 10);
+      if (cityColor) {
+        el.style.color = cityColor;
+      }
+    } else {
+      el.style.color = 'white';
+    }
 
     // Only fetch if coordinates have changed to save API calls
     if (currentCityLat === lat && currentCityLon === lon) return;
@@ -9467,7 +9485,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       updateFields(data);
 
       // Fetch and display city name based on current LAT/LON
-      updateCityDisplay(LAT, LON);
+      updateCityDisplay(LAT, LON, data);
 
       // update the overlapping bar chart (today + 7 days)
       try {
