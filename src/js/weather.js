@@ -384,6 +384,15 @@ import weatherConditions from '../data/weather-conditions.json';
     const hasChange = originalPrevVal === null || prevVal !== newVal;
 
     elements.forEach(el => {
+      // If the element is currently running a two-stage animation, do not interrupt it!
+      if (el.dataset.animating === 'true') {
+        const radius = getRadiusFn(el);
+        const circumference = 2 * Math.PI * radius;
+        const newPercent = calcAboveBelowAverageProgress(newVal, minVal, avgVal, maxVal);
+        el.dataset.targetOffset = circumference * (1 - newPercent);
+        return;
+      }
+
       const radius = getRadiusFn(el);
       const circumference = 2 * Math.PI * radius;
       el.style.strokeDasharray = `${circumference}`;
@@ -392,6 +401,10 @@ import weatherConditions from '../data/weather-conditions.json';
       const targetOffset = circumference * (1 - newPercent);
 
       if (hasChange) {
+        // Mark as animating
+        el.dataset.animating = 'true';
+        el.dataset.targetOffset = targetOffset;
+
         // Stage 1: Animate clockwise from old value's offset to MAX (strokeDashoffset = 0)
         const oldPercent = calcAboveBelowAverageProgress(prevVal, minVal, avgVal, maxVal);
         const startOffset = circumference * (1 - oldPercent);
@@ -407,7 +420,12 @@ import weatherConditions from '../data/weather-conditions.json';
 
         // Stage 2: Animate counter-clockwise from MAX (0) to new targetOffset
         setTimeout(() => {
-          el.style.strokeDashoffset = targetOffset;
+          const currentTarget = parseFloat(el.dataset.targetOffset) ?? targetOffset;
+          el.style.strokeDashoffset = currentTarget;
+          
+          setTimeout(() => {
+            el.dataset.animating = 'false';
+          }, 800);
         }, 820);
       } else {
         // Normal update (no change or initial load)
