@@ -144,6 +144,8 @@ import weatherConditions from '../data/weather-conditions.json';
   // Easily editable animation duration for the alert banner slide (in milliseconds)
   const ALERT_ANIMATION_MS = 1000;
 
+
+
   // --- CONFIG: Doppler Radar Option ---
   // Status of the left and right widgets
   let SHOW_DOPPLER_RADAR_LEFT = false;
@@ -1618,6 +1620,8 @@ import weatherConditions from '../data/weather-conditions.json';
         border-bottom: 0.2vw solid rgba(255, 255, 255, 0.2);
         z-index: 1;
       }
+
+
       .alert-banner-content {
         position: relative;
         z-index: 2;
@@ -2595,6 +2599,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
       });
     }
     
+
+    
     const container = document.getElementById('alerts-container');
     
     // Console logging to debug tornado watch
@@ -2667,6 +2673,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const bannerBg = document.createElement('div');
       bannerBg.className = 'alert-banner-bg';
       bannerBg.style.backgroundColor = bannerColor;
+
       banner.appendChild(bannerBg);
 
       banner.style.cursor = 'pointer';
