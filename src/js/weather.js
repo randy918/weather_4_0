@@ -842,7 +842,8 @@ import weatherConditions from '../data/weather-conditions.json';
     { max: 90,  color: 'hsl(30,  100%, 50%)' },  // 80s: orange
     { max: 100, color: 'hsl(0,   90%, 55%)' },   // 90s: red
     { max: 110, color: 'hsl(0, 100%, 37%)' },   // 100s: red
-    { max: Infinity, color: 'hsl(0, 100%, 22%)' } // 110+: red-purple
+    { max: 120, color: 'hsl(0, 100%, 22%)' },   // 110s: red-purple
+    { max: Infinity, color: 'hsl(0, 0%, 0%)' }   // 120+: black
   ];
 
   function tempToColor(temp) {
