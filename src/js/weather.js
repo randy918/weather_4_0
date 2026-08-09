@@ -840,9 +840,9 @@ import weatherConditions from '../data/weather-conditions.json';
     { max: 70,  color: 'hsl(80,  90%, 40%)' },   // 60s: yellow-green
     { max: 80,  color: 'hsl(45,  100%, 50%)' },  // 70s: yellow-gold
     { max: 90,  color: 'hsl(30,  100%, 50%)' },  // 80s: orange
-    { max: 100, color: 'hsl(0,   90%, 55%)' },   // 90s: red
+    { max: 100, color: 'hsl(0,   90%, 55%)' },   // 90s: tomato red
     { max: 110, color: 'hsl(0, 100%, 37%)' },   // 100s: red
-    { max: 120, color: 'hsl(0, 100%, 22%)' },   // 110s: red-purple
+    { max: 120, color: 'hsl(0, 100%, 22%)' },   // 110s: brown
     { max: Infinity, color: 'hsl(0, 0%, 0%)' }   // 120+: black
   ];
 
