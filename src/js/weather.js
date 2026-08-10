@@ -46,8 +46,8 @@ import weatherConditions from '../data/weather-conditions.json';
   const RAIN_DROP_SPEED = 15;                        // Droplet speed in pixels per frame
   const RAIN_DROP_HEAD_OPACITY = 0.3;                // Opacity of the leading tip (almost white)
   const RAIN_DROP_TAIL_OPACITY = 0.0;                // Opacity of the trailing end of the tail (fading)
-  const RAIN_SPAWN_INTERVAL_MS = 2000;               // Spawn interval in milliseconds (one drop every 2 seconds)
-  const RAIN_WIND_TILT_RATIO = 1.0;                  // 1-to-1 ratio of tilt degrees per 1 mph of East-West wind speed
+  const RAIN_SPAWN_INTERVAL_MS = 200;               // Spawn interval in milliseconds (one drop every 2 seconds)
+  const RAIN_WIND_TILT_RATIO = 2.0;                  // 1-to-1 ratio of tilt degrees per 1 mph of East-West wind speed
 
   document.documentElement.style.setProperty('--rain-enabled', RAIN_ENABLED);
   document.documentElement.style.setProperty('--rain-drop-width', RAIN_DROP_WIDTH + 'px');
