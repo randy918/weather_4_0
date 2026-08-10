@@ -39,6 +39,25 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--gauge-transition-duration', GAUGE_TRANSITION_DURATION_MS + 'ms');
   let refreshTimerId = null;
 
+  // --- CONFIG: Rain Drop Animation ---
+  const RAIN_ENABLED = true;                         // Set to false to disable all canvas drawing
+  const RAIN_DROP_WIDTH = 2;                         // Thickness of raindrop in pixels
+  const RAIN_DROP_TAIL_LENGTH_VW = 12.0;             // Length of fading tail in vw units
+  const RAIN_DROP_SPEED = 15;                        // Droplet speed in pixels per frame
+  const RAIN_DROP_HEAD_OPACITY = 0.3;                // Opacity of the leading tip (almost white)
+  const RAIN_DROP_TAIL_OPACITY = 0.0;                // Opacity of the trailing end of the tail (fading)
+  const RAIN_SPAWN_INTERVAL_MS = 2000;               // Spawn interval in milliseconds (one drop every 2 seconds)
+  const RAIN_WIND_TILT_RATIO = 1.0;                  // 1-to-1 ratio of tilt degrees per 1 mph of East-West wind speed
+
+  document.documentElement.style.setProperty('--rain-enabled', RAIN_ENABLED);
+  document.documentElement.style.setProperty('--rain-drop-width', RAIN_DROP_WIDTH + 'px');
+  document.documentElement.style.setProperty('--rain-drop-tail-length-vw', RAIN_DROP_TAIL_LENGTH_VW + 'vw');
+  document.documentElement.style.setProperty('--rain-drop-speed', RAIN_DROP_SPEED);
+  document.documentElement.style.setProperty('--rain-drop-head-opacity', RAIN_DROP_HEAD_OPACITY);
+  document.documentElement.style.setProperty('--rain-drop-tail-opacity', RAIN_DROP_TAIL_OPACITY);
+  document.documentElement.style.setProperty('--rain-spawn-interval-ms', RAIN_SPAWN_INTERVAL_MS + 'ms');
+  document.documentElement.style.setProperty('--rain-wind-tilt-ratio', RAIN_WIND_TILT_RATIO);
+
   // Store last weather data for resize repositioning of temp pointer--
   let lastWeatherData = null;
 
@@ -2047,8 +2066,130 @@ import weatherConditions from '../data/weather-conditions.json';
     }
     */
   }
+
+  function createDrop(canvas, startY) {
+    // Get current wind parameters from API data
+    const windSpeed = lastWeatherData?.current?.wind_speed || 0;
+    const windDeg = lastWeatherData?.current?.wind_deg || 0;
+    
+    // Calculate East-West component of wind speed in mph
+    // In meteorology, deg is the direction the wind is COMING FROM.
+    // So u-component (East-West wind speed, positive blowing East, negative blowing West) is:
+    const windDegRad = (windDeg * Math.PI) / 180;
+    const u = -windSpeed * Math.sin(windDegRad);
+    
+    // Convert to tilt in degrees: 1 mph of East-West wind = 1 degree of tilt (via RAIN_WIND_TILT_RATIO)
+    const tiltDegrees = u * RAIN_WIND_TILT_RATIO;
+    
+    // Fall path angle: 90 degrees is straight down, < 90 tilts right, > 90 tilts left
+    const dropAngleDeg = 90 - tiltDegrees;
+    const angleRad = (dropAngleDeg * Math.PI) / 180;
+    
+    return {
+      x: Math.random() * canvas.width,
+      y: startY,
+      speed: RAIN_DROP_SPEED,
+      angleRad: angleRad,
+      
+      update() {
+        this.x += this.speed * Math.cos(this.angleRad);
+        this.y += this.speed * Math.sin(this.angleRad);
+      },
+      
+      isOffScreen(endY) {
+        const tailLength = window.innerWidth * (RAIN_DROP_TAIL_LENGTH_VW / 100);
+        const tailY = this.y - tailLength * Math.sin(this.angleRad);
+        return tailY > endY || this.x > canvas.width + tailLength || this.x < -tailLength;
+      },
+      
+      draw(ctx) {
+        const tailLength = window.innerWidth * (RAIN_DROP_TAIL_LENGTH_VW / 100);
+        const startX = this.x - tailLength * Math.cos(this.angleRad);
+        const startYVal = this.y - tailLength * Math.sin(this.angleRad);
+        
+        const grad = ctx.createLinearGradient(startX, startYVal, this.x, this.y);
+        grad.addColorStop(0, `rgba(255, 255, 255, ${RAIN_DROP_TAIL_OPACITY})`);
+        grad.addColorStop(1, `rgba(255, 255, 255, ${RAIN_DROP_HEAD_OPACITY})`);
+        
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = RAIN_DROP_WIDTH;
+        ctx.lineCap = 'round';
+        
+        ctx.beginPath();
+        ctx.moveTo(startX, startYVal);
+        ctx.lineTo(this.x, this.y);
+        ctx.stroke();
+      }
+    };
+  }
+
+  function initRainCanvas() {
+    const canvas = document.getElementById('weather-rain-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+    
+    let activeDrops = [];
+    let lastSpawnTime = 0;
+    
+    function animate(currentTime) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      if (RAIN_ENABLED) {
+        // Calculate dynamic vertical boundaries in pixels
+        const alertsContainer = document.getElementById('alerts-container');
+        const rainBanner = document.getElementById('rain-forecast-banner');
+        let bannerHeightVw = 0;
+        if (alertsContainer) {
+          bannerHeightVw += parseFloat(alertsContainer.style.height) || 0;
+        }
+        if (rainBanner) {
+          bannerHeightVw += parseFloat(rainBanner.style.height) || 0;
+        }
+        
+        const startY = (bannerHeightVw / 100) * window.innerWidth;
+        const loContainer = document.querySelector('.loContainer');
+        const endY = loContainer ? loContainer.getBoundingClientRect().bottom : canvas.height;
+        
+        const time = currentTime || performance.now();
+        if (time - lastSpawnTime >= RAIN_SPAWN_INTERVAL_MS) {
+          activeDrops.push(createDrop(canvas, startY));
+          lastSpawnTime = time;
+        }
+        
+        // Clip rendering to startY and endY boundaries
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, startY, canvas.width, Math.max(0, endY - startY));
+        ctx.clip();
+        
+        activeDrops = activeDrops.filter(drop => {
+          drop.update();
+          if (drop.isOffScreen(endY)) {
+            return false;
+          }
+          drop.draw(ctx);
+          return true;
+        });
+        
+        ctx.restore();
+      }
+      
+      requestAnimationFrame(animate);
+    }
+    
+    requestAnimationFrame(animate);
+  }
+
   if (document.body) {
     initAlertsContainer();
+    initRainCanvas();
     // Initialize fragile elements with starting position
     const moon = document.getElementById('moon-phase-img');
     const descImg = document.getElementById('weather-desc-image');
@@ -2070,6 +2211,7 @@ import weatherConditions from '../data/weather-conditions.json';
   } else {
     document.addEventListener('DOMContentLoaded', () => {
       initAlertsContainer();
+      initRainCanvas();
       // Initialize fragile elements with starting position
       const moon = document.getElementById('moon-phase-img');
       const descImg = document.getElementById('weather-desc-image');
