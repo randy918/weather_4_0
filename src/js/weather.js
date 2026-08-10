@@ -46,8 +46,16 @@ import weatherConditions from '../data/weather-conditions.json';
   const RAIN_DROP_SPEED = 15;                        // Droplet speed in pixels per frame
   const RAIN_DROP_HEAD_OPACITY = 0.3;                // Opacity of the leading tip (almost white)
   const RAIN_DROP_TAIL_OPACITY = 0.0;                // Opacity of the trailing end of the tail (fading)
-  const RAIN_SPAWN_INTERVAL_MS = 200;               // Spawn interval in milliseconds (one drop every 2 seconds)
-  const RAIN_WIND_TILT_RATIO = 2.0;                  // 1-to-1 ratio of tilt degrees per 1 mph of East-West wind speed
+  const RAIN_WIND_TILT_RATIO = 2.0;                  // Ratio of tilt degrees per 1 mph of East-West wind speed
+  
+  // --- CONFIG: Dynamic Rain Density ---
+  const RAIN_MIN_SPAWN_INTERVAL_MS = 50;             // Downpour speed (heavy rain) in milliseconds
+  const RAIN_MAX_SPAWN_INTERVAL_MS = 3000;           // Drizzle speed (light rain) in milliseconds
+  const RAIN_LIGHT_THRESHOLD_MM = 0.1;               // Minimum rain rate in mm/h to trigger animation
+  const RAIN_HEAVY_THRESHOLD_MM = 10.0;              // Rain rate in mm/h considered max downpour
+
+  let currentRainSpawnIntervalMs = RAIN_MAX_SPAWN_INTERVAL_MS;
+  let isRainingCurrently = false;
 
   document.documentElement.style.setProperty('--rain-enabled', RAIN_ENABLED);
   document.documentElement.style.setProperty('--rain-drop-width', RAIN_DROP_WIDTH + 'px');
@@ -55,8 +63,12 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--rain-drop-speed', RAIN_DROP_SPEED);
   document.documentElement.style.setProperty('--rain-drop-head-opacity', RAIN_DROP_HEAD_OPACITY);
   document.documentElement.style.setProperty('--rain-drop-tail-opacity', RAIN_DROP_TAIL_OPACITY);
-  document.documentElement.style.setProperty('--rain-spawn-interval-ms', RAIN_SPAWN_INTERVAL_MS + 'ms');
   document.documentElement.style.setProperty('--rain-wind-tilt-ratio', RAIN_WIND_TILT_RATIO);
+  document.documentElement.style.setProperty('--rain-min-spawn-interval-ms', RAIN_MIN_SPAWN_INTERVAL_MS + 'ms');
+  document.documentElement.style.setProperty('--rain-max-spawn-interval-ms', RAIN_MAX_SPAWN_INTERVAL_MS + 'ms');
+  document.documentElement.style.setProperty('--rain-light-threshold-mm', RAIN_LIGHT_THRESHOLD_MM);
+  document.documentElement.style.setProperty('--rain-heavy-threshold-mm', RAIN_HEAVY_THRESHOLD_MM);
+  document.documentElement.style.setProperty('--rain-spawn-interval-ms', currentRainSpawnIntervalMs + 'ms');
 
   // Store last weather data for resize repositioning of temp pointer--
   let lastWeatherData = null;
@@ -678,7 +690,7 @@ import weatherConditions from '../data/weather-conditions.json';
 
   function getUrl() {
     // include daily so we can show next-10-days highs
-    return `https://api.openweathermap.org/data/3.0/onecall?lat=${LAT}&lon=${LON}&exclude=minutely&appid=${API_KEY}&units=imperial`;
+    return `https://api.openweathermap.org/data/3.0/onecall?lat=${LAT}&lon=${LON}&appid=${API_KEY}&units=imperial`;
   }
 
   function setPlaceholders() {
@@ -1022,6 +1034,32 @@ import weatherConditions from '../data/weather-conditions.json';
         });
       }
     }
+  }
+
+  function updateRainAnimationState(data) {
+    if (!data) return;
+    
+    // Retrieve precipitation (to-the-minute if available, otherwise current hourly)
+    let precipitation = 0;
+    if (data.minutely && data.minutely.length > 0) {
+      precipitation = data.minutely[0].precipitation || 0;
+    } else if (data.current?.rain) {
+      precipitation = data.current.rain['1h'] || data.current.rain['3h'] / 3 || 0;
+    }
+    
+    if (precipitation >= RAIN_LIGHT_THRESHOLD_MM) {
+      isRainingCurrently = true;
+      
+      // Calculate dynamic interval (linear interpolation between min and max based on rain rate)
+      const ratio = Math.min((precipitation - RAIN_LIGHT_THRESHOLD_MM) / (RAIN_HEAVY_THRESHOLD_MM - RAIN_LIGHT_THRESHOLD_MM), 1.0);
+      currentRainSpawnIntervalMs = RAIN_MAX_SPAWN_INTERVAL_MS - ratio * (RAIN_MAX_SPAWN_INTERVAL_MS - RAIN_MIN_SPAWN_INTERVAL_MS);
+    } else {
+      isRainingCurrently = false;
+      currentRainSpawnIntervalMs = RAIN_MAX_SPAWN_INTERVAL_MS; // Fallback to max interval
+    }
+    
+    document.documentElement.style.setProperty('--rain-spawn-interval-ms', currentRainSpawnIntervalMs + 'ms');
+    console.log(`🌧️ Rain animation state updated: isRainingCurrently=${isRainingCurrently}, precipitation=${precipitation} mm/h, spawnInterval=${currentRainSpawnIntervalMs.toFixed(0)}ms`);
   }
 
   function updateFields(data) {
@@ -2141,7 +2179,7 @@ import weatherConditions from '../data/weather-conditions.json';
     function animate(currentTime) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      if (RAIN_ENABLED) {
+      if (RAIN_ENABLED && isRainingCurrently) {
         // Calculate dynamic vertical boundaries in pixels
         const alertsContainer = document.getElementById('alerts-container');
         const rainBanner = document.getElementById('rain-forecast-banner');
@@ -2158,7 +2196,7 @@ import weatherConditions from '../data/weather-conditions.json';
         const endY = loContainer ? loContainer.getBoundingClientRect().bottom : canvas.height;
         
         const time = currentTime || performance.now();
-        if (time - lastSpawnTime >= RAIN_SPAWN_INTERVAL_MS) {
+        if (time - lastSpawnTime >= currentRainSpawnIntervalMs) {
           activeDrops.push(createDrop(canvas, startY));
           lastSpawnTime = time;
         }
@@ -2179,6 +2217,8 @@ import weatherConditions from '../data/weather-conditions.json';
         });
         
         ctx.restore();
+      } else {
+        activeDrops = [];
       }
       
       requestAnimationFrame(animate);
@@ -9649,6 +9689,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
       
       // Update lower scrolling gradient overlay based on most popular 24-hour temp
       updateHourlyGradientOverlay(data);
+      
+      // Update dynamic rain animation state based on precipitation rates
+      updateRainAnimationState(data);
       
       updateFields(data);
 
