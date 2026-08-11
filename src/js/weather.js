@@ -75,6 +75,7 @@ import weatherConditions from '../data/weather-conditions.json';
 
   // --- CONFIG: Snow Flake Animation ---
   const SNOW_ENABLED = true;                         // Set to false to disable all canvas drawing
+  const SNOW_DIAL_MASK_PERCENT = 95;                 // EDITABLE: Percentage of dial radius to mask/block snow (e.g., 100 for full size, 99 for slight buffer, 2 for a tiny center dot)
   const SNOW_FLAKE_RADIUS_MIN_DESKTOP = 1.0;         // Minimum snowflake radius in pixels (Desktop)
   const SNOW_FLAKE_RADIUS_MIN_MOBILE = 0.6;          // Minimum snowflake radius in pixels (Mobile)
   const SNOW_FLAKE_RADIUS_MAX_DESKTOP = 3.5;         // Maximum snowflake radius in pixels (Desktop)
@@ -111,6 +112,7 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--snow-light-threshold-mm', SNOW_LIGHT_THRESHOLD_MM);
   document.documentElement.style.setProperty('--snow-heavy-threshold-mm', SNOW_HEAVY_THRESHOLD_MM);
   document.documentElement.style.setProperty('--snow-spawn-interval-ms', currentSnowSpawnIntervalMs + 'ms');
+  document.documentElement.style.setProperty('--snow-dial-mask-percent', SNOW_DIAL_MASK_PERCENT);
 
   // Store last weather data for resize repositioning of temp pointer--
   let lastWeatherData = null;
@@ -2303,6 +2305,23 @@ import weatherConditions from '../data/weather-conditions.json';
     requestAnimationFrame(animate);
   }
 
+  function getActiveDials() {
+    const elements = document.querySelectorAll('.clockGridItem, #analog-clock');
+    const dials = [];
+    elements.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        const radius = rect.width / 2;
+        dials.push({
+          cx: rect.left + radius,
+          cy: rect.top + radius,
+          r: radius
+        });
+      }
+    });
+    return dials;
+  }
+
   function createFlake(canvas, startY) {
     const isMobile = window.innerWidth <= 767;
     const radiusMin = isMobile ? SNOW_FLAKE_RADIUS_MIN_MOBILE : SNOW_FLAKE_RADIUS_MIN_DESKTOP;
@@ -2364,6 +2383,8 @@ import weatherConditions from '../data/weather-conditions.json';
     
     let activeFlakes = [];
     let lastSpawnTime = 0;
+    let cachedDials = [];
+    let lastDialUpdate = 0;
     
     function animate(currentTime) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -2392,17 +2413,43 @@ import weatherConditions from '../data/weather-conditions.json';
           lastSpawnTime = time;
         }
         
+        // Cache dial coordinates to prevent layout thrashing (forced reflows)
+        if (time - lastDialUpdate > 1000 || cachedDials.length === 0) {
+          cachedDials = getActiveDials();
+          lastDialUpdate = time;
+        }
+        const dials = cachedDials;
+        
         ctx.save();
         ctx.beginPath();
         ctx.rect(0, startY, canvas.width, Math.max(0, endY - startY));
         ctx.clip();
         
+        // Draw and update falling active flakes, hiding them when inside dial bounds
         activeFlakes = activeFlakes.filter(flake => {
           flake.update();
+          
           if (flake.isOffScreen(endY)) {
             return false;
           }
-          flake.draw(ctx);
+          
+          // Masking: Check if flake is inside any dial circle (shrunk by SNOW_DIAL_MASK_PERCENT)
+          let isInsideDial = false;
+          for (let i = 0; i < dials.length; i++) {
+            const d = dials[i];
+            const dx = flake.x - d.cx;
+            const dy = flake.y - d.cy;
+            const maskRadius = d.r * (SNOW_DIAL_MASK_PERCENT / 100);
+            // Compare squared distance to avoid Math.sqrt
+            if (dx * dx + dy * dy < maskRadius * maskRadius) {
+              isInsideDial = true;
+              break;
+            }
+          }
+          
+          if (!isInsideDial) {
+            flake.draw(ctx);
+          }
           return true;
         });
         
