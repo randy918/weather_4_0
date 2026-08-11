@@ -131,8 +131,9 @@ import weatherConditions from '../data/weather-conditions.json';
   // --- CONFIG: Clock Grid (8 Countdown Circles Row) ---
   const CLOCK_GRID_SIZE = '11vw';         // EDITABLE: Width and height of each circle widget
   const CLOCK_GRID_GAP = '1vw';          // EDITABLE: Gap between cells
-  const CLOCK_GRID_MARGIN_TOP = '1.5vw';   // EDITABLE: Top margin of the row
-  const CLOCK_GRID_MARGIN_BOTTOM = '2vw';// EDITABLE: Bottom margin of the row
+  const CLOCK_GRID_MARGIN_TOP_DESKTOP = '2.2vw'; // EDITABLE Desktop: Top margin of the row / gap below summary
+  const CLOCK_GRID_MARGIN_TOP_MOBILE = '3.0vw';  // EDITABLE Mobile: Top margin of the row / gap below summary
+  const CLOCK_GRID_MARGIN_BOTTOM = '0vw';// EDITABLE: Bottom margin of the row
   const CLOCK_GRID_MARGIN_LEFT = '2vw';  // EDITABLE: Left margin for the row as a whole
   const CLOCK_GRID_MARGIN_RIGHT = '2vw'; // EDITABLE: Right margin for the row as a whole
   const CLOCK_GRID_TRACK_COLOR = 'rgba(255, 255, 255, 0.2)'; // EDITABLE: Circle track color
@@ -186,7 +187,8 @@ import weatherConditions from '../data/weather-conditions.json';
 
   document.documentElement.style.setProperty('--clock-grid-size', CLOCK_GRID_SIZE);
   document.documentElement.style.setProperty('--clock-grid-gap', CLOCK_GRID_GAP);
-  document.documentElement.style.setProperty('--clock-grid-margin-top', CLOCK_GRID_MARGIN_TOP);
+  document.documentElement.style.setProperty('--clock-grid-margin-top-desktop', CLOCK_GRID_MARGIN_TOP_DESKTOP);
+  document.documentElement.style.setProperty('--clock-grid-margin-top-mobile', CLOCK_GRID_MARGIN_TOP_MOBILE);
   document.documentElement.style.setProperty('--clock-grid-margin-bottom', CLOCK_GRID_MARGIN_BOTTOM);
   document.documentElement.style.setProperty('--clock-grid-margin-left', CLOCK_GRID_MARGIN_LEFT);
   document.documentElement.style.setProperty('--clock-grid-margin-right', CLOCK_GRID_MARGIN_RIGHT);
@@ -3778,15 +3780,25 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   // --- Weather Description Config ---
   // Line 3: The API description (e.g., "Overcast clouds.")
-  const DESC_MARGIN_TOP = '-1vw';     // EDITABLE: Space ABOVE the 3rd line
-  const DESC_MARGIN_BOTTOM = '1vw';   // EDITABLE: Space BELOW the 3rd line
+  const DESC_MARGIN_TOP_DESKTOP = '-1vw';     // EDITABLE Desktop: Space ABOVE the 3rd line
+  const DESC_MARGIN_TOP_MOBILE = '-1vw';      // EDITABLE Mobile: Space ABOVE the 3rd line
+  const DESC_MARGIN_BOTTOM_DESKTOP = '1vw';   // EDITABLE Desktop: Space BELOW the 3rd line
+  const DESC_MARGIN_BOTTOM_MOBILE = '1vw';    // EDITABLE Mobile: Space BELOW the 3rd line
   
   // Line 4: The custom derived phrase (e.g., "Raw.")
-  const DERIVED_DESC_MARGIN_TOP = '-1.5vw';    // EDITABLE: Space ABOVE the 4th line
-  const DERIVED_DESC_MARGIN_BOTTOM = '3vw';    // EDITABLE: Space BELOW the 4th line
+  const DERIVED_DESC_MARGIN_TOP_DESKTOP = '-1.5vw';    // EDITABLE Desktop: Space ABOVE the 4th line
+  const DERIVED_DESC_MARGIN_TOP_MOBILE = '-1.5vw';     // EDITABLE Mobile: Space ABOVE the 4th line
+  const DERIVED_DESC_MARGIN_BOTTOM_DESKTOP = '2.2vw';  // EDITABLE Desktop: Space BELOW the 4th line / gap above summary
+  const DERIVED_DESC_MARGIN_BOTTOM_MOBILE = '3.0vw';   // EDITABLE Mobile: Space BELOW the 4th line / gap above summary
 
   // Create and update weather description element
   function updateWeatherDescription(data) {
+    const isMobile = window.innerWidth <= 767;
+    const descMarginTop = isMobile ? DESC_MARGIN_TOP_MOBILE : DESC_MARGIN_TOP_DESKTOP;
+    const descMarginBottom = isMobile ? DESC_MARGIN_BOTTOM_MOBILE : DESC_MARGIN_BOTTOM_DESKTOP;
+    const derivedDescMarginTop = isMobile ? DERIVED_DESC_MARGIN_TOP_MOBILE : DERIVED_DESC_MARGIN_TOP_DESKTOP;
+    const derivedDescMarginBottom = isMobile ? DERIVED_DESC_MARGIN_BOTTOM_MOBILE : DERIVED_DESC_MARGIN_BOTTOM_DESKTOP;
+
     const id = 'weather-description';
     let el = document.getElementById(id);
     
@@ -3801,7 +3813,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       el.style.fontSize = '5vw';
       el.style.whiteSpace = 'nowrap'; // Force single line for shrink-to-fit
       el.style.lineHeight = '1';
-      el.style.margin = `${DESC_MARGIN_TOP} auto ${DESC_MARGIN_BOTTOM}`;
+      el.style.margin = `${descMarginTop} auto ${descMarginBottom}`;
       el.style.color = 'inherit';
       el.style.opacity = '1';
       el.style.textShadow = '0 2px 6px rgba(0, 0, 0, 0.0), 0 4px 12px rgba(0, 0, 0, 0.0)';
@@ -3837,8 +3849,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       // Center horizontally natively
       dupEl.style.margin = '0 auto'; 
-      dupEl.style.marginTop = DERIVED_DESC_MARGIN_TOP; 
-      dupEl.style.marginBottom = DERIVED_DESC_MARGIN_BOTTOM; 
+      dupEl.style.marginTop = derivedDescMarginTop; 
+      dupEl.style.marginBottom = derivedDescMarginBottom; 
       
       dupEl.style.color = 'inherit';
       dupEl.style.opacity = '1';
@@ -3908,7 +3920,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       el.style.transform = 'none';
       el.style.display = 'block'; // Force display style for transform, 'block' ensures it stays on its own line
       el.style.width = 'max-content'; // Crucial: forces block width to tightly hug the text so scrollWidth and scaleX work perfectly
-      el.style.margin = `${DESC_MARGIN_TOP} auto ${DESC_MARGIN_BOTTOM}`; // Apply editable margins
+      el.style.margin = `${descMarginTop} auto ${descMarginBottom}`; // Apply editable margins
       
       if (dupEl) {
         dupEl.style.fontSize = '5vw';
@@ -3916,8 +3928,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
         dupEl.style.display = 'block'; // 'block' forces line break
         dupEl.style.width = 'max-content'; 
         dupEl.style.margin = '0 auto';
-        dupEl.style.marginTop = DERIVED_DESC_MARGIN_TOP; 
-        dupEl.style.marginBottom = DERIVED_DESC_MARGIN_BOTTOM;
+        dupEl.style.marginTop = derivedDescMarginTop; 
+        dupEl.style.marginBottom = derivedDescMarginBottom;
       }
       
       // Force repaint/reflow to ensure accurate measurement after resetting transforms
@@ -6078,11 +6090,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const DAILY_SUMMARY_LINE_HEIGHT_DESKTOP = '1';         // EDITABLE Desktop: Line height / leading
   const DAILY_SUMMARY_LINE_HEIGHT_MOBILE = '1.2';        // EDITABLE Mobile: Line height / leading
 
-  const DAILY_SUMMARY_MARGIN_TOP_DESKTOP = '0.5vw';       // EDITABLE Desktop: Space ABOVE summary line
-  const DAILY_SUMMARY_MARGIN_TOP_MOBILE = '0.5vw';        // EDITABLE Mobile: Space ABOVE summary line
+  const DAILY_SUMMARY_MARGIN_TOP_DESKTOP = '2.2vw';       // EDITABLE Desktop: Space ABOVE summary line (match DERIVED_DESC_MARGIN_BOTTOM_DESKTOP)
+  const DAILY_SUMMARY_MARGIN_TOP_MOBILE = '3.0vw';        // EDITABLE Mobile: Space ABOVE summary line (match DERIVED_DESC_MARGIN_BOTTOM_MOBILE)
 
-  const DAILY_SUMMARY_MARGIN_BOTTOM_DESKTOP = '1vw';  // EDITABLE Desktop: Space BELOW summary line
-  const DAILY_SUMMARY_MARGIN_BOTTOM_MOBILE = '1vw';      // EDITABLE Mobile: Space BELOW summary line
+  const DAILY_SUMMARY_MARGIN_BOTTOM_DESKTOP = '2.2vw';  // EDITABLE Desktop: Space BELOW summary line (match CLOCK_GRID_MARGIN_TOP_DESKTOP)
+  const DAILY_SUMMARY_MARGIN_BOTTOM_MOBILE = '3.0vw';      // EDITABLE Mobile: Space BELOW summary line (match CLOCK_GRID_MARGIN_TOP_MOBILE)
 
   // Helper to polish machine-generated OpenWeather summaries into natural, smooth English
   function formatNaturalSummary(text) {

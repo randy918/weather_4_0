@@ -1172,6 +1172,7 @@ main {
     --grid-moon-phase-size: var(--grid-moon-phase-size-desktop, 93%);
     --grid-moon-phase-x-offset: var(--grid-moon-phase-x-offset-desktop, 0vw);
     --grid-moon-phase-y-offset: var(--grid-moon-phase-y-offset-desktop, 0vw);
+    --clock-grid-margin-top: var(--clock-grid-margin-top-desktop, 2.2vw);
     --radar-threshold-left: 150;
     --radar-threshold-right: 300;
 
@@ -1204,6 +1205,7 @@ main {
         --grid-moon-phase-size: var(--grid-moon-phase-size-mobile, 93%);
         --grid-moon-phase-x-offset: var(--grid-moon-phase-x-offset-mobile, 0vw);
         --grid-moon-phase-y-offset: var(--grid-moon-phase-y-offset-mobile, 0vw);
+        --clock-grid-margin-top: var(--clock-grid-margin-top-mobile, 3vw);
     }
 
     .grid-wind-speed-text {
