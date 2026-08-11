@@ -6090,11 +6090,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const DAILY_SUMMARY_LINE_HEIGHT_DESKTOP = '1';         // EDITABLE Desktop: Line height / leading
   const DAILY_SUMMARY_LINE_HEIGHT_MOBILE = '1.2';        // EDITABLE Mobile: Line height / leading
 
-  const DAILY_SUMMARY_MARGIN_TOP_DESKTOP = '2.2vw';       // EDITABLE Desktop: Space ABOVE summary line (match DERIVED_DESC_MARGIN_BOTTOM_DESKTOP)
+  const DAILY_SUMMARY_MARGIN_TOP_DESKTOP = '-1vw';       // EDITABLE Desktop: Space ABOVE summary line (match DERIVED_DESC_MARGIN_BOTTOM_DESKTOP)
   const DAILY_SUMMARY_MARGIN_TOP_MOBILE = '3.0vw';        // EDITABLE Mobile: Space ABOVE summary line (match DERIVED_DESC_MARGIN_BOTTOM_MOBILE)
 
-  const DAILY_SUMMARY_MARGIN_BOTTOM_DESKTOP = '2.2vw';  // EDITABLE Desktop: Space BELOW summary line (match CLOCK_GRID_MARGIN_TOP_DESKTOP)
-  const DAILY_SUMMARY_MARGIN_BOTTOM_MOBILE = '3.0vw';      // EDITABLE Mobile: Space BELOW summary line (match CLOCK_GRID_MARGIN_TOP_MOBILE)
+  const DAILY_SUMMARY_MARGIN_BOTTOM_DESKTOP = '-3vw';  // EDITABLE Desktop: Space BELOW summary line (match CLOCK_GRID_MARGIN_TOP_DESKTOP)
+  const DAILY_SUMMARY_MARGIN_BOTTOM_MOBILE = '-3vw';      // EDITABLE Mobile: Space BELOW summary line (match CLOCK_GRID_MARGIN_TOP_MOBILE)
 
   // Helper to polish machine-generated OpenWeather summaries into natural, smooth English
   function formatNaturalSummary(text) {
@@ -6155,6 +6155,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
     el.style.letterSpacing = letterSpacing;
     el.style.lineHeight = lineHeight;
     el.style.margin = `${marginTop} auto ${marginBottom}`;
+
+    // Apply font-family override for 100-109 temperature range
+    const tempVal = data?.current?.temp ?? lastWeatherData?.current?.temp;
+    const is100s = typeof tempVal === 'number' && tempVal >= 100 && tempVal < 110;
+    const summaryFont = is100s ? "'medium', sans-serif" : "'light', sans-serif";
+    el.style.setProperty('--daily-summary-font-family', summaryFont);
 
     // Position directly between Sweltering (#weather-description-duplicate or #weather-description) and the first dial row
     const swelteringTarget = document.getElementById('weather-description-duplicate') ||
@@ -7537,6 +7543,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
       container.style.opacity = '1';
     }
 
+    // Determine active location font family for 100-109 temperature range
+    const tempVal = lastWeatherData?.current?.temp;
+    const is100s = typeof tempVal === 'number' && tempVal >= 100 && tempVal < 110;
+    const activeLocationFont = is100s ? "'medium', sans-serif" : LOCATION_FONT_FAMILY;
+
     // Set CSS custom properties for CSS accessibility
     document.documentElement.style.setProperty('--location-group-margin-top', LOCATION_GROUP_MARGIN_TOP);
     document.documentElement.style.setProperty('--location-group-margin-bottom', LOCATION_GROUP_MARGIN_BOTTOM);
@@ -7544,7 +7555,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--location-item-margin-bottom', LOCATION_ITEM_MARGIN_BOTTOM);
     document.documentElement.style.setProperty('--location-typesize', LOCATION_TYPESIZE);
     document.documentElement.style.setProperty('--location-letter-spacing', LOCATION_LETTER_SPACING);
-    document.documentElement.style.setProperty('--location-font-family', LOCATION_FONT_FAMILY);
+    document.documentElement.style.setProperty('--location-font-family', activeLocationFont);
     document.documentElement.style.setProperty('--location-active-color', LOCATION_ACTIVE_COLOR);
     document.documentElement.style.setProperty('--location-inactive-color', LOCATION_INACTIVE_COLOR);
 
@@ -7578,7 +7589,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const isActive = Math.abs(LAT - loc.lat) < 0.1 && Math.abs(LON - loc.lon) < 0.1;
 
       cityEl.style.fontSize = LOCATION_TYPESIZE;
-      cityEl.style.fontFamily = LOCATION_FONT_FAMILY;
+      cityEl.style.fontFamily = activeLocationFont;
       cityEl.style.letterSpacing = LOCATION_LETTER_SPACING;
       cityEl.style.marginTop = LOCATION_ITEM_MARGIN_TOP;
       cityEl.style.marginBottom = LOCATION_ITEM_MARGIN_BOTTOM;
@@ -9314,8 +9325,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }
     }
     
-    // Apply editable styles every time to support hot-reloading tweaks
-    el.style.fontFamily = CITY_FONT_FAMILY;
+    // Apply editable styles every time to support hot-reloading tweaks (or 'medium' for 100-109 temp range)
+    const tempVal = data?.current?.temp ?? lastWeatherData?.current?.temp;
+    const is100s = typeof tempVal === 'number' && tempVal >= 100 && tempVal < 110;
+    el.style.fontFamily = is100s ? "'medium', sans-serif" : CITY_FONT_FAMILY;
     el.style.fontSize = CITY_FONT_SIZE;
     el.style.marginTop = CITY_MARGIN_TOP;
     el.style.marginBottom = CITY_MARGIN_BOTTOM;
