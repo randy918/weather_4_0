@@ -22,7 +22,8 @@ html {
     scrollbar-width: none;  // Firefox
 }
 
-#weather-rain-canvas {
+#weather-rain-canvas,
+#weather-snow-canvas {
     position: fixed;
     top: 0;
     left: 0;

@@ -27,6 +27,9 @@ import weatherConditions from '../data/weather-conditions.json';
   // Refresh interval (default 5 minutes)
   const DEFAULT_REFRESH_MS = 5 * 60 * 1000;
   let currentRefreshMs = DEFAULT_REFRESH_MS;
+  const urlParams = new URLSearchParams(window.location.search);
+  const forceSnow = urlParams.get('snow') === 'true' || urlParams.get('snow') === '1' || urlParams.get('test_snow') === 'true';
+  const forceRain = urlParams.get('rain') === 'true' || urlParams.get('rain') === '1' || urlParams.get('test_rain') === 'true';
 
   // --- CONFIG: Clock Hands Spin Animation ---
   const CLOCK_SPIN_DURATION_MS = 1200; // EDITABLE: Reset animation spin duration in milliseconds
@@ -69,6 +72,45 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--rain-light-threshold-mm', RAIN_LIGHT_THRESHOLD_MM);
   document.documentElement.style.setProperty('--rain-heavy-threshold-mm', RAIN_HEAVY_THRESHOLD_MM);
   document.documentElement.style.setProperty('--rain-spawn-interval-ms', currentRainSpawnIntervalMs + 'ms');
+
+  // --- CONFIG: Snow Flake Animation ---
+  const SNOW_ENABLED = true;                         // Set to false to disable all canvas drawing
+  const SNOW_FLAKE_RADIUS_MIN_DESKTOP = 1.0;         // Minimum snowflake radius in pixels (Desktop)
+  const SNOW_FLAKE_RADIUS_MIN_MOBILE = 0.6;          // Minimum snowflake radius in pixels (Mobile)
+  const SNOW_FLAKE_RADIUS_MAX_DESKTOP = 3.5;         // Maximum snowflake radius in pixels (Desktop)
+  const SNOW_FLAKE_RADIUS_MAX_MOBILE = 2.0;          // Maximum snowflake radius in pixels (Mobile)
+  const SNOW_FLAKE_SPEED_MIN = 0.5;                  // Minimum speed in pixels per frame
+  const SNOW_FLAKE_SPEED_MAX = 2.2;                  // Maximum speed in pixels per frame
+  const SNOW_FLAKE_OPACITY_MIN = 0.2;                // Minimum snowflake opacity (0.0 to 1.0)
+  const SNOW_FLAKE_OPACITY_MAX = 0.85;               // Maximum snowflake opacity (0.0 to 1.0)
+  const SNOW_FLAKE_DRIFT_AMPLITUDE = 1.2;            // Amplitude of horizontal sway (drift)
+  const SNOW_WIND_DRIFT_RATIO = 0.5;                 // Ratio of additional drift per 1 mph of East-West wind speed
+
+  // --- CONFIG: Dynamic Snow Density ---
+  const SNOW_MIN_SPAWN_INTERVAL_MS = 100;            // Heavy snow spawn interval in milliseconds
+  const SNOW_MAX_SPAWN_INTERVAL_MS = 1200;           // Light snow spawn interval in milliseconds
+  const SNOW_LIGHT_THRESHOLD_MM = 0.1;               // Minimum snow rate in mm/h to trigger animation
+  const SNOW_HEAVY_THRESHOLD_MM = 5.0;               // Snow rate in mm/h considered max heavy snow
+
+  let currentSnowSpawnIntervalMs = SNOW_MAX_SPAWN_INTERVAL_MS;
+  let isSnowingCurrently = false;
+
+  document.documentElement.style.setProperty('--snow-enabled', SNOW_ENABLED);
+  document.documentElement.style.setProperty('--snow-flake-radius-min-desktop', SNOW_FLAKE_RADIUS_MIN_DESKTOP + 'px');
+  document.documentElement.style.setProperty('--snow-flake-radius-min-mobile', SNOW_FLAKE_RADIUS_MIN_MOBILE + 'px');
+  document.documentElement.style.setProperty('--snow-flake-radius-max-desktop', SNOW_FLAKE_RADIUS_MAX_DESKTOP + 'px');
+  document.documentElement.style.setProperty('--snow-flake-radius-max-mobile', SNOW_FLAKE_RADIUS_MAX_MOBILE + 'px');
+  document.documentElement.style.setProperty('--snow-flake-speed-min', SNOW_FLAKE_SPEED_MIN);
+  document.documentElement.style.setProperty('--snow-flake-speed-max', SNOW_FLAKE_SPEED_MAX);
+  document.documentElement.style.setProperty('--snow-flake-opacity-min', SNOW_FLAKE_OPACITY_MIN);
+  document.documentElement.style.setProperty('--snow-flake-opacity-max', SNOW_FLAKE_OPACITY_MAX);
+  document.documentElement.style.setProperty('--snow-flake-drift-amplitude', SNOW_FLAKE_DRIFT_AMPLITUDE);
+  document.documentElement.style.setProperty('--snow-wind-drift-ratio', SNOW_WIND_DRIFT_RATIO);
+  document.documentElement.style.setProperty('--snow-min-spawn-interval-ms', SNOW_MIN_SPAWN_INTERVAL_MS + 'ms');
+  document.documentElement.style.setProperty('--snow-max-spawn-interval-ms', SNOW_MAX_SPAWN_INTERVAL_MS + 'ms');
+  document.documentElement.style.setProperty('--snow-light-threshold-mm', SNOW_LIGHT_THRESHOLD_MM);
+  document.documentElement.style.setProperty('--snow-heavy-threshold-mm', SNOW_HEAVY_THRESHOLD_MM);
+  document.documentElement.style.setProperty('--snow-spawn-interval-ms', currentSnowSpawnIntervalMs + 'ms');
 
   // Store last weather data for resize repositioning of temp pointer--
   let lastWeatherData = null;
@@ -1060,6 +1102,34 @@ import weatherConditions from '../data/weather-conditions.json';
     
     document.documentElement.style.setProperty('--rain-spawn-interval-ms', currentRainSpawnIntervalMs + 'ms');
     console.log(`🌧️ Rain animation state updated: isRainingCurrently=${isRainingCurrently}, precipitation=${precipitation} mm/h, spawnInterval=${currentRainSpawnIntervalMs.toFixed(0)}ms`);
+  }
+
+  function updateSnowAnimationState(data) {
+    if (!data) return;
+    
+    // Check if the current weather ID indicates snow (6xx)
+    const currentId = data.current?.weather?.[0]?.id;
+    const isSnowId = currentId && (currentId >= 600 && currentId < 700);
+    
+    let snowPrecipitation = 0;
+    if (data.current?.snow) {
+      snowPrecipitation = data.current.snow['1h'] || data.current.snow['3h'] / 3 || 0;
+    } else if (isSnowId && data.minutely && data.minutely.length > 0) {
+      // If condition is snow, minutely precipitation represents snow
+      snowPrecipitation = data.minutely[0].precipitation || 0;
+    }
+    
+    if (snowPrecipitation >= SNOW_LIGHT_THRESHOLD_MM) {
+      isSnowingCurrently = true;
+      const ratio = Math.min((snowPrecipitation - SNOW_LIGHT_THRESHOLD_MM) / (SNOW_HEAVY_THRESHOLD_MM - SNOW_LIGHT_THRESHOLD_MM), 1.0);
+      currentSnowSpawnIntervalMs = SNOW_MAX_SPAWN_INTERVAL_MS - ratio * (SNOW_MAX_SPAWN_INTERVAL_MS - SNOW_MIN_SPAWN_INTERVAL_MS);
+    } else {
+      isSnowingCurrently = false;
+      currentSnowSpawnIntervalMs = SNOW_MAX_SPAWN_INTERVAL_MS;
+    }
+    
+    document.documentElement.style.setProperty('--snow-spawn-interval-ms', currentSnowSpawnIntervalMs + 'ms');
+    console.log(`❄️ Snow animation state updated: isSnowingCurrently=${isSnowingCurrently}, snowPrecipitation=${snowPrecipitation} mm/h, spawnInterval=${currentSnowSpawnIntervalMs.toFixed(0)}ms`);
   }
 
   function updateFields(data) {
@@ -2161,7 +2231,10 @@ import weatherConditions from '../data/weather-conditions.json';
     };
   }
 
+  let rainCanvasInitialized = false;
   function initRainCanvas() {
+    if (rainCanvasInitialized) return;
+    rainCanvasInitialized = true;
     const canvas = document.getElementById('weather-rain-canvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -2179,7 +2252,10 @@ import weatherConditions from '../data/weather-conditions.json';
     function animate(currentTime) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      if (RAIN_ENABLED && isRainingCurrently) {
+      // Determine if we should rain. If forceSnow is active, force rain off.
+      const shouldRain = (RAIN_ENABLED && isRainingCurrently && !forceSnow) || (forceRain && !forceSnow);
+      
+      if (shouldRain) {
         // Calculate dynamic vertical boundaries in pixels
         const alertsContainer = document.getElementById('alerts-container');
         const rainBanner = document.getElementById('rain-forecast-banner');
@@ -2227,9 +2303,124 @@ import weatherConditions from '../data/weather-conditions.json';
     requestAnimationFrame(animate);
   }
 
+  function createFlake(canvas, startY) {
+    const isMobile = window.innerWidth <= 767;
+    const radiusMin = isMobile ? SNOW_FLAKE_RADIUS_MIN_MOBILE : SNOW_FLAKE_RADIUS_MIN_DESKTOP;
+    const radiusMax = isMobile ? SNOW_FLAKE_RADIUS_MAX_MOBILE : SNOW_FLAKE_RADIUS_MAX_DESKTOP;
+    
+    // Get current wind parameters from API data
+    const windSpeed = lastWeatherData?.current?.wind_speed || 0;
+    const windDeg = lastWeatherData?.current?.wind_deg || 0;
+    const windDegRad = (windDeg * Math.PI) / 180;
+    const u = -windSpeed * Math.sin(windDegRad);
+    const windDrift = u * SNOW_WIND_DRIFT_RATIO;
+
+    const radius = radiusMin + Math.random() * (radiusMax - radiusMin);
+    const speed = SNOW_FLAKE_SPEED_MIN + Math.random() * (SNOW_FLAKE_SPEED_MAX - SNOW_FLAKE_SPEED_MIN);
+    const opacity = SNOW_FLAKE_OPACITY_MIN + Math.random() * (SNOW_FLAKE_OPACITY_MAX - SNOW_FLAKE_OPACITY_MIN);
+    
+    return {
+      x: Math.random() * canvas.width,
+      y: startY - radius,
+      radius: radius,
+      speed: speed,
+      opacity: opacity,
+      driftPhase: Math.random() * Math.PI * 2,
+      driftSpeed: 0.01 + Math.random() * 0.02,
+      
+      update() {
+        this.driftPhase += this.driftSpeed;
+        this.x += Math.sin(this.driftPhase) * SNOW_FLAKE_DRIFT_AMPLITUDE + windDrift;
+        this.y += this.speed;
+      },
+      
+      isOffScreen(endY) {
+        return this.y > endY + this.radius || this.x > canvas.width + this.radius || this.x < -this.radius;
+      },
+      
+      draw(ctx) {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+        ctx.fill();
+      }
+    };
+  }
+
+  let snowCanvasInitialized = false;
+  function initSnowCanvas() {
+    if (snowCanvasInitialized) return;
+    snowCanvasInitialized = true;
+    const canvas = document.getElementById('weather-snow-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+    
+    let activeFlakes = [];
+    let lastSpawnTime = 0;
+    
+    function animate(currentTime) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Determine if we should snow. If forceRain is active, force snow off.
+      const shouldSnow = (SNOW_ENABLED && isSnowingCurrently && !forceRain) || (forceSnow && !forceRain);
+      
+      if (shouldSnow) {
+        const alertsContainer = document.getElementById('alerts-container');
+        const rainBanner = document.getElementById('rain-forecast-banner');
+        let bannerHeightVw = 0;
+        if (alertsContainer) {
+          bannerHeightVw += parseFloat(alertsContainer.style.height) || 0;
+        }
+        if (rainBanner) {
+          bannerHeightVw += parseFloat(rainBanner.style.height) || 0;
+        }
+        
+        const startY = (bannerHeightVw / 100) * window.innerWidth;
+        const loContainer = document.querySelector('.loContainer');
+        const endY = loContainer ? loContainer.getBoundingClientRect().bottom : canvas.height;
+        
+        const time = currentTime || performance.now();
+        if (time - lastSpawnTime >= currentSnowSpawnIntervalMs) {
+          activeFlakes.push(createFlake(canvas, startY));
+          lastSpawnTime = time;
+        }
+        
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, startY, canvas.width, Math.max(0, endY - startY));
+        ctx.clip();
+        
+        activeFlakes = activeFlakes.filter(flake => {
+          flake.update();
+          if (flake.isOffScreen(endY)) {
+            return false;
+          }
+          flake.draw(ctx);
+          return true;
+        });
+        
+        ctx.restore();
+      } else {
+        activeFlakes = [];
+      }
+      
+      requestAnimationFrame(animate);
+    }
+    
+    requestAnimationFrame(animate);
+  }
+
   if (document.body) {
     initAlertsContainer();
     initRainCanvas();
+    initSnowCanvas();
     // Initialize fragile elements with starting position
     const moon = document.getElementById('moon-phase-img');
     const descImg = document.getElementById('weather-desc-image');
@@ -2252,6 +2443,7 @@ import weatherConditions from '../data/weather-conditions.json';
     document.addEventListener('DOMContentLoaded', () => {
       initAlertsContainer();
       initRainCanvas();
+      initSnowCanvas();
       // Initialize fragile elements with starting position
       const moon = document.getElementById('moon-phase-img');
       const descImg = document.getElementById('weather-desc-image');
@@ -9692,6 +9884,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
       
       // Update dynamic rain animation state based on precipitation rates
       updateRainAnimationState(data);
+      
+      // Update dynamic snow animation state based on precipitation rates
+      updateSnowAnimationState(data);
       
       updateFields(data);
 
