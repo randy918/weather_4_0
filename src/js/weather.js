@@ -128,6 +128,22 @@ import weatherConditions from '../data/weather-conditions.json';
   // Increase to prevent minor noise/dust (clutter) from showing the radar. Try 80, 120, or 200!
   const RADAR_PRECIPITATION_PIXEL_THRESHOLD = 120;
 
+  // --- CONFIG: Temperature Pointer Configuration (DUAL Desktop & Mobile) ---
+  const TEMP_POINTER_WIDTH_DESKTOP = '1.732vw';         // EDITABLE Desktop: Width of the triangle pointing to current temp
+  const TEMP_POINTER_WIDTH_MOBILE = '2.5vw';            // EDITABLE Mobile: Width of the triangle
+  const TEMP_POINTER_HEIGHT_DESKTOP = '2.0vw';          // EDITABLE Desktop: Height of the triangle
+  const TEMP_POINTER_HEIGHT_MOBILE = '2.88vw';          // EDITABLE Mobile: Height of the triangle
+  const TEMP_POINTER_SHADOW = 'drop-shadow(-0.3vw 0.3vw 0.4vw rgba(0, 0, 0, 0.6))'; // EDITABLE: Shadow style (uses drop-shadow)
+  const TEMP_POINTER_USE_CURRENT_COLOR = true;          // EDITABLE: Set to true to color the pointer using the current temp's color bucket
+  const TEMP_POINTER_DEFAULT_COLOR = 'white';           // EDITABLE: Default / fallback color for the pointer
+
+  document.documentElement.style.setProperty('--temp-pointer-width-desktop', TEMP_POINTER_WIDTH_DESKTOP);
+  document.documentElement.style.setProperty('--temp-pointer-width-mobile', TEMP_POINTER_WIDTH_MOBILE);
+  document.documentElement.style.setProperty('--temp-pointer-height-desktop', TEMP_POINTER_HEIGHT_DESKTOP);
+  document.documentElement.style.setProperty('--temp-pointer-height-mobile', TEMP_POINTER_HEIGHT_MOBILE);
+  document.documentElement.style.setProperty('--temp-pointer-shadow', TEMP_POINTER_SHADOW);
+  document.documentElement.style.setProperty('--temp-pointer-default-color', TEMP_POINTER_DEFAULT_COLOR);
+
   // --- CONFIG: Clock Grid (8 Countdown Circles Row) ---
   const CLOCK_GRID_SIZE = '11vw';         // EDITABLE: Width and height of each circle widget
   const CLOCK_GRID_GAP = '1vw';          // EDITABLE: Gap between cells
@@ -923,6 +939,13 @@ import weatherConditions from '../data/weather-conditions.json';
     { max: Infinity, color: 'hsl(0, 0%, 0%)' }   // 120+: black
   ];
 
+
+
+
+
+
+
+
   function tempToColor(temp) {
     if (typeof temp !== 'number' || Number.isNaN(temp)) return null;
     
@@ -947,6 +970,13 @@ import weatherConditions from '../data/weather-conditions.json';
       el.style.removeProperty('color');
     }
   }
+
+
+
+
+
+
+
 
   function getMoonPhaseName(phase) {
     if (typeof phase !== 'number') return '';
@@ -1693,6 +1723,13 @@ import weatherConditions from '../data/weather-conditions.json';
     console.log(`Humidity updated: ${humidity}% (${humidityPercent}%)`);
   }
 
+
+
+
+
+
+
+
   // Initialize the alert container and force bulletproof CSS transitions
   function initAlertsContainer() {
     if (document.getElementById('alerts-container')) return;
@@ -1806,7 +1843,7 @@ import weatherConditions from '../data/weather-conditions.json';
       #moon-phase-img {
         position: absolute !important;
         transform-origin: top left !important;
-        transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw))) scale(0.63) !important;
+        transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw) + var(--daily-summary-push, 0px))) scale(0.63) !important;
       }
       #wind-direction-arrow {
         position: absolute !important;
@@ -1818,10 +1855,10 @@ import weatherConditions from '../data/weather-conditions.json';
         pointer-events: none !important;
         opacity: 0.9 !important;
         transform-origin: center center !important;
-        transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw))) !important;
+        transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw) + var(--daily-summary-push, 0px))) !important;
       }
       #analog-clock, #barometric-pressure-gauge {
-        transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw))) !important;
+        transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw) + var(--daily-summary-push, 0px))) !important;
       }
       @keyframes scroll-weather-bg {
         0% { background-position: 0 center; }
@@ -1845,7 +1882,7 @@ import weatherConditions from '../data/weather-conditions.json';
         border-radius: ${WEATHER_IMAGE_BORDER_RADIUS};
         -webkit-mask-image: -webkit-radial-gradient(white, black);
         transform-origin: top right !important;
-        transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw))) !important;
+        transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw) + var(--daily-summary-push, 0px))) !important;
         z-index: 50;
         overflow: hidden;
         opacity: 0; /* Hide initially to prevent page load flash */
@@ -1885,7 +1922,7 @@ import weatherConditions from '../data/weather-conditions.json';
         border-radius: ${WEATHER_IMAGE_BORDER_RADIUS};
         -webkit-mask-image: -webkit-radial-gradient(white, black);
         transform-origin: top left !important;
-        transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw))) !important;
+        transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw) + var(--daily-summary-push, 0px))) !important;
         z-index: 50;
         overflow: hidden;
         opacity: 0; /* Hide initially to prevent page load flash */
@@ -2178,6 +2215,13 @@ import weatherConditions from '../data/weather-conditions.json';
     }
     */
   }
+
+
+
+
+
+
+
 
   function createDrop(canvas, startY) {
     // Get current wind parameters from API data
@@ -2513,6 +2557,13 @@ import weatherConditions from '../data/weather-conditions.json';
       setTimeout(() => document.body.classList.add('transitions-ready'), 100);
     });
   }
+
+
+
+
+
+
+
 
   // Helper function to update the position of fragile elements based on total banner height
   // Store the current wind arrow rotation globally so we can reapply it
@@ -3778,6 +3829,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
     }
   }
 
+
+
+
+
+
+
+
   // --- Weather Description Config ---
   // Line 3: The API description (e.g., "Overcast clouds.")
   const DESC_MARGIN_TOP_DESKTOP = '-1vw';     // EDITABLE Desktop: Space ABOVE the 3rd line
@@ -4867,6 +4925,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
     
     return { active, inactive };
   }
+
+
+
+
+
+
+
 
   // Create and insert the 8-cell clock grid container dynamically
   function updateClockGridRow(data) {
@@ -6077,6 +6142,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
     });
   }
 
+
+
+
+
+
+
+
   // --- Daily Weather Summary Line Config (DUAL Desktop & Mobile) ---
   const DAILY_SUMMARY_WIDTH_DESKTOP = '55vw';            // EDITABLE Desktop: Centered block width in vw (e.g. '40vw', '50vw')
   const DAILY_SUMMARY_WIDTH_MOBILE = '70vw';             // EDITABLE Mobile: Centered block width in vw (e.g. '70vw', '80vw')
@@ -6090,11 +6162,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const DAILY_SUMMARY_LINE_HEIGHT_DESKTOP = '1';         // EDITABLE Desktop: Line height / leading
   const DAILY_SUMMARY_LINE_HEIGHT_MOBILE = '1.2';        // EDITABLE Mobile: Line height / leading
 
-  const DAILY_SUMMARY_MARGIN_TOP_DESKTOP = '-1vw';       // EDITABLE Desktop: Space ABOVE summary line (match DERIVED_DESC_MARGIN_BOTTOM_DESKTOP)
+  const DAILY_SUMMARY_MARGIN_TOP_DESKTOP = '2.2vw';       // EDITABLE Desktop: Space ABOVE summary line (match DERIVED_DESC_MARGIN_BOTTOM_DESKTOP)
   const DAILY_SUMMARY_MARGIN_TOP_MOBILE = '3.0vw';        // EDITABLE Mobile: Space ABOVE summary line (match DERIVED_DESC_MARGIN_BOTTOM_MOBILE)
 
   const DAILY_SUMMARY_MARGIN_BOTTOM_DESKTOP = '-3vw';  // EDITABLE Desktop: Space BELOW summary line (match CLOCK_GRID_MARGIN_TOP_DESKTOP)
-  const DAILY_SUMMARY_MARGIN_BOTTOM_MOBILE = '-3vw';      // EDITABLE Mobile: Space BELOW summary line (match CLOCK_GRID_MARGIN_TOP_MOBILE)
+  const DAILY_SUMMARY_MARGIN_BOTTOM_MOBILE = '3.0vw';      // EDITABLE Mobile: Space BELOW summary line (match CLOCK_GRID_MARGIN_TOP_MOBILE)
 
   // Helper to polish machine-generated OpenWeather summaries into natural, smooth English
   function formatNaturalSummary(text) {
@@ -9179,10 +9251,21 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
     // Position the pointer
     // EDITABLE: Position pointer so its RIGHT edge aligns with right edge of today's temperature bar
-    // Calculate width directly from CSS (1.732vw) to avoid offsetWidth issues
-    const pointerWidth = window.innerWidth * 0.01732; // 1.732vw in pixels
+    // Calculate width dynamically from configuration to avoid offsetWidth issues
+    const isMobile = window.innerWidth <= 767;
+    const widthStr = isMobile ? TEMP_POINTER_WIDTH_MOBILE : TEMP_POINTER_WIDTH_DESKTOP;
+    const vwVal = parseFloat(widthStr) || 1.732;
+    const pointerWidth = window.innerWidth * (vwVal / 100);
     const pointerLeft = (hiRect.right - containerRect.left) - pointerWidth;
     
+    // Apply dynamic temp color to pointer if configured
+    if (TEMP_POINTER_USE_CURRENT_COLOR) {
+      const pointerColor = tempToColor(currentTemp);
+      pointer.style.setProperty('--temp-pointer-color', pointerColor || TEMP_POINTER_DEFAULT_COLOR);
+    } else {
+      pointer.style.setProperty('--temp-pointer-color', TEMP_POINTER_DEFAULT_COLOR);
+    }
+
     // Set position relative to dualContainer (center the pointer vertically on the calculated Y position)
     pointer.style.left = `${pointerLeft}px`;
     pointer.style.top = `${pointerY}px`;

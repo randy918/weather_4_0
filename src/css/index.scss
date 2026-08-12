@@ -371,10 +371,8 @@ $loader-logo-offset-y: 25vw;
 // EDITABLE: Temperature Pointer - White triangle indicating current temp on today's hi/lo cells
 .temp-pointer {
     position: absolute;
-    width: 1.732vw; // Width of equilateral triangle (height * sqrt(3)/2, for 2vw tall)
-    height: 2vw; // EDITABLE: Height of the triangle
-    background-color: white; // EDITABLE: Triangle color
-    clip-path: polygon(0% 50%, 100% 0%, 100% 100%); // Left-pointing triangle (vertical side at right)
+    width: var(--temp-pointer-width-desktop, 1.732vw);
+    height: var(--temp-pointer-height-desktop, 2vw);
     z-index: 100;
     pointer-events: none;
     opacity: 0; // Initially hidden until positioned by JS
@@ -382,8 +380,22 @@ $loader-logo-offset-y: 25vw;
     border-radius: 0; // Ensure sharp corners, no rounding
     shape-rendering: crispEdges; // Force sharp rendering
 
-    // EDITABLE: Shadow effect
-    filter: drop-shadow(0.3vw 0.3vw 0.5vw rgba(0, 0, 0, 0.5));
+    @media (max-width: 767px) {
+        width: var(--temp-pointer-width-mobile, 2.5vw);
+        height: var(--temp-pointer-height-mobile, 2.88vw);
+    }
+
+    // EDITABLE: Shadow effect (now applied to parent container to prevent clip-path clipping)
+    filter: var(--temp-pointer-shadow, drop-shadow(-0.3vw 0.3vw 0.4vw rgba(0, 0, 0, 0.6)));
+
+    &::after {
+        content: '';
+        display: block;
+        width: 100%;
+        height: 100%;
+        background-color: var(--temp-pointer-color, white); // EDITABLE: Dynamic temp color
+        clip-path: polygon(0% 50%, 100% 0%, 100% 100%); // Left-pointing triangle (vertical side at right)
+    }
 }
 
 //>  ████████████████████████████████████  CITY OVERLAY BUTTON
