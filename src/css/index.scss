@@ -642,7 +642,6 @@ main {
     font-family: "bold", sans-serif;
     font-size: 5vw;
     color: var(--theBrown);
-    box-shadow: 0 0.4vw 1.2vw 0 rgba(0, 0, 0, 1);
     display: flex;
     justify-content: center;
     align-items: flex-start;
@@ -663,13 +662,37 @@ main {
     }
 }
 
+.hiItem {
+    box-shadow: 0 0.4vw 1.2vw 0 rgba(0, 0, 0, 1);
+}
+
 .loItem {
     align-items: flex-end;
     padding-top: 0;
     padding-bottom: 0;
+    box-shadow: none; // Disable standard downward shadow
 
     span {
         margin-bottom: 0.4vw;
+    }
+
+    // EDITABLE: Upward multiply shadow cast from low bars onto the high bars beneath them
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: transparent;
+        box-shadow: var(--lo-temp-shadow-desktop, 0 -0.8vw 1.5vw rgba(0, 0, 0, 0.8));
+        mix-blend-mode: var(--lo-temp-shadow-blend-mode, multiply);
+        pointer-events: none;
+        z-index: -1;
+
+        @media (max-width: 767px) {
+            box-shadow: var(--lo-temp-shadow-mobile, 0 -1.2vw 2.0vw rgba(0, 0, 0, 0.8));
+        }
     }
 }
 

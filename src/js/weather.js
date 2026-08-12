@@ -144,6 +144,23 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--temp-pointer-shadow', TEMP_POINTER_SHADOW);
   document.documentElement.style.setProperty('--temp-pointer-default-color', TEMP_POINTER_DEFAULT_COLOR);
 
+  // --- CONFIG: Low Temp Bar Upward Shadow (8-day forecast) ---
+  const LO_TEMP_SHADOW_OFFSET_Y_DESKTOP = '-3vw';     // EDITABLE Desktop: Upward vertical offset (negative is up)
+  const LO_TEMP_SHADOW_OFFSET_Y_MOBILE = '-3.0vw';      // EDITABLE Mobile: Upward vertical offset (negative is up)
+  const LO_TEMP_SHADOW_BLUR_DESKTOP = '1.2vw';          // EDITABLE Desktop: Shadow blur/spread size
+  const LO_TEMP_SHADOW_BLUR_MOBILE = '1.6vw';           // EDITABLE Mobile: Shadow blur/spread size
+  const LO_TEMP_SHADOW_OPACITY_DESKTOP = 0.2;          // EDITABLE Desktop: Shadow opacity (0.0 = clear, 1.0 = pitch black)
+  const LO_TEMP_SHADOW_OPACITY_MOBILE = 0.2;           // EDITABLE Mobile: Shadow opacity (0.0 = clear, 1.0 = pitch black)
+  const LO_TEMP_SHADOW_BLEND_MODE = 'multiply';         // EDITABLE: Blend mode for the upward shadow
+
+  // Construct shadow strings dynamically using the configurations above
+  const loTempShadowDesktop = `0 ${LO_TEMP_SHADOW_OFFSET_Y_DESKTOP} ${LO_TEMP_SHADOW_BLUR_DESKTOP} 0 rgba(0, 0, 0, ${LO_TEMP_SHADOW_OPACITY_DESKTOP})`;
+  const loTempShadowMobile = `0 ${LO_TEMP_SHADOW_OFFSET_Y_MOBILE} ${LO_TEMP_SHADOW_BLUR_MOBILE} 0 rgba(0, 0, 0, ${LO_TEMP_SHADOW_OPACITY_MOBILE})`;
+
+  document.documentElement.style.setProperty('--lo-temp-shadow-desktop', loTempShadowDesktop);
+  document.documentElement.style.setProperty('--lo-temp-shadow-mobile', loTempShadowMobile);
+  document.documentElement.style.setProperty('--lo-temp-shadow-blend-mode', LO_TEMP_SHADOW_BLEND_MODE);
+
   // --- CONFIG: Clock Grid (8 Countdown Circles Row) ---
   const CLOCK_GRID_SIZE = '11vw';         // EDITABLE: Width and height of each circle widget
   const CLOCK_GRID_GAP = '1vw';          // EDITABLE: Gap between cells
@@ -4866,12 +4883,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
       btnBoth.innerHTML = `<span style="color: ${activeColor}; font-size: inherit; font-family: inherit;">F&C</span>`;
     }
     
-    // Ensure it's placed right below the weather description (or its duplicate)
+    // Ensure it's placed right below the daily weather summary (if it exists),
+    // otherwise below the duplicate line (or description line).
+    const summaryEl = document.getElementById('daily-weather-summary');
     const dupEl = document.getElementById('weather-description-duplicate');
     const descEl = document.getElementById('weather-description');
     
-    // We want dots to go AFTER the duplicate line, if it exists. Otherwise after descEl.
-    const targetEl = dupEl || descEl;
+    // We want dots to go AFTER the summary line, if it exists. Otherwise after the duplicate line (or description line).
+    const targetEl = summaryEl || dupEl || descEl;
     if (targetEl && targetEl.parentNode && targetEl.nextSibling !== container) {
       targetEl.parentNode.insertBefore(container, targetEl.nextSibling);
     }
@@ -6151,7 +6170,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   // --- Daily Weather Summary Line Config (DUAL Desktop & Mobile) ---
   const DAILY_SUMMARY_WIDTH_DESKTOP = '55vw';            // EDITABLE Desktop: Centered block width in vw (e.g. '40vw', '50vw')
-  const DAILY_SUMMARY_WIDTH_MOBILE = '70vw';             // EDITABLE Mobile: Centered block width in vw (e.g. '70vw', '80vw')
+  const DAILY_SUMMARY_WIDTH_MOBILE = '55vw';             // EDITABLE Mobile: Centered block width in vw (e.g. '70vw', '80vw')
 
   const DAILY_SUMMARY_FONT_SIZE_DESKTOP = '3.6vw';       // EDITABLE Desktop: Font size (e.g. '1.6vw', '2vw', '3.6vw')
   const DAILY_SUMMARY_FONT_SIZE_MOBILE = '4vw';          // EDITABLE Mobile: Font size (e.g. '4vw', '5vw', '3.5vw')
