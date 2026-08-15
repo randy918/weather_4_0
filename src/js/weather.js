@@ -4723,7 +4723,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       document.head.appendChild(style);
     }
 
-    let container = document.getElementById('refresh-dots-container');
+    let container = document.getElementById('refresh-spacer-container');
     const colors = getDotsColors(currentTemp);
     
     // Hot-reload fix: if DOTS_COUNT is changed, clear out the old dots so they instantly rebuild!
@@ -4734,7 +4734,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
     if (!container) {
       container = document.createElement('div');
-      container.id = 'refresh-dots-container';
+      container.id = 'refresh-spacer-container';
       container.style.display = 'flex';
       container.style.justifyContent = 'flex-start';  // Align left to make room on the right
       container.style.paddingLeft = '0.2vw'; // Keep left edge perfectly aligned with sun/moon rows below it
@@ -5073,10 +5073,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
         container.appendChild(item);
       }
       
-      // Insert right below the refresh dots container
-      const refreshDots = document.getElementById('refresh-dots-container');
-      if (refreshDots && refreshDots.parentNode) {
-        refreshDots.parentNode.insertBefore(container, refreshDots.nextSibling);
+      // Insert right below the refresh spacer container
+      const refreshSpacer = document.getElementById('refresh-spacer-container');
+      if (refreshSpacer && refreshSpacer.parentNode) {
+        refreshSpacer.parentNode.insertBefore(container, refreshSpacer.nextSibling);
       } else {
         (document.querySelector('main.content') || document.body).appendChild(container);
       }
@@ -6261,7 +6261,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
                          document.querySelector('.clockGridContainer7') ||
                          document.querySelector('.clockGridContainer4') ||
                          document.querySelector('.clockGridContainer') ||
-                         document.getElementById('refresh-dots-container');
+                         document.getElementById('refresh-spacer-container');
 
     if (swelteringTarget && swelteringTarget.parentNode) {
       if (el.previousSibling !== swelteringTarget) {
@@ -6625,10 +6625,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
       wrapper.appendChild(dotsContainer);
       wrapper.appendChild(pill);
       
-      // Insert right below the clock grid container (or fallback to refresh dots container)
+      // Insert right below the clock grid container (or fallback to refresh spacer container)
       const clockGrid = document.getElementById('clock-grid-container');
-      const refreshDots = document.getElementById('refresh-dots-container');
-      const targetAnchor = clockGrid || refreshDots;
+      const refreshSpacer = document.getElementById('refresh-spacer-container');
+      const targetAnchor = clockGrid || refreshSpacer;
       if (targetAnchor && targetAnchor.parentNode) {
         targetAnchor.parentNode.insertBefore(wrapper, targetAnchor.nextSibling);
       } else {
@@ -10591,7 +10591,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     getRefreshInterval: () => currentRefreshMs,
     getTempColor: (temp) => tempToColor(temp),
     refreshDotColors: () => {
-      const container = document.getElementById('refresh-dots-container');
+      const container = document.getElementById('refresh-spacer-container');
       if (container) {
         const colors = getDotsColors(currentTempForDots);
         const dots = container.querySelectorAll('.refresh-dot');
