@@ -50,3 +50,4 @@ When displaying RainViewer Doppler radar data in this workspace, follow these co
    - To maximize readability, configuration simplicity, and dynamic responsiveness, ALWAYS define styling variables (such as layout dimensions, margins, paddings, colors, font sizes, transitions, and offsets) as editable JS constants at the top of JS functions/modules.
    - Inject these configurations into the DOM via `element.style.setProperty('--variable-name', value)` (or on `document.documentElement` for global scope).
    - In the stylesheet (`.css` / `.scss`), reference these configurations exclusively using `var(--variable-name)`. Avoid hardcoding specific layout, spacing, and color numbers in traditional CSS files so that all configurations remain centralized in JS.
+   - Note: The abbreviation **jcv** or **JCV** strictly refers to "JS CSS Variables" or "JS-Driven Configuration" as defined in this rule.
