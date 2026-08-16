@@ -6169,7 +6169,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
 
   // --- Daily Weather Summary Line Config (DUAL Desktop & Mobile) ---
-  const DAILY_SUMMARY_WIDTH_DESKTOP = '55vw';            // EDITABLE Desktop: Centered block width in vw (e.g. '40vw', '50vw')
+  const DAILY_SUMMARY_WIDTH_DESKTOP = '45vw';            // EDITABLE Desktop: Centered block width in vw (e.g. '40vw', '50vw')
   const DAILY_SUMMARY_WIDTH_MOBILE = '55vw';             // EDITABLE Mobile: Centered block width in vw (e.g. '70vw', '80vw')
 
   const DAILY_SUMMARY_FONT_SIZE_DESKTOP = '3.6vw';       // EDITABLE Desktop: Font size (e.g. '1.6vw', '2vw', '3.6vw')
@@ -7970,6 +7970,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           e.stopPropagation();
           SHOW_DOPPLER_RADAR_RIGHT = !SHOW_DOPPLER_RADAR_RIGHT;
           USER_DOPPLER_OVERRIDE_RIGHT = SHOW_DOPPLER_RADAR_RIGHT;
+          rightRadarHovered = false; // Reset hover state on click to prevent immediate peek inversion
           console.log(`🔄 Right circle clicked. Manual Override: ${SHOW_DOPPLER_RADAR_RIGHT ? 'FORCING DOPPLER' : 'FORCING TIME'} (Natural state is: ${AUTO_DOPPLER_RADAR_RIGHT ? 'DOPPLER' : 'TIME'})`);
           
           if (rightDopplerOverrideTimerId) {
@@ -8026,6 +8027,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           e.stopPropagation();
           SHOW_DOPPLER_RADAR_LEFT = !SHOW_DOPPLER_RADAR_LEFT;
           USER_DOPPLER_OVERRIDE_LEFT = SHOW_DOPPLER_RADAR_LEFT;
+          leftRadarHovered = false; // Reset hover state on click to prevent immediate peek inversion
           console.log(`🔄 Left circle clicked. Manual Override: ${SHOW_DOPPLER_RADAR_LEFT ? 'FORCING DOPPLER' : 'FORCING TIME'} (Natural state is: ${AUTO_DOPPLER_RADAR_LEFT ? 'DOPPLER' : 'TIME'})`);
           
           if (leftDopplerOverrideTimerId) {
@@ -10671,12 +10673,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (rightEl) {
       rightEl.style.cursor = 'pointer';
       rightEl.addEventListener('mouseenter', () => {
+        if (!window.matchMedia('(hover: hover)').matches) return;
         rightRadarHovered = true;
         if (lastWeatherData) {
           updateWeatherDescription(lastWeatherData);
         }
       });
       rightEl.addEventListener('mouseleave', () => {
+        if (!window.matchMedia('(hover: hover)').matches) return;
         rightRadarHovered = false;
         if (lastWeatherData) {
           updateWeatherDescription(lastWeatherData);
@@ -10687,12 +10691,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (leftEl) {
       leftEl.style.cursor = 'pointer';
       leftEl.addEventListener('mouseenter', () => {
+        if (!window.matchMedia('(hover: hover)').matches) return;
         leftRadarHovered = true;
         if (lastWeatherData) {
           updateWeatherDescription(lastWeatherData);
         }
       });
       leftEl.addEventListener('mouseleave', () => {
+        if (!window.matchMedia('(hover: hover)').matches) return;
         leftRadarHovered = false;
         if (lastWeatherData) {
           updateWeatherDescription(lastWeatherData);

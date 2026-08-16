@@ -51,3 +51,6 @@ When displaying RainViewer Doppler radar data in this workspace, follow these co
    - Inject these configurations into the DOM via `element.style.setProperty('--variable-name', value)` (or on `document.documentElement` for global scope).
    - In the stylesheet (`.css` / `.scss`), reference these configurations exclusively using `var(--variable-name)`. Avoid hardcoding specific layout, spacing, and color numbers in traditional CSS files so that all configurations remain centralized in JS.
    - Note: The abbreviation **jcv** or **JCV** strictly refers to "JS CSS Variables" or "JS-Driven Configuration" as defined in this rule.
+
+10. **Commit Message Timestamps**:
+   - When generating or proposing git commit messages in this workspace, always append a hyphen and the current local timestamp flush to the end of the commit summary (e.g. `-[YYYY-MM-DD HH:MM:SS]`).
