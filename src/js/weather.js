@@ -31,6 +31,24 @@ import weatherConditions from '../data/weather-conditions.json';
   const forceSnow = urlParams.get('snow') === 'true' || urlParams.get('snow') === '1' || urlParams.get('test_snow') === 'true';
   const forceRain = urlParams.get('rain') === 'true' || urlParams.get('rain') === '1' || urlParams.get('test_rain') === 'true';
 
+  // --- CONFIG: Season Starts Test / Preview & Styling (JCV) ---
+  const TEST_SHOW_SEASON_COUNTDOWN_PREVIEW = false; // EDITABLE: Set to true to force-show a countdown for testing
+
+  const SPRING_STARTS_COLOR = "rgba(46, 204, 113, 0.85)"; // Spring fresh green
+  const SUMMER_STARTS_COLOR = "rgba(243, 156, 18, 0.85)"; // Summer gold-orange
+  const FALL_STARTS_COLOR = "rgba(211, 84, 0, 0.85)";     // Fall rust orange
+  const WINTER_STARTS_COLOR = "rgba(52, 152, 219, 0.85)";   // Winter ice blue
+
+  const SPRING_STARTS_ICON = "img/sun-wat.svg";
+  const SUMMER_STARTS_ICON = "img/sun-wat.svg";
+  const FALL_STARTS_ICON = "img/wind-wat.svg";
+  const WINTER_STARTS_ICON = "img/fog-wat.svg";
+
+  document.documentElement.style.setProperty('--spring-starts-color', SPRING_STARTS_COLOR);
+  document.documentElement.style.setProperty('--summer-starts-color', SUMMER_STARTS_COLOR);
+  document.documentElement.style.setProperty('--fall-starts-color', FALL_STARTS_COLOR);
+  document.documentElement.style.setProperty('--winter-starts-color', WINTER_STARTS_COLOR);
+
   // --- CONFIG: Clock Hands Spin Animation ---
   const CLOCK_SPIN_DURATION_MS = 1200; // EDITABLE: Reset animation spin duration in milliseconds
   let isClockSpinning = false;
@@ -686,6 +704,10 @@ import weatherConditions from '../data/weather-conditions.json';
     "TORNADO WARNING": "hsl(0, 90%, 35%)", // Dark red
     "TORNADO WATCH": "hsl(0,   90%, 55%)", // Orange
     "WIND ADVISORY": "hsl(220, 90%, 35%)", // Bright blue-purple
+    "SPRING STARTS": "var(--spring-starts-color)",
+    "SUMMER STARTS": "var(--summer-starts-color)",
+    "FALL STARTS": "var(--fall-starts-color)",
+    "WINTER STARTS": "var(--winter-starts-color)",
   };
 
   // EDITABLE: Alert Banner Icons
@@ -710,6 +732,10 @@ import weatherConditions from '../data/weather-conditions.json';
     "TORNADO WARNING": "img/thun-wat.svg",
     "TORNADO WATCH": "img/thun-wat.svg",
     "WIND ADVISORY": "img/wind-wat.svg",
+    "SPRING STARTS": SPRING_STARTS_ICON,
+    "SUMMER STARTS": SUMMER_STARTS_ICON,
+    "FALL STARTS": FALL_STARTS_ICON,
+    "WINTER STARTS": WINTER_STARTS_ICON,
   };
 
   // Dynamic temperature range based on actual week's data
@@ -2838,6 +2864,112 @@ import weatherConditions from '../data/weather-conditions.json';
       }
     });
 
+    // Add season countdown alerts if within 24 hours of starting
+    const seasonEvents = {
+      2025: {
+        SPRING: "2025-03-20T09:01:00Z",
+        SUMMER: "2025-06-20T22:42:00Z",
+        FALL:   "2025-09-22T14:19:00Z",
+        WINTER: "2025-12-21T10:03:00Z"
+      },
+      2026: {
+        SPRING: "2026-03-20T14:02:00Z",
+        SUMMER: "2026-06-21T07:42:00Z",
+        FALL:   "2026-09-22T21:05:00Z",
+        WINTER: "2026-12-21T19:50:00Z"
+      },
+      2027: {
+        SPRING: "2027-03-20T19:59:00Z",
+        SUMMER: "2027-06-21T13:42:00Z",
+        FALL:   "2027-09-23T03:01:00Z",
+        WINTER: "2027-12-21T01:42:00Z"
+      },
+      2028: {
+        SPRING: "2028-03-20T01:45:00Z",
+        SUMMER: "2028-06-20T19:41:00Z",
+        FALL:   "2028-09-22T08:45:00Z",
+        WINTER: "2028-12-21T07:33:00Z"
+      },
+      2029: {
+        SPRING: "2029-03-20T07:37:00Z",
+        SUMMER: "2029-06-21T01:29:00Z",
+        FALL:   "2029-09-22T14:37:00Z",
+        WINTER: "2029-12-21T13:13:00Z"
+      },
+      2030: {
+        SPRING: "2030-03-20T13:28:00Z",
+        SUMMER: "2030-06-21T07:30:00Z",
+        FALL:   "2030-09-22T20:27:00Z",
+        WINTER: "2030-12-21T19:09:00Z"
+      }
+    };
+
+    // (TEST_SHOW_SEASON_COUNTDOWN_PREVIEW is defined at the top of the file as a JCV)
+
+    const nowMs = Date.now();
+    const nowYear = new Date().getUTCFullYear();
+    const yearEvents = seasonEvents[nowYear];
+
+    if (yearEvents) {
+      const testPreviewActive = (() => {
+        try {
+          return new URLSearchParams(window.location.search).has('testSeason') || TEST_SHOW_SEASON_COUNTDOWN_PREVIEW;
+        } catch(e) {
+          return TEST_SHOW_SEASON_COUNTDOWN_PREVIEW;
+        }
+      })();
+
+      for (let [seasonName, eventIsoStr] of Object.entries(yearEvents)) {
+        let eventTimeMs = Date.parse(eventIsoStr);
+        let diffMs = eventTimeMs - nowMs;
+
+        // For testing/preview mode, if active, force the FALL starts countdown to be 19 hours away
+        if (testPreviewActive && seasonName === 'FALL') {
+          eventTimeMs = nowMs + 19 * 60 * 60 * 1000 + 120000; // 19 hours and 2 minutes
+          diffMs = eventTimeMs - nowMs;
+        }
+
+        // Active only during the 24 hours countdown BEFORE the exact start of the season
+        if (diffMs > 0 && diffMs <= 24 * 60 * 60 * 1000) {
+          const diffMinutes = Math.ceil(diffMs / 60000);
+          let countdownStr = "";
+          
+          if (diffMinutes >= 60) {
+            const hours = Math.floor(diffMinutes / 60);
+            countdownStr = `in ${hours} hour${hours > 1 ? 's' : ''}`;
+          } else {
+            countdownStr = `in ${diffMinutes} minute${diffMinutes > 1 ? 's' : ''}`;
+          }
+
+          const localTime = new Date(eventTimeMs);
+          const localTimeStr = localTime.toLocaleDateString('en-US', {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric'
+          }) + " at " + localTime.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+          });
+
+          // Push season countdown to the alerts array
+          alerts.push({
+            event: `${seasonName} STARTS`,
+            countdown: countdownStr,
+            sender_name: "Astronomical Season Countdown",
+            start: Math.floor(nowMs / 1000),
+            end: Math.floor(eventTimeMs / 1000),
+            description: `The astronomical beginning of ${seasonName.charAt(0) + seasonName.slice(1).toLowerCase()} is approaching:
+            
+• Exact Local Start: ${localTimeStr}
+• Time Remaining: ${countdownStr}
+
+Prepare for the seasonal transition!`
+          });
+        }
+      }
+    }
+
     // Check if Great / Nice Weather Advisory conditions are met (Using "Feels Like" temperature)
     const currentFeelsLike = data.current?.feels_like ?? data.current?.temp;
     const humidity = data.current?.humidity;
@@ -3193,7 +3325,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
       
       // Format: "TORNADO WATCH expires 6:15 am" or "TEMPERATURE DROP ADVISORY tomorrow"
       let alertText = alert.event.toUpperCase();
-      if (eventName.includes('TEMPERATURE DROP') || eventName.includes('TEMPERATURE RISE')) {
+      if (alert.countdown) {
+        alertText += ` <span class="alert-expires">${alert.countdown}</span>`;
+      } else if (eventName.includes('TEMPERATURE DROP') || eventName.includes('TEMPERATURE RISE')) {
         alertText += ` <span class="alert-expires">tomorrow</span>`;
       } else if (alert.end) {
         const endDate = new Date(alert.end * 1000); // Convert Unix timestamp to Date
