@@ -526,43 +526,73 @@ import weatherConditions from '../data/weather-conditions.json';
       const radius = getRadiusFn(el);
       const circumference = 2 * Math.PI * radius;
       el.style.strokeDasharray = `${circumference}`;
+      el.style.transition = 'none'; // Disable CSS transitions to prevent conflicts
 
       const newPercent = calcAboveBelowAverageProgress(newVal, minVal, avgVal, maxVal);
       const targetOffset = circumference * (1 - newPercent);
+      const currentOffset = parseFloat(el.style.strokeDashoffset) || circumference;
 
       if (hasChange) {
         // Mark as animating
         el.dataset.animating = 'true';
         el.dataset.targetOffset = targetOffset;
 
-        // Stage 1: Animate clockwise from old value's offset to MAX (strokeDashoffset = 0)
         const oldPercent = calcAboveBelowAverageProgress(prevVal, minVal, avgVal, maxVal);
         const startOffset = circumference * (1 - oldPercent);
+        
+        const isIncrease = newVal > prevVal;
 
-        el.style.transition = 'none';
-        el.style.strokeDashoffset = startOffset;
-        void el.offsetHeight; // Force reflow
-
-        el.style.transition = 'stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
-        setTimeout(() => {
-          el.style.strokeDashoffset = '0';
-        }, 20);
-
-        // Stage 2: Animate counter-clockwise from MAX (0) to new targetOffset
-        setTimeout(() => {
-          const currentTarget = parseFloat(el.dataset.targetOffset) ?? targetOffset;
-          el.style.strokeDashoffset = currentTarget;
-          
-          setTimeout(() => {
-            el.dataset.animating = 'false';
-          }, 800);
-        }, 820);
+        if (isIncrease) {
+          // Stage 1: Animate clockwise from old value's offset to MAX (strokeDashoffset = 0)
+          animateValue(el, startOffset, 0, 800, () => {
+            const currentTarget = parseFloat(el.dataset.targetOffset) ?? targetOffset;
+            // Stage 2: Animate counter-clockwise from MAX (0) to new targetOffset
+            animateValue(el, 0, currentTarget, 800, () => {
+              el.dataset.animating = 'false';
+            });
+          });
+        } else {
+          // Stage 1: Animate counter-clockwise from old value's offset to MIN (strokeDashoffset = circumference)
+          animateValue(el, startOffset, circumference, 800, () => {
+            const currentTarget = parseFloat(el.dataset.targetOffset) ?? targetOffset;
+            // Stage 2: Animate clockwise from MIN (circumference) to new targetOffset
+            animateValue(el, circumference, currentTarget, 800, () => {
+              el.dataset.animating = 'false';
+            });
+          });
+        }
       } else {
-        // Normal update (no change or initial load)
-        el.style.transition = 'stroke-dashoffset 0.8s cubic-bezier(0.25, 1, 0.5, 1)';
-        el.style.strokeDashoffset = targetOffset;
+        // Normal update (no change or initial load): animate smoothly to target
+        animateValue(el, currentOffset, targetOffset, 800);
       }
     });
+  }
+
+  // JS animation helper using requestAnimationFrame
+  function animateValue(el, startOffset, targetOffset, duration, onComplete) {
+    const startTime = performance.now();
+    
+    function update(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Easing: easeInOutCubic
+      const eased = progress < 0.5 
+        ? 4 * progress * progress * progress 
+        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+      
+      const current = startOffset + (targetOffset - startOffset) * eased;
+      el.style.strokeDashoffset = current;
+      
+      if (progress < 1) {
+        requestAnimationFrame(update);
+      } else {
+        el.style.strokeDashoffset = targetOffset;
+        if (onComplete) onComplete();
+      }
+    }
+    
+    requestAnimationFrame(update);
   }
 
   // EDITABLE: Scrolling Gradient Overlay configuration (Non-phone version: iPad, desktop)
@@ -1483,7 +1513,8 @@ import weatherConditions from '../data/weather-conditions.json';
   // Update the wind gauge with wind speed and gust data
   function updateWindGauge(data) {
     const windSpeed = data?.current?.wind_speed || 0;
-    const windGust = data?.current?.wind_gust || windSpeed; // Default to wind_speed if gust not available
+    const rawWindGust = data?.current?.wind_gust || windSpeed;
+    const windGust = (rawWindGust - windSpeed >= 5) ? rawWindGust : windSpeed;
     
     if (lastWindSpeed !== null && windSpeed !== lastWindSpeed) {
       triggerWindSpeedSpinAnimation();
@@ -1612,12 +1643,17 @@ import weatherConditions from '../data/weather-conditions.json';
     gridGustProgressEls.forEach(gridGustProgressEl => {
       const length = Math.max(0, (percentGust - percentSpeed) * circumference);
       const dashOffset = - (percentSpeed * circumference);
-      gridGustProgressEl.style.strokeDasharray = `${length}, ${circumference}`;
-      gridGustProgressEl.style.strokeDashoffset = dashOffset;
-      if (gustTempColor) {
-        gridGustProgressEl.style.stroke = gustTempColor;
-      } else if (tempColor) {
-        gridGustProgressEl.style.stroke = tempColor;
+      if (length > 0) {
+        gridGustProgressEl.style.display = '';
+        gridGustProgressEl.style.strokeDasharray = `${length}, ${circumference}`;
+        gridGustProgressEl.style.strokeDashoffset = dashOffset;
+        if (gustTempColor) {
+          gridGustProgressEl.style.stroke = gustTempColor;
+        } else if (tempColor) {
+          gridGustProgressEl.style.stroke = tempColor;
+        }
+      } else {
+        gridGustProgressEl.style.display = 'none';
       }
     });
     
@@ -5241,11 +5277,15 @@ Plan ahead for significantly warmer conditions tomorrow!`
              titleText = getMoonPhaseName(data.daily[0].moon_phase);
           }
           
-          // If this is the "WIND" dial (index 2), replace the title with "Gust [X] mph"
+          // If this is the "WIND" dial (index 2), replace the title with "Gust [X] mph" or base wind speed
           if (i === 2 && data && data.current) {
              const windSpeed = data.current.wind_speed || 0;
-             const windGust = data.current.wind_gust || windSpeed;
-             titleText = `${Math.round(windGust)} mph Gusts`;
+             const rawWindGust = data.current.wind_gust || windSpeed;
+             if (rawWindGust - windSpeed >= 5) {
+                titleText = `${Math.round(rawWindGust)} mph Gusts`;
+             } else {
+                titleText = `${Math.round(windSpeed)} mph`;
+             }
           }
           
           // If this is the "SUN" dial (index 5), show the OPPOSITE event of what's inside the dial
@@ -5350,8 +5390,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
         const windTitle = labelsContainer.querySelector('.label-title-2');
         if (windTitle && data && data.current) {
            const windSpeed = data.current.wind_speed || 0;
-           const windGust = data.current.wind_gust || windSpeed;
-           windTitle.innerText = `${Math.round(windGust)} mph Gusts`;
+           const rawWindGust = data.current.wind_gust || windSpeed;
+           if (rawWindGust - windSpeed >= 5) {
+              windTitle.innerText = `${Math.round(rawWindGust)} mph Gusts`;
+           } else {
+              windTitle.innerText = `${Math.round(windSpeed)} mph`;
+           }
         }
         
         // Also update the sun opposite event text live
@@ -5575,8 +5619,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
         
         if (i === 2 && data && data.current) {
            const windSpeed = data.current.wind_speed || 0;
-           const windGust = data.current.wind_gust || windSpeed;
-           titleText = `${Math.round(windGust)} mph Gusts`;
+           const rawWindGust = data.current.wind_gust || windSpeed;
+           if (rawWindGust - windSpeed >= 5) {
+              titleText = `${Math.round(rawWindGust)} mph Gusts`;
+           } else {
+              titleText = `${Math.round(windSpeed)} mph`;
+           }
         }
 
         if (i === 3 && data && data.current && typeof data.current.dew_point === 'number') {
@@ -5687,8 +5735,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const windTitle = labelsContainer7.querySelector('.label-title-2');
       if (windTitle && data && data.current) {
          const windSpeed = data.current.wind_speed || 0;
-         const windGust = data.current.wind_gust || windSpeed;
-         windTitle.innerText = `${Math.round(windGust)} mph Gusts`;
+         const rawWindGust = data.current.wind_gust || windSpeed;
+         if (rawWindGust - windSpeed >= 5) {
+            windTitle.innerText = `${Math.round(rawWindGust)} mph Gusts`;
+         } else {
+            windTitle.innerText = `${Math.round(windSpeed)} mph`;
+         }
       }
 
       const humidityTitle = labelsContainer7.querySelector('.label-title-3');
@@ -5892,8 +5944,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
         
         if (i === 2 && data && data.current) {
            const windSpeed = data.current.wind_speed || 0;
-           const windGust = data.current.wind_gust || windSpeed;
-           titleText = `${Math.round(windGust)} mph Gusts`;
+           const rawWindGust = data.current.wind_gust || windSpeed;
+           if (rawWindGust - windSpeed >= 5) {
+              titleText = `${Math.round(rawWindGust)} mph Gusts`;
+           } else {
+              titleText = `${Math.round(windSpeed)} mph`;
+           }
         }
 
         item.innerHTML = `
@@ -5920,8 +5976,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const windTitle = labelsContainer4_1.querySelector('.label-title-2');
       if (windTitle && data && data.current) {
          const windSpeed = data.current.wind_speed || 0;
-         const windGust = data.current.wind_gust || windSpeed;
-         windTitle.innerText = `${Math.round(windGust)} mph Gusts`;
+         const rawWindGust = data.current.wind_gust || windSpeed;
+         if (rawWindGust - windSpeed >= 5) {
+            windTitle.innerText = `${Math.round(rawWindGust)} mph Gusts`;
+         } else {
+            windTitle.innerText = `${Math.round(windSpeed)} mph`;
+         }
       }
     }
 
@@ -6700,7 +6760,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // Create and update the wind dots row (pill + 60 dots)
   function updateWindDotsRow(data) {
     const windSpeed = data?.current?.wind_speed || 0;
-    const windGust = data?.current?.wind_gust || windSpeed;
+    const rawWindGust = data?.current?.wind_gust || windSpeed;
+    const windGust = (rawWindGust - windSpeed >= 5) ? rawWindGust : windSpeed;
     const currentTemp = data?.current?.temp || null;
     
     console.log(`%c[WIND TEST] Raw API Speed: ${data?.current?.wind_speed} mph | Raw API Gust: ${data?.current?.wind_gust} mph`, 'background: #222; color: #00ffff; font-size: 16px; padding: 4px;');
