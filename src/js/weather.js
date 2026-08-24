@@ -1504,7 +1504,7 @@ import weatherConditions from '../data/weather-conditions.json';
 
     // Determine whether stem is pointing upwards (above the middle) or downwards (below the middle)
     const windDeg = parseFloat(data?.current?.wind_deg);
-    const ARROW_OFFSET = -180;
+    const ARROW_OFFSET = 0;
     const displayDeg = !isNaN(windDeg) ? (windDeg + ARROW_OFFSET) : 0;
     const normalizedDeg = ((displayDeg % 360) + 360) % 360;
     const isStemAboveMiddle = (normalizedDeg <= 90 || normalizedDeg >= 270);
@@ -10927,7 +10927,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const deg = parseFloat(windDeg);
     if (!isNaN(deg)) {
       // EDITABLE: Arrow orientation offset - adjust if arrow doesn't align with actual wind direction
-      const ARROW_OFFSET = -180; // Calibrated so 190° from API shows as 10° on screen
+      const ARROW_OFFSET = 0; // Calibrated to point into the wind per meteorological convention
       const displayDeg = deg + ARROW_OFFSET;
       
       // Calculate or update accumulated rotation for spin effect
@@ -11018,8 +11018,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
     // Ensure windDeg is a number
     const deg = parseFloat(windDeg);
     if (!isNaN(deg)) {
-      console.log(`Updating wind rotation: raw=${windDeg}, parsed=${deg} deg (applying ${deg + 180} deg)`);
-      overlay.style.transform = `rotate(${deg + 180}deg)`;
+      console.log(`Updating wind rotation: raw=${windDeg}, parsed=${deg} deg (applying ${deg} deg)`);
+      overlay.style.transform = `rotate(${deg}deg)`;
       // Add title for debugging/visibility
       overlay.title = `Wind Direction: ${deg}°`;
     } else {
