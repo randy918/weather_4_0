@@ -3708,6 +3708,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const FEELS_LIKE_BOTTOM_MARGIN = '0vw';   // EDITABLE: Gap BELOW the whole "feels like" line
   const FEELS_LIKE_Y_OFFSET = '0vw';        // EDITABLE: Tight vertical nudge (positive = down, negative = up)
   const FEELS_LIKE_VAL_Y_OFFSET = '0vw';    // EDITABLE: Tight vertical nudge for ONLY the feels-like temp value
+  const FEELS_LIKE_DIFF_THRESHOLD = 5;      // EDITABLE: Minimum degree difference (+/-) required to show "feels like"
   
   const FEELS_LIKE_TEXT_SIZE_DEFAULT = '5vw';   // EDITABLE: Standard size of the feels-like label text (single mode)
   const FEELS_LIKE_TEMP_SIZE_DEFAULT = '7.25vw'; // EDITABLE: ENLARGED size of feels-like temp (single mode) when diff >= 10
@@ -3859,6 +3860,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const feelsLike = data?.current?.feels_like;
     const currentTemp = data?.current?.temp;
 
+    // Check whether feels-like is significant (5+ degrees away from current temp)
+    const hasSignificantFeelsLike = typeof feelsLike === 'number' && 
+                                   typeof currentTemp === 'number' && 
+                                   Math.abs(Math.round(feelsLike) - Math.round(currentTemp)) >= FEELS_LIKE_DIFF_THRESHOLD;
+
     // Determine active size based on whether feels-like is 10+ degrees away from current temp
     let activeTempSizeDefault = FEELS_LIKE_TEXT_SIZE_DEFAULT;
     let activeTempSizeDual = FEELS_LIKE_TEXT_SIZE_DUAL;
@@ -3879,7 +3885,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     el.style.setProperty('--feels-like-temp-size-dual', activeTempSizeDual);
     el.style.transform = `translate(var(--middle-text-x-offset, 0vw), var(--feels-like-y-offset, 0vw))`;
     
-    if (typeof feelsLike === 'number') {
+    if (typeof currentTemp === 'number' || typeof feelsLike === 'number') {
       // --- EDITABLE: "feels like" text styles ---
       // Default View (Single Temp)
       const FEELS_LIKE_LETTER_SPACING_DEFAULT = '-.225vw';
@@ -3895,7 +3901,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const FEELS_LIKE_TEMP_LETTER_SPACING_DUAL = '-0.08vw'; // EDITABLE: Kerning for feels-like temp value
       const FEELS_LIKE_HUNDREDS_ONE_LETTER_SPACING_DUAL = '-0.25vw'; // EDITABLE: Additional kerning for the "first 1" in hundreds
 
-      const dynamicColor = tempToColor(feelsLike) || 'inherit';
+      const dynamicColor = (typeof feelsLike === 'number' ? tempToColor(feelsLike) : null) || 'inherit';
       
       // Check difference based on rounded display values (Disabled: glow turned off as requested)
       let isHotGlow = false;
@@ -3928,25 +3934,31 @@ Plan ahead for significantly warmer conditions tomorrow!`
         feelsLikeContainer = el.querySelector('.feels-like-val-container');
       }
 
-      // Update labelEl
-      if (displayUnit === 'BOTH') {
-        labelEl.style.fontFamily = "'light', sans-serif";
-        labelEl.style.fontWeight = 'normal';
-        labelEl.style.fontSize = FEELS_LIKE_TEXT_SIZE_DUAL;
-        labelEl.style.letterSpacing = FEELS_LIKE_LETTER_SPACING_DUAL;
-        labelEl.style.marginLeft = FEELS_LIKE_MARGIN_LEFT_DUAL;
-        labelEl.style.marginRight = FEELS_LIKE_MARGIN_RIGHT_DUAL;
-        labelEl.style.color = 'inherit';
-        labelEl.textContent = 'feels like';
+      // Update labelEl (only show if feels like is significant)
+      if (hasSignificantFeelsLike) {
+        labelEl.style.display = 'inline';
+        if (displayUnit === 'BOTH') {
+          labelEl.style.fontFamily = "'light', sans-serif";
+          labelEl.style.fontWeight = 'normal';
+          labelEl.style.fontSize = FEELS_LIKE_TEXT_SIZE_DUAL;
+          labelEl.style.letterSpacing = FEELS_LIKE_LETTER_SPACING_DUAL;
+          labelEl.style.marginLeft = FEELS_LIKE_MARGIN_LEFT_DUAL;
+          labelEl.style.marginRight = FEELS_LIKE_MARGIN_RIGHT_DUAL;
+          labelEl.style.color = 'inherit';
+          labelEl.textContent = 'feels like';
+        } else {
+          labelEl.style.fontFamily = "'light', sans-serif";
+          labelEl.style.fontWeight = 'normal';
+          labelEl.style.fontSize = FEELS_LIKE_TEXT_SIZE_DEFAULT;
+          labelEl.style.letterSpacing = FEELS_LIKE_LETTER_SPACING_DEFAULT;
+          labelEl.style.marginLeft = FEELS_LIKE_MARGIN_LEFT_DEFAULT;
+          labelEl.style.marginRight = FEELS_LIKE_MARGIN_RIGHT_DEFAULT;
+          labelEl.style.color = 'inherit';
+          labelEl.textContent = 'feels like';
+        }
       } else {
-        labelEl.style.fontFamily = "'light', sans-serif";
-        labelEl.style.fontWeight = 'normal';
-        labelEl.style.fontSize = FEELS_LIKE_TEXT_SIZE_DEFAULT;
-        labelEl.style.letterSpacing = FEELS_LIKE_LETTER_SPACING_DEFAULT;
-        labelEl.style.marginLeft = FEELS_LIKE_MARGIN_LEFT_DEFAULT;
-        labelEl.style.marginRight = FEELS_LIKE_MARGIN_RIGHT_DEFAULT;
-        labelEl.style.color = 'inherit';
-        labelEl.textContent = 'feels like';
+        labelEl.style.display = 'none';
+        labelEl.textContent = '';
       }
 
       const currClr = typeof currentTemp === 'number' ? (tempToColor(currentTemp) || 'white') : 'white';
@@ -3974,40 +3986,45 @@ Plan ahead for significantly warmer conditions tomorrow!`
         currentTempContainer.innerHTML = '';
       }
 
-      // Update Feels Like Container
-      feelsLikeContainer.style.display = 'inline-flex';
-      if (glowClass) {
-        if (!feelsLikeContainer.classList.contains(glowClass)) feelsLikeContainer.className = `feels-like-val-container ${glowClass}`;
-      } else {
-        feelsLikeContainer.className = 'feels-like-val-container';
-      }
-      if (glowStyle) {
-        feelsLikeContainer.style.setProperty('--feels-glow-color', glowColor);
-      }
-      feelsLikeContainer.style.transform = `translateY(var(--feels-like-val-y-offset, 0vw))`;
-      feelsLikeContainer.style.fontFamily = displayUnit === 'BOTH' ? "'boldcond', sans-serif" : "'bold', sans-serif";
-      feelsLikeContainer.style.fontSize = displayUnit === 'BOTH' ? 'var(--feels-like-temp-size-dual, 6.25vw)' : 'var(--feels-like-temp-size-default, 6.25vw)';
-      
-      const activeSpacing = displayUnit === 'BOTH' ? FEELS_LIKE_TEMP_LETTER_SPACING_DUAL : FEELS_LIKE_TEMP_LETTER_SPACING_DEFAULT;
-      feelsLikeContainer.style.letterSpacing = activeSpacing;
-      el.style.setProperty('--feels-like-temp-letter-spacing', activeSpacing);
+      // Update Feels Like Container (only show if feels like is significant)
+      if (hasSignificantFeelsLike) {
+        feelsLikeContainer.style.display = 'inline-flex';
+        if (glowClass) {
+          if (!feelsLikeContainer.classList.contains(glowClass)) feelsLikeContainer.className = `feels-like-val-container ${glowClass}`;
+        } else {
+          feelsLikeContainer.className = 'feels-like-val-container';
+        }
+        if (glowStyle) {
+          feelsLikeContainer.style.setProperty('--feels-glow-color', glowColor);
+        }
+        feelsLikeContainer.style.transform = `translateY(var(--feels-like-val-y-offset, 0vw))`;
+        feelsLikeContainer.style.fontFamily = displayUnit === 'BOTH' ? "'boldcond', sans-serif" : "'bold', sans-serif";
+        feelsLikeContainer.style.fontSize = displayUnit === 'BOTH' ? 'var(--feels-like-temp-size-dual, 6.25vw)' : 'var(--feels-like-temp-size-default, 6.25vw)';
+        
+        const activeSpacing = displayUnit === 'BOTH' ? FEELS_LIKE_TEMP_LETTER_SPACING_DUAL : FEELS_LIKE_TEMP_LETTER_SPACING_DEFAULT;
+        feelsLikeContainer.style.letterSpacing = activeSpacing;
+        el.style.setProperty('--feels-like-temp-letter-spacing', activeSpacing);
 
-      const activeHundredsOneSpacing = displayUnit === 'BOTH' ? FEELS_LIKE_HUNDREDS_ONE_LETTER_SPACING_DUAL : FEELS_LIKE_HUNDREDS_ONE_LETTER_SPACING_DEFAULT;
-      el.style.setProperty('--hundreds-one-margin-right', activeHundredsOneSpacing);
+        const activeHundredsOneSpacing = displayUnit === 'BOTH' ? FEELS_LIKE_HUNDREDS_ONE_LETTER_SPACING_DUAL : FEELS_LIKE_HUNDREDS_ONE_LETTER_SPACING_DEFAULT;
+        el.style.setProperty('--hundreds-one-margin-right', activeHundredsOneSpacing);
 
-      feelsLikeContainer.style.color = dynamicColor;
-      feelsLikeContainer.style.transition = 'color 0.5s ease';
-      
-      let feelsLikeText = '';
-      if (displayUnit === 'BOTH') {
-        const fF = Math.round(feelsLike);
-        const fC = Math.round((feelsLike - 32) * 5 / 9);
-        feelsLikeText = `${fF}${formatSlash()}${fC}`;
+        feelsLikeContainer.style.color = dynamicColor;
+        feelsLikeContainer.style.transition = 'color 0.5s ease';
+        
+        let feelsLikeText = '';
+        if (displayUnit === 'BOTH') {
+          const fF = Math.round(feelsLike);
+          const fC = Math.round((feelsLike - 32) * 5 / 9);
+          feelsLikeText = `${fF}${formatSlash()}${fC}`;
+        } else {
+          const displayFeelsLike = displayUnit === 'C' ? (feelsLike - 32) * 5 / 9 : feelsLike;
+          feelsLikeText = `${Math.round(displayFeelsLike)}°`;
+        }
+        updateOdometer(feelsLikeContainer, feelsLikeText);
       } else {
-        const displayFeelsLike = displayUnit === 'C' ? (feelsLike - 32) * 5 / 9 : feelsLike;
-        feelsLikeText = `${Math.round(displayFeelsLike)}°`;
+        feelsLikeContainer.style.display = 'none';
+        feelsLikeContainer.innerHTML = '';
       }
-      updateOdometer(feelsLikeContainer, feelsLikeText);
 
       el.style.color = tempToColor(currentTemp) || 'inherit';
       el.style.marginTop = '1.5vw'; // Unconditionally force the larger top margin
