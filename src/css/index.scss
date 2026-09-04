@@ -1446,3 +1446,26 @@ main {
     transform-origin: 50% 50% !important;
     animation: celestial-orbit 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
 }
+
+// Passive Versioning display
+.weather-version {
+    position: relative;
+    width: 100%;
+    text-align: center;
+    z-index: 15;
+    pointer-events: none;
+    font-family: var(--weather-version-font-family, 'light', sans-serif);
+    font-size: var(--weather-version-font-size-desktop, 5vw);
+    letter-spacing: var(--weather-version-letter-spacing-desktop, -0.05vw);
+    margin-top: var(--weather-version-margin-top-desktop, 1.5vw);
+    margin-bottom: var(--weather-version-margin-bottom-desktop, 1.5vw);
+    color: var(--weather-version-color, var(--temp-color, #ffffff));
+    transition: color 0.5s ease, opacity 1s ease;
+
+    @media (max-width: 767px) {
+        font-size: var(--weather-version-font-size-mobile, 5vw);
+        letter-spacing: var(--weather-version-letter-spacing-mobile, -0.05vw);
+        margin-top: var(--weather-version-margin-top-mobile, 2vw);
+        margin-bottom: var(--weather-version-margin-bottom-mobile, 2vw);
+    }
+}

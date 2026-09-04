@@ -1037,6 +1037,9 @@ import weatherConditions from '../data/weather-conditions.json';
       // Only set on document root for current temperature (not high/low)
       if (isCurrentTemp) {
         document.documentElement.style.setProperty('--temp-color', color);
+        if (typeof updateVersionDisplay === 'function') {
+          updateVersionDisplay(temp);
+        }
       }
     } else {
       el.style.removeProperty('--temp-color');
@@ -3708,7 +3711,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const FEELS_LIKE_BOTTOM_MARGIN = '0vw';   // EDITABLE: Gap BELOW the whole "feels like" line
   const FEELS_LIKE_Y_OFFSET = '0vw';        // EDITABLE: Tight vertical nudge (positive = down, negative = up)
   const FEELS_LIKE_VAL_Y_OFFSET = '0vw';    // EDITABLE: Tight vertical nudge for ONLY the feels-like temp value
-  const FEELS_LIKE_DIFF_THRESHOLD = 5;      // EDITABLE: Minimum degree difference (+/-) required to show "feels like"
+  const FEELS_LIKE_DIFF_THRESHOLD = 10;      // EDITABLE: Minimum degree difference (+/-) required to show "feels like"
   
   const FEELS_LIKE_TEXT_SIZE_DEFAULT = '5vw';   // EDITABLE: Standard size of the feels-like label text (single mode)
   const FEELS_LIKE_TEMP_SIZE_DEFAULT = '7.25vw'; // EDITABLE: ENLARGED size of feels-like temp (single mode) when diff >= 10
@@ -4050,7 +4053,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // Line 4: The custom derived phrase (e.g., "Raw.")
   const DERIVED_DESC_MARGIN_TOP_DESKTOP = '-1.5vw';    // EDITABLE Desktop: Space ABOVE the 4th line
   const DERIVED_DESC_MARGIN_TOP_MOBILE = '-1.5vw';     // EDITABLE Mobile: Space ABOVE the 4th line
-  const DERIVED_DESC_MARGIN_BOTTOM_DESKTOP = '2.2vw';  // EDITABLE Desktop: Space BELOW the 4th line / gap above summary
+  const DERIVED_DESC_MARGIN_BOTTOM_DESKTOP = '-1vw';  // EDITABLE Desktop: Space BELOW the 4th line / gap above summary
   const DERIVED_DESC_MARGIN_BOTTOM_MOBILE = '3.0vw';   // EDITABLE Mobile: Space BELOW the 4th line / gap above summary
 
   // Create and update weather description element
@@ -4885,6 +4888,29 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   const LAST_UPDATED_MARGIN_TOP = LOCATION_GROUP_MARGIN_BOTTOM; // EDITABLE: Top offset pushing App Last Updated note below location switcher
 
+  // ==========================================
+  // --- EDITABLE: Passive Versioning Config (JCV) ---
+  // ==========================================
+  const VERSION_NUMBER = '1000';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
+
+  // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
+  const VERSION_FONT_SIZE_DESKTOP = '5vw';         // EDITABLE Desktop: Font size (matches Tulsa/Traverse City 5vw)
+  const VERSION_FONT_SIZE_MOBILE  = '5vw';         // EDITABLE Mobile: Font size
+  const VERSION_FONT_FAMILY       = "'light', sans-serif"; // EDITABLE: Font family (matches Tulsa/Traverse City)
+  const VERSION_LETTER_SPACING_DESKTOP = '-0.05vw';// EDITABLE Desktop: Kerning / letter spacing (matches Tulsa/Traverse City)
+  const VERSION_LETTER_SPACING_MOBILE  = '-0.05vw';// EDITABLE Mobile: Kerning / letter spacing
+
+  // Space above and below (JCV editable attributes)
+  const VERSION_MARGIN_TOP_DESKTOP    = '1.5vw';   // EDITABLE Desktop: Space ABOVE version (gap below F/C row)
+  const VERSION_MARGIN_TOP_MOBILE     = '2vw';     // EDITABLE Mobile: Space ABOVE version
+  const VERSION_MARGIN_BOTTOM_DESKTOP = '1.5vw';   // EDITABLE Desktop: Space BELOW version (gap above Weather last updated)
+  const VERSION_MARGIN_BOTTOM_MOBILE  = '2vw';     // EDITABLE Mobile: Space BELOW version
+
+  // Color & Opacity (uses current temperature color by default)
+  const VERSION_COLOR_OVERRIDE = '';               // EDITABLE: Custom color override (leave '' to use current temperature color)
+  const VERSION_OPACITY        = '1.0';            // EDITABLE: Opacity
+
   // Store the current temperature for use by countdown updates
   let currentTempForDots = null;
 
@@ -5006,13 +5032,20 @@ Plan ahead for significantly warmer conditions tomorrow!`
       btnContainer.appendChild(btn2);
     }
 
-    // Position/Append formats buttons centered at the very bottom after last updated
-    const targetParent = document.querySelector('main.content') || document.body;
+    // Position/Append formats buttons below location switcher
+    const locSwitcher = document.getElementById('weather-location-switcher');
+    const versionEl = document.getElementById('weather-version');
     const lastUpdatedEl = document.getElementById('weather-last-updated');
-    if (lastUpdatedEl) {
-      if (lastUpdatedEl.nextSibling !== btnContainer) {
-        lastUpdatedEl.parentNode.insertBefore(btnContainer, lastUpdatedEl.nextSibling);
+    const targetParent = document.querySelector('main.content') || document.body;
+    
+    if (locSwitcher && locSwitcher.parentNode) {
+      if (locSwitcher.nextSibling !== btnContainer) {
+        locSwitcher.parentNode.insertBefore(btnContainer, locSwitcher.nextSibling);
       }
+    } else if (versionEl && versionEl.parentNode) {
+      versionEl.parentNode.insertBefore(btnContainer, versionEl);
+    } else if (lastUpdatedEl && lastUpdatedEl.parentNode) {
+      lastUpdatedEl.parentNode.insertBefore(btnContainer, lastUpdatedEl);
     } else {
       if (btnContainer.parentNode !== targetParent) {
         targetParent.appendChild(btnContainer);
@@ -5031,7 +5064,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     btnContainer.style.alignItems = 'center';
     btnContainer.style.gap = TEMP_BTN_GAP;
     btnContainer.style.width = '100%';
-    btnContainer.style.paddingBottom = '6vw'; // Responsive padding to keep a nice gap at the bottom of the page
+    btnContainer.style.paddingBottom = '0vw'; // Padding handled cleanly by version margin-top
     
     const btns = btnContainer.querySelectorAll('.temp-btn');
     if (btns.length >= 2) {
@@ -7790,18 +7823,27 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }
     }
 
+    // Render or update the Version indicator directly BELOW format buttons
+    updateVersionDisplay();
+    const versionEl = document.getElementById('weather-version');
+    if (versionEl && btnContainer && btnContainer.parentNode) {
+      if (btnContainer.nextSibling !== versionEl) {
+        btnContainer.parentNode.insertBefore(versionEl, btnContainer.nextSibling);
+      }
+    }
+
     if (span) {
       span.innerHTML = `Weather last updated: ${text}<br>App last updated: ${appBuildDate}<br>Radar data from RainViewer • Weather data from OpenWeather`;
       span.style.fontSize = '1.6875vw';
       span.style.color = 'white';
       span.style.opacity = '1';
-      span.style.marginTop = LAST_UPDATED_MARGIN_TOP;
+      span.style.marginTop = '0vw';
     } else {
       span = document.createElement('div');
       span.id = id;
       span.innerHTML = `Weather last updated: ${text}<br>App last updated: ${appBuildDate}<br>Radar data from RainViewer • Weather data from OpenWeather`;
       span.style.position = 'relative'; // Normal document flow
-      span.style.margin = `${LAST_UPDATED_MARGIN_TOP} auto 0`;
+      span.style.margin = `0 auto 0`;
       span.style.paddingBottom = '4vw';
       span.style.width = '100%';
       span.style.fontSize = '1.6875vw'; // 75% of 2.25vw
@@ -7815,8 +7857,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
       span.style.zIndex = '10';
     }
 
-    // Position #weather-last-updated at the VERY BOTTOM below format buttons / location switcher
-    const bottomTarget = btnContainer || locSwitcher;
+    // Position #weather-last-updated at the VERY BOTTOM below version / format buttons / location switcher
+    const bottomTarget = versionEl || btnContainer || locSwitcher;
     if (bottomTarget && bottomTarget.parentNode) {
       if (bottomTarget.nextSibling !== span) {
         bottomTarget.parentNode.insertBefore(span, bottomTarget.nextSibling);
@@ -7926,6 +7968,96 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       container.appendChild(cityEl);
     });
+  }
+
+  // Helper to render and update the passive version number indicator (positioned between F/C and Last Updated)
+  function updateVersionDisplay(temp = null) {
+    const id = 'weather-version';
+    let el = document.getElementById(id);
+    const mainContainer = document.querySelector('main') || document.body;
+
+    const isMobile = window.innerWidth <= 767;
+    const versionFontSize = isMobile ? VERSION_FONT_SIZE_MOBILE : VERSION_FONT_SIZE_DESKTOP;
+    const versionMarginTop = isMobile ? VERSION_MARGIN_TOP_MOBILE : VERSION_MARGIN_TOP_DESKTOP;
+    const versionMarginBottom = isMobile ? VERSION_MARGIN_BOTTOM_MOBILE : VERSION_MARGIN_BOTTOM_DESKTOP;
+    const versionLetterSpacing = isMobile ? VERSION_LETTER_SPACING_MOBILE : VERSION_LETTER_SPACING_DESKTOP;
+
+    // Set CSS custom properties on documentElement for styling & JCV responsiveness
+    document.documentElement.style.setProperty('--weather-version-font-size-desktop', VERSION_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--weather-version-font-size-mobile', VERSION_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--weather-version-margin-top-desktop', VERSION_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--weather-version-margin-top-mobile', VERSION_MARGIN_TOP_MOBILE);
+    document.documentElement.style.setProperty('--weather-version-margin-bottom-desktop', VERSION_MARGIN_BOTTOM_DESKTOP);
+    document.documentElement.style.setProperty('--weather-version-margin-bottom-mobile', VERSION_MARGIN_BOTTOM_MOBILE);
+    document.documentElement.style.setProperty('--weather-version-letter-spacing-desktop', VERSION_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--weather-version-letter-spacing-mobile', VERSION_LETTER_SPACING_MOBILE);
+    document.documentElement.style.setProperty('--weather-version-font-family', VERSION_FONT_FAMILY);
+
+    // Determine current temperature color
+    let tempVal = (typeof temp === 'number' && !Number.isNaN(temp)) ? temp : (lastWeatherData?.current?.temp ?? currentTempForDots);
+    if (typeof tempVal !== 'number' || Number.isNaN(tempVal)) {
+      try {
+        const stored = localStorage.getItem('weather_last_temp_raw');
+        if (stored !== null) {
+          const parsed = parseFloat(stored);
+          if (!Number.isNaN(parsed)) tempVal = parsed;
+        }
+      } catch (e) {}
+    }
+
+    let color = VERSION_COLOR_OVERRIDE;
+    if (!color) {
+      if (typeof tempVal === 'number' && !Number.isNaN(tempVal)) {
+        color = tempToColor(tempVal);
+      } else {
+        const rootColor = document.documentElement.style.getPropertyValue('--temp-color');
+        if (rootColor && rootColor.trim() !== '') {
+          color = rootColor.trim();
+        } else {
+          color = 'white';
+        }
+      }
+    }
+    document.documentElement.style.setProperty('--weather-version-color', color);
+
+    if (!el) {
+      el = document.createElement('div');
+      el.id = id;
+      el.className = 'weather-version';
+      el.style.position = 'relative';
+      el.style.width = '100%';
+      el.style.textAlign = 'center';
+      el.style.zIndex = '15';
+      el.style.pointerEvents = 'none';
+      el.style.transition = 'color 0.5s ease, opacity 1s ease';
+    }
+
+    el.textContent = `${VERSION_PREFIX}${VERSION_NUMBER}`;
+    el.style.fontFamily = VERSION_FONT_FAMILY;
+    el.style.fontSize = versionFontSize;
+    el.style.letterSpacing = versionLetterSpacing;
+    el.style.marginTop = versionMarginTop;
+    el.style.marginBottom = versionMarginBottom;
+    el.style.color = color;
+    el.style.opacity = VERSION_OPACITY;
+
+    // Position correctly in DOM: after #temp-format-buttons (or #weather-location-switcher)
+    const btnContainer = document.getElementById('temp-format-buttons');
+    const locSwitcher = document.getElementById('weather-location-switcher');
+    const lastUpdatedEl = document.getElementById('weather-last-updated');
+    const anchor = btnContainer || locSwitcher;
+
+    if (anchor && anchor.parentNode) {
+      if (anchor.nextSibling !== el) {
+        anchor.parentNode.insertBefore(el, anchor.nextSibling);
+      }
+    } else if (lastUpdatedEl && lastUpdatedEl.parentNode) {
+      if (lastUpdatedEl.previousSibling !== el) {
+        lastUpdatedEl.parentNode.insertBefore(el, lastUpdatedEl);
+      }
+    } else if (!el.parentNode) {
+      mainContainer.appendChild(el);
+    }
   }
 
   // Helper to persistently record missing assets to a To-Do list
@@ -9611,12 +9743,22 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const id = 'weather-city-name';
     let el = document.getElementById(id);
     
-    // --- EDITABLE: City Name Display Attributes ---
-    const CITY_FONT_SIZE = '5vw';
-    const CITY_FONT_FAMILY = "'light', sans-serif"; // e.g., 'light', 'bold', 'Weather'
-    const CITY_MARGIN_TOP = '2vw';    // Space above the city name
-    const CITY_MARGIN_BOTTOM = '-4.5vw'; // Space below the city name
-    const CITY_LETTER_SPACING = '-0.05vw'; // Gap between letters (e.g., '0.1vw', '-0.05vw', 'normal')
+    // --- EDITABLE: City Name Display Attributes (Desktop & Mobile) ---
+    const CITY_FONT_SIZE_DESKTOP = '5vw';          // EDITABLE Desktop: City name font size
+    const CITY_FONT_SIZE_MOBILE = '5vw';           // EDITABLE Mobile: City name font size
+    const CITY_FONT_FAMILY = "'light', sans-serif";// EDITABLE: Base font family (e.g., 'light', 'bold', 'Weather')
+    const CITY_MARGIN_TOP_DESKTOP = '2vw';         // EDITABLE Desktop: Space ABOVE the city name
+    const CITY_MARGIN_TOP_MOBILE = '2vw';          // EDITABLE Mobile: Space ABOVE the city name
+    const CITY_MARGIN_BOTTOM_DESKTOP = '-2.5vw';   // EDITABLE Desktop: Space BELOW the city name
+    const CITY_MARGIN_BOTTOM_MOBILE = '-4.5vw';    // EDITABLE Mobile: Space BELOW the city name
+    const CITY_LETTER_SPACING_DESKTOP = '-0.05vw'; // EDITABLE Desktop: Gap between letters
+    const CITY_LETTER_SPACING_MOBILE = '-0.05vw';  // EDITABLE Mobile: Gap between letters
+
+    const isMobile = window.innerWidth <= 767;
+    const cityFontSize = isMobile ? CITY_FONT_SIZE_MOBILE : CITY_FONT_SIZE_DESKTOP;
+    const cityMarginTop = isMobile ? CITY_MARGIN_TOP_MOBILE : CITY_MARGIN_TOP_DESKTOP;
+    const cityMarginBottom = isMobile ? CITY_MARGIN_BOTTOM_MOBILE : CITY_MARGIN_BOTTOM_DESKTOP;
+    const cityLetterSpacing = isMobile ? CITY_LETTER_SPACING_MOBILE : CITY_LETTER_SPACING_DESKTOP;
 
     if (!el) {
       el = document.createElement('div');
@@ -9645,10 +9787,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const tempVal = data?.current?.temp ?? lastWeatherData?.current?.temp;
     const is100s = typeof tempVal === 'number' && tempVal >= 100 && tempVal < 110;
     el.style.fontFamily = is100s ? "'medium', sans-serif" : CITY_FONT_FAMILY;
-    el.style.fontSize = CITY_FONT_SIZE;
-    el.style.marginTop = CITY_MARGIN_TOP;
-    el.style.marginBottom = CITY_MARGIN_BOTTOM;
-    el.style.letterSpacing = CITY_LETTER_SPACING;
+    el.style.fontSize = cityFontSize;
+    el.style.marginTop = cityMarginTop;
+    el.style.marginBottom = cityMarginBottom;
+    el.style.letterSpacing = cityLetterSpacing;
     el.style.transform = 'translateX(var(--middle-text-x-offset, 0vw))';
 
     // Apply color associated strictly with current temperature + 10
@@ -10967,6 +11109,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       setTimeout(() => {
         updateTempPointer(lastWeatherData);
         updateDailySummary(lastWeatherData);
+        updateVersionDisplay();
         // updateWindDotsRow(lastWeatherData); // Reposition wind arrow
       }, 100);
     }
