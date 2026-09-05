@@ -761,9 +761,9 @@ import weatherConditions from '../data/weather-conditions.json';
   const STARFIELD_CENTER_X_MOBILE = '50vw';         // EDITABLE Mobile: Horizontal position of circle center
 
   // 4. Slow Rotation Around Center (Seconds per 360° turn & direction)
-  const STARFIELD_ROTATION_SPEED_S_DESKTOP = 480;   // EDITABLE Desktop: Seconds per 360° rotation (480s = 8 minutes)
-  const STARFIELD_ROTATION_SPEED_S_MOBILE = 480;    // EDITABLE Mobile: Seconds per 360° rotation
-  const STARFIELD_ROTATION_DIRECTION_DESKTOP = 'normal'; // EDITABLE Desktop: 'normal' (clockwise) or 'reverse' (counter-clockwise)
+  const STARFIELD_ROTATION_SPEED_S_DESKTOP = 500;   // EDITABLE Desktop: Seconds per 360° rotation (480s = 8 minutes)
+  const STARFIELD_ROTATION_SPEED_S_MOBILE = 1480;    // EDITABLE Mobile: Seconds per 360° rotation
+  const STARFIELD_ROTATION_DIRECTION_DESKTOP = 'reverse'; // EDITABLE Desktop: 'normal' (clockwise) or 'reverse' (counter-clockwise)
   const STARFIELD_ROTATION_DIRECTION_MOBILE = 'normal';  // EDITABLE Mobile: 'normal' or 'reverse'
 
   // 5. Vertical Square Mask (Opacity going 100% to 0% vertically going down)
@@ -790,7 +790,120 @@ import weatherConditions from '../data/weather-conditions.json';
   const STARFIELD_OUT_OF_FOCUS_BLUR_DESKTOP = 4.0;  // EDITABLE Desktop: Blur radius for out-of-focus stars in px
   const STARFIELD_OUT_OF_FOCUS_BLUR_MOBILE = 3.0;   // EDITABLE Mobile: Blur radius for out-of-focus stars in px
 
+  // 9. Dial & Doppler Interior Masking (Mask out stars inside dials and radar circles)
+  let STARFIELD_MASK_DIALS_ENABLED = true;               // EDITABLE: Set true to mask out stars behind dials
+  const STARFIELD_MASK_WEATHER_CIRCLES = true;           // EDITABLE: Set true to also mask out stars behind the 2 large radar/weather circles
+  const STARFIELD_DIAL_MASK_PERCENT_DESKTOP = 100;       // EDITABLE Desktop: Dial cutout radius percentage (100 = full dial)
+  const STARFIELD_DIAL_MASK_PERCENT_MOBILE = 100;        // EDITABLE Mobile: Dial cutout radius percentage
+  const STARFIELD_DOPPLER_MASK_PERCENT_DESKTOP = 100;    // EDITABLE Desktop: Doppler circle cutout radius percentage
+  const STARFIELD_DOPPLER_MASK_PERCENT_MOBILE = 100;     // EDITABLE Mobile: Doppler circle cutout radius percentage
+
+  // 10. Startup Star Temperature Tints (Percentage of stars tinted by current & adjacent temperatures)
+  const STARFIELD_COLOR_PERCENT_CURRENT_TEMP_DESKTOP = 20; // EDITABLE Desktop: % of stars tinted with current temperature color
+  const STARFIELD_COLOR_PERCENT_CURRENT_TEMP_MOBILE = 20;  // EDITABLE Mobile: % of stars tinted with current temperature color
+  const STARFIELD_COLOR_PERCENT_PLUS10_TEMP_DESKTOP = 10;  // EDITABLE Desktop: % of stars tinted with (current temp + 10) color
+  const STARFIELD_COLOR_PERCENT_PLUS10_TEMP_MOBILE = 10;   // EDITABLE Mobile: % of stars tinted with (current temp + 10) color
+  const STARFIELD_COLOR_PERCENT_MINUS10_TEMP_DESKTOP = 10; // EDITABLE Desktop: % of stars tinted with (current temp - 10) color
+  const STARFIELD_COLOR_PERCENT_MINUS10_TEMP_MOBILE = 10;  // EDITABLE Mobile: % of stars tinted with (current temp - 10) color
+
+  // 11. Individual Star Twinkling & Scintillation (Random twinkling across starfield)
+  let STARFIELD_TWINKLE_ENABLED = true;                  // EDITABLE: Enable/disable individual star twinkling
+  const STARFIELD_TWINKLE_RATIO_DESKTOP = 0.35;          // EDITABLE Desktop: Ratio of stars that twinkle (0.35 = 35%)
+  const STARFIELD_TWINKLE_RATIO_MOBILE = 0.30;           // EDITABLE Mobile: Ratio of stars that twinkle
+  const STARFIELD_TWINKLE_SPEED_MIN_DESKTOP = 0.8;       // EDITABLE Desktop: Min seconds per twinkle cycle (lower = faster twinkle)
+  const STARFIELD_TWINKLE_SPEED_MIN_MOBILE = 0.8;        // EDITABLE Mobile: Min seconds per twinkle cycle
+  const STARFIELD_TWINKLE_SPEED_MAX_DESKTOP = 2.4;       // EDITABLE Desktop: Max seconds per twinkle cycle
+  const STARFIELD_TWINKLE_SPEED_MAX_MOBILE = 2.4;        // EDITABLE Mobile: Max seconds per twinkle cycle
+  const STARFIELD_TWINKLE_DEPTH_DESKTOP = 0.70;          // EDITABLE Desktop: Twinkle dimming depth (0.70 = dips down to 30% brightness)
+  const STARFIELD_TWINKLE_DEPTH_MOBILE = 0.70;           // EDITABLE Mobile: Twinkle dimming depth
+
+  // 12. Random Star Flares (Occasional bright blooming pulses on random stars)
+  let STARFIELD_FLARE_ENABLED = true;                    // EDITABLE: Enable/disable random star flare pulses
+  const STARFIELD_FLARE_INTERVAL_MIN_S_DESKTOP = 4;      // EDITABLE Desktop: Min seconds between random flare events
+  const STARFIELD_FLARE_INTERVAL_MIN_S_MOBILE = 5;       // EDITABLE Mobile: Min seconds between random flare events
+  const STARFIELD_FLARE_INTERVAL_MAX_S_DESKTOP = 9;      // EDITABLE Desktop: Max seconds between random flare events
+  const STARFIELD_FLARE_INTERVAL_MAX_S_MOBILE = 11;      // EDITABLE Mobile: Max seconds between random flare events
+  const STARFIELD_FLARE_DURATION_S_DESKTOP = 2.2;        // EDITABLE Desktop: Duration of each flare bloom in seconds
+  const STARFIELD_FLARE_DURATION_S_MOBILE = 2.0;         // EDITABLE Mobile: Duration of each flare bloom in seconds
+  const STARFIELD_FLARE_SIZE_MULT_DESKTOP = 2.5;         // EDITABLE Desktop: Peak size multiplier during flare bloom
+  const STARFIELD_FLARE_SIZE_MULT_MOBILE = 2.2;          // EDITABLE Mobile: Peak size multiplier during flare bloom
+
+  // 13. Occasional Shooting Stars (Meteors)
+  let STARFIELD_METEOR_ENABLED = true;                   // EDITABLE: Enable/disable occasional shooting stars
+  const STARFIELD_METEOR_INTERVAL_MIN_S_DESKTOP = 25;    // EDITABLE Desktop: Min seconds between shooting star streaks
+  const STARFIELD_METEOR_INTERVAL_MIN_S_MOBILE = 35;     // EDITABLE Mobile: Min seconds between shooting star streaks
+  const STARFIELD_METEOR_INTERVAL_MAX_S_DESKTOP = 60;    // EDITABLE Desktop: Max seconds between shooting star streaks
+  const STARFIELD_METEOR_INTERVAL_MAX_S_MOBILE = 75;     // EDITABLE Mobile: Max seconds between shooting star streaks
+  const STARFIELD_METEOR_LENGTH_DESKTOP = 90;            // EDITABLE Desktop: Streak trail length in px
+  const STARFIELD_METEOR_LENGTH_MOBILE = 65;             // EDITABLE Mobile: Streak trail length in px
+  const STARFIELD_METEOR_SPEED_DESKTOP = 400;            // EDITABLE Desktop: Streak speed in px per second
+  const STARFIELD_METEOR_SPEED_MOBILE = 320;             // EDITABLE Mobile: Streak speed in px per second
+
   let starFieldStars = null;
+  let activeFlare = null;
+  let nextFlareTime = 0;
+  let activeMeteors = [];
+  let nextMeteorTime = 0;
+  let starfieldAnimId = null;
+  let starfieldAnimRunning = false;
+
+  // Helper: Parse hsl(H, S%, L%) into [r, g, b] array
+  function parseHslToRgb(hslStr) {
+    if (!hslStr || typeof hslStr !== 'string') return [255, 255, 255];
+    const match = hslStr.match(/hsl\s*\(\s*([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*\)/i);
+    if (!match) return [255, 255, 255];
+    const h = parseFloat(match[1]) / 360;
+    const s = parseFloat(match[2]) / 100;
+    const l = parseFloat(match[3]) / 100;
+    let r, g, b;
+    if (s === 0) {
+      r = g = b = l;
+    } else {
+      const hue2rgb = (p, q, t) => {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1/6) return p + (q - p) * 6 * t;
+        if (t < 1/2) return q;
+        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+        return p;
+      };
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1/3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1/3);
+    }
+    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+  }
+
+  function getStarfieldTempColors(wData) {
+    const data = wData || lastWeatherData || window.lastWeatherData;
+    const currTemp = (typeof data?.current?.temp === 'number') ? data.current.temp : 72;
+    const colorCurrHsl = (typeof tempToColor === 'function' ? tempToColor(currTemp) : null) || 'hsl(45, 100%, 50%)';
+    const colorPlus10Hsl = (typeof tempToColor === 'function' ? tempToColor(currTemp + 10) : null) || 'hsl(30, 100%, 50%)';
+    const colorMinus10Hsl = (typeof tempToColor === 'function' ? tempToColor(currTemp - 10) : null) || 'hsl(80, 90%, 40%)';
+
+    return {
+      currTemp,
+      rgbCurr: parseHslToRgb(colorCurrHsl),
+      rgbPlus10: parseHslToRgb(colorPlus10Hsl),
+      rgbMinus10: parseHslToRgb(colorMinus10Hsl)
+    };
+  }
+
+  function refreshStarfieldTempColors(data) {
+    if (!starFieldStars || starFieldStars.length === 0) return;
+    const { rgbCurr, rgbPlus10, rgbMinus10 } = getStarfieldTempColors(data);
+    starFieldStars.forEach(star => {
+      if (star.colorType === 'curr') {
+        star.rgb = rgbCurr;
+      } else if (star.colorType === 'plus10') {
+        star.rgb = rgbPlus10;
+      } else if (star.colorType === 'minus10') {
+        star.rgb = rgbMinus10;
+      }
+    });
+  }
 
   function generateStarFieldData() {
     const isPhone = window.innerWidth < 768;
@@ -803,9 +916,36 @@ import weatherConditions from '../data/weather-conditions.json';
     const oofRatio = isPhone ? STARFIELD_OUT_OF_FOCUS_RATIO_MOBILE : STARFIELD_OUT_OF_FOCUS_RATIO_DESKTOP;
     const maxBlur = isPhone ? STARFIELD_OUT_OF_FOCUS_BLUR_MOBILE : STARFIELD_OUT_OF_FOCUS_BLUR_DESKTOP;
 
+    // Temperature colors and percentage distribution
+    const { rgbCurr, rgbPlus10, rgbMinus10 } = getStarfieldTempColors();
+    const pctCurr = isPhone ? STARFIELD_COLOR_PERCENT_CURRENT_TEMP_MOBILE : STARFIELD_COLOR_PERCENT_CURRENT_TEMP_DESKTOP;
+    const pctPlus10 = isPhone ? STARFIELD_COLOR_PERCENT_PLUS10_TEMP_MOBILE : STARFIELD_COLOR_PERCENT_PLUS10_TEMP_DESKTOP;
+    const pctMinus10 = isPhone ? STARFIELD_COLOR_PERCENT_MINUS10_TEMP_MOBILE : STARFIELD_COLOR_PERCENT_MINUS10_TEMP_DESKTOP;
+
+    const numCurr = Math.round(count * (pctCurr / 100));
+    const numPlus10 = Math.round(count * (pctPlus10 / 100));
+    const numMinus10 = Math.round(count * (pctMinus10 / 100));
+
+    const colorAssignments = [];
+    for (let i = 0; i < numCurr; i++) colorAssignments.push('curr');
+    for (let i = 0; i < numPlus10; i++) colorAssignments.push('plus10');
+    for (let i = 0; i < numMinus10; i++) colorAssignments.push('minus10');
+    while (colorAssignments.length < count) colorAssignments.push('natural');
+
+    // Shuffle distribution array so temperature stars are evenly dispersed throughout the night sky
+    for (let i = colorAssignments.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [colorAssignments[i], colorAssignments[j]] = [colorAssignments[j], colorAssignments[i]];
+    }
+
+    // Twinkle parameters
+    const twinkleRatio = isPhone ? STARFIELD_TWINKLE_RATIO_MOBILE : STARFIELD_TWINKLE_RATIO_DESKTOP;
+    const twinkleSpeedMin = isPhone ? STARFIELD_TWINKLE_SPEED_MIN_MOBILE : STARFIELD_TWINKLE_SPEED_MIN_DESKTOP;
+    const twinkleSpeedMax = isPhone ? STARFIELD_TWINKLE_SPEED_MAX_MOBILE : STARFIELD_TWINKLE_SPEED_MAX_DESKTOP;
+
     const stars = [];
     for (let i = 0; i < count; i++) {
-      // Uniform random distribution inside a circle:
+      // Uniform random distribution inside circle:
       const theta = Math.random() * Math.PI * 2;
       const r = Math.sqrt(Math.random());
       const normX = r * Math.cos(theta); // Normalized: -1 to +1
@@ -818,17 +958,31 @@ import weatherConditions from '../data/weather-conditions.json';
       // Opacity / Brightness variation
       const alpha = 0.35 + Math.random() * 0.65;
 
-      // Realistic spectral temperature tints
-      const randColor = Math.random();
+      const colorType = colorAssignments[i] || 'natural';
       let rgb = [255, 255, 255]; // Pure white (default)
-      if (randColor < 0.15) {
-        rgb = [205, 225, 255]; // Subtle blue tint
-      } else if (randColor < 0.30) {
-        rgb = [255, 242, 215]; // Subtle warm amber tint
+
+      if (colorType === 'curr') {
+        rgb = rgbCurr;
+      } else if (colorType === 'plus10') {
+        rgb = rgbPlus10;
+      } else if (colorType === 'minus10') {
+        rgb = rgbMinus10;
+      } else {
+        const randNatural = Math.random();
+        if (randNatural < 0.20) {
+          rgb = [205, 225, 255]; // Subtle celestial blue
+        } else if (randNatural < 0.40) {
+          rgb = [255, 242, 215]; // Subtle warm amber
+        }
       }
 
       const isOutOfFocus = Math.random() < oofRatio;
       const blur = isOutOfFocus ? (1.5 + Math.random() * (maxBlur - 1.5)) : 0;
+
+      // Twinkle properties
+      const isTwinkler = Math.random() < twinkleRatio;
+      const twinklePeriod = twinkleSpeedMin + Math.random() * (twinkleSpeedMax - twinkleSpeedMin);
+      const twinklePhase = Math.random() * Math.PI * 2;
 
       stars.push({
         normX,
@@ -836,15 +990,33 @@ import weatherConditions from '../data/weather-conditions.json';
         size,
         alpha,
         rgb,
+        colorType,
         isOutOfFocus,
-        blur
+        blur,
+        isTwinkler,
+        twinklePeriod,
+        twinklePhase
       });
     }
 
     starFieldStars = stars;
   }
 
-  function drawStarfield() {
+  function scheduleNextFlare(nowSec) {
+    const isPhone = window.innerWidth < 768;
+    const minS = isPhone ? STARFIELD_FLARE_INTERVAL_MIN_S_MOBILE : STARFIELD_FLARE_INTERVAL_MIN_S_DESKTOP;
+    const maxS = isPhone ? STARFIELD_FLARE_INTERVAL_MAX_S_MOBILE : STARFIELD_FLARE_INTERVAL_MAX_S_DESKTOP;
+    nextFlareTime = nowSec + minS + Math.random() * (maxS - minS);
+  }
+
+  function scheduleNextMeteor(nowSec) {
+    const isPhone = window.innerWidth < 768;
+    const minS = isPhone ? STARFIELD_METEOR_INTERVAL_MIN_S_MOBILE : STARFIELD_METEOR_INTERVAL_MIN_S_DESKTOP;
+    const maxS = isPhone ? STARFIELD_METEOR_INTERVAL_MAX_S_MOBILE : STARFIELD_METEOR_INTERVAL_MAX_S_DESKTOP;
+    nextMeteorTime = nowSec + minS + Math.random() * (maxS - minS);
+  }
+
+  function drawStarfield(timestamp) {
     const canvas = document.getElementById('starfield-canvas');
     if (!canvas) return;
 
@@ -858,8 +1030,13 @@ import weatherConditions from '../data/weather-conditions.json';
     const diameterPx = Math.round((dVw / 100) * window.innerWidth);
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.round(diameterPx * dpr);
-    canvas.height = Math.round(diameterPx * dpr);
+    const targetW = Math.round(diameterPx * dpr);
+    const targetH = Math.round(diameterPx * dpr);
+
+    if (canvas.width !== targetW || canvas.height !== targetH) {
+      canvas.width = targetW;
+      canvas.height = targetH;
+    }
 
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -869,35 +1046,107 @@ import weatherConditions from '../data/weather-conditions.json';
     const cx = diameterPx / 2;
     const cy = diameterPx / 2;
     const radius = diameterPx / 2;
+    const nowSec = (timestamp || performance.now()) / 1000;
 
-    starFieldStars.forEach(star => {
+    // Flare management
+    if (STARFIELD_FLARE_ENABLED) {
+      if (!nextFlareTime) scheduleNextFlare(nowSec);
+      if (!activeFlare && nowSec >= nextFlareTime && starFieldStars.length > 0) {
+        const starIdx = Math.floor(Math.random() * starFieldStars.length);
+        const dur = isPhone ? STARFIELD_FLARE_DURATION_S_MOBILE : STARFIELD_FLARE_DURATION_S_DESKTOP;
+        const mult = isPhone ? STARFIELD_FLARE_SIZE_MULT_MOBILE : STARFIELD_FLARE_SIZE_MULT_DESKTOP;
+        activeFlare = {
+          starIndex: starIdx,
+          startTime: nowSec,
+          duration: dur,
+          sizeMult: mult
+        };
+      }
+      if (activeFlare && nowSec >= activeFlare.startTime + activeFlare.duration) {
+        activeFlare = null;
+        scheduleNextFlare(nowSec);
+      }
+    }
+
+    // Meteor management
+    if (STARFIELD_METEOR_ENABLED) {
+      if (!nextMeteorTime) scheduleNextMeteor(nowSec);
+      if (nowSec >= nextMeteorTime) {
+        const angle = (25 + Math.random() * 35) * (Math.PI / 180); // 25° to 60° diagonal streak
+        const speed = isPhone ? STARFIELD_METEOR_SPEED_MOBILE : STARFIELD_METEOR_SPEED_DESKTOP;
+        const length = isPhone ? STARFIELD_METEOR_LENGTH_MOBILE : STARFIELD_METEOR_LENGTH_DESKTOP;
+        const dur = 0.5 + Math.random() * 0.4;
+        const startX = cx + (Math.random() * 2 - 1) * radius * 0.7;
+        const startY = cy + (Math.random() * 2 - 1) * radius * 0.5;
+        activeMeteors.push({
+          x: startX,
+          y: startY,
+          angle,
+          speed,
+          length,
+          startTime: nowSec,
+          duration: dur
+        });
+        scheduleNextMeteor(nowSec);
+      }
+      activeMeteors = activeMeteors.filter(m => nowSec < m.startTime + m.duration);
+    }
+
+    const twinkleDepth = isPhone ? STARFIELD_TWINKLE_DEPTH_MOBILE : STARFIELD_TWINKLE_DEPTH_DESKTOP;
+
+    // Draw stars
+    starFieldStars.forEach((star, idx) => {
       const x = cx + star.normX * radius;
       const y = cy + star.normY * radius;
       const [r, g, b] = star.rgb;
 
+      let currentAlpha = star.alpha;
+      let currentSize = star.size;
+
+      // Apply twinkling
+      if (STARFIELD_TWINKLE_ENABLED && star.isTwinkler) {
+        const wave = 0.5 + 0.5 * Math.sin(nowSec * (2 * Math.PI / star.twinklePeriod) + star.twinklePhase);
+        currentAlpha = star.alpha * (1 - twinkleDepth * (1 - wave));
+      }
+
+      // Apply flare bloom
+      if (activeFlare && activeFlare.starIndex === idx) {
+        const p = (nowSec - activeFlare.startTime) / activeFlare.duration;
+        const flarePulse = Math.sin(p * Math.PI);
+        currentSize = star.size * (1 + (activeFlare.sizeMult - 1) * flarePulse);
+        currentAlpha = Math.min(1.0, star.alpha + 0.5 * flarePulse);
+
+        const flareRadius = currentSize * 3.5;
+        const flareGrad = ctx.createRadialGradient(x, y, 0, x, y, flareRadius);
+        flareGrad.addColorStop(0, `rgba(255, 255, 255, ${0.9 * flarePulse})`);
+        flareGrad.addColorStop(0.3, `rgba(${r}, ${g}, ${b}, ${0.6 * flarePulse})`);
+        flareGrad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+        ctx.fillStyle = flareGrad;
+        ctx.beginPath();
+        ctx.arc(x, y, flareRadius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
       if (star.isOutOfFocus) {
-        // Soft out-of-focus bokeh halo
-        const totalRadius = star.size + star.blur;
+        const totalRadius = currentSize + star.blur;
         const grad = ctx.createRadialGradient(x, y, 0, x, y, totalRadius);
-        grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${star.alpha * 0.85})`);
-        grad.addColorStop(0.4, `rgba(${r}, ${g}, ${b}, ${star.alpha * 0.35})`);
+        grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${currentAlpha * 0.85})`);
+        grad.addColorStop(0.4, `rgba(${r}, ${g}, ${b}, ${currentAlpha * 0.35})`);
         grad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
         ctx.fillStyle = grad;
         ctx.beginPath();
         ctx.arc(x, y, totalRadius, 0, Math.PI * 2);
         ctx.fill();
       } else {
-        // Crisp pinpoint star
-        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${star.alpha})`;
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${currentAlpha})`;
         ctx.beginPath();
-        ctx.arc(x, y, star.size, 0, Math.PI * 2);
+        ctx.arc(x, y, currentSize, 0, Math.PI * 2);
         ctx.fill();
 
-        // Subtle atmospheric glow around larger stars
-        if (star.size > 1.4) {
-          const glowRad = star.size * 2.2;
+        if (currentSize > 1.4) {
+          const glowRad = currentSize * 2.2;
           const grad = ctx.createRadialGradient(x, y, 0, x, y, glowRad);
-          grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${star.alpha * 0.4})`);
+          grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${currentAlpha * 0.4})`);
           grad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
           ctx.fillStyle = grad;
           ctx.beginPath();
@@ -907,7 +1156,59 @@ import weatherConditions from '../data/weather-conditions.json';
       }
     });
 
+    // Draw meteors
+    activeMeteors.forEach(m => {
+      const elapsed = nowSec - m.startTime;
+      const progress = elapsed / m.duration;
+      const dist = elapsed * m.speed;
+      const headX = m.x + Math.cos(m.angle) * dist;
+      const headY = m.y + Math.sin(m.angle) * dist;
+      const tailX = headX - Math.cos(m.angle) * m.length;
+      const tailY = headY - Math.sin(m.angle) * m.length;
+
+      const meteorAlpha = progress < 0.2 ? (progress / 0.2) : (1 - (progress - 0.2) / 0.8);
+
+      const mGrad = ctx.createLinearGradient(tailX, tailY, headX, headY);
+      mGrad.addColorStop(0, 'rgba(255, 255, 255, 0)');
+      mGrad.addColorStop(0.7, `rgba(200, 230, 255, ${meteorAlpha * 0.5})`);
+      mGrad.addColorStop(1, `rgba(255, 255, 255, ${meteorAlpha * 0.95})`);
+
+      ctx.strokeStyle = mGrad;
+      ctx.lineWidth = isPhone ? 1.5 : 2.0;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(tailX, tailY);
+      ctx.lineTo(headX, headY);
+      ctx.stroke();
+
+      ctx.fillStyle = `rgba(255, 255, 255, ${meteorAlpha})`;
+      ctx.beginPath();
+      ctx.arc(headX, headY, isPhone ? 1.5 : 2.0, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
     ctx.restore();
+  }
+
+  function starfieldAnimLoop(timestamp) {
+    if (!starfieldAnimRunning) return;
+    drawStarfield(timestamp);
+    starfieldAnimId = requestAnimationFrame(starfieldAnimLoop);
+  }
+
+  function startStarfieldAnimation() {
+    if (!starfieldAnimRunning) {
+      starfieldAnimRunning = true;
+      starfieldAnimId = requestAnimationFrame(starfieldAnimLoop);
+    }
+  }
+
+  function stopStarfieldAnimation() {
+    starfieldAnimRunning = false;
+    if (starfieldAnimId) {
+      cancelAnimationFrame(starfieldAnimId);
+      starfieldAnimId = null;
+    }
   }
 
   function calculateStarfieldOpacity(data) {
@@ -947,7 +1248,74 @@ import weatherConditions from '../data/weather-conditions.json';
   function updateStarfieldOpacity(data) {
     const opacity = calculateStarfieldOpacity(data || lastWeatherData);
     document.documentElement.style.setProperty('--starfield-opacity', opacity.toFixed(4));
+    if (opacity > 0) {
+      startStarfieldAnimation();
+    } else {
+      stopStarfieldAnimation();
+    }
     return opacity;
+  }
+
+  function updateStarfieldMask() {
+    const starfieldContainer = document.getElementById('starfield-container');
+    if (!starfieldContainer) return;
+
+    const isPhone = window.innerWidth < 768;
+    const maskStart = isPhone ? STARFIELD_MASK_START_MOBILE : STARFIELD_MASK_START_DESKTOP;
+    const maskEnd = isPhone ? STARFIELD_MASK_END_MOBILE : STARFIELD_MASK_END_DESKTOP;
+
+    if (!STARFIELD_MASK_DIALS_ENABLED) {
+      const fallbackMask = `linear-gradient(to bottom, rgba(0, 0, 0, 1) ${maskStart}, rgba(0, 0, 0, 0) ${maskEnd})`;
+      starfieldContainer.style.setProperty('-webkit-mask-image', fallbackMask);
+      starfieldContainer.style.setProperty('mask-image', fallbackMask);
+      document.documentElement.style.setProperty('--starfield-mask-image', fallbackMask);
+      return;
+    }
+
+    const dialMaskPercent = isPhone ? STARFIELD_DIAL_MASK_PERCENT_MOBILE : STARFIELD_DIAL_MASK_PERCENT_DESKTOP;
+    const dopplerMaskPercent = isPhone ? STARFIELD_DOPPLER_MASK_PERCENT_MOBILE : STARFIELD_DOPPLER_MASK_PERCENT_DESKTOP;
+
+    // Viewport dimensions
+    const w = Math.max(document.documentElement.clientWidth, window.innerWidth);
+    const h = Math.max(document.documentElement.clientHeight, window.innerHeight);
+
+    // Collect all active dial elements to mask out
+    let selector = '.clockGridItem, #analog-clock';
+    if (STARFIELD_MASK_WEATHER_CIRCLES) {
+      selector += ', #weather-desc-image, #weather-desc-image-left';
+    }
+
+    const elements = document.querySelectorAll(selector);
+    const pathParts = [`M 0 0 H ${w} V ${h} H 0 Z`];
+
+    elements.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        const isDoppler = el.id === 'weather-desc-image' || el.id === 'weather-desc-image-left';
+        const maskPct = isDoppler ? dopplerMaskPercent : dialMaskPercent;
+        const radius = (rect.width / 2) * (maskPct / 100);
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        // SVG circle sub-path using evenodd rule:
+        pathParts.push(`M ${(cx - radius).toFixed(1)} ${cy.toFixed(1)} a ${radius.toFixed(1)} ${radius.toFixed(1)} 0 1 0 ${(radius * 2).toFixed(1)} 0 a ${radius.toFixed(1)} ${radius.toFixed(1)} 0 1 0 ${(-radius * 2).toFixed(1)} 0 Z`);
+      }
+    });
+
+    const fullPathD = pathParts.join(' ');
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">` +
+      `<defs>` +
+        `<linearGradient id="sf-grad" x1="0" y1="0" x2="0" y2="1">` +
+          `<stop offset="${maskStart}" stop-color="white" stop-opacity="1"/>` +
+          `<stop offset="${maskEnd}" stop-color="white" stop-opacity="0"/>` +
+        `</linearGradient>` +
+      `</defs>` +
+      `<path fill="url(#sf-grad)" fill-rule="evenodd" d="${fullPathD}"/>` +
+    `</svg>`;
+
+    const maskValue = `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+    starfieldContainer.style.setProperty('-webkit-mask-image', maskValue);
+    starfieldContainer.style.setProperty('mask-image', maskValue);
+    document.documentElement.style.setProperty('--starfield-mask-image', maskValue);
   }
 
   function applyStarfieldProperties() {
@@ -960,6 +1328,8 @@ import weatherConditions from '../data/weather-conditions.json';
     const rotationDirection = isPhone ? STARFIELD_ROTATION_DIRECTION_MOBILE : STARFIELD_ROTATION_DIRECTION_DESKTOP;
     const maskStart = isPhone ? STARFIELD_MASK_START_MOBILE : STARFIELD_MASK_START_DESKTOP;
     const maskEnd = isPhone ? STARFIELD_MASK_END_MOBILE : STARFIELD_MASK_END_DESKTOP;
+    const dialMaskPercent = isPhone ? STARFIELD_DIAL_MASK_PERCENT_MOBILE : STARFIELD_DIAL_MASK_PERCENT_DESKTOP;
+    const dopplerMaskPercent = isPhone ? STARFIELD_DOPPLER_MASK_PERCENT_MOBILE : STARFIELD_DOPPLER_MASK_PERCENT_DESKTOP;
 
     document.documentElement.style.setProperty('--starfield-diameter', diameter);
     document.documentElement.style.setProperty('--starfield-center-y', centerY);
@@ -968,19 +1338,55 @@ import weatherConditions from '../data/weather-conditions.json';
     document.documentElement.style.setProperty('--starfield-rotation-direction', rotationDirection);
     document.documentElement.style.setProperty('--starfield-mask-start', maskStart);
     document.documentElement.style.setProperty('--starfield-mask-end', maskEnd);
+    document.documentElement.style.setProperty('--starfield-color-pct-curr', `${isPhone ? STARFIELD_COLOR_PERCENT_CURRENT_TEMP_MOBILE : STARFIELD_COLOR_PERCENT_CURRENT_TEMP_DESKTOP}%`);
+    document.documentElement.style.setProperty('--starfield-color-pct-plus10', `${isPhone ? STARFIELD_COLOR_PERCENT_PLUS10_TEMP_MOBILE : STARFIELD_COLOR_PERCENT_PLUS10_TEMP_DESKTOP}%`);
+    document.documentElement.style.setProperty('--starfield-color-pct-minus10', `${isPhone ? STARFIELD_COLOR_PERCENT_MINUS10_TEMP_MOBILE : STARFIELD_COLOR_PERCENT_MINUS10_TEMP_DESKTOP}%`);
+    document.documentElement.style.setProperty('--starfield-dial-mask-pct', `${dialMaskPercent}%`);
+    document.documentElement.style.setProperty('--starfield-doppler-mask-pct', `${dopplerMaskPercent}%`);
 
     updateStarfieldOpacity(lastWeatherData);
     drawStarfield();
+    updateStarfieldMask();
+
+    // Directly bind and synchronize the CSS animation on the canvas element (iPad/Safari optimization)
+    const canvas = document.getElementById('starfield-canvas');
+    if (canvas) {
+      canvas.style.animation = 'none';
+      void canvas.offsetWidth; // Force WebKit reflow to guarantee animation starts cleanly
+      canvas.style.setProperty('animation', `starfield-rotate ${rotationSpeed}s linear infinite`, 'important');
+      canvas.style.setProperty('animation-direction', rotationDirection, 'important');
+      canvas.style.setProperty('transform-origin', '50% 50%', 'important');
+    }
   }
 
   function initStarfield() {
+    // Inject bulletproof @keyframes to prevent minifiers from stripping angle units
+    if (!document.getElementById('starfield-style')) {
+      const style = document.createElement('style');
+      style.id = 'starfield-style';
+      style.textContent = `
+        @keyframes starfield-rotate {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
     let container = document.getElementById('starfield-container');
     if (!container) {
       container = document.createElement('div');
       container.id = 'starfield-container';
+      const circle = document.createElement('div');
+      circle.id = 'starfield-circle';
       const canvas = document.createElement('canvas');
       canvas.id = 'starfield-canvas';
-      container.appendChild(canvas);
+      circle.appendChild(canvas);
+      container.appendChild(circle);
 
       const fixedBg = document.getElementById('fixed-bg');
       if (fixedBg && fixedBg.parentNode) {
@@ -991,10 +1397,14 @@ import weatherConditions from '../data/weather-conditions.json';
     }
 
     applyStarfieldProperties();
+    setTimeout(updateStarfieldMask, 150);
+    setTimeout(updateStarfieldMask, 600);
+    setTimeout(updateStarfieldMask, 1500);
   }
 
-  // Window resize handler for starfield
+  // Window event handlers for starfield
   window.addEventListener('resize', applyStarfieldProperties);
+  window.addEventListener('scroll', () => requestAnimationFrame(updateStarfieldMask), { passive: true });
 
   // Periodic check (every 60s) to advance day/night opacity transition
   setInterval(() => {
@@ -1012,6 +1422,54 @@ import weatherConditions from '../data/weather-conditions.json';
     generateStarFieldData();
     drawStarfield();
     console.log(`✨ Starfield regenerated with ${starFieldStars ? starFieldStars.length : 0} stars`);
+  };
+  window.Weather.updateStarfieldMask = updateStarfieldMask;
+  window.Weather.setStarfieldMaskDials = (enabled) => {
+    STARFIELD_MASK_DIALS_ENABLED = !!enabled;
+    updateStarfieldMask();
+    console.log(`✨ Starfield dial mask enabled: ${STARFIELD_MASK_DIALS_ENABLED}`);
+  };
+  window.Weather.setStarfieldTwinkle = (enabled) => {
+    STARFIELD_TWINKLE_ENABLED = !!enabled;
+    console.log(`✨ Starfield twinkling set to: ${STARFIELD_TWINKLE_ENABLED}`);
+  };
+  window.Weather.setStarfieldFlares = (enabled) => {
+    STARFIELD_FLARE_ENABLED = !!enabled;
+    console.log(`✨ Starfield flares set to: ${STARFIELD_FLARE_ENABLED}`);
+  };
+  window.Weather.setStarfieldMeteors = (enabled) => {
+    STARFIELD_METEOR_ENABLED = !!enabled;
+    console.log(`✨ Starfield meteors set to: ${STARFIELD_METEOR_ENABLED}`);
+  };
+  window.Weather.triggerFlare = () => {
+    if (starFieldStars && starFieldStars.length > 0) {
+      const isPhone = window.innerWidth < 768;
+      const starIdx = Math.floor(Math.random() * starFieldStars.length);
+      activeFlare = {
+        starIndex: starIdx,
+        startTime: performance.now() / 1000,
+        duration: isPhone ? STARFIELD_FLARE_DURATION_S_MOBILE : STARFIELD_FLARE_DURATION_S_DESKTOP,
+        sizeMult: isPhone ? STARFIELD_FLARE_SIZE_MULT_MOBILE : STARFIELD_FLARE_SIZE_MULT_DESKTOP
+      };
+      console.log(`✨ Triggered star flare on star #${starIdx}`);
+    }
+  };
+  window.Weather.triggerMeteor = () => {
+    const isPhone = window.innerWidth < 768;
+    const dVw = parseFloat(isPhone ? STARFIELD_CIRCLE_DIAMETER_MOBILE : STARFIELD_CIRCLE_DIAMETER_DESKTOP) || 100;
+    const diameterPx = Math.round((dVw / 100) * window.innerWidth);
+    const radius = diameterPx / 2;
+    const nowSec = performance.now() / 1000;
+    activeMeteors.push({
+      x: radius + (Math.random() * 2 - 1) * radius * 0.6,
+      y: radius * 0.4 + (Math.random() * 2 - 1) * radius * 0.3,
+      angle: (30 + Math.random() * 30) * (Math.PI / 180),
+      speed: isPhone ? STARFIELD_METEOR_SPEED_MOBILE : STARFIELD_METEOR_SPEED_DESKTOP,
+      length: isPhone ? STARFIELD_METEOR_LENGTH_MOBILE : STARFIELD_METEOR_LENGTH_DESKTOP,
+      startTime: nowSec,
+      duration: 0.8
+    });
+    console.log('✨ Triggered shooting star');
   };
 
   // EDITABLE: Wind speed text Y-offset adjustment
@@ -3088,6 +3546,8 @@ import weatherConditions from '../data/weather-conditions.json';
       gradientLower.style.setProperty('--alert-push', pushValue);
     }
     updateLowerGradientPosition();
+    setTimeout(updateStarfieldMask, 50);
+    setTimeout(updateStarfieldMask, 1050);
     
     /* eslint-disable */console.log(...oo_oo(`2266558813_2709_4_2709_67_4`,`Fragile elements pushed down by ${totalHeight}vw`));
   }
@@ -5164,6 +5624,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
     // Initialize dots countdown with current temperature
     initDotsCountdown(currentTemp);
+
+    if (typeof updateStarfieldMask === 'function') {
+      requestAnimationFrame(updateStarfieldMask);
+    }
   }
 
   // --- Dots Countdown Config ---
@@ -5279,7 +5743,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1013';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1018';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
@@ -6676,6 +7140,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
          }
       }
     }
+    requestAnimationFrame(updateStarfieldMask);
   }
 
   // Update the humidity dial in grid cell #4 (index 3)
@@ -10818,6 +11283,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
       
       // Update dynamic night sky starfield opacity
       updateStarfieldOpacity(data);
+      if (typeof refreshStarfieldTempColors === 'function') {
+        refreshStarfieldTempColors(data);
+      }
+      if (typeof updateStarfieldMask === 'function') {
+        setTimeout(updateStarfieldMask, 200);
+      }
       
       updateFields(data);
 

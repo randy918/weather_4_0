@@ -45,12 +45,18 @@ html {
     opacity: var(--starfield-opacity, 0);
     transition: opacity 1200ms ease;
 
-    // Square vertical mask: 100% opacity at top, fading to 0% opacity vertically going down
-    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) var(--starfield-mask-start, 0%), rgba(0, 0, 0, 0) var(--starfield-mask-end, 75%));
-    -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) var(--starfield-mask-start, 0%), rgba(0, 0, 0, 0) var(--starfield-mask-end, 75%));
+    // Square vertical mask with dynamic dial cutout support:
+    mask-image: var(--starfield-mask-image, linear-gradient(to bottom, rgba(0, 0, 0, 1) var(--starfield-mask-start, 0%), rgba(0, 0, 0, 0) var(--starfield-mask-end, 75%)));
+    -webkit-mask-image: var(--starfield-mask-image, linear-gradient(to bottom, rgba(0, 0, 0, 1) var(--starfield-mask-start, 0%), rgba(0, 0, 0, 0) var(--starfield-mask-end, 75%)));
+    mask-size: 100% 100%;
+    -webkit-mask-size: 100% 100%;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    mask-position: 0 0;
+    -webkit-mask-position: 0 0;
 }
 
-#starfield-canvas {
+#starfield-circle {
     position: absolute;
     top: var(--starfield-center-y, 35vw);
     left: var(--starfield-center-x, 50vw);
@@ -58,18 +64,27 @@ html {
     height: var(--starfield-diameter, 100vw);
     border-radius: 50%;
     transform: translate(-50%, -50%);
-    animation: starfield-rotate var(--starfield-rotation-speed, 480s) linear infinite;
-    animation-direction: var(--starfield-rotation-direction, normal);
-    transform-origin: center center;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+#starfield-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 50%;
+    transform-origin: 50% 50%;
     will-change: transform;
+    animation: starfield-rotate var(--starfield-rotation-speed, 480s) linear infinite !important;
+    animation-direction: var(--starfield-rotation-direction, normal);
 }
 
 @keyframes starfield-rotate {
     from {
-        transform: translate(-50%, -50%) rotate(0deg);
+        transform: rotate(0.01deg);
     }
     to {
-        transform: translate(-50%, -50%) rotate(360deg);
+        transform: rotate(360.01deg);
     }
 }
 
