@@ -806,27 +806,27 @@ import weatherConditions from '../data/weather-conditions.json';
   const STARFIELD_COLOR_PERCENT_MINUS10_TEMP_DESKTOP = 10; // EDITABLE Desktop: % of stars tinted with (current temp - 10) color
   const STARFIELD_COLOR_PERCENT_MINUS10_TEMP_MOBILE = 10;  // EDITABLE Mobile: % of stars tinted with (current temp - 10) color
 
-  // 11. Individual Star Twinkling & Scintillation (Random twinkling across starfield)
-  let STARFIELD_TWINKLE_ENABLED = true;                  // EDITABLE: Enable/disable individual star twinkling
-  const STARFIELD_TWINKLE_RATIO_DESKTOP = 0.35;          // EDITABLE Desktop: Ratio of stars that twinkle (0.35 = 35%)
-  const STARFIELD_TWINKLE_RATIO_MOBILE = 0.30;           // EDITABLE Mobile: Ratio of stars that twinkle
-  const STARFIELD_TWINKLE_SPEED_MIN_DESKTOP = 0.8;       // EDITABLE Desktop: Min seconds per twinkle cycle (lower = faster twinkle)
-  const STARFIELD_TWINKLE_SPEED_MIN_MOBILE = 0.8;        // EDITABLE Mobile: Min seconds per twinkle cycle
-  const STARFIELD_TWINKLE_SPEED_MAX_DESKTOP = 2.4;       // EDITABLE Desktop: Max seconds per twinkle cycle
-  const STARFIELD_TWINKLE_SPEED_MAX_MOBILE = 2.4;        // EDITABLE Mobile: Max seconds per twinkle cycle
-  const STARFIELD_TWINKLE_DEPTH_DESKTOP = 0.70;          // EDITABLE Desktop: Twinkle dimming depth (0.70 = dips down to 30% brightness)
-  const STARFIELD_TWINKLE_DEPTH_MOBILE = 0.70;           // EDITABLE Mobile: Twinkle dimming depth
+  // 11. Individual Star Twinkling & Scintillation (Occasional random twinkling "now and then")
+  let STARFIELD_TWINKLE_ENABLED = true;                         // EDITABLE: Enable/disable individual star twinkling
+  const STARFIELD_TWINKLE_COMMONNESS_DESKTOP = 1.0;            // EDITABLE Desktop: How common twinkles are (1.0 = relaxed 'now and then' ~3.5s pause, 2.0 = ~1.8s, 0.5 = ~7s calm sky)
+  const STARFIELD_TWINKLE_COMMONNESS_MOBILE = 0.8;             // EDITABLE Mobile: How common twinkles are (0.8 = ~4.5s average lull between twinkles)
+  const STARFIELD_TWINKLE_RANDOMNESS_DESKTOP = 0.85;           // EDITABLE Desktop: How random the timing is (0.0 = regular clockwork, 1.0 = pure Poisson random arrival)
+  const STARFIELD_TWINKLE_RANDOMNESS_MOBILE = 0.85;            // EDITABLE Mobile: How random the timing is (0.0 to 1.0)
+  const STARFIELD_TWINKLE_DURATION_S_DESKTOP = 0.35;           // EDITABLE Desktop: Duration of a single sparkle in seconds (snappy, realistic twinkle)
+  const STARFIELD_TWINKLE_DURATION_S_MOBILE = 0.35;            // EDITABLE Mobile: Duration of a single sparkle in seconds
+  const STARFIELD_TWINKLE_INTENSITY_DESKTOP = 0.80;            // EDITABLE Desktop: Sparkle brilliance & glint brightness (0.0 = subtle, 1.0 = brilliant sparkle)
+  const STARFIELD_TWINKLE_INTENSITY_MOBILE = 0.75;             // EDITABLE Mobile: Sparkle brilliance & glint brightness
 
-  // 12. Random Star Flares (Occasional bright blooming pulses on random stars)
-  let STARFIELD_FLARE_ENABLED = true;                    // EDITABLE: Enable/disable random star flare pulses
-  const STARFIELD_FLARE_INTERVAL_MIN_S_DESKTOP = 4;      // EDITABLE Desktop: Min seconds between random flare events
-  const STARFIELD_FLARE_INTERVAL_MIN_S_MOBILE = 5;       // EDITABLE Mobile: Min seconds between random flare events
-  const STARFIELD_FLARE_INTERVAL_MAX_S_DESKTOP = 9;      // EDITABLE Desktop: Max seconds between random flare events
-  const STARFIELD_FLARE_INTERVAL_MAX_S_MOBILE = 11;      // EDITABLE Mobile: Max seconds between random flare events
-  const STARFIELD_FLARE_DURATION_S_DESKTOP = 2.2;        // EDITABLE Desktop: Duration of each flare bloom in seconds
-  const STARFIELD_FLARE_DURATION_S_MOBILE = 2.0;         // EDITABLE Mobile: Duration of each flare bloom in seconds
-  const STARFIELD_FLARE_SIZE_MULT_DESKTOP = 2.5;         // EDITABLE Desktop: Peak size multiplier during flare bloom
-  const STARFIELD_FLARE_SIZE_MULT_MOBILE = 2.2;          // EDITABLE Mobile: Peak size multiplier during flare bloom
+  // 12. Random Star Flares (Disabled by default to prevent mechanical balloon/pulsing)
+  let STARFIELD_FLARE_ENABLED = false;                   // EDITABLE: Set false to prevent stars from blooming/pulsing like balloons
+  const STARFIELD_FLARE_INTERVAL_MIN_S_DESKTOP = 15;     // EDITABLE Desktop: Min seconds between random flare events
+  const STARFIELD_FLARE_INTERVAL_MIN_S_MOBILE = 20;      // EDITABLE Mobile: Min seconds between random flare events
+  const STARFIELD_FLARE_INTERVAL_MAX_S_DESKTOP = 30;     // EDITABLE Desktop: Max seconds between random flare events
+  const STARFIELD_FLARE_INTERVAL_MAX_S_MOBILE = 40;      // EDITABLE Mobile: Max seconds between random flare events
+  const STARFIELD_FLARE_DURATION_S_DESKTOP = 1.5;        // EDITABLE Desktop: Duration of each flare bloom in seconds
+  const STARFIELD_FLARE_DURATION_S_MOBILE = 1.5;         // EDITABLE Mobile: Duration of each flare bloom in seconds
+  const STARFIELD_FLARE_SIZE_MULT_DESKTOP = 1.8;         // EDITABLE Desktop: Peak size multiplier during flare bloom
+  const STARFIELD_FLARE_SIZE_MULT_MOBILE = 1.6;          // EDITABLE Mobile: Peak size multiplier during flare bloom
 
   // 13. Occasional Shooting Stars (Meteors)
   let STARFIELD_METEOR_ENABLED = true;                   // EDITABLE: Enable/disable occasional shooting stars
@@ -844,6 +844,7 @@ import weatherConditions from '../data/weather-conditions.json';
   let nextFlareTime = 0;
   let activeMeteors = [];
   let nextMeteorTime = 0;
+  let nextTwinkleTime = 0;
   let starfieldAnimId = null;
   let starfieldAnimRunning = false;
 
@@ -938,11 +939,6 @@ import weatherConditions from '../data/weather-conditions.json';
       [colorAssignments[i], colorAssignments[j]] = [colorAssignments[j], colorAssignments[i]];
     }
 
-    // Twinkle parameters
-    const twinkleRatio = isPhone ? STARFIELD_TWINKLE_RATIO_MOBILE : STARFIELD_TWINKLE_RATIO_DESKTOP;
-    const twinkleSpeedMin = isPhone ? STARFIELD_TWINKLE_SPEED_MIN_MOBILE : STARFIELD_TWINKLE_SPEED_MIN_DESKTOP;
-    const twinkleSpeedMax = isPhone ? STARFIELD_TWINKLE_SPEED_MAX_MOBILE : STARFIELD_TWINKLE_SPEED_MAX_DESKTOP;
-
     const stars = [];
     for (let i = 0; i < count; i++) {
       // Uniform random distribution inside circle:
@@ -979,11 +975,6 @@ import weatherConditions from '../data/weather-conditions.json';
       const isOutOfFocus = Math.random() < oofRatio;
       const blur = isOutOfFocus ? (1.5 + Math.random() * (maxBlur - 1.5)) : 0;
 
-      // Twinkle properties
-      const isTwinkler = Math.random() < twinkleRatio;
-      const twinklePeriod = twinkleSpeedMin + Math.random() * (twinkleSpeedMax - twinkleSpeedMin);
-      const twinklePhase = Math.random() * Math.PI * 2;
-
       stars.push({
         normX,
         normY,
@@ -993,13 +984,34 @@ import weatherConditions from '../data/weather-conditions.json';
         colorType,
         isOutOfFocus,
         blur,
-        isTwinkler,
-        twinklePeriod,
-        twinklePhase
+        twinkle: null
       });
     }
 
     starFieldStars = stars;
+  }
+
+  function scheduleNextTwinkle(nowSec) {
+    const isPhone = window.innerWidth < 768;
+    const baseCommonness = isPhone ? STARFIELD_TWINKLE_COMMONNESS_MOBILE : STARFIELD_TWINKLE_COMMONNESS_DESKTOP;
+    const commonness = Math.max(0.05, typeof window !== 'undefined' && window.STARFIELD_TWINKLE_COMMONNESS_OVERRIDE !== undefined ? window.STARFIELD_TWINKLE_COMMONNESS_OVERRIDE : baseCommonness);
+    const baseRandomness = isPhone ? STARFIELD_TWINKLE_RANDOMNESS_MOBILE : STARFIELD_TWINKLE_RANDOMNESS_DESKTOP;
+    const randomness = Math.max(0, Math.min(1, typeof window !== 'undefined' && window.STARFIELD_TWINKLE_RANDOMNESS_OVERRIDE !== undefined ? window.STARFIELD_TWINKLE_RANDOMNESS_OVERRIDE : baseRandomness));
+
+    // Base interval in seconds between twinkles:
+    // At commonness = 1.0, average lull is ~3.5s.
+    // At commonness = 2.0, average lull is ~1.75s.
+    // At commonness = 0.5, average lull is ~7.0s.
+    const baseInterval = 3.5 / commonness;
+
+    // Poisson process exponential distribution for natural sporadic timing
+    // -ln(U) has mean = 1.0, generating realistic clustered and spaced intervals
+    const u = Math.max(0.0001, Math.random());
+    const poissonInterval = -Math.log(u) * baseInterval;
+
+    // Blend between clockwork regular (randomness = 0) and pure Poisson (randomness = 1)
+    const actualInterval = Math.max(0.25, (1 - randomness) * baseInterval + randomness * poissonInterval);
+    nextTwinkleTime = nowSec + actualInterval;
   }
 
   function scheduleNextFlare(nowSec) {
@@ -1092,7 +1104,33 @@ import weatherConditions from '../data/weather-conditions.json';
       activeMeteors = activeMeteors.filter(m => nowSec < m.startTime + m.duration);
     }
 
-    const twinkleDepth = isPhone ? STARFIELD_TWINKLE_DEPTH_MOBILE : STARFIELD_TWINKLE_DEPTH_DESKTOP;
+    // Random "now and then" star twinkle management
+    if (STARFIELD_TWINKLE_ENABLED && starFieldStars.length > 0) {
+      if (!nextTwinkleTime) scheduleNextTwinkle(nowSec);
+      if (nowSec >= nextTwinkleTime) {
+        // Pick an eligible star that is not currently twinkling or flaring
+        const eligible = [];
+        for (let i = 0; i < starFieldStars.length; i++) {
+          if (!starFieldStars[i].twinkle && (!activeFlare || activeFlare.starIndex !== i)) {
+            eligible.push(i);
+          }
+        }
+        if (eligible.length > 0) {
+          const chosenIdx = eligible[Math.floor(Math.random() * eligible.length)];
+          const durBase = isPhone ? STARFIELD_TWINKLE_DURATION_S_MOBILE : STARFIELD_TWINKLE_DURATION_S_DESKTOP;
+          const intensity = isPhone ? STARFIELD_TWINKLE_INTENSITY_MOBILE : STARFIELD_TWINKLE_INTENSITY_DESKTOP;
+          const dur = durBase * (0.85 + Math.random() * 0.3);
+
+          starFieldStars[chosenIdx].twinkle = {
+            startTime: nowSec,
+            duration: dur,
+            intensity: intensity,
+            phase: Math.random() * Math.PI * 2
+          };
+        }
+        scheduleNextTwinkle(nowSec);
+      }
+    }
 
     // Draw stars
     starFieldStars.forEach((star, idx) => {
@@ -1103,10 +1141,56 @@ import weatherConditions from '../data/weather-conditions.json';
       let currentAlpha = star.alpha;
       let currentSize = star.size;
 
-      // Apply twinkling
-      if (STARFIELD_TWINKLE_ENABLED && star.isTwinkler) {
-        const wave = 0.5 + 0.5 * Math.sin(nowSec * (2 * Math.PI / star.twinklePeriod) + star.twinklePhase);
-        currentAlpha = star.alpha * (1 - twinkleDepth * (1 - wave));
+      // Apply organic "now and then" twinkle (crisp scintillation, NO balloon/size pulsing)
+      if (star.twinkle) {
+        const elapsed = nowSec - star.twinkle.startTime;
+        if (elapsed >= star.twinkle.duration) {
+          star.twinkle = null;
+        } else {
+          const progress = elapsed / star.twinkle.duration; // 0.0 to 1.0
+
+          // Organic scintillation envelope:
+          // Rapid rise (attack ~20%), turbulent micro-scintillations (~50%), quick smooth release (~30%)
+          let scintEnvelope = 0;
+          if (progress < 0.20) {
+            scintEnvelope = progress / 0.20;
+          } else if (progress < 0.70) {
+            const subP = (progress - 0.20) / 0.50;
+            // 3 rapid asymmetric atmospheric micro-shimmer peaks
+            scintEnvelope = 0.70 + 0.30 * Math.sin(subP * Math.PI * 5 + star.twinkle.phase);
+          } else {
+            const decP = (progress - 0.70) / 0.30;
+            scintEnvelope = 1.0 - decP;
+          }
+
+          // Boost alpha towards 1.0 during sparkle (keeps star diameter stable, zero balloon pulsing)
+          const alphaBoost = (1.0 - star.alpha) * scintEnvelope * star.twinkle.intensity;
+          currentAlpha = Math.min(1.0, star.alpha + alphaBoost);
+
+          // Render crisp micro-glint diffraction sparkle at peak brilliance
+          if (scintEnvelope > 0.35 && star.twinkle.intensity > 0.25) {
+            const glintAlpha = ((scintEnvelope - 0.35) / 0.65) * star.twinkle.intensity;
+            const glintLen = (star.size + 2.5) * scintEnvelope;
+
+            ctx.save();
+            ctx.strokeStyle = `rgba(255, 255, 255, ${Math.min(1.0, glintAlpha * 0.85)})`;
+            ctx.lineWidth = 0.75;
+            ctx.beginPath();
+            // Tiny 4-point celestial micro-glint cross
+            ctx.moveTo(x - glintLen, y);
+            ctx.lineTo(x + glintLen, y);
+            ctx.moveTo(x, y - glintLen);
+            ctx.lineTo(x, y + glintLen);
+            ctx.stroke();
+
+            // Brilliant white pinpoint core
+            ctx.fillStyle = `rgba(255, 255, 255, ${Math.min(1.0, glintAlpha * 0.95)})`;
+            ctx.beginPath();
+            ctx.arc(x, y, Math.max(0.6, star.size * 0.6), 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          }
+        }
       }
 
       // Apply flare bloom
@@ -1343,6 +1427,10 @@ import weatherConditions from '../data/weather-conditions.json';
     document.documentElement.style.setProperty('--starfield-color-pct-minus10', `${isPhone ? STARFIELD_COLOR_PERCENT_MINUS10_TEMP_MOBILE : STARFIELD_COLOR_PERCENT_MINUS10_TEMP_DESKTOP}%`);
     document.documentElement.style.setProperty('--starfield-dial-mask-pct', `${dialMaskPercent}%`);
     document.documentElement.style.setProperty('--starfield-doppler-mask-pct', `${dopplerMaskPercent}%`);
+    document.documentElement.style.setProperty('--starfield-twinkle-commonness', isPhone ? `${STARFIELD_TWINKLE_COMMONNESS_MOBILE}` : `${STARFIELD_TWINKLE_COMMONNESS_DESKTOP}`);
+    document.documentElement.style.setProperty('--starfield-twinkle-randomness', isPhone ? `${STARFIELD_TWINKLE_RANDOMNESS_MOBILE}` : `${STARFIELD_TWINKLE_RANDOMNESS_DESKTOP}`);
+    document.documentElement.style.setProperty('--starfield-twinkle-duration', isPhone ? `${STARFIELD_TWINKLE_DURATION_S_MOBILE}s` : `${STARFIELD_TWINKLE_DURATION_S_DESKTOP}s`);
+    document.documentElement.style.setProperty('--starfield-twinkle-intensity', isPhone ? `${STARFIELD_TWINKLE_INTENSITY_MOBILE}` : `${STARFIELD_TWINKLE_INTENSITY_DESKTOP}`);
 
     updateStarfieldOpacity(lastWeatherData);
     drawStarfield();
@@ -1432,6 +1520,31 @@ import weatherConditions from '../data/weather-conditions.json';
   window.Weather.setStarfieldTwinkle = (enabled) => {
     STARFIELD_TWINKLE_ENABLED = !!enabled;
     console.log(`✨ Starfield twinkling set to: ${STARFIELD_TWINKLE_ENABLED}`);
+  };
+  window.Weather.setStarfieldTwinkleConfig = ({ commonness, randomness, intensity, duration } = {}) => {
+    if (commonness !== undefined) {
+      window.STARFIELD_TWINKLE_COMMONNESS_OVERRIDE = commonness;
+      console.log(`✨ Starfield twinkle commonness set to: ${commonness}`);
+    }
+    if (randomness !== undefined) {
+      window.STARFIELD_TWINKLE_RANDOMNESS_OVERRIDE = randomness;
+      console.log(`✨ Starfield twinkle randomness set to: ${randomness}`);
+    }
+  };
+  window.Weather.triggerTwinkle = () => {
+    if (starFieldStars && starFieldStars.length > 0) {
+      const isPhone = window.innerWidth < 768;
+      const starIdx = Math.floor(Math.random() * starFieldStars.length);
+      const dur = isPhone ? STARFIELD_TWINKLE_DURATION_S_MOBILE : STARFIELD_TWINKLE_DURATION_S_DESKTOP;
+      const intensity = isPhone ? STARFIELD_TWINKLE_INTENSITY_MOBILE : STARFIELD_TWINKLE_INTENSITY_DESKTOP;
+      starFieldStars[starIdx].twinkle = {
+        startTime: performance.now() / 1000,
+        duration: dur,
+        intensity: intensity,
+        phase: Math.random() * Math.PI * 2
+      };
+      console.log(`✨ Triggered single sparkle on star #${starIdx}`);
+    }
   };
   window.Weather.setStarfieldFlares = (enabled) => {
     STARFIELD_FLARE_ENABLED = !!enabled;
@@ -5743,7 +5856,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1018';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1020';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
