@@ -747,22 +747,34 @@ import weatherConditions from '../data/weather-conditions.json';
   // --- EDITABLE: Night Sky Starfield Configuration (JCV) ---
   // ==========================================
   // 1. Test Mode: Set to true to force starfield visible during daytime for testing (or use URL query ?stars=true)
-  let STARFIELD_TEST_MODE = true; // EDITABLE: Toggle true to force starfield visible during daytime (set false for auto day/night)
+  let STARFIELD_TEST_MODE = false; // EDITABLE: Toggle true to force starfield visible during daytime (set false for auto day/night)
 
   // 2. Day/Night Opacity Fade Window (in minutes)
   const STARFIELD_FADE_WINDOW_MINUTES = 60; // EDITABLE: Minutes before sunset to fade in / minutes after sunrise to fade out
 
-  // 3. Circle Geometry & Position (Full width & center vertical position)
+  // 3. Container Dimensions, Position & Stacking Order (JCV)
+  const STARFIELD_CONTAINER_TOP_DESKTOP = '0vw';    // EDITABLE Desktop: Vertical top position of starfield container
+  const STARFIELD_CONTAINER_TOP_MOBILE = '0vw';     // EDITABLE Mobile: Vertical top position of starfield container
+  const STARFIELD_CONTAINER_HEIGHT_DESKTOP = '100vh'; // EDITABLE Desktop: Height of starfield container (100vh matches full screen on load)
+  const STARFIELD_CONTAINER_HEIGHT_MOBILE = '100vh';  // EDITABLE Mobile: Height of starfield container (100vh matches full screen on load)
+  const STARFIELD_Z_INDEX_DESKTOP = -9990;          // EDITABLE Desktop: z-index layer (below gradient overlays at 0)
+  const STARFIELD_Z_INDEX_MOBILE = -9990;           // EDITABLE Mobile: z-index layer
+
+  // 4. Circle Geometry, Center Position & Top Cutoff (JCV)
+  // Shifts stars UP so the city name (Tulsa) area is filled with stars, flush with top boundary / banners
+  const STARFIELD_TOP_CUTOFF_DESKTOP = '12vw';      // EDITABLE Desktop: Vertical size cut off at top (shifts stars UP to fill Tulsa area flush with top)
+  const STARFIELD_TOP_CUTOFF_MOBILE = '12vw';       // EDITABLE Mobile: Vertical size cut off at top (shifts stars UP to fill Tulsa area flush with top)
   const STARFIELD_CIRCLE_DIAMETER_DESKTOP = '100vw'; // EDITABLE Desktop: Diameter of starfield circle (full width)
   const STARFIELD_CIRCLE_DIAMETER_MOBILE = '100vw';  // EDITABLE Mobile: Diameter of starfield circle (full width)
-  const STARFIELD_CENTER_Y_DESKTOP = '35vw';        // EDITABLE Desktop: Vertical position of circle center
-  const STARFIELD_CENTER_Y_MOBILE = '45vw';         // EDITABLE Mobile: Vertical position of circle center
+  // Optional manual center Y override (leave null to automatically calculate: Radius - TopCutoff, e.g. 50vw - 12vw = 38vw):
+  const STARFIELD_CENTER_Y_DESKTOP = null;          // EDITABLE Desktop: Explicit Center Y or null to auto-calculate (50vw - 12vw = 38vw)
+  const STARFIELD_CENTER_Y_MOBILE = null;           // EDITABLE Mobile: Explicit Center Y or null to auto-calculate (50vw - 12vw = 38vw)
   const STARFIELD_CENTER_X_DESKTOP = '50vw';        // EDITABLE Desktop: Horizontal position of circle center
   const STARFIELD_CENTER_X_MOBILE = '50vw';         // EDITABLE Mobile: Horizontal position of circle center
 
   // 4. Slow Rotation Around Center (Seconds per 360° turn & direction)
   const STARFIELD_ROTATION_SPEED_S_DESKTOP = 500;   // EDITABLE Desktop: Seconds per 360° rotation (480s = 8 minutes)
-  const STARFIELD_ROTATION_SPEED_S_MOBILE = 1480;    // EDITABLE Mobile: Seconds per 360° rotation
+  const STARFIELD_ROTATION_SPEED_S_MOBILE = 400;    // EDITABLE Mobile: Seconds per 360° rotation
   const STARFIELD_ROTATION_DIRECTION_DESKTOP = 'reverse'; // EDITABLE Desktop: 'normal' (clockwise) or 'reverse' (counter-clockwise)
   const STARFIELD_ROTATION_DIRECTION_MOBILE = 'normal';  // EDITABLE Mobile: 'normal' or 'reverse'
 
@@ -780,18 +792,18 @@ import weatherConditions from '../data/weather-conditions.json';
 
   // 7. Star Sizes (Minimum, Maximum, and Random Selection)
   const STARFIELD_STAR_MIN_SIZE_DESKTOP = 0.8;      // EDITABLE Desktop: Minimum star radius in px
-  const STARFIELD_STAR_MIN_SIZE_MOBILE = 0.6;       // EDITABLE Mobile: Minimum star radius in px
-  const STARFIELD_STAR_MAX_SIZE_DESKTOP = 2.4;      // EDITABLE Desktop: Maximum star radius in px
-  const STARFIELD_STAR_MAX_SIZE_MOBILE = 1.8;       // EDITABLE Mobile: Maximum star radius in px
+  const STARFIELD_STAR_MIN_SIZE_MOBILE = 0.8;       // EDITABLE Mobile: Minimum star radius in px
+  const STARFIELD_STAR_MAX_SIZE_DESKTOP = 1.8;      // EDITABLE Desktop: Maximum star radius in px
+  const STARFIELD_STAR_MAX_SIZE_MOBILE = 1.2;       // EDITABLE Mobile: Maximum star radius in px
 
   // 8. Out-of-Focus Stars (Atmospheric Blur Ratio & Max Blur Radius)
   const STARFIELD_OUT_OF_FOCUS_RATIO_DESKTOP = 0.30; // EDITABLE Desktop: Ratio of stars that are out-of-focus (0.30 = 30%)
   const STARFIELD_OUT_OF_FOCUS_RATIO_MOBILE = 0.30;  // EDITABLE Mobile: Ratio of stars that are out-of-focus
-  const STARFIELD_OUT_OF_FOCUS_BLUR_DESKTOP = 4.0;  // EDITABLE Desktop: Blur radius for out-of-focus stars in px
-  const STARFIELD_OUT_OF_FOCUS_BLUR_MOBILE = 3.0;   // EDITABLE Mobile: Blur radius for out-of-focus stars in px
+  const STARFIELD_OUT_OF_FOCUS_BLUR_DESKTOP = 1.0;  // EDITABLE Desktop: Blur radius for out-of-focus stars in px
+  const STARFIELD_OUT_OF_FOCUS_BLUR_MOBILE = 1.0;   // EDITABLE Mobile: Blur radius for out-of-focus stars in px
 
   // 9. Dial & Doppler Interior Masking (Mask out stars inside dials and radar circles)
-  let STARFIELD_MASK_DIALS_ENABLED = true;               // EDITABLE: Set true to mask out stars behind dials
+  let STARFIELD_MASK_DIALS_ENABLED = true;                // EDITABLE: Set true to mask out stars behind dials
   const STARFIELD_MASK_WEATHER_CIRCLES = true;           // EDITABLE: Set true to also mask out stars behind the 2 large radar/weather circles
   const STARFIELD_DIAL_MASK_PERCENT_DESKTOP = 100;       // EDITABLE Desktop: Dial cutout radius percentage (100 = full dial)
   const STARFIELD_DIAL_MASK_PERCENT_MOBILE = 100;        // EDITABLE Mobile: Dial cutout radius percentage
@@ -799,12 +811,12 @@ import weatherConditions from '../data/weather-conditions.json';
   const STARFIELD_DOPPLER_MASK_PERCENT_MOBILE = 100;     // EDITABLE Mobile: Doppler circle cutout radius percentage
 
   // 10. Startup Star Temperature Tints (Percentage of stars tinted by current & adjacent temperatures)
-  const STARFIELD_COLOR_PERCENT_CURRENT_TEMP_DESKTOP = 20; // EDITABLE Desktop: % of stars tinted with current temperature color
-  const STARFIELD_COLOR_PERCENT_CURRENT_TEMP_MOBILE = 20;  // EDITABLE Mobile: % of stars tinted with current temperature color
-  const STARFIELD_COLOR_PERCENT_PLUS10_TEMP_DESKTOP = 10;  // EDITABLE Desktop: % of stars tinted with (current temp + 10) color
-  const STARFIELD_COLOR_PERCENT_PLUS10_TEMP_MOBILE = 10;   // EDITABLE Mobile: % of stars tinted with (current temp + 10) color
-  const STARFIELD_COLOR_PERCENT_MINUS10_TEMP_DESKTOP = 10; // EDITABLE Desktop: % of stars tinted with (current temp - 10) color
-  const STARFIELD_COLOR_PERCENT_MINUS10_TEMP_MOBILE = 10;  // EDITABLE Mobile: % of stars tinted with (current temp - 10) color
+  const STARFIELD_COLOR_PERCENT_CURRENT_TEMP_DESKTOP = 7; // EDITABLE Desktop: % of stars tinted with current temperature color
+  const STARFIELD_COLOR_PERCENT_CURRENT_TEMP_MOBILE = 7;  // EDITABLE Mobile: % of stars tinted with current temperature color
+  const STARFIELD_COLOR_PERCENT_PLUS10_TEMP_DESKTOP = 7;  // EDITABLE Desktop: % of stars tinted with (current temp + 10) color
+  const STARFIELD_COLOR_PERCENT_PLUS10_TEMP_MOBILE = 7;   // EDITABLE Mobile: % of stars tinted with (current temp + 10) color
+  const STARFIELD_COLOR_PERCENT_MINUS10_TEMP_DESKTOP = 7; // EDITABLE Desktop: % of stars tinted with (current temp - 10) color
+  const STARFIELD_COLOR_PERCENT_MINUS10_TEMP_MOBILE = 7;  // EDITABLE Mobile: % of stars tinted with (current temp - 10) color
 
   // 11. Individual Star Twinkling & Scintillation (Occasional random twinkling "now and then")
   let STARFIELD_TWINKLE_ENABLED = true;                         // EDITABLE: Enable/disable individual star twinkling
@@ -1067,6 +1079,10 @@ import weatherConditions from '../data/weather-conditions.json';
 
     const elements = document.querySelectorAll(selector);
     const dials = [];
+    const starfieldCircle = document.getElementById('starfield-circle');
+    const circleRect = starfieldCircle ? starfieldCircle.getBoundingClientRect() : null;
+    const circleCenterX = circleRect ? (circleRect.left + circleRect.width / 2) : (window.innerWidth / 2);
+    const circleCenterY = circleRect ? (circleRect.top + circleRect.height / 2) : 0;
 
     elements.forEach(el => {
       const rect = el.getBoundingClientRect();
@@ -1075,8 +1091,8 @@ import weatherConditions from '../data/weather-conditions.json';
         const maskPct = isDoppler ? dopplerMaskPercent : dialMaskPercent;
         const radius = (rect.width / 2) * (maskPct / 100);
         dials.push({
-          screenX: rect.left + rect.width / 2,
-          screenY: rect.top + rect.height / 2,
+          dx: (rect.left + rect.width / 2) - circleCenterX,
+          dy: (rect.top + rect.height / 2) - circleCenterY,
           radius: radius
         });
       }
@@ -1333,10 +1349,6 @@ import weatherConditions from '../data/weather-conditions.json';
     if (STARFIELD_MASK_DIALS_ENABLED) {
       const dials = getStarfieldMaskDials();
       if (dials.length > 0) {
-        const starfieldCircle = document.getElementById('starfield-circle');
-        const circleRect = starfieldCircle ? starfieldCircle.getBoundingClientRect() : canvas.getBoundingClientRect();
-        const circleCenterX = circleRect.left + circleRect.width / 2;
-        const circleCenterY = circleRect.top + circleRect.height / 2;
         const rotAngle = getCanvasRotationAngle(canvas);
         const cos = Math.cos(-rotAngle);
         const sin = Math.sin(-rotAngle);
@@ -1347,10 +1359,8 @@ import weatherConditions from '../data/weather-conditions.json';
 
         for (let i = 0; i < dials.length; i++) {
           const d = dials[i];
-          const dx = d.screenX - circleCenterX;
-          const dy = d.screenY - circleCenterY;
-          const localX = cx + (dx * cos - dy * sin);
-          const localY = cy + (dx * sin + dy * cos);
+          const localX = cx + (d.dx * cos - d.dy * sin);
+          const localY = cy + (d.dx * sin + d.dy * cos);
 
           ctx.beginPath();
           ctx.arc(localX, localY, d.radius, 0, Math.PI * 2);
@@ -1440,19 +1450,19 @@ import weatherConditions from '../data/weather-conditions.json';
     const maskEnd = isPhone ? STARFIELD_MASK_END_MOBILE : STARFIELD_MASK_END_DESKTOP;
 
     if (!STARFIELD_MASK_DIALS_ENABLED) {
-      const fallbackMask = `linear-gradient(to bottom, rgba(0, 0, 0, 1) ${maskStart}, rgba(0, 0, 0, 0) ${maskEnd})`;
-      starfieldContainer.style.setProperty('-webkit-mask-image', fallbackMask);
-      starfieldContainer.style.setProperty('mask-image', fallbackMask);
-      document.documentElement.style.setProperty('--starfield-mask-image', fallbackMask);
+      starfieldContainer.style.setProperty('-webkit-mask-image', 'none');
+      starfieldContainer.style.setProperty('mask-image', 'none');
+      document.documentElement.style.setProperty('--starfield-mask-image', 'none');
       return;
     }
 
     const dialMaskPercent = isPhone ? STARFIELD_DIAL_MASK_PERCENT_MOBILE : STARFIELD_DIAL_MASK_PERCENT_DESKTOP;
     const dopplerMaskPercent = isPhone ? STARFIELD_DOPPLER_MASK_PERCENT_MOBILE : STARFIELD_DOPPLER_MASK_PERCENT_DESKTOP;
 
-    // Viewport dimensions
-    const w = Math.max(document.documentElement.clientWidth, window.innerWidth);
-    const h = Math.max(document.documentElement.clientHeight, window.innerHeight);
+    // Container dimensions for SVG mask
+    const containerRect = starfieldContainer.getBoundingClientRect();
+    const w = Math.round(containerRect.width) || Math.max(document.documentElement.clientWidth, window.innerWidth);
+    const h = Math.round(containerRect.height) || Math.max(document.documentElement.clientHeight, window.innerHeight);
 
     // Collect all active dial elements to mask out
     let selector = '.clockGridItem, #analog-clock';
@@ -1469,8 +1479,9 @@ import weatherConditions from '../data/weather-conditions.json';
         const isDoppler = el.id === 'weather-desc-image' || el.id === 'weather-desc-image-left';
         const maskPct = isDoppler ? dopplerMaskPercent : dialMaskPercent;
         const radius = (rect.width / 2) * (maskPct / 100);
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
+        // Position cutouts relative to starfield container (scroll-invariant)
+        const cx = (rect.left + rect.width / 2) - containerRect.left;
+        const cy = (rect.top + rect.height / 2) - containerRect.top;
         // SVG circle sub-path using evenodd rule:
         pathParts.push(`M ${(cx - radius).toFixed(1)} ${cy.toFixed(1)} a ${radius.toFixed(1)} ${radius.toFixed(1)} 0 1 0 ${(radius * 2).toFixed(1)} 0 a ${radius.toFixed(1)} ${radius.toFixed(1)} 0 1 0 ${(-radius * 2).toFixed(1)} 0 Z`);
       }
@@ -1496,9 +1507,21 @@ import weatherConditions from '../data/weather-conditions.json';
   function applyStarfieldProperties() {
     const isPhone = window.innerWidth < 768;
     
+    const containerTop = isPhone ? STARFIELD_CONTAINER_TOP_MOBILE : STARFIELD_CONTAINER_TOP_DESKTOP;
+    const containerHeight = isPhone ? STARFIELD_CONTAINER_HEIGHT_MOBILE : STARFIELD_CONTAINER_HEIGHT_DESKTOP;
+    const zIndex = isPhone ? STARFIELD_Z_INDEX_MOBILE : STARFIELD_Z_INDEX_DESKTOP;
+    const topCutoff = isPhone ? STARFIELD_TOP_CUTOFF_MOBILE : STARFIELD_TOP_CUTOFF_DESKTOP;
     const diameter = isPhone ? STARFIELD_CIRCLE_DIAMETER_MOBILE : STARFIELD_CIRCLE_DIAMETER_DESKTOP;
-    const centerY = isPhone ? STARFIELD_CENTER_Y_MOBILE : STARFIELD_CENTER_Y_DESKTOP;
+    const manualCenterY = isPhone ? STARFIELD_CENTER_Y_MOBILE : STARFIELD_CENTER_Y_DESKTOP;
     const centerX = isPhone ? STARFIELD_CENTER_X_MOBILE : STARFIELD_CENTER_X_DESKTOP;
+
+    let centerY = manualCenterY;
+    if (!centerY) {
+      const radiusVal = (parseFloat(diameter) || 100) / 2;
+      const cutoffVal = parseFloat(topCutoff) || 0;
+      centerY = `${(radiusVal - cutoffVal).toFixed(2)}vw`;
+    }
+
     const rotationSpeed = isPhone ? STARFIELD_ROTATION_SPEED_S_MOBILE : STARFIELD_ROTATION_SPEED_S_DESKTOP;
     const rotationDirection = isPhone ? STARFIELD_ROTATION_DIRECTION_MOBILE : STARFIELD_ROTATION_DIRECTION_DESKTOP;
     const maskStart = isPhone ? STARFIELD_MASK_START_MOBILE : STARFIELD_MASK_START_DESKTOP;
@@ -1506,6 +1529,10 @@ import weatherConditions from '../data/weather-conditions.json';
     const dialMaskPercent = isPhone ? STARFIELD_DIAL_MASK_PERCENT_MOBILE : STARFIELD_DIAL_MASK_PERCENT_DESKTOP;
     const dopplerMaskPercent = isPhone ? STARFIELD_DOPPLER_MASK_PERCENT_MOBILE : STARFIELD_DOPPLER_MASK_PERCENT_DESKTOP;
 
+    document.documentElement.style.setProperty('--starfield-container-top', containerTop);
+    document.documentElement.style.setProperty('--starfield-container-height', containerHeight);
+    document.documentElement.style.setProperty('--starfield-z-index', zIndex);
+    document.documentElement.style.setProperty('--starfield-top-cutoff', topCutoff);
     document.documentElement.style.setProperty('--starfield-diameter', diameter);
     document.documentElement.style.setProperty('--starfield-center-y', centerY);
     document.documentElement.style.setProperty('--starfield-center-x', centerX);
@@ -1583,7 +1610,7 @@ import weatherConditions from '../data/weather-conditions.json';
 
   // Window event handlers for starfield
   window.addEventListener('resize', applyStarfieldProperties);
-  window.addEventListener('scroll', () => requestAnimationFrame(updateStarfieldMask), { passive: true });
+  // Note: Starfield container is position: absolute and scrolls naturally on GPU compositor matching scrolling gradient overlays
 
   // Periodic check (every 60s) to advance day/night opacity transition
   setInterval(() => {
@@ -1602,6 +1629,7 @@ import weatherConditions from '../data/weather-conditions.json';
     drawStarfield();
     console.log(`✨ Starfield regenerated with ${starFieldStars ? starFieldStars.length : 0} stars`);
   };
+  window.Weather.getStars = () => starFieldStars;
   window.Weather.updateStarfieldMask = updateStarfieldMask;
   window.Weather.setStarfieldMaskDials = (enabled) => {
     STARFIELD_MASK_DIALS_ENABLED = !!enabled;
@@ -3648,6 +3676,7 @@ import weatherConditions from '../data/weather-conditions.json';
     const baroGauge = document.getElementById('barometric-pressure-gauge');
     const gradientUpper = document.querySelector('.scrolling-gradient-overlay');
     const gradientLower = document.querySelector('.scrolling-gradient-overlay-lower');
+    const starfieldContainer = document.getElementById('starfield-container');
     if (moon) moon.style.setProperty('--alert-push', '0vw');
     if (descImg) descImg.style.setProperty('--alert-push', '0vw');
     if (descImgLeft) descImgLeft.style.setProperty('--alert-push', '0vw');
@@ -3656,6 +3685,7 @@ import weatherConditions from '../data/weather-conditions.json';
     if (baroGauge) baroGauge.style.setProperty('--alert-push', '0vw');
     if (gradientUpper) gradientUpper.style.setProperty('--alert-push', '0vw');
     if (gradientLower) gradientLower.style.setProperty('--alert-push', '0vw');
+    if (starfieldContainer) starfieldContainer.style.setProperty('--alert-push', '0vw');
     setTimeout(() => document.body.classList.add('transitions-ready'), 100);
   } else {
     document.addEventListener('DOMContentLoaded', () => {
@@ -3672,6 +3702,7 @@ import weatherConditions from '../data/weather-conditions.json';
       const baroGauge = document.getElementById('barometric-pressure-gauge');
       const gradientUpper = document.querySelector('.scrolling-gradient-overlay');
       const gradientLower = document.querySelector('.scrolling-gradient-overlay-lower');
+      const starfieldContainer = document.getElementById('starfield-container');
       if (moon) moon.style.setProperty('--alert-push', '0vw');
       if (descImg) descImg.style.setProperty('--alert-push', '0vw');
       if (descImgLeft) descImgLeft.style.setProperty('--alert-push', '0vw');
@@ -3680,6 +3711,7 @@ import weatherConditions from '../data/weather-conditions.json';
       if (baroGauge) baroGauge.style.setProperty('--alert-push', '0vw');
       if (gradientUpper) gradientUpper.style.setProperty('--alert-push', '0vw');
       if (gradientLower) gradientLower.style.setProperty('--alert-push', '0vw');
+      if (starfieldContainer) starfieldContainer.style.setProperty('--alert-push', '0vw');
       setTimeout(() => document.body.classList.add('transitions-ready'), 100);
     });
   }
@@ -3720,6 +3752,7 @@ import weatherConditions from '../data/weather-conditions.json';
     const baroGauge = document.getElementById('barometric-pressure-gauge');
     const gradientUpper = document.querySelector('.scrolling-gradient-overlay');
     const gradientLower = document.querySelector('.scrolling-gradient-overlay-lower');
+    const starfieldContainer = document.getElementById('starfield-container');
     
     const pushValue = `${totalHeight}vw`;
     
@@ -3748,6 +3781,9 @@ import weatherConditions from '../data/weather-conditions.json';
     }
     if (gradientLower) {
       gradientLower.style.setProperty('--alert-push', pushValue);
+    }
+    if (starfieldContainer) {
+      starfieldContainer.style.setProperty('--alert-push', pushValue);
     }
     updateLowerGradientPosition();
     setTimeout(updateStarfieldMask, 50);
@@ -4511,6 +4547,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const baroGauge = document.getElementById('barometric-pressure-gauge');
       const gradientUpper = document.querySelector('.scrolling-gradient-overlay');
       const gradientLower = document.querySelector('.scrolling-gradient-overlay-lower');
+      const starfieldContainer = document.getElementById('starfield-container');
       if (moon) moon.style.setProperty('--alert-push', startPushValue);
       if (descImg) descImg.style.setProperty('--alert-push', startPushValue);
       const descImgLeft = document.getElementById('weather-desc-image-left');
@@ -4520,6 +4557,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       if (baroGauge) baroGauge.style.setProperty('--alert-push', startPushValue);
       if (gradientUpper) gradientUpper.style.setProperty('--alert-push', startPushValue);
       if (gradientLower) gradientLower.style.setProperty('--alert-push', startPushValue);
+      if (starfieldContainer) starfieldContainer.style.setProperty('--alert-push', startPushValue);
       
       // Ensure starting height is explicitly set so it animates properly and hide overflow during transition
       container.style.overflow = 'hidden';
@@ -5947,7 +5985,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1022';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1043';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
@@ -12000,7 +12038,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   }
 
   // Public helper for dev & testing
-  window.Weather = {
+  window.Weather = Object.assign(window.Weather || {}, {
     refresh: getLocalWeather,
     setApiKey: (key) => { API_KEY = key; },
     setLatLon: (lat, lon) => { 
@@ -12063,7 +12101,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       localStorage.removeItem('missing_assets_todo');
       if (typeof updateMissingAssetsDisplay === 'function') updateMissingAssetsDisplay();
     }
-  };
+  });
 
   // Attempt to get user's location, with a graceful fallback to the default.
   function initWeatherWithGeolocation() {

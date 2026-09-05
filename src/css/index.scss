@@ -34,16 +34,17 @@ html {
 }
 
 #starfield-container {
-    position: fixed;
-    top: 0;
+    position: absolute;
+    top: var(--starfield-container-top, 0vw);
     left: 0;
     width: 100vw;
-    height: 100vh;
-    z-index: -9990; // Placed z-wise just above the full page gradient background (-9999)
+    height: var(--starfield-container-height, 100vh);
+    z-index: var(--starfield-z-index, -9990); // Placed z-wise just above the full page gradient background (-9999) and below overlays (0)
     pointer-events: none;
     overflow: hidden;
     opacity: var(--starfield-opacity, 0);
-    transition: opacity 1200ms ease;
+    transform: translateY(var(--alert-push, 0vw));
+    transition: opacity 1200ms ease, transform 1000ms ease;
 
     // Square vertical mask with dynamic dial cutout support:
     mask-image: var(--starfield-mask-image, linear-gradient(to bottom, rgba(0, 0, 0, 1) var(--starfield-mask-start, 0%), rgba(0, 0, 0, 0) var(--starfield-mask-end, 75%)));
@@ -58,7 +59,7 @@ html {
 
 #starfield-circle {
     position: absolute;
-    top: var(--starfield-center-y, 35vw);
+    top: var(--starfield-center-y, calc(var(--starfield-diameter, 100vw) / 2 - var(--starfield-top-cutoff, 12vw)));
     left: var(--starfield-center-x, 50vw);
     width: var(--starfield-diameter, 100vw);
     height: var(--starfield-diameter, 100vw);
