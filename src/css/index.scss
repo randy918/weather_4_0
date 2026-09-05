@@ -48,15 +48,14 @@ html {
 
 .scrolling-gradient-overlay-lower {
     position: absolute;
-    top: var(--gradient-lower-top, 100vw); // DOM SCSS variable for JS manipulation
+    top: var(--gradient-lower-top, 116vw); // DOM SCSS variable for JS manipulation (anchored dynamically to 24 sky images)
     left: 0;
     width: 100vw;
-    height: var(--gradient-lower-height, 25vw); // DOM SCSS variable for JS manipulation
+    height: var(--gradient-lower-height, 38vw); // DOM SCSS variable for JS manipulation
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%);
     pointer-events: none; // Don't interfere with clicks
     z-index: 0; // Behind other UI elements but over the background
-    transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw) + var(--daily-summary-push, 0px)));
-    transition: transform 1000ms ease;
+    transition: top 1000ms ease;
 }
 
 //>  ████████████████████████████████████  STARTUP LOADER

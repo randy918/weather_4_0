@@ -621,16 +621,21 @@ import weatherConditions from '../data/weather-conditions.json';
     requestAnimationFrame(update);
   }
 
+  // EDITABLE: Lower gradient overlay lowest border vertical offset (relative to 24 sky images bottom edge)
+  const GRADIENT_LOWER_BORDER_OFFSET_DESKTOP = '0vw'; // EDITABLE Desktop: Adjust lowest border position (positive moves DOWN, negative moves UP)
+  const GRADIENT_LOWER_BORDER_OFFSET_MOBILE = '0vw';  // EDITABLE Mobile: Adjust lowest border position (positive moves DOWN, negative moves UP)
+
   // EDITABLE: Scrolling Gradient Overlay configuration (Non-phone version: iPad, desktop)
   const GRADIENT_NON_PHONE = {
     top: '40.5vw',
     height: '45vw',
     midpoint: '70%',
     midOpacity: '0.65',
-    lowerTop: '116vw',
+    lowerTop: '116vw', // Fallback top before 24 sky images render
     lowerHeight: '38vw',
     lowerMidpoint: '90%',
-    lowerMidOpacity: '0.65'
+    lowerMidOpacity: '0.65',
+    lowerBorderOffset: GRADIENT_LOWER_BORDER_OFFSET_DESKTOP
   };
 
   // EDITABLE: Scrolling Gradient Overlay configuration (Phone version only)
@@ -639,11 +644,81 @@ import weatherConditions from '../data/weather-conditions.json';
     height: '45vw',
     midpoint: '70%',
     midOpacity: '0.65',
-    lowerTop: '158vw',
+    lowerTop: '158vw', // Fallback top before 24 sky images render
     lowerHeight: '38vw',
     lowerMidpoint: '90%',
-    lowerMidOpacity: '0.65'
+    lowerMidOpacity: '0.65',
+    lowerBorderOffset: GRADIENT_LOWER_BORDER_OFFSET_MOBILE
   };
+
+  let lastCalculatedLowerTop = '';
+
+  function updateLowerGradientPosition() {
+    const isPhone = window.innerWidth < 768;
+    const config = isPhone ? GRADIENT_PHONE : GRADIENT_NON_PHONE;
+    const offsetStr = isPhone ? GRADIENT_LOWER_BORDER_OFFSET_MOBILE : GRADIENT_LOWER_BORDER_OFFSET_DESKTOP;
+    const offsetVal = parseFloat(offsetStr) || 0;
+    const lowerHeightVal = parseFloat(config.lowerHeight) || 38;
+    const pxPerVw = window.innerWidth / 100;
+
+    const imagesContainer = document.querySelector('.hourly-images-container');
+
+    // Account for any active alert / rain banner height transitions
+    const alertsContainer = document.getElementById('alerts-container');
+    const rainBanner = document.getElementById('rain-forecast-banner');
+
+    let pendingDeltaPx = 0;
+    if (alertsContainer && alertsContainer.style.height) {
+      const targetAlertsPx = (parseFloat(alertsContainer.style.height) || 0) * pxPerVw;
+      const currentAlertsPx = alertsContainer.getBoundingClientRect().height;
+      pendingDeltaPx += (targetAlertsPx - currentAlertsPx);
+    }
+    if (rainBanner && rainBanner.style.height) {
+      const targetRainPx = (parseFloat(rainBanner.style.height) || 0) * pxPerVw;
+      const currentRainPx = rainBanner ? rainBanner.getBoundingClientRect().height : 0;
+      pendingDeltaPx += (targetRainPx - currentRainPx);
+    }
+
+    let lowerBottomVwNum;
+
+    if (imagesContainer && imagesContainer.getBoundingClientRect().bottom > 0) {
+      const rect = imagesContainer.getBoundingClientRect();
+      const scrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+      const measuredBottomPx = rect.bottom + scrollY + pendingDeltaPx;
+      lowerBottomVwNum = (measuredBottomPx / pxPerVw) + offsetVal;
+    } else {
+      // Fallback before 24 sky images render
+      const fallbackTop = parseFloat(config.lowerTop || (isPhone ? 158 : 116));
+      lowerBottomVwNum = fallbackTop + lowerHeightVal + offsetVal;
+    }
+
+    const lowerTopVwNum = lowerBottomVwNum - lowerHeightVal;
+    const lowerTopVw = `${lowerTopVwNum.toFixed(2)}vw`;
+    const lowerBottomVw = `${lowerBottomVwNum.toFixed(2)}vw`;
+
+    if (lastCalculatedLowerTop !== lowerTopVw) {
+      lastCalculatedLowerTop = lowerTopVw;
+      document.documentElement.style.setProperty('--gradient-lower-top', lowerTopVw);
+      document.documentElement.style.setProperty('--gradient-lower-bottom', lowerBottomVw);
+      document.documentElement.style.setProperty('--gradient-lower-border-offset', offsetStr);
+    }
+  }
+
+  let hourlyResizeObserver = null;
+  function initHourlyResizeObserver() {
+    if (typeof ResizeObserver === 'undefined') return;
+    const target = document.querySelector('.hourly-images-container');
+    if (!target) return;
+    if (hourlyResizeObserver) {
+      hourlyResizeObserver.disconnect();
+    }
+    hourlyResizeObserver = new ResizeObserver(() => {
+      updateLowerGradientPosition();
+    });
+    hourlyResizeObserver.observe(target);
+    const wrapper = document.getElementById('hourly-forecast-wrapper');
+    if (wrapper) hourlyResizeObserver.observe(wrapper);
+  }
 
   function applyGradientProperties() {
     const isPhone = window.innerWidth < 768;
@@ -653,10 +728,12 @@ import weatherConditions from '../data/weather-conditions.json';
     document.documentElement.style.setProperty('--gradient-height', config.height);
     document.documentElement.style.setProperty('--gradient-midpoint', config.midpoint);
     document.documentElement.style.setProperty('--gradient-mid-opacity', config.midOpacity);
-    document.documentElement.style.setProperty('--gradient-lower-top', config.lowerTop);
     document.documentElement.style.setProperty('--gradient-lower-height', config.lowerHeight);
     document.documentElement.style.setProperty('--gradient-lower-midpoint', config.lowerMidpoint);
     document.documentElement.style.setProperty('--gradient-lower-mid-opacity', config.lowerMidOpacity);
+    document.documentElement.style.setProperty('--gradient-lower-border-offset', isPhone ? GRADIENT_LOWER_BORDER_OFFSET_MOBILE : GRADIENT_LOWER_BORDER_OFFSET_DESKTOP);
+
+    updateLowerGradientPosition();
   }
 
   // Initial apply
@@ -2238,6 +2315,11 @@ import weatherConditions from '../data/weather-conditions.json';
 
     const container = document.createElement('div');
     container.id = 'alerts-container';
+    container.addEventListener('transitionend', (e) => {
+      if (e.propertyName === 'height') {
+        updateLowerGradientPosition();
+      }
+    });
     document.body.insertBefore(container, document.body.firstChild);
 
     // Create rain forecast banner container immediately after alerts
@@ -2731,6 +2813,7 @@ import weatherConditions from '../data/weather-conditions.json';
     if (gradientLower) {
       gradientLower.style.setProperty('--alert-push', pushValue);
     }
+    updateLowerGradientPosition();
     
     /* eslint-disable */console.log(...oo_oo(`2266558813_2709_4_2709_67_4`,`Fragile elements pushed down by ${totalHeight}vw`));
   }
@@ -3529,6 +3612,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
     
     const container = document.createElement('div');
     container.id = 'rain-forecast-banner';
+    container.addEventListener('transitionend', (e) => {
+      if (e.propertyName === 'height') {
+        updateLowerGradientPosition();
+      }
+    });
     
     // Insert after alerts container
     const alertsContainer = document.getElementById('alerts-container');
@@ -4917,7 +5005,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1008';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1012';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
@@ -6562,6 +6650,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
       el.style.display = 'none';
       document.documentElement.style.setProperty('--daily-summary-push', '0px');
     }
+
+    requestAnimationFrame(() => {
+      updateLowerGradientPosition();
+    });
 
     // Apply color associated strictly with current temperature + 10
     const currentTemp = data?.current?.temp;
@@ -9347,6 +9439,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
     wrapper.appendChild(imagesContainer);
     wrapper.appendChild(labelsContainer);
     wrapper.appendChild(rainContainer);
+
+    updateLowerGradientPosition();
+    requestAnimationFrame(() => {
+      updateLowerGradientPosition();
+      initHourlyResizeObserver();
+    });
   }
 
   // Update the overlapping bar chart (hiItem and loItem)
