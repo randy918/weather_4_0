@@ -396,17 +396,28 @@ import weatherConditions from '../data/weather-conditions.json';
   // --- Weather Image Config (Upper Right/Left Circle Cells) ---
   // EDITABLE: Size, margins, and offsets for the left and right weather circle cells.
   // These variables are injected as CSS variables, allowing easy tweaks here or via CSS.
-  const CIRCLE_CELL_SIZE = '24vw';           // EDITABLE: Diameter of the circles (resizes them)
-  const CIRCLE_CELL_TOP = '0vw';            // EDITABLE: Space above the circles (top spacing)
+  const CIRCLE_CELL_SIZE_DESKTOP = '24vw';       // EDITABLE Desktop: Diameter of the circles (resizes them)
+  const CIRCLE_CELL_SIZE_MOBILE = 'var(--dynamic-item-size-4)'; // EDITABLE Mobile: Diameter of the circles (matches 4-column dial size)
+  const CIRCLE_CELL_TOP_DESKTOP = '0vw';         // EDITABLE Desktop: Space above the circles (top spacing)
+  const CIRCLE_CELL_TOP_MOBILE = '0vw';          // EDITABLE Mobile: Space above the circles (top spacing)
   const CIRCLE_CELL_LEFT = '3vw';           // EDITABLE: Space left of the left circle cell
   const CIRCLE_CELL_RIGHT = '3vw';          // EDITABLE: Space right of the right circle cell
-  const CIRCLE_CELL_MARGIN_BOTTOM = '2vw';  // EDITABLE: Space below the circle cells (margin-bottom)
+  // NOTE on Space Below: Because the circle cells are positioned 'absolute', space below them
+  // to the dials row is controlled by CLOCK_GRID_MARGIN_TOP_DESKTOP / MOBILE (lines 185-186)
+  // as well as adjusting CIRCLE_CELL_TOP above.
+  const CIRCLE_CELL_MARGIN_BOTTOM = '2vw';  // Legacy margin-bottom (see CLOCK_GRID_MARGIN_TOP for gap to dials)
   const WEATHER_IMAGE_BORDER_RADIUS = '50%'; // EDITABLE: Circle shape rounding (keep at 50%)
   const RADAR_CENTER_DOT_SIZE = '1.0vw';      // EDITABLE: Size of the radar center dot (middle dot)
 
+  // Compatibility aliases
+  const CIRCLE_CELL_SIZE = CIRCLE_CELL_SIZE_DESKTOP;
+  const CIRCLE_CELL_TOP = CIRCLE_CELL_TOP_DESKTOP;
+
   // Set initial CSS variables for sizing and spacing
   document.documentElement.style.setProperty('--circle-cell-size', CIRCLE_CELL_SIZE);
-  document.documentElement.style.setProperty('--circle-cell-top', CIRCLE_CELL_TOP);
+  document.documentElement.style.setProperty('--circle-cell-top-desktop', CIRCLE_CELL_TOP_DESKTOP);
+  document.documentElement.style.setProperty('--circle-cell-top-mobile', CIRCLE_CELL_TOP_MOBILE);
+  document.documentElement.style.setProperty('--circle-cell-top', window.innerWidth <= 767 ? CIRCLE_CELL_TOP_MOBILE : CIRCLE_CELL_TOP_DESKTOP);
   document.documentElement.style.setProperty('--circle-cell-left', CIRCLE_CELL_LEFT);
   document.documentElement.style.setProperty('--circle-cell-right', CIRCLE_CELL_RIGHT);
   document.documentElement.style.setProperty('--circle-cell-margin-bottom', CIRCLE_CELL_MARGIN_BOTTOM);
@@ -441,8 +452,12 @@ import weatherConditions from '../data/weather-conditions.json';
   // EDITABLE: Adjust the vertical position of the "fragile" top-row elements as a set.
   // This moves the Moon Phase, Wind Arrow, and Weather Description Image together.
   // Use negative values to move UP, positive values to move DOWN (e.g., '-1.5vw' or '2vw').
-  const FRAGILE_ELEMENTS_Y_OFFSET = '2vw'; 
-  document.documentElement.style.setProperty('--fragile-y-offset', FRAGILE_ELEMENTS_Y_OFFSET);
+  const FRAGILE_ELEMENTS_Y_OFFSET_DESKTOP = '2vw';  // EDITABLE Desktop: Vertical position offset
+  const FRAGILE_ELEMENTS_Y_OFFSET_MOBILE = '2vw';   // EDITABLE Mobile: Vertical position offset
+  const FRAGILE_ELEMENTS_Y_OFFSET = FRAGILE_ELEMENTS_Y_OFFSET_DESKTOP;
+  document.documentElement.style.setProperty('--fragile-y-offset-desktop', FRAGILE_ELEMENTS_Y_OFFSET_DESKTOP);
+  document.documentElement.style.setProperty('--fragile-y-offset-mobile', FRAGILE_ELEMENTS_Y_OFFSET_MOBILE);
+  document.documentElement.style.setProperty('--fragile-y-offset', window.innerWidth <= 767 ? FRAGILE_ELEMENTS_Y_OFFSET_MOBILE : FRAGILE_ELEMENTS_Y_OFFSET_DESKTOP);
 
   // EDITABLE: Adjust the horizontal position of the middle four lines of text as a set.
   // Positive values move the text to the RIGHT, negative values move it to the LEFT (e.g., '.5vw' or '-.5vw').
@@ -1925,7 +1940,7 @@ import weatherConditions from '../data/weather-conditions.json';
       #moon-phase-img {
         position: absolute !important;
         transform-origin: top left !important;
-        transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw) + var(--daily-summary-push, 0px))) scale(0.63) !important;
+        transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw))) scale(0.63) !important;
       }
       #wind-direction-arrow {
         position: absolute !important;
@@ -1937,10 +1952,10 @@ import weatherConditions from '../data/weather-conditions.json';
         pointer-events: none !important;
         opacity: 0.9 !important;
         transform-origin: center center !important;
-        transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw) + var(--daily-summary-push, 0px))) !important;
+        transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw))) !important;
       }
       #analog-clock, #barometric-pressure-gauge {
-        transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw) + var(--daily-summary-push, 0px))) !important;
+        transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw))) !important;
       }
       @keyframes scroll-weather-bg {
         0% { background-position: 0 center; }
@@ -1964,7 +1979,7 @@ import weatherConditions from '../data/weather-conditions.json';
         border-radius: ${WEATHER_IMAGE_BORDER_RADIUS};
         -webkit-mask-image: -webkit-radial-gradient(white, black);
         transform-origin: top right !important;
-        transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw) + var(--daily-summary-push, 0px))) !important;
+        transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw))) !important;
         z-index: 50;
         overflow: hidden;
         opacity: 0; /* Hide initially to prevent page load flash */
@@ -2004,7 +2019,7 @@ import weatherConditions from '../data/weather-conditions.json';
         border-radius: ${WEATHER_IMAGE_BORDER_RADIUS};
         -webkit-mask-image: -webkit-radial-gradient(white, black);
         transform-origin: top left !important;
-        transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw) + var(--daily-summary-push, 0px))) !important;
+        transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw))) !important;
         z-index: 50;
         overflow: hidden;
         opacity: 0; /* Hide initially to prevent page load flash */
@@ -4891,7 +4906,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1003';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1005';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
@@ -11104,6 +11119,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   // Reposition temperature pointer and wind arrow on window resize
   window.addEventListener('resize', () => {
+    const isMobile = window.innerWidth <= 767;
+    document.documentElement.style.setProperty('--circle-cell-top', isMobile ? CIRCLE_CELL_TOP_MOBILE : CIRCLE_CELL_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--fragile-y-offset', isMobile ? FRAGILE_ELEMENTS_Y_OFFSET_MOBILE : FRAGILE_ELEMENTS_Y_OFFSET_DESKTOP);
     if (lastWeatherData) {
       // Delay to ensure DOM has settled after resize
       setTimeout(() => {

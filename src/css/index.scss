@@ -1208,6 +1208,8 @@ main {
     --grid-moon-phase-x-offset: var(--grid-moon-phase-x-offset-desktop, 0vw);
     --grid-moon-phase-y-offset: var(--grid-moon-phase-y-offset-desktop, 0vw);
     --clock-grid-margin-top: var(--clock-grid-margin-top-desktop, 2.2vw);
+    --circle-cell-top: var(--circle-cell-top-desktop, 0vw);
+    --fragile-y-offset: var(--fragile-y-offset-desktop, 2vw);
     --radar-threshold-left: 150;
     --radar-threshold-right: 300;
 
@@ -1241,6 +1243,8 @@ main {
         --grid-moon-phase-x-offset: var(--grid-moon-phase-x-offset-mobile, 0vw);
         --grid-moon-phase-y-offset: var(--grid-moon-phase-y-offset-mobile, 0vw);
         --clock-grid-margin-top: var(--clock-grid-margin-top-mobile, 3vw);
+        --circle-cell-top: var(--circle-cell-top-mobile, 0vw);
+        --fragile-y-offset: var(--fragile-y-offset-mobile, 2vw);
     }
 
     .grid-wind-speed-text {
@@ -1264,12 +1268,14 @@ main {
         width: var(--dynamic-item-size-4) !important;
         height: var(--dynamic-item-size-4) !important;
         left: calc(var(--clock-grid-margin-left, 2vw) + (100vw - var(--clock-grid-margin-left, 2vw) - var(--clock-grid-margin-right, 2vw)) * 0.125 - var(--dynamic-item-size-4) / 2) !important;
+        top: var(--circle-cell-top, 0vw) !important;
     }
 
     #weather-desc-image {
         width: var(--dynamic-item-size-4) !important;
         height: var(--dynamic-item-size-4) !important;
         right: calc(var(--clock-grid-margin-right, 2vw) + (100vw - var(--clock-grid-margin-left, 2vw) - var(--clock-grid-margin-right, 2vw)) * 0.125 - var(--dynamic-item-size-4) / 2) !important;
+        top: var(--circle-cell-top, 0vw) !important;
     }
 }
 
