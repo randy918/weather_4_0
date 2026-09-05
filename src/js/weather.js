@@ -398,7 +398,7 @@ import weatherConditions from '../data/weather-conditions.json';
   // These variables are injected as CSS variables, allowing easy tweaks here or via CSS.
   const CIRCLE_CELL_SIZE_DESKTOP = '24vw';       // EDITABLE Desktop: Diameter of the circles (resizes them)
   const CIRCLE_CELL_SIZE_MOBILE = 'var(--dynamic-item-size-4)'; // EDITABLE Mobile: Diameter of the circles (matches 4-column dial size)
-  const CIRCLE_CELL_TOP_DESKTOP = '0vw';         // EDITABLE Desktop: Space above the circles (top spacing)
+  const CIRCLE_CELL_TOP_DESKTOP = '8vw';         // EDITABLE Desktop: Space above the circles (top spacing)
   const CIRCLE_CELL_TOP_MOBILE = '0vw';          // EDITABLE Mobile: Space above the circles (top spacing)
   const CIRCLE_CELL_LEFT = '3vw';           // EDITABLE: Space left of the left circle cell
   const CIRCLE_CELL_RIGHT = '3vw';          // EDITABLE: Space right of the right circle cell
@@ -9764,7 +9764,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const CITY_FONT_FAMILY = "'light', sans-serif";// EDITABLE: Base font family (e.g., 'light', 'bold', 'Weather')
     const CITY_MARGIN_TOP_DESKTOP = '2vw';         // EDITABLE Desktop: Space ABOVE the city name
     const CITY_MARGIN_TOP_MOBILE = '2vw';          // EDITABLE Mobile: Space ABOVE the city name
-    const CITY_MARGIN_BOTTOM_DESKTOP = '-2.5vw';   // EDITABLE Desktop: Space BELOW the city name
+    const CITY_MARGIN_BOTTOM_DESKTOP = '-1.5vw';   // EDITABLE Desktop: Space BELOW the city name
     const CITY_MARGIN_BOTTOM_MOBILE = '-4.5vw';    // EDITABLE Mobile: Space BELOW the city name
     const CITY_LETTER_SPACING_DESKTOP = '-0.05vw'; // EDITABLE Desktop: Gap between letters
     const CITY_LETTER_SPACING_MOBILE = '-0.05vw';  // EDITABLE Mobile: Gap between letters
