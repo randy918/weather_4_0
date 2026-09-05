@@ -162,6 +162,17 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--temp-pointer-shadow', TEMP_POINTER_SHADOW);
   document.documentElement.style.setProperty('--temp-pointer-default-color', TEMP_POINTER_DEFAULT_COLOR);
 
+  // --- CONFIG: 8-Day Forecast Temperature Bar Padding (Hi & Lo Degrees) ---
+  const HI_BAR_PADDING_TOP_DESKTOP = '0.4vw';         // EDITABLE Desktop: Top padding hugging degrees to top of hi bar
+  const HI_BAR_PADDING_TOP_MOBILE = '0.4vw';          // EDITABLE Mobile: Top padding hugging degrees to top of hi bar
+  const LO_BAR_PADDING_TOP_DESKTOP = '0.4vw';         // EDITABLE Desktop: Top padding hugging degrees to top of lo cell
+  const LO_BAR_PADDING_TOP_MOBILE = '0.4vw';          // EDITABLE Mobile: Top padding hugging degrees to top of lo cell
+
+  document.documentElement.style.setProperty('--hi-bar-padding-top-desktop', HI_BAR_PADDING_TOP_DESKTOP);
+  document.documentElement.style.setProperty('--hi-bar-padding-top-mobile', HI_BAR_PADDING_TOP_MOBILE);
+  document.documentElement.style.setProperty('--lo-bar-padding-top-desktop', LO_BAR_PADDING_TOP_DESKTOP);
+  document.documentElement.style.setProperty('--lo-bar-padding-top-mobile', LO_BAR_PADDING_TOP_MOBILE);
+
   // --- CONFIG: Low Temp Bar Upward Shadow (8-day forecast) ---
   const LO_TEMP_SHADOW_OFFSET_Y_DESKTOP = '-3vw';     // EDITABLE Desktop: Upward vertical offset (negative is up)
   const LO_TEMP_SHADOW_OFFSET_Y_MOBILE = '-3.0vw';      // EDITABLE Mobile: Upward vertical offset (negative is up)
@@ -4906,7 +4917,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1005';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1006';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
