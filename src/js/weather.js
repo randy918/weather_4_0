@@ -1028,6 +1028,64 @@ import weatherConditions from '../data/weather-conditions.json';
     nextMeteorTime = nowSec + minS + Math.random() * (maxS - minS);
   }
 
+  function getCanvasRotationAngle(canvas) {
+    if (!canvas) return 0;
+    const style = window.getComputedStyle(canvas);
+    const transform = style.transform || style.webkitTransform;
+    if (!transform || transform === 'none') return 0;
+    const match = transform.match(/^matrix\(([^)]+)\)$/);
+    if (match) {
+      const values = match[1].split(',').map(parseFloat);
+      return Math.atan2(values[1], values[0]);
+    }
+    const match3d = transform.match(/^matrix3d\(([^)]+)\)$/);
+    if (match3d) {
+      const values = match3d[1].split(',').map(parseFloat);
+      return Math.atan2(values[1], values[0]);
+    }
+    return 0;
+  }
+
+  let cachedStarfieldMaskDials = [];
+  let lastStarfieldMaskDialsTime = 0;
+
+  function getStarfieldMaskDials() {
+    const now = performance.now();
+    if (cachedStarfieldMaskDials.length > 0 && (now - lastStarfieldMaskDialsTime < 400)) {
+      return cachedStarfieldMaskDials;
+    }
+    lastStarfieldMaskDialsTime = now;
+
+    const isPhone = window.innerWidth < 768;
+    const dialMaskPercent = isPhone ? STARFIELD_DIAL_MASK_PERCENT_MOBILE : STARFIELD_DIAL_MASK_PERCENT_DESKTOP;
+    const dopplerMaskPercent = isPhone ? STARFIELD_DOPPLER_MASK_PERCENT_MOBILE : STARFIELD_DOPPLER_MASK_PERCENT_DESKTOP;
+
+    let selector = '.clockGridItem, #analog-clock';
+    if (STARFIELD_MASK_WEATHER_CIRCLES) {
+      selector += ', #weather-desc-image, #weather-desc-image-left';
+    }
+
+    const elements = document.querySelectorAll(selector);
+    const dials = [];
+
+    elements.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        const isDoppler = el.id === 'weather-desc-image' || el.id === 'weather-desc-image-left';
+        const maskPct = isDoppler ? dopplerMaskPercent : dialMaskPercent;
+        const radius = (rect.width / 2) * (maskPct / 100);
+        dials.push({
+          screenX: rect.left + rect.width / 2,
+          screenY: rect.top + rect.height / 2,
+          radius: radius
+        });
+      }
+    });
+
+    cachedStarfieldMaskDials = dials;
+    return dials;
+  }
+
   function drawStarfield(timestamp) {
     const canvas = document.getElementById('starfield-canvas');
     if (!canvas) return;
@@ -1271,6 +1329,38 @@ import weatherConditions from '../data/weather-conditions.json';
       ctx.fill();
     });
 
+    // Mask out dials and Doppler circles directly on the canvas buffer (ensures shooting stars & stars are 100% masked)
+    if (STARFIELD_MASK_DIALS_ENABLED) {
+      const dials = getStarfieldMaskDials();
+      if (dials.length > 0) {
+        const starfieldCircle = document.getElementById('starfield-circle');
+        const circleRect = starfieldCircle ? starfieldCircle.getBoundingClientRect() : canvas.getBoundingClientRect();
+        const circleCenterX = circleRect.left + circleRect.width / 2;
+        const circleCenterY = circleRect.top + circleRect.height / 2;
+        const rotAngle = getCanvasRotationAngle(canvas);
+        const cos = Math.cos(-rotAngle);
+        const sin = Math.sin(-rotAngle);
+
+        ctx.save();
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+
+        for (let i = 0; i < dials.length; i++) {
+          const d = dials[i];
+          const dx = d.screenX - circleCenterX;
+          const dy = d.screenY - circleCenterY;
+          const localX = cx + (dx * cos - dy * sin);
+          const localY = cy + (dx * sin + dy * cos);
+
+          ctx.beginPath();
+          ctx.arc(localX, localY, d.radius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.restore();
+      }
+    }
+
     ctx.restore();
   }
 
@@ -1341,6 +1431,7 @@ import weatherConditions from '../data/weather-conditions.json';
   }
 
   function updateStarfieldMask() {
+    cachedStarfieldMaskDials = []; // Invalidate canvas dial mask cache
     const starfieldContainer = document.getElementById('starfield-container');
     if (!starfieldContainer) return;
 
@@ -5856,7 +5947,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1020';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1021';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
