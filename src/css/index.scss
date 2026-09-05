@@ -33,6 +33,46 @@ html {
     pointer-events: none;
 }
 
+#starfield-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -9990; // Placed z-wise just above the full page gradient background (-9999)
+    pointer-events: none;
+    overflow: hidden;
+    opacity: var(--starfield-opacity, 0);
+    transition: opacity 1200ms ease;
+
+    // Square vertical mask: 100% opacity at top, fading to 0% opacity vertically going down
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) var(--starfield-mask-start, 0%), rgba(0, 0, 0, 0) var(--starfield-mask-end, 75%));
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) var(--starfield-mask-start, 0%), rgba(0, 0, 0, 0) var(--starfield-mask-end, 75%));
+}
+
+#starfield-canvas {
+    position: absolute;
+    top: var(--starfield-center-y, 35vw);
+    left: var(--starfield-center-x, 50vw);
+    width: var(--starfield-diameter, 100vw);
+    height: var(--starfield-diameter, 100vw);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: starfield-rotate var(--starfield-rotation-speed, 480s) linear infinite;
+    animation-direction: var(--starfield-rotation-direction, normal);
+    transform-origin: center center;
+    will-change: transform;
+}
+
+@keyframes starfield-rotate {
+    from {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
 .scrolling-gradient-overlay {
     position: absolute;
     top: var(--gradient-top, 0vw); // DOM SCSS variable for JS manipulation

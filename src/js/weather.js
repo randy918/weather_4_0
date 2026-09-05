@@ -30,6 +30,7 @@ import weatherConditions from '../data/weather-conditions.json';
   const urlParams = new URLSearchParams(window.location.search);
   const forceSnow = urlParams.get('snow') === 'true' || urlParams.get('snow') === '1' || urlParams.get('test_snow') === 'true';
   const forceRain = urlParams.get('rain') === 'true' || urlParams.get('rain') === '1' || urlParams.get('test_rain') === 'true';
+  const forceStars = urlParams.get('stars') === 'true' || urlParams.get('stars') === '1' || urlParams.get('test_stars') === 'true';
 
   // --- CONFIG: Season Starts Test / Preview & Styling (JCV) ---
   const TEST_SHOW_SEASON_COUNTDOWN_PREVIEW = false; // EDITABLE: Set to true to force-show a countdown for testing
@@ -622,8 +623,8 @@ import weatherConditions from '../data/weather-conditions.json';
   }
 
   // EDITABLE: Lower gradient overlay lowest border vertical offset (relative to 24 sky images bottom edge)
-  const GRADIENT_LOWER_BORDER_OFFSET_DESKTOP = '0vw'; // EDITABLE Desktop: Adjust lowest border position (positive moves DOWN, negative moves UP)
-  const GRADIENT_LOWER_BORDER_OFFSET_MOBILE = '0vw';  // EDITABLE Mobile: Adjust lowest border position (positive moves DOWN, negative moves UP)
+  const GRADIENT_LOWER_BORDER_OFFSET_DESKTOP = '-4vw'; // EDITABLE Desktop: Adjust lowest border position (positive moves DOWN, negative moves UP)
+  const GRADIENT_LOWER_BORDER_OFFSET_MOBILE = '-4vw';  // EDITABLE Mobile: Adjust lowest border position (positive moves DOWN, negative moves UP)
 
   // EDITABLE: Scrolling Gradient Overlay configuration (Non-phone version: iPad, desktop)
   const GRADIENT_NON_PHONE = {
@@ -741,6 +742,277 @@ import weatherConditions from '../data/weather-conditions.json';
 
   // Re-apply on window resize
   window.addEventListener('resize', applyGradientProperties);
+
+  // ==========================================
+  // --- EDITABLE: Night Sky Starfield Configuration (JCV) ---
+  // ==========================================
+  // 1. Test Mode: Set to true to force starfield visible during daytime for testing (or use URL query ?stars=true)
+  let STARFIELD_TEST_MODE = true; // EDITABLE: Toggle true to force starfield visible during daytime (set false for auto day/night)
+
+  // 2. Day/Night Opacity Fade Window (in minutes)
+  const STARFIELD_FADE_WINDOW_MINUTES = 60; // EDITABLE: Minutes before sunset to fade in / minutes after sunrise to fade out
+
+  // 3. Circle Geometry & Position (Full width & center vertical position)
+  const STARFIELD_CIRCLE_DIAMETER_DESKTOP = '100vw'; // EDITABLE Desktop: Diameter of starfield circle (full width)
+  const STARFIELD_CIRCLE_DIAMETER_MOBILE = '100vw';  // EDITABLE Mobile: Diameter of starfield circle (full width)
+  const STARFIELD_CENTER_Y_DESKTOP = '35vw';        // EDITABLE Desktop: Vertical position of circle center
+  const STARFIELD_CENTER_Y_MOBILE = '45vw';         // EDITABLE Mobile: Vertical position of circle center
+  const STARFIELD_CENTER_X_DESKTOP = '50vw';        // EDITABLE Desktop: Horizontal position of circle center
+  const STARFIELD_CENTER_X_MOBILE = '50vw';         // EDITABLE Mobile: Horizontal position of circle center
+
+  // 4. Slow Rotation Around Center (Seconds per 360° turn & direction)
+  const STARFIELD_ROTATION_SPEED_S_DESKTOP = 480;   // EDITABLE Desktop: Seconds per 360° rotation (480s = 8 minutes)
+  const STARFIELD_ROTATION_SPEED_S_MOBILE = 480;    // EDITABLE Mobile: Seconds per 360° rotation
+  const STARFIELD_ROTATION_DIRECTION_DESKTOP = 'normal'; // EDITABLE Desktop: 'normal' (clockwise) or 'reverse' (counter-clockwise)
+  const STARFIELD_ROTATION_DIRECTION_MOBILE = 'normal';  // EDITABLE Mobile: 'normal' or 'reverse'
+
+  // 5. Vertical Square Mask (Opacity going 100% to 0% vertically going down)
+  const STARFIELD_MASK_START_DESKTOP = '0%';        // EDITABLE Desktop: Start point of 100% opacity
+  const STARFIELD_MASK_START_MOBILE = '0%';         // EDITABLE Mobile: Start point of 100% opacity
+  const STARFIELD_MASK_END_DESKTOP = '75%';         // EDITABLE Desktop: End point where opacity reaches 0%
+  const STARFIELD_MASK_END_MOBILE = '70%';          // EDITABLE Mobile: End point where opacity reaches 0%
+
+  // 6. Number of Stars & Wildness Randomization
+  const STARFIELD_STAR_COUNT_DESKTOP = 160;         // EDITABLE Desktop: Base star count
+  const STARFIELD_STAR_COUNT_MOBILE = 110;          // EDITABLE Mobile: Base star count
+  const STARFIELD_COUNT_VARIANCE_DESKTOP = 0.35;    // EDITABLE Desktop: Wildness/randomness variance factor (0.35 = ±35%)
+  const STARFIELD_COUNT_VARIANCE_MOBILE = 0.35;     // EDITABLE Mobile: Wildness/randomness variance factor (0.35 = ±35%)
+
+  // 7. Star Sizes (Minimum, Maximum, and Random Selection)
+  const STARFIELD_STAR_MIN_SIZE_DESKTOP = 0.8;      // EDITABLE Desktop: Minimum star radius in px
+  const STARFIELD_STAR_MIN_SIZE_MOBILE = 0.6;       // EDITABLE Mobile: Minimum star radius in px
+  const STARFIELD_STAR_MAX_SIZE_DESKTOP = 2.4;      // EDITABLE Desktop: Maximum star radius in px
+  const STARFIELD_STAR_MAX_SIZE_MOBILE = 1.8;       // EDITABLE Mobile: Maximum star radius in px
+
+  // 8. Out-of-Focus Stars (Atmospheric Blur Ratio & Max Blur Radius)
+  const STARFIELD_OUT_OF_FOCUS_RATIO_DESKTOP = 0.30; // EDITABLE Desktop: Ratio of stars that are out-of-focus (0.30 = 30%)
+  const STARFIELD_OUT_OF_FOCUS_RATIO_MOBILE = 0.30;  // EDITABLE Mobile: Ratio of stars that are out-of-focus
+  const STARFIELD_OUT_OF_FOCUS_BLUR_DESKTOP = 4.0;  // EDITABLE Desktop: Blur radius for out-of-focus stars in px
+  const STARFIELD_OUT_OF_FOCUS_BLUR_MOBILE = 3.0;   // EDITABLE Mobile: Blur radius for out-of-focus stars in px
+
+  let starFieldStars = null;
+
+  function generateStarFieldData() {
+    const isPhone = window.innerWidth < 768;
+    const baseCount = isPhone ? STARFIELD_STAR_COUNT_MOBILE : STARFIELD_STAR_COUNT_DESKTOP;
+    const variance = isPhone ? STARFIELD_COUNT_VARIANCE_MOBILE : STARFIELD_COUNT_VARIANCE_DESKTOP;
+    const count = Math.max(10, Math.round(baseCount * (1 + (Math.random() * 2 - 1) * variance)));
+
+    const minSize = isPhone ? STARFIELD_STAR_MIN_SIZE_MOBILE : STARFIELD_STAR_MIN_SIZE_DESKTOP;
+    const maxSize = isPhone ? STARFIELD_STAR_MAX_SIZE_MOBILE : STARFIELD_STAR_MAX_SIZE_DESKTOP;
+    const oofRatio = isPhone ? STARFIELD_OUT_OF_FOCUS_RATIO_MOBILE : STARFIELD_OUT_OF_FOCUS_RATIO_DESKTOP;
+    const maxBlur = isPhone ? STARFIELD_OUT_OF_FOCUS_BLUR_MOBILE : STARFIELD_OUT_OF_FOCUS_BLUR_DESKTOP;
+
+    const stars = [];
+    for (let i = 0; i < count; i++) {
+      // Uniform random distribution inside a circle:
+      const theta = Math.random() * Math.PI * 2;
+      const r = Math.sqrt(Math.random());
+      const normX = r * Math.cos(theta); // Normalized: -1 to +1
+      const normY = r * Math.sin(theta); // Normalized: -1 to +1
+
+      // Size distribution: power curve so faint pinpoints dominate with occasional bright stars
+      const sizeFactor = Math.pow(Math.random(), 2.0);
+      const size = minSize + sizeFactor * (maxSize - minSize);
+
+      // Opacity / Brightness variation
+      const alpha = 0.35 + Math.random() * 0.65;
+
+      // Realistic spectral temperature tints
+      const randColor = Math.random();
+      let rgb = [255, 255, 255]; // Pure white (default)
+      if (randColor < 0.15) {
+        rgb = [205, 225, 255]; // Subtle blue tint
+      } else if (randColor < 0.30) {
+        rgb = [255, 242, 215]; // Subtle warm amber tint
+      }
+
+      const isOutOfFocus = Math.random() < oofRatio;
+      const blur = isOutOfFocus ? (1.5 + Math.random() * (maxBlur - 1.5)) : 0;
+
+      stars.push({
+        normX,
+        normY,
+        size,
+        alpha,
+        rgb,
+        isOutOfFocus,
+        blur
+      });
+    }
+
+    starFieldStars = stars;
+  }
+
+  function drawStarfield() {
+    const canvas = document.getElementById('starfield-canvas');
+    if (!canvas) return;
+
+    if (!starFieldStars) {
+      generateStarFieldData();
+    }
+
+    const isPhone = window.innerWidth < 768;
+    const diameterStr = isPhone ? STARFIELD_CIRCLE_DIAMETER_MOBILE : STARFIELD_CIRCLE_DIAMETER_DESKTOP;
+    const dVw = parseFloat(diameterStr) || 100;
+    const diameterPx = Math.round((dVw / 100) * window.innerWidth);
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(diameterPx * dpr);
+    canvas.height = Math.round(diameterPx * dpr);
+
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.scale(dpr, dpr);
+
+    const cx = diameterPx / 2;
+    const cy = diameterPx / 2;
+    const radius = diameterPx / 2;
+
+    starFieldStars.forEach(star => {
+      const x = cx + star.normX * radius;
+      const y = cy + star.normY * radius;
+      const [r, g, b] = star.rgb;
+
+      if (star.isOutOfFocus) {
+        // Soft out-of-focus bokeh halo
+        const totalRadius = star.size + star.blur;
+        const grad = ctx.createRadialGradient(x, y, 0, x, y, totalRadius);
+        grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${star.alpha * 0.85})`);
+        grad.addColorStop(0.4, `rgba(${r}, ${g}, ${b}, ${star.alpha * 0.35})`);
+        grad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(x, y, totalRadius, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        // Crisp pinpoint star
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${star.alpha})`;
+        ctx.beginPath();
+        ctx.arc(x, y, star.size, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Subtle atmospheric glow around larger stars
+        if (star.size > 1.4) {
+          const glowRad = star.size * 2.2;
+          const grad = ctx.createRadialGradient(x, y, 0, x, y, glowRad);
+          grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${star.alpha * 0.4})`);
+          grad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(x, y, glowRad, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    });
+
+    ctx.restore();
+  }
+
+  function calculateStarfieldOpacity(data) {
+    if (STARFIELD_TEST_MODE || forceStars) {
+      return 1.0;
+    }
+
+    const nowSec = Math.floor(Date.now() / 1000);
+    const today = data?.daily?.[0];
+    const sunriseSec = today?.sunrise ?? data?.current?.sunrise;
+    const sunsetSec = today?.sunset ?? data?.current?.sunset;
+    const fadeSec = Math.max(1, STARFIELD_FADE_WINDOW_MINUTES * 60);
+
+    if (typeof sunriseSec !== 'number' || typeof sunsetSec !== 'number') {
+      const hr = new Date().getHours();
+      return (hr >= 20 || hr < 6) ? 1.0 : 0.0;
+    }
+
+    if (nowSec >= sunsetSec) {
+      // After sunset -> full night
+      return 1.0;
+    } else if (nowSec >= sunsetSec - fadeSec) {
+      // 60 minutes PRECEDING sunset -> fade from 0 to 1
+      return Math.max(0, Math.min(1, (nowSec - (sunsetSec - fadeSec)) / fadeSec));
+    } else if (nowSec > sunriseSec + fadeSec) {
+      // Full daytime -> 0
+      return 0.0;
+    } else if (nowSec >= sunriseSec) {
+      // 60 minutes POST sunrise -> fade from 1 to 0
+      return Math.max(0, Math.min(1, 1 - (nowSec - sunriseSec) / fadeSec));
+    } else {
+      // Before today's sunrise -> full night
+      return 1.0;
+    }
+  }
+
+  function updateStarfieldOpacity(data) {
+    const opacity = calculateStarfieldOpacity(data || lastWeatherData);
+    document.documentElement.style.setProperty('--starfield-opacity', opacity.toFixed(4));
+    return opacity;
+  }
+
+  function applyStarfieldProperties() {
+    const isPhone = window.innerWidth < 768;
+    
+    const diameter = isPhone ? STARFIELD_CIRCLE_DIAMETER_MOBILE : STARFIELD_CIRCLE_DIAMETER_DESKTOP;
+    const centerY = isPhone ? STARFIELD_CENTER_Y_MOBILE : STARFIELD_CENTER_Y_DESKTOP;
+    const centerX = isPhone ? STARFIELD_CENTER_X_MOBILE : STARFIELD_CENTER_X_DESKTOP;
+    const rotationSpeed = isPhone ? STARFIELD_ROTATION_SPEED_S_MOBILE : STARFIELD_ROTATION_SPEED_S_DESKTOP;
+    const rotationDirection = isPhone ? STARFIELD_ROTATION_DIRECTION_MOBILE : STARFIELD_ROTATION_DIRECTION_DESKTOP;
+    const maskStart = isPhone ? STARFIELD_MASK_START_MOBILE : STARFIELD_MASK_START_DESKTOP;
+    const maskEnd = isPhone ? STARFIELD_MASK_END_MOBILE : STARFIELD_MASK_END_DESKTOP;
+
+    document.documentElement.style.setProperty('--starfield-diameter', diameter);
+    document.documentElement.style.setProperty('--starfield-center-y', centerY);
+    document.documentElement.style.setProperty('--starfield-center-x', centerX);
+    document.documentElement.style.setProperty('--starfield-rotation-speed', `${rotationSpeed}s`);
+    document.documentElement.style.setProperty('--starfield-rotation-direction', rotationDirection);
+    document.documentElement.style.setProperty('--starfield-mask-start', maskStart);
+    document.documentElement.style.setProperty('--starfield-mask-end', maskEnd);
+
+    updateStarfieldOpacity(lastWeatherData);
+    drawStarfield();
+  }
+
+  function initStarfield() {
+    let container = document.getElementById('starfield-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'starfield-container';
+      const canvas = document.createElement('canvas');
+      canvas.id = 'starfield-canvas';
+      container.appendChild(canvas);
+
+      const fixedBg = document.getElementById('fixed-bg');
+      if (fixedBg && fixedBg.parentNode) {
+        fixedBg.parentNode.insertBefore(container, fixedBg.nextSibling);
+      } else {
+        document.body.insertBefore(container, document.body.firstChild);
+      }
+    }
+
+    applyStarfieldProperties();
+  }
+
+  // Window resize handler for starfield
+  window.addEventListener('resize', applyStarfieldProperties);
+
+  // Periodic check (every 60s) to advance day/night opacity transition
+  setInterval(() => {
+    updateStarfieldOpacity(lastWeatherData);
+  }, 60000);
+
+  // Expose Starfield helpers to window.Weather for manual console testing
+  if (!window.Weather) window.Weather = {};
+  window.Weather.setStarfieldTestMode = (enabled) => {
+    STARFIELD_TEST_MODE = !!enabled;
+    const op = updateStarfieldOpacity(lastWeatherData);
+    console.log(`✨ Starfield test mode set to: ${STARFIELD_TEST_MODE}, opacity: ${op}`);
+  };
+  window.Weather.regenerateStarfield = () => {
+    generateStarFieldData();
+    drawStarfield();
+    console.log(`✨ Starfield regenerated with ${starFieldStars ? starFieldStars.length : 0} stars`);
+  };
 
   // EDITABLE: Wind speed text Y-offset adjustment
   const WIND_NUMBER_Y_OFFSET_DESKTOP = '-1vw'; // EDITABLE: Desktop vertical position of main wind number (negative moves UP)
@@ -2704,6 +2976,7 @@ import weatherConditions from '../data/weather-conditions.json';
     initAlertsContainer();
     initRainCanvas();
     initSnowCanvas();
+    initStarfield();
     // Initialize fragile elements with starting position
     const moon = document.getElementById('moon-phase-img');
     const descImg = document.getElementById('weather-desc-image');
@@ -2727,6 +3000,7 @@ import weatherConditions from '../data/weather-conditions.json';
       initAlertsContainer();
       initRainCanvas();
       initSnowCanvas();
+      initStarfield();
       // Initialize fragile elements with starting position
       const moon = document.getElementById('moon-phase-img');
       const descImg = document.getElementById('weather-desc-image');
@@ -5005,7 +5279,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1012';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1013';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
@@ -10541,6 +10815,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
       
       // Update dynamic snow animation state based on precipitation rates
       updateSnowAnimationState(data);
+      
+      // Update dynamic night sky starfield opacity
+      updateStarfieldOpacity(data);
       
       updateFields(data);
 
