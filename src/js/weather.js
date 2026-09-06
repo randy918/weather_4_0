@@ -5985,7 +5985,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1043';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1057';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
@@ -6093,6 +6093,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
           updateOverlappingBarChart(lastWeatherData);
           updateDewpointDial(lastWeatherData);
           setTimeout(() => updateTempPointer(lastWeatherData), 50);
+          setTimeout(() => updateTempPointer(lastWeatherData), 850);
+          setTimeout(() => updateTempPointer(lastWeatherData), 1650);
         }
         if (window.Weather && window.Weather.refreshDotColors) {
           window.Weather.refreshDotColors();
@@ -6116,6 +6118,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
           updateOverlappingBarChart(lastWeatherData);
           updateDewpointDial(lastWeatherData);
           setTimeout(() => updateTempPointer(lastWeatherData), 50);
+          setTimeout(() => updateTempPointer(lastWeatherData), 850);
+          setTimeout(() => updateTempPointer(lastWeatherData), 1650);
         }
         if (window.Weather && window.Weather.refreshDotColors) {
           window.Weather.refreshDotColors();
@@ -10537,6 +10541,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
           setTimeout(() => {
             item.classList.remove('animating-change');
             item.style.zIndex = ''; // Restore default (underneath low bar)
+            if (index === 0) {
+              updateTempPointer(data);
+            }
           }, 800);
         }, 820);
 
@@ -10618,6 +10625,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
               loItem.classList.remove('animating-change');
               loItem.style.zIndex = '';
               loItem.style.overflow = '';
+              if (index === 0) {
+                updateTempPointer(data);
+              }
             }, 800);
           }, 820);
 
@@ -10716,8 +10726,41 @@ Plan ahead for significantly warmer conditions tomorrow!`
     /* eslint-disable */console.log(...oo_oo(`2266558813_9611_4_9611_76_4`,`🎯 TEMP POINTER CALC - Clamped Ratio: ${ratio.toFixed(4)}`));
 
     // Calculate position: start from loTop, move up by ratio * barRange
-    // ratio = 0.0 means at loTop (today's low), ratio = 1.0 means at hiTop (today's high)
-    const pointerY = (loTop - containerRect.top) - (ratio * barRange);
+    // Check if bars are actively in the "dip down, dip back up" animation
+    const isAnimating = hiItem.classList.contains('animating-change') || loItem.classList.contains('animating-change');
+    const isDipCorrupted = (tempRange >= 3 && barRange <= 5);
+
+    let pointerY;
+    if (!isAnimating && !isDipCorrupted && barRange > 0) {
+      // Normal state: Bars are at rest, calculate directly from rendered element tops
+      // ratio = 0.0 means at loTop (today's low), ratio = 1.0 means at hiTop (today's high)
+      pointerY = (loTop - containerRect.top) - (ratio * barRange);
+    } else {
+      // Animating or collapsed state: Calculate target position mathematically to prevent the pointer
+      // from being dragged down to ~77° while the high bar dips down to the low bar
+      const range = tempRangeMax - tempRangeMin;
+      const clampedTemp = Math.max(loTemp, Math.min(hiTemp, currentTemp));
+      const currentRatio = range > 0 ? (clampedTemp - tempRangeMin) / range : 0.5;
+      const clampedRatio = Math.max(0, Math.min(1, currentRatio));
+
+      const hiContainer = document.querySelector('.hiContainer');
+      let availableHeight = 0;
+      if (hiContainer) {
+        const hiContainerStyle = window.getComputedStyle(hiContainer);
+        const paddingTop = parseFloat(hiContainerStyle.paddingTop) || 0;
+        const paddingBottom = parseFloat(hiContainerStyle.paddingBottom) || 0;
+        availableHeight = hiContainer.clientHeight - paddingTop - paddingBottom;
+      }
+      if (availableHeight <= 0) {
+        availableHeight = containerRect.height;
+      }
+
+      const minBarHeightPx = window.innerWidth * (MIN_TEMP_BAR_HEIGHT_VW / 100);
+      const fullScalePx = Math.max(0, availableHeight - minBarHeightPx);
+      const targetBarHeight = minBarHeightPx + fullScalePx * clampedRatio;
+      const baselineY = (hiRect.bottom || loRect.bottom) - containerRect.top;
+      pointerY = baselineY - targetBarHeight;
+    }
 
     // Position the pointer
     // EDITABLE: Position pointer so its RIGHT edge aligns with right edge of today's temperature bar
@@ -10855,7 +10898,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const CITY_MARGIN_TOP_DESKTOP = '2vw';         // EDITABLE Desktop: Space ABOVE the city name
     const CITY_MARGIN_TOP_MOBILE = '2vw';          // EDITABLE Mobile: Space ABOVE the city name
     const CITY_MARGIN_BOTTOM_DESKTOP = '-1.5vw';   // EDITABLE Desktop: Space BELOW the city name
-    const CITY_MARGIN_BOTTOM_MOBILE = '-4.5vw';    // EDITABLE Mobile: Space BELOW the city name
+    const CITY_MARGIN_BOTTOM_MOBILE = '0vw';    // EDITABLE Mobile: Space BELOW the city name
     const CITY_LETTER_SPACING_DESKTOP = '-0.05vw'; // EDITABLE Desktop: Gap between letters
     const CITY_LETTER_SPACING_MOBILE = '-0.05vw';  // EDITABLE Mobile: Gap between letters
 
@@ -11548,6 +11591,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
         updateOverlappingBarChart(data);
         // Position pointer after a small delay to ensure bars are rendered
         setTimeout(() => updateTempPointer(data), 100);
+        // Safety updates after 8-day bar animation stages (820ms dip down, 1620ms dip up)
+        setTimeout(() => updateTempPointer(data), 850);
+        setTimeout(() => updateTempPointer(data), 1650);
       } catch(e) {
         console.warn('Error updating overlapping bar chart:', e);
       }
@@ -12105,6 +12151,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   // Attempt to get user's location, with a graceful fallback to the default.
   function initWeatherWithGeolocation() {
+    // Start initial fetch immediately with default location (Tulsa) so startup loader dismisses in < 1 second
+    startAutoRefresh();
+
     if (navigator.geolocation) {
       /* eslint-disable */console.log(...oo_oo(`2266558813_10995_6_10995_81_4`,'Geolocation is available. Attempting to get user location...'));
       navigator.geolocation.getCurrentPosition(
@@ -12117,20 +12166,18 @@ Plan ahead for significantly warmer conditions tomorrow!`
           startAutoRefresh(); // Start refreshing with the new location
         },
         (error) => {
-          // Error or permission denied.
-          console.warn(`Geolocation failed (Code ${error.code}): ${error.message}. Falling back to default location.`);
-          startAutoRefresh(); // Start refreshing with the default Tulsa location
+          // Error or permission denied. Already running with default location.
+          console.warn(`Geolocation failed (Code ${error.code}): ${error.message}. Continuing with default location.`);
         },
         {
           enableHighAccuracy: false, // Lower battery usage, usually good enough
-          timeout: 10000,          // 10 seconds to respond
+          timeout: 5000,           // 5 seconds to respond
           maximumAge: 600000       // Accept a cached position up to 10 minutes old
         }
       );
     } else {
       // Geolocation is not supported by this browser.
-      console.warn('Geolocation is not supported by this browser. Falling back to default location.');
-      startAutoRefresh(); // Start refreshing with the default Tulsa location
+      console.warn('Geolocation is not supported by this browser. Continuing with default location.');
     }
   }
 
