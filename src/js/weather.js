@@ -5246,17 +5246,59 @@ Plan ahead for significantly warmer conditions tomorrow!`
     return cell;
   }
 
-  // --- Feels Like Margin Config ---
-  const FEELS_LIKE_TOP_MARGIN = '1vw';    // EDITABLE: Gap ABOVE the whole "feels like" line
-  const FEELS_LIKE_BOTTOM_MARGIN = '0vw';   // EDITABLE: Gap BELOW the whole "feels like" line
-  const FEELS_LIKE_Y_OFFSET = '0vw';        // EDITABLE: Tight vertical nudge (positive = down, negative = up)
-  const FEELS_LIKE_VAL_Y_OFFSET = '0vw';    // EDITABLE: Tight vertical nudge for ONLY the feels-like temp value
-  const FEELS_LIKE_DIFF_THRESHOLD = 10;      // EDITABLE: Minimum degree difference (+/-) required to show "feels like"
+  // =========================================================================
+  // --- 1. STANDALONE TOP TEMPERATURE (When diff < 10°, NO "feels like") ---
+  // Controls the temperature directly under the city when feels-like is hidden (e.g. "72°")
+  // =========================================================================
+  const CURRENT_TEMP_TOP_SIZE_DESKTOP = '7.25vw';       // EDITABLE Desktop: Font size of standalone temp at top
+  const CURRENT_TEMP_TOP_SIZE_MOBILE = '13.25vw';       // EDITABLE Mobile: Font size of standalone temp at top
+  const CURRENT_TEMP_TOP_SIZE_DEFAULT = CURRENT_TEMP_TOP_SIZE_DESKTOP;
+  const CURRENT_TEMP_TOP_SIZE_DUAL_DESKTOP = '5vw';     // EDITABLE Desktop: Dual F/C button mode font size
+  const CURRENT_TEMP_TOP_SIZE_DUAL_MOBILE = '7.25vw';   // EDITABLE Mobile: Dual F/C button mode font size
+
+  const CURRENT_TEMP_TOP_MARGIN_DESKTOP = '-.3vw';        // EDITABLE Desktop: Gap ABOVE standalone temp (under city)
+  const CURRENT_TEMP_TOP_MARGIN_MOBILE = '-2vw';         // EDITABLE Mobile: Gap ABOVE standalone temp (under city)
+  const CURRENT_TEMP_BOTTOM_MARGIN_DESKTOP = '0vw';     // EDITABLE Desktop: Gap BELOW standalone temp
+  const CURRENT_TEMP_BOTTOM_MARGIN_MOBILE = '0vw';      // EDITABLE Mobile: Gap BELOW standalone temp
+  const CURRENT_TEMP_Y_OFFSET_DESKTOP = '0vw';          // EDITABLE Desktop: Fine vertical nudge (+ down, - up)
+  const CURRENT_TEMP_Y_OFFSET_MOBILE = '0vw';           // EDITABLE Mobile: Fine vertical nudge (+ down, - up)
+
+  // =========================================================================
+  // --- 2. "FEELS LIKE" ACTIVE MODE (When difference >= 10°, WITH "feels like XX°") ---
+  // Active only when feels-like differs from core temp by 10°+ (e.g. "72° feels like 85°")
+  // =========================================================================
+  const FEELS_LIKE_DIFF_THRESHOLD = 10;                 // EDITABLE: Degree difference (+/-) required to show "feels like"
   
-  const FEELS_LIKE_TEXT_SIZE_DEFAULT = '5vw';   // EDITABLE: Standard size of the feels-like label text (single mode)
-  const FEELS_LIKE_TEMP_SIZE_DEFAULT = '7.25vw'; // EDITABLE: ENLARGED size of feels-like temp (single mode) when diff >= 10
-  const FEELS_LIKE_TEXT_SIZE_DUAL = '4vw';      // EDITABLE: Standard size of the feels-like label text (dual mode)
-  const FEELS_LIKE_TEMP_SIZE_DUAL = '6.25vw';    // EDITABLE: ENLARGED size of feels-like temp (dual mode) when diff >= 10
+  // Spacing & Margins for the entire "feels like" row
+  const FEELS_LIKE_TOP_MARGIN_DESKTOP = '1vw';          // EDITABLE Desktop: Gap ABOVE "feels like" row (under city)
+  const FEELS_LIKE_TOP_MARGIN_MOBILE = '1vw';           // EDITABLE Mobile: Gap ABOVE "feels like" row (under city)
+  const FEELS_LIKE_TOP_MARGIN = FEELS_LIKE_TOP_MARGIN_DESKTOP;
+  const FEELS_LIKE_BOTTOM_MARGIN_DESKTOP = '0vw';       // EDITABLE Desktop: Gap BELOW "feels like" row
+  const FEELS_LIKE_BOTTOM_MARGIN_MOBILE = '0vw';        // EDITABLE Mobile: Gap BELOW "feels like" row
+  const FEELS_LIKE_BOTTOM_MARGIN = FEELS_LIKE_BOTTOM_MARGIN_DESKTOP;
+  const FEELS_LIKE_Y_OFFSET_DESKTOP = '0vw';            // EDITABLE Desktop: Fine vertical nudge for entire row (+ down, - up)
+  const FEELS_LIKE_Y_OFFSET_MOBILE = '0vw';             // EDITABLE Mobile: Fine vertical nudge for entire row (+ down, - up)
+  const FEELS_LIKE_Y_OFFSET = FEELS_LIKE_Y_OFFSET_DESKTOP;
+  const FEELS_LIKE_VAL_Y_OFFSET = '0vw';                // EDITABLE: Tight vertical nudge for ONLY the feels-like temp value
+
+  // Font Sizes during "feels like" mode
+  // (a) First number (Core temp, e.g. "72°" in "72° feels like 85°")
+  const FEELS_LIKE_CORE_TEMP_SIZE_DESKTOP = '5vw';      // EDITABLE Desktop: Size of core temp during feels-like mode
+  const FEELS_LIKE_CORE_TEMP_SIZE_MOBILE = '5vw';       // EDITABLE Mobile: Size of core temp during feels-like mode
+  const FEELS_LIKE_CORE_TEMP_SIZE_DUAL_DESKTOP = '4vw'; // EDITABLE Desktop: Dual F/C core temp size
+  const FEELS_LIKE_CORE_TEMP_SIZE_DUAL_MOBILE = '4vw';  // EDITABLE Mobile: Dual F/C core temp size
+
+  // (b) Middle label text ("feels like")
+  const FEELS_LIKE_TEXT_SIZE_DESKTOP = '5vw';           // EDITABLE Desktop: Size of "feels like" label text (single mode)
+  const FEELS_LIKE_TEXT_SIZE_MOBILE = '5vw';            // EDITABLE Mobile: Size of "feels like" label text (single mode)
+  const FEELS_LIKE_TEXT_SIZE_DUAL_DESKTOP = '4vw';      // EDITABLE Desktop: Size of "feels like" label text (dual mode)
+  const FEELS_LIKE_TEXT_SIZE_DUAL_MOBILE = '4vw';       // EDITABLE Mobile: Size of "feels like" label text (dual mode)
+
+  // (c) Second number (Feels-like temp, e.g. "85°" in "72° feels like 85°")
+  const FEELS_LIKE_TEMP_SIZE_DESKTOP = '7.25vw';        // EDITABLE Desktop: Size of feels-like temp (single mode)
+  const FEELS_LIKE_TEMP_SIZE_MOBILE = '7.25vw';         // EDITABLE Mobile: Size of feels-like temp (single mode)
+  const FEELS_LIKE_TEMP_SIZE_DUAL_DESKTOP = '6.25vw';   // EDITABLE Desktop: Size of feels-like temp (dual mode)
+  const FEELS_LIKE_TEMP_SIZE_DUAL_MOBILE = '6.25vw';    // EDITABLE Mobile: Size of feels-like temp (dual mode)
 
   // --- Odometer Digit "1" Kerning Config ---
   const ODOMETER_ONE_MARGIN_LEFT = '-0.06em';  // EDITABLE: Left margin adjustment for digit 1 to tighten kerning
@@ -5403,29 +5445,55 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const feelsLike = data?.current?.feels_like;
     const currentTemp = data?.current?.temp;
 
-    // Check whether feels-like is significant (5+ degrees away from current temp)
+    // Check whether feels-like is significant (FEELS_LIKE_DIFF_THRESHOLD degrees away from current temp)
     const hasSignificantFeelsLike = typeof feelsLike === 'number' && 
                                    typeof currentTemp === 'number' && 
                                    Math.abs(Math.round(feelsLike) - Math.round(currentTemp)) >= FEELS_LIKE_DIFF_THRESHOLD;
 
-    // Determine active size based on whether feels-like is 10+ degrees away from current temp
-    let activeTempSizeDefault = FEELS_LIKE_TEXT_SIZE_DEFAULT;
-    let activeTempSizeDual = FEELS_LIKE_TEXT_SIZE_DUAL;
-    if (typeof feelsLike === 'number' && typeof currentTemp === 'number') {
-      const diff = Math.abs(Math.round(feelsLike) - Math.round(currentTemp));
-      if (diff >= 10) {
-        activeTempSizeDefault = FEELS_LIKE_TEMP_SIZE_DEFAULT;
-        activeTempSizeDual = FEELS_LIKE_TEMP_SIZE_DUAL;
-      }
-    }
-    
+    const isPhone = window.innerWidth < 768;
+
+    // 1. Spacing & Margins: strictly choose between Standalone config and Feels-Like config
+    const activeTopMargin = hasSignificantFeelsLike
+      ? (isPhone ? FEELS_LIKE_TOP_MARGIN_MOBILE : FEELS_LIKE_TOP_MARGIN_DESKTOP)
+      : (isPhone ? CURRENT_TEMP_TOP_MARGIN_MOBILE : CURRENT_TEMP_TOP_MARGIN_DESKTOP);
+
+    const activeBottomMargin = hasSignificantFeelsLike
+      ? (isPhone ? FEELS_LIKE_BOTTOM_MARGIN_MOBILE : FEELS_LIKE_BOTTOM_MARGIN_DESKTOP)
+      : (isPhone ? CURRENT_TEMP_BOTTOM_MARGIN_MOBILE : CURRENT_TEMP_BOTTOM_MARGIN_DESKTOP);
+
+    const activeYOffset = hasSignificantFeelsLike
+      ? (isPhone ? FEELS_LIKE_Y_OFFSET_MOBILE : FEELS_LIKE_Y_OFFSET_DESKTOP)
+      : (isPhone ? CURRENT_TEMP_Y_OFFSET_MOBILE : CURRENT_TEMP_Y_OFFSET_DESKTOP);
+
     // Always apply styling so hot-reloading works
-    el.style.margin = `0 auto ${FEELS_LIKE_BOTTOM_MARGIN}`;
-    el.style.paddingTop = FEELS_LIKE_TOP_MARGIN;
-    el.style.setProperty('--feels-like-y-offset', FEELS_LIKE_Y_OFFSET);
+    el.style.margin = `0 auto`;
+    el.style.marginTop = activeTopMargin;
+    el.style.marginBottom = activeBottomMargin;
+    el.style.paddingTop = '0px';
+    el.style.paddingBottom = '0px';
+    el.style.setProperty('--feels-like-y-offset', activeYOffset);
     el.style.setProperty('--feels-like-val-y-offset', FEELS_LIKE_VAL_Y_OFFSET);
-    el.style.setProperty('--feels-like-temp-size-default', activeTempSizeDefault);
-    el.style.setProperty('--feels-like-temp-size-dual', activeTempSizeDual);
+    el.style.setProperty('--current-temp-top-size-desktop', CURRENT_TEMP_TOP_SIZE_DESKTOP);
+    el.style.setProperty('--current-temp-top-size-mobile', CURRENT_TEMP_TOP_SIZE_MOBILE);
+    el.style.setProperty('--current-temp-top-size-dual-desktop', CURRENT_TEMP_TOP_SIZE_DUAL_DESKTOP);
+    el.style.setProperty('--current-temp-top-size-dual-mobile', CURRENT_TEMP_TOP_SIZE_DUAL_MOBILE);
+    el.style.setProperty('--current-temp-top-margin-desktop', CURRENT_TEMP_TOP_MARGIN_DESKTOP);
+    el.style.setProperty('--current-temp-top-margin-mobile', CURRENT_TEMP_TOP_MARGIN_MOBILE);
+    el.style.setProperty('--current-temp-bottom-margin-desktop', CURRENT_TEMP_BOTTOM_MARGIN_DESKTOP);
+    el.style.setProperty('--current-temp-bottom-margin-mobile', CURRENT_TEMP_BOTTOM_MARGIN_MOBILE);
+    el.style.setProperty('--current-temp-y-offset-desktop', CURRENT_TEMP_Y_OFFSET_DESKTOP);
+    el.style.setProperty('--current-temp-y-offset-mobile', CURRENT_TEMP_Y_OFFSET_MOBILE);
+
+    el.style.setProperty('--feels-like-top-margin-desktop', FEELS_LIKE_TOP_MARGIN_DESKTOP);
+    el.style.setProperty('--feels-like-top-margin-mobile', FEELS_LIKE_TOP_MARGIN_MOBILE);
+    el.style.setProperty('--feels-like-bottom-margin-desktop', FEELS_LIKE_BOTTOM_MARGIN_DESKTOP);
+    el.style.setProperty('--feels-like-bottom-margin-mobile', FEELS_LIKE_BOTTOM_MARGIN_MOBILE);
+    el.style.setProperty('--feels-like-y-offset-desktop', FEELS_LIKE_Y_OFFSET_DESKTOP);
+    el.style.setProperty('--feels-like-y-offset-mobile', FEELS_LIKE_Y_OFFSET_MOBILE);
+    el.style.setProperty('--feels-like-core-temp-size-desktop', FEELS_LIKE_CORE_TEMP_SIZE_DESKTOP);
+    el.style.setProperty('--feels-like-core-temp-size-mobile', FEELS_LIKE_CORE_TEMP_SIZE_MOBILE);
+    el.style.setProperty('--feels-like-temp-size-desktop', FEELS_LIKE_TEMP_SIZE_DESKTOP);
+    el.style.setProperty('--feels-like-temp-size-mobile', FEELS_LIKE_TEMP_SIZE_MOBILE);
     el.style.transform = `translate(var(--middle-text-x-offset, 0vw), var(--feels-like-y-offset, 0vw))`;
     
     if (typeof currentTemp === 'number' || typeof feelsLike === 'number') {
@@ -5479,26 +5547,19 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       // Update labelEl (only show if feels like is significant)
       if (hasSignificantFeelsLike) {
+        const labelSize = displayUnit === 'BOTH'
+          ? (isPhone ? FEELS_LIKE_TEXT_SIZE_DUAL_MOBILE : FEELS_LIKE_TEXT_SIZE_DUAL_DESKTOP)
+          : (isPhone ? FEELS_LIKE_TEXT_SIZE_MOBILE : FEELS_LIKE_TEXT_SIZE_DESKTOP);
+
         labelEl.style.display = 'inline';
-        if (displayUnit === 'BOTH') {
-          labelEl.style.fontFamily = "'light', sans-serif";
-          labelEl.style.fontWeight = 'normal';
-          labelEl.style.fontSize = FEELS_LIKE_TEXT_SIZE_DUAL;
-          labelEl.style.letterSpacing = FEELS_LIKE_LETTER_SPACING_DUAL;
-          labelEl.style.marginLeft = FEELS_LIKE_MARGIN_LEFT_DUAL;
-          labelEl.style.marginRight = FEELS_LIKE_MARGIN_RIGHT_DUAL;
-          labelEl.style.color = 'inherit';
-          labelEl.textContent = 'feels like';
-        } else {
-          labelEl.style.fontFamily = "'light', sans-serif";
-          labelEl.style.fontWeight = 'normal';
-          labelEl.style.fontSize = FEELS_LIKE_TEXT_SIZE_DEFAULT;
-          labelEl.style.letterSpacing = FEELS_LIKE_LETTER_SPACING_DEFAULT;
-          labelEl.style.marginLeft = FEELS_LIKE_MARGIN_LEFT_DEFAULT;
-          labelEl.style.marginRight = FEELS_LIKE_MARGIN_RIGHT_DEFAULT;
-          labelEl.style.color = 'inherit';
-          labelEl.textContent = 'feels like';
-        }
+        labelEl.style.fontFamily = "'light', sans-serif";
+        labelEl.style.fontWeight = 'normal';
+        labelEl.style.fontSize = labelSize;
+        labelEl.style.letterSpacing = displayUnit === 'BOTH' ? FEELS_LIKE_LETTER_SPACING_DUAL : FEELS_LIKE_LETTER_SPACING_DEFAULT;
+        labelEl.style.marginLeft = displayUnit === 'BOTH' ? FEELS_LIKE_MARGIN_LEFT_DUAL : FEELS_LIKE_MARGIN_LEFT_DEFAULT;
+        labelEl.style.marginRight = displayUnit === 'BOTH' ? FEELS_LIKE_MARGIN_RIGHT_DUAL : FEELS_LIKE_MARGIN_RIGHT_DEFAULT;
+        labelEl.style.color = 'inherit';
+        labelEl.textContent = 'feels like';
       } else {
         labelEl.style.display = 'none';
         labelEl.textContent = '';
@@ -5508,9 +5569,20 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       // Update Current Temp Container
       if (typeof currentTemp === 'number') {
+        const isPhone = window.innerWidth < 768;
+        let currentTempTopSize;
+        if (hasSignificantFeelsLike) {
+          currentTempTopSize = displayUnit === 'BOTH'
+            ? (isPhone ? FEELS_LIKE_CORE_TEMP_SIZE_DUAL_MOBILE : FEELS_LIKE_CORE_TEMP_SIZE_DUAL_DESKTOP)
+            : (isPhone ? FEELS_LIKE_CORE_TEMP_SIZE_MOBILE : FEELS_LIKE_CORE_TEMP_SIZE_DESKTOP);
+        } else {
+          currentTempTopSize = displayUnit === 'BOTH'
+            ? (isPhone ? CURRENT_TEMP_TOP_SIZE_DUAL_MOBILE : CURRENT_TEMP_TOP_SIZE_DUAL_DESKTOP)
+            : (isPhone ? CURRENT_TEMP_TOP_SIZE_MOBILE : CURRENT_TEMP_TOP_SIZE_DESKTOP);
+        }
         currentTempContainer.style.display = 'inline-flex';
         currentTempContainer.style.fontFamily = displayUnit === 'BOTH' ? "'boldcond', sans-serif" : "'bold', sans-serif";
-        currentTempContainer.style.fontSize = displayUnit === 'BOTH' ? '5vw' : FEELS_LIKE_TEXT_SIZE_DEFAULT;
+        currentTempContainer.style.setProperty('font-size', currentTempTopSize, 'important');
         currentTempContainer.style.color = currClr;
         currentTempContainer.style.transition = 'color 0.5s ease';
         
@@ -5531,6 +5603,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       // Update Feels Like Container (only show if feels like is significant)
       if (hasSignificantFeelsLike) {
+        const feelsLikeTempSize = displayUnit === 'BOTH'
+          ? (isPhone ? FEELS_LIKE_TEMP_SIZE_DUAL_MOBILE : FEELS_LIKE_TEMP_SIZE_DUAL_DESKTOP)
+          : (isPhone ? FEELS_LIKE_TEMP_SIZE_MOBILE : FEELS_LIKE_TEMP_SIZE_DESKTOP);
+
         feelsLikeContainer.style.display = 'inline-flex';
         if (glowClass) {
           if (!feelsLikeContainer.classList.contains(glowClass)) feelsLikeContainer.className = `feels-like-val-container ${glowClass}`;
@@ -5542,7 +5618,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         }
         feelsLikeContainer.style.transform = `translateY(var(--feels-like-val-y-offset, 0vw))`;
         feelsLikeContainer.style.fontFamily = displayUnit === 'BOTH' ? "'boldcond', sans-serif" : "'bold', sans-serif";
-        feelsLikeContainer.style.fontSize = displayUnit === 'BOTH' ? 'var(--feels-like-temp-size-dual, 6.25vw)' : 'var(--feels-like-temp-size-default, 6.25vw)';
+        feelsLikeContainer.style.fontSize = feelsLikeTempSize;
         
         const activeSpacing = displayUnit === 'BOTH' ? FEELS_LIKE_TEMP_LETTER_SPACING_DUAL : FEELS_LIKE_TEMP_LETTER_SPACING_DEFAULT;
         feelsLikeContainer.style.letterSpacing = activeSpacing;
@@ -5570,7 +5646,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }
 
       el.style.color = tempToColor(currentTemp) || 'inherit';
-      el.style.marginTop = '1.5vw'; // Unconditionally force the larger top margin
     } else {
       el.textContent = '';
     }
@@ -6435,7 +6510,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1066';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1072';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
@@ -12724,6 +12799,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         updateTempPointer(lastWeatherData);
         updateDailySummary(lastWeatherData);
         updateVersionDisplay();
+        updateFeelsLike(lastWeatherData);
         // updateWindDotsRow(lastWeatherData); // Reposition wind arrow
       }, 100);
     }
