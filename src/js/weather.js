@@ -31,9 +31,17 @@ import weatherConditions from '../data/weather-conditions.json';
   const forceSnow = urlParams.get('snow') === 'true' || urlParams.get('snow') === '1' || urlParams.get('test_snow') === 'true';
   const forceRain = urlParams.get('rain') === 'true' || urlParams.get('rain') === '1' || urlParams.get('test_rain') === 'true';
   const forceStars = urlParams.get('stars') === 'true' || urlParams.get('stars') === '1' || urlParams.get('test_stars') === 'true';
+  const testMeteorParam = urlParams.get('testMeteor') || urlParams.get('meteor');
+  const testMeteorCountdownParam = urlParams.get('meteorCountdown') === 'true' || urlParams.get('test_meteor_countdown') === 'true';
+  const testMeteorLiveParam = urlParams.get('meteorLive') === 'true' || urlParams.get('test_meteor_live') === 'true';
 
   // --- CONFIG: Season Starts Test / Preview & Styling (JCV) ---
   const TEST_SHOW_SEASON_COUNTDOWN_PREVIEW = false; // EDITABLE: Set to true to force-show a countdown for testing
+
+  // --- CONFIG: Meteor Shower Test / Preview Toggles (JCV) ---
+  // Toggle either of these true to preview the meteor shower banner states:
+  let TEST_SHOW_METEOR_COUNTDOWN_PREVIEW = false; // EDITABLE: Set true to test the 12-hour countdown warning banner ("Perseid Meteor Shower Coming in 4 hours")
+  let TEST_SHOW_METEOR_LIVE_PREVIEW = false;      // EDITABLE: Set true to test the active viewing banner & 20X shooting stars ("Perseid Meteor Shower Occurring")
 
   const SPRING_STARTS_COLOR = "rgba(46, 204, 113, 0.85)"; // Spring fresh green
   const SUMMER_STARTS_COLOR = "rgba(243, 156, 18, 0.85)"; // Summer gold-orange
@@ -850,6 +858,134 @@ import weatherConditions from '../data/weather-conditions.json';
   const STARFIELD_METEOR_LENGTH_MOBILE = 65;             // EDITABLE Mobile: Streak trail length in px
   const STARFIELD_METEOR_SPEED_DESKTOP = 400;            // EDITABLE Desktop: Streak speed in px per second
   const STARFIELD_METEOR_SPEED_MOBILE = 320;             // EDITABLE Mobile: Streak speed in px per second
+  const STARFIELD_METEOR_ANGLE_MIN_DEG_DESKTOP = 15;     // EDITABLE Desktop: Min downward screen trajectory angle in degrees (15° = downward-right)
+  const STARFIELD_METEOR_ANGLE_MIN_DEG_MOBILE = 15;      // EDITABLE Mobile: Min downward screen trajectory angle in degrees
+  const STARFIELD_METEOR_ANGLE_MAX_DEG_DESKTOP = 165;    // EDITABLE Desktop: Max downward screen trajectory angle in degrees (165° = downward-left, 90° = straight down)
+  const STARFIELD_METEOR_ANGLE_MAX_DEG_MOBILE = 165;     // EDITABLE Mobile: Max downward screen trajectory angle in degrees
+
+  // 14. Meteor Shower Live Event & Banner Configuration (JCV)
+  let METEOR_SHOWER_TEST_MODE = null;                     // EDITABLE: null (auto by date/weather), 'coming' (force 12h countdown banner), 'occurring' (force active banner & 20x meteors)
+  const METEOR_SHOWER_OCCURRENCE_MULTIPLIER_DESKTOP = 20; // EDITABLE Desktop: Shooting star occurrence frequency multiplier during visual shower (20X)
+  const METEOR_SHOWER_OCCURRENCE_MULTIPLIER_MOBILE = 20;  // EDITABLE Mobile: Shooting star occurrence frequency multiplier during visual shower (20X)
+  const METEOR_SHOWER_COUNTDOWN_HOURS_DESKTOP = 12;       // EDITABLE Desktop: Advance warning countdown window in hours (12 hours)
+  const METEOR_SHOWER_COUNTDOWN_HOURS_MOBILE = 12;        // EDITABLE Mobile: Advance warning countdown window in hours (12 hours)
+  const METEOR_SHOWER_MAX_CLOUD_COVER_DESKTOP = 30;       // EDITABLE Desktop: Max cloud cover % threshold (<= 30%)
+  const METEOR_SHOWER_MAX_CLOUD_COVER_MOBILE = 30;        // EDITABLE Mobile: Max cloud cover % threshold (<= 30%)
+  const METEOR_SHOWER_MOON_PHASE_MIN_WINDOW_1_DESKTOP = 0.0;  // EDITABLE Desktop: Moon phase window 1 min (0.0 = New Moon)
+  const METEOR_SHOWER_MOON_PHASE_MIN_WINDOW_1_MOBILE = 0.0;   // EDITABLE Mobile: Moon phase window 1 min
+  const METEOR_SHOWER_MOON_PHASE_MAX_WINDOW_1_DESKTOP = 0.35; // EDITABLE Desktop: Moon phase window 1 max (0.35 = crescent/first quarter)
+  const METEOR_SHOWER_MOON_PHASE_MAX_WINDOW_1_MOBILE = 0.35;  // EDITABLE Mobile: Moon phase window 1 max
+  const METEOR_SHOWER_MOON_PHASE_MIN_WINDOW_2_DESKTOP = 0.65; // EDITABLE Desktop: Moon phase window 2 min (0.65 = waning crescent)
+  const METEOR_SHOWER_MOON_PHASE_MIN_WINDOW_2_MOBILE = 0.65;  // EDITABLE Mobile: Moon phase window 2 min
+  const METEOR_SHOWER_MOON_PHASE_MAX_WINDOW_2_DESKTOP = 1.0;  // EDITABLE Desktop: Moon phase window 2 max (1.0 = New Moon)
+  const METEOR_SHOWER_MOON_PHASE_MAX_WINDOW_2_MOBILE = 1.0;   // EDITABLE Mobile: Moon phase window 2 max
+  const METEOR_SHOWER_BANNER_COLOR_DESKTOP = "rgba(45, 25, 75, 0.88)"; // EDITABLE Desktop: Cosmic indigo banner background color
+  const METEOR_SHOWER_BANNER_COLOR_MOBILE = "rgba(45, 25, 75, 0.88)";  // EDITABLE Mobile: Cosmic indigo banner background color
+  const METEOR_SHOWER_BANNER_ICON = "img/meteor-wat.svg";              // EDITABLE: SVG icon path for meteor shower banner
+  const METEOR_SHOWER_COMING_LABEL = "METEOR SHOWER COMING";           // EDITABLE: Event title suffix for countdown banner
+  const METEOR_SHOWER_OCCURRING_LABEL = "METEOR SHOWER OCCURRING";     // EDITABLE: Event title suffix for active shower banner
+
+  // Major annual meteor showers with peak windows and hemisphere latitude bounds
+  const POPULAR_METEOR_SHOWERS = [
+    {
+      name: "Quadrantid",
+      fullName: "Quadrantid Meteor Shower",
+      radiant: "Boötes",
+      peakMonth: 1, // Jan
+      peakStartDay: 3,
+      peakEndDay: 4,
+      peakRatePerHour: 110,
+      minLat: -10,
+      maxLat: 90,
+      description: "One of the year's best meteor showers, known for producing bright fireball meteors with persistent glowing trains."
+    },
+    {
+      name: "Lyrid",
+      fullName: "Lyrid Meteor Shower",
+      radiant: "Lyra",
+      peakMonth: 4, // Apr
+      peakStartDay: 21,
+      peakEndDay: 22,
+      peakRatePerHour: 20,
+      minLat: -30,
+      maxLat: 90,
+      description: "Fast and bright meteors from Comet Thatcher, often leaving luminous dust trails lasting several seconds."
+    },
+    {
+      name: "Eta Aquariid",
+      fullName: "Eta Aquariid Meteor Shower",
+      radiant: "Aquarius",
+      peakMonth: 5, // May
+      peakStartDay: 5,
+      peakEndDay: 6,
+      peakRatePerHour: 50,
+      minLat: -90,
+      maxLat: 60,
+      description: "Swift meteors originating from Halley's Comet, featuring high speeds and glowing vapor trains."
+    },
+    {
+      name: "Perseid",
+      fullName: "Perseid Meteor Shower",
+      radiant: "Perseus",
+      peakMonth: 8, // Aug
+      peakStartDay: 11,
+      peakEndDay: 13,
+      peakRatePerHour: 100,
+      minLat: -30,
+      maxLat: 90,
+      description: "The summer's most famous meteor shower from Comet Swift-Tuttle, renowned for abundant fireballs and high rates."
+    },
+    {
+      name: "Orionid",
+      fullName: "Orionid Meteor Shower",
+      radiant: "Orion",
+      peakMonth: 10, // Oct
+      peakStartDay: 20,
+      peakEndDay: 22,
+      peakRatePerHour: 25,
+      minLat: -90,
+      maxLat: 90,
+      description: "Debris left behind by Halley's Comet striking Earth's atmosphere at 41 miles per second with fine incandescent trails."
+    },
+    {
+      name: "Leonid",
+      fullName: "Leonid Meteor Shower",
+      radiant: "Leo",
+      peakMonth: 11, // Nov
+      peakStartDay: 17,
+      peakEndDay: 18,
+      peakRatePerHour: 15,
+      minLat: -90,
+      maxLat: 90,
+      description: "Historic meteor shower from Comet Tempel-Tuttle, celebrated for swift greenish meteors and historic meteor storms."
+    },
+    {
+      name: "Geminid",
+      fullName: "Geminid Meteor Shower",
+      radiant: "Gemini",
+      peakMonth: 12, // Dec
+      peakStartDay: 13,
+      peakEndDay: 14,
+      peakRatePerHour: 120,
+      minLat: -40,
+      maxLat: 90,
+      description: "Widely regarded as the king of annual meteor showers, producing intensely bright, multicolored, slow-moving fireballs from asteroid 3200 Phaethon."
+    },
+    {
+      name: "Ursid",
+      fullName: "Ursid Meteor Shower",
+      radiant: "Ursa Minor",
+      peakMonth: 12, // Dec
+      peakStartDay: 21,
+      peakEndDay: 22,
+      peakRatePerHour: 10,
+      minLat: 0,
+      maxLat: 90,
+      description: "Late December shower radiating from the Little Dipper near Polaris, best viewed in far northern skies."
+    }
+  ];
+
+  let isMeteorShowerOccurring = false;
 
   let starFieldStars = null;
   let activeFlare = null;
@@ -1035,9 +1171,23 @@ import weatherConditions from '../data/weather-conditions.json';
 
   function scheduleNextMeteor(nowSec) {
     const isPhone = window.innerWidth < 768;
-    const minS = isPhone ? STARFIELD_METEOR_INTERVAL_MIN_S_MOBILE : STARFIELD_METEOR_INTERVAL_MIN_S_DESKTOP;
-    const maxS = isPhone ? STARFIELD_METEOR_INTERVAL_MAX_S_MOBILE : STARFIELD_METEOR_INTERVAL_MAX_S_DESKTOP;
+    let minS = isPhone ? STARFIELD_METEOR_INTERVAL_MIN_S_MOBILE : STARFIELD_METEOR_INTERVAL_MIN_S_DESKTOP;
+    let maxS = isPhone ? STARFIELD_METEOR_INTERVAL_MAX_S_MOBILE : STARFIELD_METEOR_INTERVAL_MAX_S_DESKTOP;
+    if (isMeteorShowerOccurring) {
+      const mult = isPhone ? METEOR_SHOWER_OCCURRENCE_MULTIPLIER_MOBILE : METEOR_SHOWER_OCCURRENCE_MULTIPLIER_DESKTOP;
+      minS = Math.max(0.2, minS / mult);
+      maxS = Math.max(0.6, maxS / mult);
+    }
     nextMeteorTime = nowSec + minS + Math.random() * (maxS - minS);
+  }
+
+  function setMeteorShowerOccurring(active) {
+    if (isMeteorShowerOccurring !== active) {
+      isMeteorShowerOccurring = active;
+      if (active) {
+        nextMeteorTime = (performance.now() / 1000) + 0.3; // Trigger streak almost immediately!
+      }
+    }
   }
 
   function getCanvasRotationAngle(canvas) {
@@ -1056,6 +1206,52 @@ import weatherConditions from '../data/weather-conditions.json';
       return Math.atan2(values[1], values[0]);
     }
     return 0;
+  }
+
+  function createMeteor(canvas, isPhone, nowSec, forcedDuration) {
+    const dVw = parseFloat(isPhone ? STARFIELD_CIRCLE_DIAMETER_MOBILE : STARFIELD_CIRCLE_DIAMETER_DESKTOP) || 100;
+    const diameterPx = Math.round((dVw / 100) * window.innerWidth);
+    const radius = diameterPx / 2;
+    const cx = radius;
+    const cy = radius;
+
+    // 1. Determine screen-space angle within lower 180° (0° is right, 90° is straight down, 180° is left)
+    const minDeg = isPhone ? STARFIELD_METEOR_ANGLE_MIN_DEG_MOBILE : STARFIELD_METEOR_ANGLE_MIN_DEG_DESKTOP;
+    const maxDeg = isPhone ? STARFIELD_METEOR_ANGLE_MAX_DEG_MOBILE : STARFIELD_METEOR_ANGLE_MAX_DEG_DESKTOP;
+    const screenAngleDeg = minDeg + Math.random() * (maxDeg - minDeg);
+    const screenAngleRad = screenAngleDeg * (Math.PI / 180);
+
+    // 2. Counter-rotate to get canvas-local angle so visual motion on screen is always downward within the lower 180°
+    const rotAngle = getCanvasRotationAngle(canvas);
+    const localAngle = screenAngleRad - rotAngle;
+
+    // 3. Screen-relative start position in the upper sky
+    // Biased horizontally opposite the travel direction so the meteor streaks gracefully across the visible sky
+    const isHeadingRight = screenAngleDeg < 90;
+    const screenRelX = isHeadingRight
+      ? (-0.55 + Math.random() * 0.75) * radius  // Starts left/center, streaks downward-right
+      : (-0.20 + Math.random() * 0.75) * radius; // Starts right/center, streaks downward-left
+    const screenRelY = -radius * (0.15 + Math.random() * 0.45); // -0.60 to -0.15 radius (upper sky)
+
+    // 4. Transform screen-relative start position into canvas-local coordinates
+    const localX = screenRelX * Math.cos(rotAngle) + screenRelY * Math.sin(rotAngle);
+    const localY = -screenRelX * Math.sin(rotAngle) + screenRelY * Math.cos(rotAngle);
+    const startX = cx + localX;
+    const startY = cy + localY;
+
+    const speed = isPhone ? STARFIELD_METEOR_SPEED_MOBILE : STARFIELD_METEOR_SPEED_DESKTOP;
+    const length = isPhone ? STARFIELD_METEOR_LENGTH_MOBILE : STARFIELD_METEOR_LENGTH_DESKTOP;
+    const duration = forcedDuration || (0.5 + Math.random() * 0.4);
+
+    return {
+      x: startX,
+      y: startY,
+      angle: localAngle,
+      speed,
+      length,
+      startTime: nowSec,
+      duration
+    };
   }
 
   let cachedStarfieldMaskDials = [];
@@ -1158,21 +1354,7 @@ import weatherConditions from '../data/weather-conditions.json';
     if (STARFIELD_METEOR_ENABLED) {
       if (!nextMeteorTime) scheduleNextMeteor(nowSec);
       if (nowSec >= nextMeteorTime) {
-        const angle = (25 + Math.random() * 35) * (Math.PI / 180); // 25° to 60° diagonal streak
-        const speed = isPhone ? STARFIELD_METEOR_SPEED_MOBILE : STARFIELD_METEOR_SPEED_DESKTOP;
-        const length = isPhone ? STARFIELD_METEOR_LENGTH_MOBILE : STARFIELD_METEOR_LENGTH_DESKTOP;
-        const dur = 0.5 + Math.random() * 0.4;
-        const startX = cx + (Math.random() * 2 - 1) * radius * 0.7;
-        const startY = cy + (Math.random() * 2 - 1) * radius * 0.5;
-        activeMeteors.push({
-          x: startX,
-          y: startY,
-          angle,
-          speed,
-          length,
-          startTime: nowSec,
-          duration: dur
-        });
+        activeMeteors.push(createMeteor(canvas, isPhone, nowSec));
         scheduleNextMeteor(nowSec);
       }
       activeMeteors = activeMeteors.filter(m => nowSec < m.startTime + m.duration);
@@ -1396,7 +1578,8 @@ import weatherConditions from '../data/weather-conditions.json';
   }
 
   function calculateStarfieldOpacity(data) {
-    if (STARFIELD_TEST_MODE || forceStars) {
+    const isLiveTest = TEST_SHOW_METEOR_LIVE_PREVIEW || testMeteorLiveParam || testMeteorParam === 'occurring' || testMeteorParam === 'live' || METEOR_SHOWER_TEST_MODE === 'occurring';
+    if (STARFIELD_TEST_MODE || forceStars || isLiveTest) {
       return 1.0;
     }
 
@@ -1549,6 +1732,7 @@ import weatherConditions from '../data/weather-conditions.json';
     document.documentElement.style.setProperty('--starfield-twinkle-randomness', isPhone ? `${STARFIELD_TWINKLE_RANDOMNESS_MOBILE}` : `${STARFIELD_TWINKLE_RANDOMNESS_DESKTOP}`);
     document.documentElement.style.setProperty('--starfield-twinkle-duration', isPhone ? `${STARFIELD_TWINKLE_DURATION_S_MOBILE}s` : `${STARFIELD_TWINKLE_DURATION_S_DESKTOP}s`);
     document.documentElement.style.setProperty('--starfield-twinkle-intensity', isPhone ? `${STARFIELD_TWINKLE_INTENSITY_MOBILE}` : `${STARFIELD_TWINKLE_INTENSITY_DESKTOP}`);
+    document.documentElement.style.setProperty('--meteor-shower-banner-color', isPhone ? METEOR_SHOWER_BANNER_COLOR_MOBILE : METEOR_SHOWER_BANNER_COLOR_DESKTOP);
 
     updateStarfieldOpacity(lastWeatherData);
     drawStarfield();
@@ -1673,6 +1857,37 @@ import weatherConditions from '../data/weather-conditions.json';
     STARFIELD_METEOR_ENABLED = !!enabled;
     console.log(`✨ Starfield meteors set to: ${STARFIELD_METEOR_ENABLED}`);
   };
+  window.Weather.setMeteorShowerTest = (mode) => {
+    METEOR_SHOWER_TEST_MODE = mode; // null, 'coming', or 'occurring'
+    if (lastWeatherData) {
+      updateAlerts(lastWeatherData);
+      updateStarfieldOpacity(lastWeatherData);
+    }
+    console.log(`🌠 Meteor shower test mode set to: ${METEOR_SHOWER_TEST_MODE}`);
+  };
+  window.Weather.testMeteorCountdown = (enabled = true) => {
+    TEST_SHOW_METEOR_COUNTDOWN_PREVIEW = !!enabled;
+    if (enabled) TEST_SHOW_METEOR_LIVE_PREVIEW = false;
+    if (lastWeatherData) {
+      updateAlerts(lastWeatherData);
+      updateStarfieldOpacity(lastWeatherData);
+    }
+    console.log(`🌠 Meteor countdown test preview: ${TEST_SHOW_METEOR_COUNTDOWN_PREVIEW}`);
+  };
+  window.Weather.testMeteorLive = (enabled = true) => {
+    TEST_SHOW_METEOR_LIVE_PREVIEW = !!enabled;
+    if (enabled) TEST_SHOW_METEOR_COUNTDOWN_PREVIEW = false;
+    if (lastWeatherData) {
+      updateAlerts(lastWeatherData);
+      updateStarfieldOpacity(lastWeatherData);
+    }
+    console.log(`🌠 Meteor live event test preview: ${TEST_SHOW_METEOR_LIVE_PREVIEW}`);
+  };
+  window.Weather.getMeteorShowerStatus = () => ({
+    isOccurring: isMeteorShowerOccurring,
+    testMode: METEOR_SHOWER_TEST_MODE,
+    conditions: typeof checkMeteorShowerConditions === 'function' ? checkMeteorShowerConditions(lastWeatherData) : null
+  });
   window.Weather.triggerFlare = () => {
     if (starFieldStars && starFieldStars.length > 0) {
       const isPhone = window.innerWidth < 768;
@@ -1688,20 +1903,10 @@ import weatherConditions from '../data/weather-conditions.json';
   };
   window.Weather.triggerMeteor = () => {
     const isPhone = window.innerWidth < 768;
-    const dVw = parseFloat(isPhone ? STARFIELD_CIRCLE_DIAMETER_MOBILE : STARFIELD_CIRCLE_DIAMETER_DESKTOP) || 100;
-    const diameterPx = Math.round((dVw / 100) * window.innerWidth);
-    const radius = diameterPx / 2;
+    const canvas = document.getElementById('starfield-canvas');
     const nowSec = performance.now() / 1000;
-    activeMeteors.push({
-      x: radius + (Math.random() * 2 - 1) * radius * 0.6,
-      y: radius * 0.4 + (Math.random() * 2 - 1) * radius * 0.3,
-      angle: (30 + Math.random() * 30) * (Math.PI / 180),
-      speed: isPhone ? STARFIELD_METEOR_SPEED_MOBILE : STARFIELD_METEOR_SPEED_DESKTOP,
-      length: isPhone ? STARFIELD_METEOR_LENGTH_MOBILE : STARFIELD_METEOR_LENGTH_DESKTOP,
-      startTime: nowSec,
-      duration: 0.8
-    });
-    console.log('✨ Triggered shooting star');
+    activeMeteors.push(createMeteor(canvas, isPhone, nowSec, 0.8));
+    console.log('✨ Triggered shooting star (downward)');
   };
 
   // EDITABLE: Wind speed text Y-offset adjustment
@@ -1803,6 +2008,7 @@ import weatherConditions from '../data/weather-conditions.json';
     "SUMMER STARTS": "var(--summer-starts-color)",
     "FALL STARTS": "var(--fall-starts-color)",
     "WINTER STARTS": "var(--winter-starts-color)",
+    "METEOR SHOWER": "var(--meteor-shower-banner-color)",
   };
 
   // EDITABLE: Alert Banner Icons
@@ -1831,6 +2037,7 @@ import weatherConditions from '../data/weather-conditions.json';
     "SUMMER STARTS": SUMMER_STARTS_ICON,
     "FALL STARTS": FALL_STARTS_ICON,
     "WINTER STARTS": WINTER_STARTS_ICON,
+    "METEOR SHOWER": METEOR_SHOWER_BANNER_ICON,
   };
 
   // Dynamic temperature range based on actual week's data
@@ -3960,6 +4167,151 @@ import weatherConditions from '../data/weather-conditions.json';
     overlay.classList.add('active');
   }
 
+  // Evaluates whether a popular annual meteor shower is observable and meets moon & cloud requirements
+  function checkMeteorShowerConditions(data) {
+    if (!data) return { active: false, state: null, shower: null };
+
+    // Support Test Mode override from 2 explicit boolean toggles, URL parameters, or console
+    const effectiveTestMode = (() => {
+      if (TEST_SHOW_METEOR_LIVE_PREVIEW || testMeteorLiveParam || testMeteorParam === 'occurring' || testMeteorParam === 'live' || METEOR_SHOWER_TEST_MODE === 'occurring') {
+        return 'occurring';
+      }
+      if (TEST_SHOW_METEOR_COUNTDOWN_PREVIEW || testMeteorCountdownParam || testMeteorParam === 'coming' || testMeteorParam === 'countdown' || testMeteorParam === 'true' || testMeteorParam === '1' || METEOR_SHOWER_TEST_MODE === 'coming') {
+        return 'coming';
+      }
+      return null;
+    })();
+
+    if (effectiveTestMode === 'occurring') {
+      const testShower = POPULAR_METEOR_SHOWERS[3]; // Perseid
+      const nowSec = Math.floor(Date.now() / 1000);
+      return {
+        active: true,
+        state: 'OCCURRING',
+        shower: testShower,
+        viewingStart: nowSec - 3600,
+        viewingEnd: nowSec + 4 * 3600
+      };
+    } else if (effectiveTestMode === 'coming') {
+      const testShower = POPULAR_METEOR_SHOWERS[3]; // Perseid
+      const nowMs = Date.now();
+      const targetTimeMs = nowMs + 4 * 3600 * 1000;
+      return {
+        active: true,
+        state: 'COMING',
+        shower: testShower,
+        viewingStart: Math.floor(targetTimeMs / 1000),
+        viewingEnd: Math.floor((targetTimeMs + 5 * 3600 * 1000) / 1000)
+      };
+    }
+
+    const nowSec = Math.floor(Date.now() / 1000);
+    const userLat = typeof LAT === 'number' ? LAT : (data.lat ?? 36.15);
+    const now = new Date();
+    const currentMonth = now.getMonth() + 1; // 1-12
+    const currentDay = now.getDate(); // 1-31
+
+    // Find any popular meteor shower active today/tonight in user's area
+    const matchingShower = POPULAR_METEOR_SHOWERS.find(s => {
+      // Check latitude coverage (Northern vs Southern hemisphere)
+      if (userLat < s.minLat || userLat > s.maxLat) return false;
+
+      // Check date range (allowing 1 day buffer around peak nights)
+      if (currentMonth === s.peakMonth) {
+        return (currentDay >= s.peakStartDay - 1 && currentDay <= s.peakEndDay + 1);
+      }
+      return false;
+    });
+
+    if (!matchingShower) {
+      return { active: false, state: null, shower: null };
+    }
+
+    const isPhone = window.innerWidth < 768;
+    const moonMin1 = isPhone ? METEOR_SHOWER_MOON_PHASE_MIN_WINDOW_1_MOBILE : METEOR_SHOWER_MOON_PHASE_MIN_WINDOW_1_DESKTOP;
+    const moonMax1 = isPhone ? METEOR_SHOWER_MOON_PHASE_MAX_WINDOW_1_MOBILE : METEOR_SHOWER_MOON_PHASE_MAX_WINDOW_1_DESKTOP;
+    const moonMin2 = isPhone ? METEOR_SHOWER_MOON_PHASE_MIN_WINDOW_2_MOBILE : METEOR_SHOWER_MOON_PHASE_MIN_WINDOW_2_DESKTOP;
+    const moonMax2 = isPhone ? METEOR_SHOWER_MOON_PHASE_MAX_WINDOW_2_MOBILE : METEOR_SHOWER_MOON_PHASE_MAX_WINDOW_2_DESKTOP;
+    const maxClouds = isPhone ? METEOR_SHOWER_MAX_CLOUD_COVER_MOBILE : METEOR_SHOWER_MAX_CLOUD_COVER_DESKTOP;
+    const countdownHours = isPhone ? METEOR_SHOWER_COUNTDOWN_HOURS_MOBILE : METEOR_SHOWER_COUNTDOWN_HOURS_DESKTOP;
+    const countdownWindowSec = countdownHours * 3600;
+
+    // 1. Moon phase check: (0 <= phase <= 0.35) || (0.65 <= phase <= 1.0)
+    // Avoid bright waxing/waning gibbous and full moon (0.35 - 0.65)
+    const todayMoonPhase = data.daily?.[0]?.moon_phase;
+    if (typeof todayMoonPhase === 'number') {
+      const isMoonDark = (todayMoonPhase >= moonMin1 && todayMoonPhase <= moonMax1) ||
+                         (todayMoonPhase >= moonMin2 && todayMoonPhase <= moonMax2);
+      if (!isMoonDark) {
+        // Moon too bright! Condition failed -> no banners
+        return { active: false, state: null, shower: matchingShower };
+      }
+    }
+
+    // 2. Nighttime & Cloud Cover Check
+    const todaySunset = data.daily?.[0]?.sunset ?? data.current?.sunset;
+    const todaySunrise = data.daily?.[0]?.sunrise ?? data.current?.sunrise;
+    const tomorrowSunrise = data.daily?.[1]?.sunrise ?? (todaySunrise ? todaySunrise + 86400 : null);
+
+    const isCurrentlyNight = (todaySunset && todaySunrise)
+      ? (nowSec >= todaySunset || nowSec < todaySunrise)
+      : (new Date().getHours() >= 20 || new Date().getHours() < 6);
+
+    const currentClouds = data.current?.clouds ?? 0;
+
+    // Check if OCCURRING right now: night + clear skies (<= 30% clouds)
+    if (isCurrentlyNight && currentClouds <= maxClouds) {
+      return {
+        active: true,
+        state: 'OCCURRING',
+        shower: matchingShower,
+        viewingStart: todaySunset || nowSec,
+        viewingEnd: (nowSec < todaySunrise ? todaySunrise : tomorrowSunrise) || (nowSec + 4 * 3600)
+      };
+    }
+
+    // Check upcoming hourly forecast for a clear viewing window
+    const hourlyList = data.hourly || [];
+    let firstClearHourSec = null;
+    let clearHourEndSec = null;
+
+    for (let i = 0; i < hourlyList.length; i++) {
+      const h = hourlyList[i];
+      if (!h || typeof h.dt !== 'number') continue;
+      if (h.dt < nowSec) continue;
+
+      const hDate = new Date(h.dt * 1000);
+      const hHour = hDate.getHours();
+      const isHourAtNight = (hHour >= 20 || hHour < 6);
+
+      if (isHourAtNight && typeof h.clouds === 'number' && h.clouds <= maxClouds) {
+        if (firstClearHourSec === null) {
+          firstClearHourSec = h.dt;
+          clearHourEndSec = h.dt + 3600;
+        } else if (h.dt === clearHourEndSec) {
+          clearHourEndSec = h.dt + 3600;
+        }
+      } else if (firstClearHourSec !== null) {
+        break;
+      }
+    }
+
+    if (firstClearHourSec !== null) {
+      const diffSec = firstClearHourSec - nowSec;
+      if (diffSec > 0 && diffSec <= countdownWindowSec) {
+        return {
+          active: true,
+          state: 'COMING',
+          shower: matchingShower,
+          viewingStart: firstClearHourSec,
+          viewingEnd: clearHourEndSec || (firstClearHourSec + 3 * 3600)
+        };
+      }
+    }
+
+    return { active: false, state: null, shower: matchingShower };
+  }
+
   // Create and update dynamic alert banners from OpenWeather API
   function updateAlerts(data) {
     const rawAlerts = data.alerts || [];
@@ -4090,6 +4442,84 @@ Prepare for the seasonal transition!`
           });
         }
       }
+    }
+
+    // --- METEOR SHOWER LIVE EVENT & WARNING BANNER ---
+    const meteorEvent = checkMeteorShowerConditions(data);
+    if (meteorEvent && meteorEvent.active && meteorEvent.shower) {
+      const shower = meteorEvent.shower;
+      const viewingStart = meteorEvent.viewingStart;
+      const viewingEnd = meteorEvent.viewingEnd;
+
+      if (meteorEvent.state === 'OCCURRING') {
+        setMeteorShowerOccurring(true);
+
+        const localStartStr = new Date(viewingStart * 1000).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+        const localEndStr = new Date(viewingEnd * 1000).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+
+        alerts.push({
+          event: `${shower.name.toUpperCase()} ${METEOR_SHOWER_OCCURRING_LABEL}`,
+          sender_name: "Astronomical Meteor Shower Alert",
+          start: viewingStart,
+          end: viewingEnd,
+          description: `The ${shower.fullName} is currently active and visually observable under optimal clear, dark skies!
+
+• Status: Prime visual viewing window open NOW
+• Sky Conditions: Favorable (<= 30% cloud cover)
+• Moon Illumination: Dark skies (minimal moonlight interference)
+• Radiant Constellation: Look toward ${shower.radiant}
+• Peak Activity: Up to ~${shower.peakRatePerHour} meteors per hour
+
+${shower.description}
+
+Viewing Tips:
+Lie flat on your back away from city lights, allowing 20-30 minutes for your eyes to adjust to the darkness. No telescope or binoculars required—shooting stars streak across wide expanses of the night sky.`
+        });
+      } else if (meteorEvent.state === 'COMING') {
+        setMeteorShowerOccurring(false);
+
+        const diffSec = Math.max(0, viewingStart - now);
+        const diffMinutes = Math.ceil(diffSec / 60);
+        let countdownStr = "";
+        if (diffMinutes >= 60) {
+          const hours = Math.floor(diffMinutes / 60);
+          countdownStr = `in ${hours} hour${hours > 1 ? 's' : ''}`;
+        } else {
+          countdownStr = `in ${diffMinutes} minute${diffMinutes > 1 ? 's' : ''}`;
+        }
+
+        const localTime = new Date(viewingStart * 1000);
+        const localTimeStr = localTime.toLocaleDateString('en-US', {
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric'
+        }) + " at " + localTime.toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        });
+
+        alerts.push({
+          event: `${shower.name.toUpperCase()} ${METEOR_SHOWER_COMING_LABEL}`,
+          countdown: countdownStr,
+          sender_name: "Astronomical Meteor Shower Alert",
+          start: now,
+          end: viewingStart,
+          description: `The ${shower.fullName} is approaching prime viewing conditions in your area!
+
+• Expected Viewing Window: Starts ${localTimeStr} (${countdownStr})
+• Forecasted Skies: Clear (<= 30% cloud cover)
+• Moon Illumination: Favorable dark skies
+• Radiant Constellation: ${shower.radiant}
+• Peak Activity: Up to ~${shower.peakRatePerHour} meteors per hour
+
+${shower.description}
+
+Prepare ahead: Scout a dark viewing location away from direct streetlights for the best viewing experience.`
+        });
+      }
+    } else {
+      setMeteorShowerOccurring(false);
     }
 
     // Check if Great / Nice Weather Advisory conditions are met (Using "Feels Like" temperature)
@@ -4451,6 +4881,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
         alertText += ` <span class="alert-expires">${alert.countdown}</span>`;
       } else if (eventName.includes('TEMPERATURE DROP') || eventName.includes('TEMPERATURE RISE')) {
         alertText += ` <span class="alert-expires">tomorrow</span>`;
+      } else if (eventName.includes('METEOR SHOWER OCCURRING') || eventName.includes('METEOR SHOWER OCCURING')) {
+        // Active visual meteor shower window: keep pure title as requested
       } else if (alert.end) {
         const endDate = new Date(alert.end * 1000); // Convert Unix timestamp to Date
         const today = new Date();
@@ -5985,7 +6417,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1058';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1063';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
