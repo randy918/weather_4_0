@@ -453,6 +453,30 @@ $loader-logo-offset-y: 25vw;
     }
 }
 
+// EDITABLE: Day 0 High Bar 10-degree horizontal indicator lines
+.day0-temp-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: var(--day0-lines-z-index, 15);
+    overflow: visible;
+}
+
+.day0-temp-line {
+    position: absolute;
+    pointer-events: none;
+    transition: top 0.5s ease-out, background-color 0.5s ease, opacity 0.5s ease;
+    box-sizing: border-box;
+    box-shadow: 0 0.08vw 0.18vw rgba(0, 0, 0, 0.45);
+
+    &.animating-change {
+        transition: top 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease !important;
+    }
+}
+
 //>  ████████████████████████████████████  CITY OVERLAY BUTTON
 
 main {
@@ -685,7 +709,7 @@ main {
 }
 
 .hiContainer {
-    z-index: 1;
+    z-index: auto; // Do not create a separate stacking context so .hiItem span can stack above .day0-temp-lines (15)
 }
 
 .loItem,
@@ -712,7 +736,7 @@ main {
         font-size: inherit;
         line-height: 1;
         position: relative;
-        z-index: 10;
+        z-index: var(--hi-bar-text-z-index, 25);
     }
 }
 

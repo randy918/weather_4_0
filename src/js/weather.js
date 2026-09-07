@@ -175,6 +175,23 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--temp-pointer-shadow', TEMP_POINTER_SHADOW);
   document.documentElement.style.setProperty('--temp-pointer-default-color', TEMP_POINTER_DEFAULT_COLOR);
 
+  // --- CONFIG: Day 0 High Bar 10-Degree Horizontal Lines ---
+  const DAY0_LINES_ENABLED = true;                          // EDITABLE: Show horizontal 10° marker lines on Day 0 high bar
+  const DAY0_LINES_COLOR_MODE = 'current_plus_10';         // EDITABLE: 'current_plus_10', 'current_minus_10', 'line_temp', or 'custom'
+  const DAY0_LINES_CUSTOM_COLOR = '';                       // EDITABLE: Set explicit color (e.g. 'white', 'rgba(255,255,255,0.7)') or leave empty for dynamic
+  const DAY0_LINES_HEIGHT_DESKTOP = '0.2vw';                // EDITABLE Desktop: Thickness of horizontal lines
+  const DAY0_LINES_HEIGHT_MOBILE = '0.3vw';                 // EDITABLE Mobile: Thickness of horizontal lines
+  const DAY0_LINES_OPACITY = 0.85;                          // EDITABLE: Opacity of the horizontal lines (0.0 to 1.0)
+  const DAY0_LINES_Z_INDEX = 15;                            // EDITABLE: Stacking order (in front of bars, behind temperature number and wedge pointer)
+  const HI_BAR_TEXT_Z_INDEX = 25;                           // EDITABLE: Stacking order for high bar temperature number (on top of lines, behind wedge pointer)
+  const DAY0_LINES_ANIMATE_WITH_BAR = true;                 // EDITABLE: Animate 10° lines down and up in lockstep with Day 0 high temp changes
+
+  document.documentElement.style.setProperty('--day0-lines-height-desktop', DAY0_LINES_HEIGHT_DESKTOP);
+  document.documentElement.style.setProperty('--day0-lines-height-mobile', DAY0_LINES_HEIGHT_MOBILE);
+  document.documentElement.style.setProperty('--day0-lines-opacity', DAY0_LINES_OPACITY);
+  document.documentElement.style.setProperty('--day0-lines-z-index', DAY0_LINES_Z_INDEX);
+  document.documentElement.style.setProperty('--hi-bar-text-z-index', HI_BAR_TEXT_Z_INDEX);
+
   // --- CONFIG: 8-Day Forecast Temperature Bar Padding (Hi & Lo Degrees) ---
   const HI_BAR_PADDING_TOP_DESKTOP = '0.4vw';         // EDITABLE Desktop: Top padding hugging degrees to top of hi bar
   const HI_BAR_PADDING_TOP_MOBILE = '0.4vw';          // EDITABLE Mobile: Top padding hugging degrees to top of hi bar
@@ -3404,6 +3421,9 @@ import weatherConditions from '../data/weather-conditions.json';
       .loItem.animating-change {
         transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1) !important;
       }
+      .day0-temp-line.animating-change {
+        transition: top 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease !important;
+      }
       body.transitions-ready #moon-phase-img {
         transition: transform ${ALERT_ANIMATION_MS}ms ease, filter 0.3s ease !important;
       }
@@ -6546,7 +6566,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1075';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1083';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
@@ -11065,9 +11085,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
         if (displayUnit === 'BOTH') {
           const oldHiTempC = Math.round((oldHiTemp - 32) * 5 / 9);
           const colorStyle = oldHiTemp >= 100 ? 'color: hsl(30, 100%, 50%) !important;' : 'color: var(--theBrown);';
-          item.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: 10; top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${oldHiTemp}${formatSlash()}${oldHiTempC}</span>`;
+          item.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: var(--hi-bar-text-z-index, 25); top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${oldHiTemp}${formatSlash()}${oldHiTempC}</span>`;
         } else {
-          const colorStyle = oldHiTemp >= 100 ? 'style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: 10;"' : 'style="color: var(--theBrown); position: relative; z-index: 10;"';
+          const colorStyle = oldHiTemp >= 100 ? 'style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: var(--hi-bar-text-z-index, 25);"' : 'style="color: var(--theBrown); position: relative; z-index: var(--hi-bar-text-z-index, 25);"';
           item.innerHTML = `<span ${colorStyle}>${oldHiTempDisplay}°</span>`;
         }
         item.style.backgroundColor = tempToColor(oldHiTemp) || '';
@@ -11079,6 +11099,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
         // Step 1: Animate height down to the low cell height (using setTimeout to ensure transition is registered)
         setTimeout(() => {
           item.style.height = loHeightStr;
+          if (index === 0 && DAY0_LINES_ANIMATE_WITH_BAR) {
+            animateDay0TempLinesDown();
+          }
         }, 20);
 
         // Step 2: After 800ms, update the temp text/colors and animate back UP to the new temperature
@@ -11089,20 +11112,26 @@ Plan ahead for significantly warmer conditions tomorrow!`
           if (displayUnit === 'BOTH') {
             const hiTempC = Math.round((hiTempF - 32) * 5 / 9);
             const colorStyle = hiTempF >= 100 ? 'color: hsl(30, 100%, 50%) !important;' : 'color: var(--theBrown);';
-            item.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: 10; top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${hiTempF}${formatSlash()}${hiTempC}</span>`;
+            item.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: var(--hi-bar-text-z-index, 25); top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${hiTempF}${formatSlash()}${hiTempC}</span>`;
           } else {
-            const colorStyle = hiTempF >= 100 ? 'style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: 10;"' : 'style="color: var(--theBrown); position: relative; z-index: 10;"';
+            const colorStyle = hiTempF >= 100 ? 'style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: var(--hi-bar-text-z-index, 25);"' : 'style="color: var(--theBrown); position: relative; z-index: var(--hi-bar-text-z-index, 25);"';
             item.innerHTML = `<span ${colorStyle}>${hiTempDisplay}°</span>`;
           }
           
           // Animate back up to the new high cell height
           item.style.height = targetHeightStr;
+          if (index === 0 && DAY0_LINES_ANIMATE_WITH_BAR) {
+            animateDay0TempLinesUp(data);
+          }
 
           // Clean up transition property and restore z-index after completion (another 800ms)
           setTimeout(() => {
             item.classList.remove('animating-change');
             item.style.zIndex = ''; // Restore default (underneath low bar)
             if (index === 0) {
+              if (DAY0_LINES_ANIMATE_WITH_BAR) {
+                finishDay0TempLinesAnimation(data);
+              }
               updateTempPointer(data);
             }
           }, 800);
@@ -11114,9 +11143,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
         if (displayUnit === 'BOTH') {
           const hiTempC = Math.round((hiTempF - 32) * 5 / 9);
           const colorStyle = hiTempF >= 100 ? 'color: hsl(30, 100%, 50%) !important;' : 'color: var(--theBrown);';
-          item.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: 10; top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${hiTempF}${formatSlash()}${hiTempC}</span>`;
+          item.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: var(--hi-bar-text-z-index, 25); top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${hiTempF}${formatSlash()}${hiTempC}</span>`;
         } else {
-          const colorStyle = hiTempF >= 100 ? 'style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: 10;"' : 'style="color: var(--theBrown); position: relative; z-index: 10;"';
+          const colorStyle = hiTempF >= 100 ? 'style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: var(--hi-bar-text-z-index, 25);"' : 'style="color: var(--theBrown); position: relative; z-index: var(--hi-bar-text-z-index, 25);"';
           item.innerHTML = `<span ${colorStyle}>${hiTempDisplay}°</span>`;
         }
         item.style.backgroundColor = tempToColor(hiTempF) || '';
@@ -11353,6 +11382,281 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
     /* eslint-disable */console.log(...oo_oo(`2266558813_9645_4_9645_235_4`,`Temp pointer: current=${currentTemp}°, today's range=${loTemp}°-${hiTemp}°, ratio=${ratio.toFixed(2)}, Y=${pointerY.toFixed(1)}px, hiTop=${hiTop.toFixed(1)}, loTop=${loTop.toFixed(1)}, barRange=${barRange.toFixed(1)}`));
     /* eslint-disable */console.log(...oo_oo(`2266558813_9646_4_9646_116_4`,`🎯 VISIBLE TEMPS - Hi Bar displays: ${hiItem.textContent}, Lo Bar displays: ${loItem.textContent}`));
+
+    // Update Day 0 high box 10-degree horizontal lines
+    updateDay0TempLines(data);
+  }
+
+  // EDITABLE: Update horizontal lines depicting every 10° on Day 0 high temperature box
+  function updateDay0TempLines(data) {
+    let linesContainer = document.getElementById('day0-temp-lines');
+    if (!DAY0_LINES_ENABLED) {
+      if (linesContainer) linesContainer.innerHTML = '';
+      return;
+    }
+
+    const currentTemp = data?.current?.temp;
+    const hiTemp = data?.daily?.[0]?.temp?.max;
+    const loTemp = data?.daily?.[0]?.temp?.min;
+
+    if (typeof currentTemp !== 'number' || typeof hiTemp !== 'number' || typeof loTemp !== 'number') {
+      if (linesContainer) linesContainer.innerHTML = '';
+      return;
+    }
+
+    const hiItem = document.querySelector('.hiItem-0');
+    const loItem = document.querySelector('.loItem-0');
+    const dualContainer = document.querySelector('.dualContainer');
+    if (!hiItem || !loItem || !dualContainer) return;
+
+    if (hiItem.classList.contains('animating-change') && DAY0_LINES_ANIMATE_WITH_BAR) {
+      return; // Do not interrupt active up/down animation
+    }
+
+    if (!linesContainer) {
+      linesContainer = document.createElement('div');
+      linesContainer.id = 'day0-temp-lines';
+      linesContainer.className = 'day0-temp-lines';
+      const pointer = document.getElementById('temp-pointer');
+      if (pointer && pointer.parentNode) {
+        pointer.parentNode.insertBefore(linesContainer, pointer);
+      } else {
+        dualContainer.appendChild(linesContainer);
+      }
+    }
+
+    const containerRect = dualContainer.getBoundingClientRect();
+    const hiRect = hiItem.getBoundingClientRect();
+    const loRect = loItem.getBoundingClientRect();
+
+    const hiTop = hiRect.top;
+    const loTop = loRect.top;
+    const barRange = loTop - hiTop;
+    const tempRange = hiTemp - loTemp;
+
+    if (tempRange <= 0 || barRange <= 0) {
+      linesContainer.innerHTML = '';
+      return;
+    }
+
+    const isMobile = window.innerWidth <= 767;
+    const lineHeight = isMobile ? DAY0_LINES_HEIGHT_MOBILE : DAY0_LINES_HEIGHT_DESKTOP;
+    const lineLeft = hiRect.left - containerRect.left;
+    const lineWidth = hiRect.width;
+
+    // The color of the horizontal line
+    let defaultLineColor;
+    if (DAY0_LINES_CUSTOM_COLOR) {
+      defaultLineColor = DAY0_LINES_CUSTOM_COLOR;
+    } else if (DAY0_LINES_COLOR_MODE === 'current_minus_10') {
+      defaultLineColor = tempToColor(currentTemp - 10) || 'white';
+    } else if (DAY0_LINES_COLOR_MODE === 'current_plus_10') {
+      defaultLineColor = tempToColor(currentTemp + 10) || 'white';
+    } else {
+      defaultLineColor = tempToColor(currentTemp) || 'white';
+    }
+
+    // Depict every 10 degrees within today's range (e.g. 80, 90, 100)
+    const isCelsius = displayUnit === 'C';
+    const displayLo = isCelsius ? (loTemp - 32) * 5 / 9 : loTemp;
+    const displayHi = isCelsius ? (hiTemp - 32) * 5 / 9 : hiTemp;
+
+    const startStep = Math.ceil(displayLo / 10) * 10;
+    const endStep = Math.floor(displayHi / 10) * 10;
+
+    const targetSteps = [];
+    for (let s = startStep; s <= endStep; s += 10) {
+      targetSteps.push(s);
+    }
+
+    // Reuse or recreate line elements
+    let lineElements = Array.from(linesContainer.querySelectorAll('.day0-temp-line'));
+    if (lineElements.length !== targetSteps.length) {
+      linesContainer.innerHTML = '';
+      lineElements = targetSteps.map(deg => {
+        const line = document.createElement('div');
+        line.className = `day0-temp-line day0-temp-line-${deg}`;
+        linesContainer.appendChild(line);
+        return line;
+      });
+    }
+
+    targetSteps.forEach((deg, i) => {
+      const line = lineElements[i];
+      if (!line) return;
+
+      const tempF = isCelsius ? (deg * 9 / 5) + 32 : deg;
+      const ratio = Math.max(0, Math.min(1, (tempF - loTemp) / tempRange));
+      const lineY = (loTop - containerRect.top) - (ratio * barRange);
+
+      let lineColor = defaultLineColor;
+      if (DAY0_LINES_COLOR_MODE === 'line_temp') {
+        lineColor = tempToColor(tempF) || defaultLineColor;
+      } else if (DAY0_LINES_COLOR_MODE === 'line_temp_minus_10') {
+        lineColor = tempToColor(tempF - 10) || defaultLineColor;
+      } else if (DAY0_LINES_COLOR_MODE === 'line_temp_plus_10') {
+        lineColor = tempToColor(tempF + 10) || defaultLineColor;
+      }
+
+      line.style.left = `${lineLeft}px`;
+      line.style.width = `${lineWidth}px`;
+      line.style.top = `${lineY}px`;
+      line.style.height = lineHeight;
+      line.style.transform = 'translateY(-50%)';
+      line.style.backgroundColor = lineColor;
+      line.style.opacity = String(DAY0_LINES_OPACITY);
+      line.setAttribute('data-temp', deg);
+      line.title = `${deg}°`;
+    });
+  }
+
+  // EDITABLE: Animate Day 0 10° lines down to low cell top during bar dip animation
+  function animateDay0TempLinesDown() {
+    if (!DAY0_LINES_ENABLED || !DAY0_LINES_ANIMATE_WITH_BAR) return;
+    const linesContainer = document.getElementById('day0-temp-lines');
+    const loItem = document.querySelector('.loItem-0');
+    const dualContainer = document.querySelector('.dualContainer');
+    if (!linesContainer || !loItem || !dualContainer) return;
+
+    const loRect = loItem.getBoundingClientRect();
+    const containerRect = dualContainer.getBoundingClientRect();
+    const collapseTopY = loRect.top - containerRect.top;
+
+    const lines = linesContainer.querySelectorAll('.day0-temp-line');
+    lines.forEach(line => {
+      line.classList.add('animating-change');
+      line.style.top = `${collapseTopY}px`;
+      line.style.opacity = '0';
+    });
+  }
+
+  // EDITABLE: Animate Day 0 10° lines expanding up from low cell top in sync with bar rising
+  function animateDay0TempLinesUp(data) {
+    if (!DAY0_LINES_ENABLED || !DAY0_LINES_ANIMATE_WITH_BAR) return;
+    let linesContainer = document.getElementById('day0-temp-lines');
+    const hiItem = document.querySelector('.hiItem-0');
+    const loItem = document.querySelector('.loItem-0');
+    const dualContainer = document.querySelector('.dualContainer');
+    if (!hiItem || !loItem || !dualContainer) return;
+
+    const currentTemp = data?.current?.temp;
+    const hiTemp = data?.daily?.[0]?.temp?.max;
+    const loTemp = data?.daily?.[0]?.temp?.min;
+    if (typeof currentTemp !== 'number' || typeof hiTemp !== 'number' || typeof loTemp !== 'number') return;
+
+    if (!linesContainer) {
+      updateDay0TempLines(data);
+      return;
+    }
+
+    const containerRect = dualContainer.getBoundingClientRect();
+    const loRect = loItem.getBoundingClientRect();
+    const hiRect = hiItem.getBoundingClientRect();
+    const collapseTopY = loRect.top - containerRect.top;
+
+    const tempRange = hiTemp - loTemp;
+    if (tempRange <= 0) return;
+
+    const range = tempRangeMax - tempRangeMin;
+    const hiRatio = range > 0 ? (hiTemp - tempRangeMin) / range : 0.5;
+    const loRatio = range > 0 ? (loTemp - tempRangeMin) / range : 0.5;
+    const minHeightPx = window.innerWidth * (MIN_TEMP_BAR_HEIGHT_VW / 100);
+    const availableH = containerRect.height - minHeightPx;
+    const targetHiHeight = minHeightPx + availableH * hiRatio;
+    const loHeight = minHeightPx + availableH * loRatio;
+    const targetBarRange = Math.max(1, targetHiHeight - loHeight);
+
+    const isMobile = window.innerWidth <= 767;
+    const lineHeight = isMobile ? DAY0_LINES_HEIGHT_MOBILE : DAY0_LINES_HEIGHT_DESKTOP;
+    const lineLeft = hiRect.left - containerRect.left;
+    const lineWidth = hiRect.width;
+
+    let defaultLineColor;
+    if (DAY0_LINES_CUSTOM_COLOR) {
+      defaultLineColor = DAY0_LINES_CUSTOM_COLOR;
+    } else if (DAY0_LINES_COLOR_MODE === 'current_minus_10') {
+      defaultLineColor = tempToColor(currentTemp - 10) || 'white';
+    } else if (DAY0_LINES_COLOR_MODE === 'current_plus_10') {
+      defaultLineColor = tempToColor(currentTemp + 10) || 'white';
+    } else {
+      defaultLineColor = tempToColor(currentTemp) || 'white';
+    }
+
+    const isCelsius = displayUnit === 'C';
+    const displayLo = isCelsius ? (loTemp - 32) * 5 / 9 : loTemp;
+    const displayHi = isCelsius ? (hiTemp - 32) * 5 / 9 : hiTemp;
+    const startStep = Math.ceil(displayLo / 10) * 10;
+    const endStep = Math.floor(displayHi / 10) * 10;
+    const targetSteps = [];
+    for (let s = startStep; s <= endStep; s += 10) {
+      targetSteps.push(s);
+    }
+
+    // Rebuild line elements if count changed
+    let lineElements = Array.from(linesContainer.querySelectorAll('.day0-temp-line'));
+    if (lineElements.length !== targetSteps.length) {
+      linesContainer.innerHTML = '';
+      lineElements = targetSteps.map(deg => {
+        const line = document.createElement('div');
+        line.className = `day0-temp-line day0-temp-line-${deg}`;
+        linesContainer.appendChild(line);
+        return line;
+      });
+    }
+
+    // Prepare lines at collapse position first without animation
+    targetSteps.forEach((deg, i) => {
+      const line = lineElements[i];
+      if (!line) return;
+      line.classList.remove('animating-change');
+      line.style.left = `${lineLeft}px`;
+      line.style.width = `${lineWidth}px`;
+      line.style.height = lineHeight;
+      line.style.transform = 'translateY(-50%)';
+      line.style.top = `${collapseTopY}px`;
+      line.style.opacity = '0';
+
+      const tempF = isCelsius ? (deg * 9 / 5) + 32 : deg;
+      let lineColor = defaultLineColor;
+      if (DAY0_LINES_COLOR_MODE === 'line_temp') {
+        lineColor = tempToColor(tempF) || defaultLineColor;
+      } else if (DAY0_LINES_COLOR_MODE === 'line_temp_minus_10') {
+        lineColor = tempToColor(tempF - 10) || defaultLineColor;
+      } else if (DAY0_LINES_COLOR_MODE === 'line_temp_plus_10') {
+        lineColor = tempToColor(tempF + 10) || defaultLineColor;
+      }
+      line.style.backgroundColor = lineColor;
+      line.setAttribute('data-temp', deg);
+      line.title = `${deg}°`;
+    });
+
+    // Force reflow so starting positions are registered before transitioning
+    void linesContainer.offsetHeight;
+
+    // Transition to target positions
+    targetSteps.forEach((deg, i) => {
+      const line = lineElements[i];
+      if (!line) return;
+
+      const tempF = isCelsius ? (deg * 9 / 5) + 32 : deg;
+      const ratio = Math.max(0, Math.min(1, (tempF - loTemp) / tempRange));
+      const targetLineY = collapseTopY - (ratio * targetBarRange);
+
+      line.classList.add('animating-change');
+      line.style.top = `${targetLineY}px`;
+      line.style.opacity = String(DAY0_LINES_OPACITY);
+    });
+  }
+
+  // EDITABLE: Cleanup after animation completes
+  function finishDay0TempLinesAnimation(data) {
+    const linesContainer = document.getElementById('day0-temp-lines');
+    if (linesContainer) {
+      linesContainer.querySelectorAll('.day0-temp-line').forEach(line => {
+        line.classList.remove('animating-change');
+      });
+    }
+    updateDay0TempLines(data);
   }
 
   // Create and update the 8 side-scrolling image cells for the 8-day forecast
