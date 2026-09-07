@@ -580,12 +580,34 @@ main {
     line-height: 1.2;
 }
 
-.hourly-images-container {
+.hourly-images-wrapper {
+    display: grid;
+    grid-template-columns: 1fr;
+    position: relative;
+    width: 100%;
+    margin-top: 0.5vw;
+}
+
+.hourly-images-container,
+.hourly-gradients-container {
+    grid-area: 1 / 1;
     width: 100%;
     display: grid;
     grid-template-columns: repeat(24, minmax(0, 1fr));
     gap: 0.25vw;
-    margin-top: 0.5vw;
+    margin: 0;
+    padding: 0;
+}
+
+.hourly-gradients-container {
+    pointer-events: none;
+    z-index: 5;
+}
+
+.hourly-image,
+.hourly-gradient-cell {
+    padding: 0 !important;
+    box-sizing: border-box;
 }
 
 .hourly-image {
@@ -595,6 +617,35 @@ main {
     background-size: auto 100%;
     background-repeat: repeat-x;
     background-position: 0 center;
+    overflow: hidden;
+}
+
+.hourly-gradient-cell {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--hourly-image-border-radius, 0.5vw);
+    overflow: hidden;
+    pointer-events: none;
+    mix-blend-mode: var(--hourly-gradient-blend-mode, normal);
+    background-image: linear-gradient(
+        to bottom,
+        var(--hourly-cell-gradient-top, transparent) 0%,
+        var(--hourly-cell-gradient-mid, transparent) var(--hourly-gradient-mid-point-desktop, var(--hourly-gradient-mid-point, 50%)),
+        var(--hourly-cell-gradient-bottom, transparent) 100%
+    );
+    background-size: 100% var(--hourly-gradient-height-desktop, var(--hourly-gradient-height, 45%));
+    background-repeat: no-repeat;
+    background-position: top left;
+
+    @media (max-width: 767px) {
+        background-image: linear-gradient(
+            to bottom,
+            var(--hourly-cell-gradient-top, transparent) 0%,
+            var(--hourly-cell-gradient-mid, transparent) var(--hourly-gradient-mid-point-mobile, var(--hourly-gradient-mid-point, 50%)),
+            var(--hourly-cell-gradient-bottom, transparent) 100%
+        );
+        background-size: 100% var(--hourly-gradient-height-mobile, var(--hourly-gradient-height, 45%));
+    }
 }
 
 .hourly-labels-container {

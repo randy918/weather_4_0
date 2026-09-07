@@ -224,26 +224,29 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--lo-temp-shadow-mobile', loTempShadowMobile);
   document.documentElement.style.setProperty('--lo-temp-shadow-blend-mode', LO_TEMP_SHADOW_BLEND_MODE);
 
-  // --- CONFIG: 8-Day Low Temp Reflection Gradient Tinges on Forecast Images (JCV) ---
-  const FORECAST_GRADIENTS_ENABLED = true;                          // EDITABLE: Enable/disable reflection gradient tinge row
-  const FORECAST_GRADIENT_HEIGHT_DESKTOP = '45%';                   // EDITABLE Desktop: Height of gradient flush to top (e.g. '45%', '50%', '2.0vw')
-  const FORECAST_GRADIENT_HEIGHT_MOBILE = '45%';                    // EDITABLE Mobile: Height of gradient flush to top
+  // =========================================================================
+  // --- CONFIG: 8-DAY GRID - Low Temp Reflection Gradient Tinges (JCV) ---
+  // (Applies EXCLUSIVELY to the 8-Day Forecast Image cells; does NOT affect 24-Hour)
+  // =========================================================================
+  const FORECAST_GRADIENTS_ENABLED = true;                          // EDITABLE: Enable/disable 8-day reflection gradient tinge row
+  const FORECAST_GRADIENT_HEIGHT_DESKTOP = '45%';                   // EDITABLE Desktop: 8-day height of gradient flush to top (e.g. '45%', '50%')
+  const FORECAST_GRADIENT_HEIGHT_MOBILE = '45%';                    // EDITABLE Mobile: 8-day height of gradient flush to top
   const FORECAST_GRADIENT_HEIGHT = FORECAST_GRADIENT_HEIGHT_DESKTOP; // Fallback alias
 
-  const FORECAST_GRADIENT_OPACITY_TOP_DESKTOP = 1.0;                // EDITABLE Desktop: Top opacity (1.0 = 100%)
-  const FORECAST_GRADIENT_OPACITY_TOP_MOBILE = 1.0;                 // EDITABLE Mobile: Top opacity (1.0 = 100%)
+  const FORECAST_GRADIENT_OPACITY_TOP_DESKTOP = 1.0;                // EDITABLE Desktop: 8-day top opacity (1.0 = 100%)
+  const FORECAST_GRADIENT_OPACITY_TOP_MOBILE = 1.0;                 // EDITABLE Mobile: 8-day top opacity (1.0 = 100%)
 
-  const FORECAST_GRADIENT_OPACITY_MID_DESKTOP = 0.5;                // EDITABLE Desktop: Midpoint opacity (0.5 = 50%)
-  const FORECAST_GRADIENT_OPACITY_MID_MOBILE = 0.5;                 // EDITABLE Mobile: Midpoint opacity (0.5 = 50%)
+  const FORECAST_GRADIENT_OPACITY_MID_DESKTOP = 0.5;                // EDITABLE Desktop: 8-day midpoint opacity (0.5 = 50%)
+  const FORECAST_GRADIENT_OPACITY_MID_MOBILE = 0.5;                 // EDITABLE Mobile: 8-day midpoint opacity (0.5 = 50%)
 
-  const FORECAST_GRADIENT_OPACITY_BOTTOM_DESKTOP = 0.0;             // EDITABLE Desktop: Bottom opacity (0.0 = 0%)
-  const FORECAST_GRADIENT_OPACITY_BOTTOM_MOBILE = 0.0;              // EDITABLE Mobile: Bottom opacity (0.0 = 0%)
+  const FORECAST_GRADIENT_OPACITY_BOTTOM_DESKTOP = 0.0;             // EDITABLE Desktop: 8-day bottom opacity (0.0 = 0%)
+  const FORECAST_GRADIENT_OPACITY_BOTTOM_MOBILE = 0.0;              // EDITABLE Mobile: 8-day bottom opacity (0.0 = 0%)
 
-  const FORECAST_GRADIENT_MID_POINT_DESKTOP = '50%';                // EDITABLE Desktop: Position of gradient midpoint (e.g. '50%' = halfway)
-  const FORECAST_GRADIENT_MID_POINT_MOBILE = '50%';                 // EDITABLE Mobile: Position of gradient midpoint (e.g. '50%' = halfway)
+  const FORECAST_GRADIENT_MID_POINT_DESKTOP = '50%';                // EDITABLE Desktop: 8-day midpoint position (e.g. '50%' = halfway)
+  const FORECAST_GRADIENT_MID_POINT_MOBILE = '50%';                 // EDITABLE Mobile: 8-day midpoint position (e.g. '50%' = halfway)
   const FORECAST_GRADIENT_MID_POINT = FORECAST_GRADIENT_MID_POINT_DESKTOP; // Fallback alias
 
-  const FORECAST_GRADIENT_BLEND_MODE = 'normal';                    // EDITABLE: Blend mode ('normal', 'screen', 'overlay', 'soft-light')
+  const FORECAST_GRADIENT_BLEND_MODE = 'normal';                    // EDITABLE: 8-day blend mode ('normal', 'screen', 'overlay', 'soft-light')
 
   document.documentElement.style.setProperty('--forecast-gradient-height-desktop', FORECAST_GRADIENT_HEIGHT_DESKTOP);
   document.documentElement.style.setProperty('--forecast-gradient-height-mobile', FORECAST_GRADIENT_HEIGHT_MOBILE);
@@ -258,6 +261,44 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--forecast-gradient-opacity-bottom-desktop', FORECAST_GRADIENT_OPACITY_BOTTOM_DESKTOP);
   document.documentElement.style.setProperty('--forecast-gradient-opacity-bottom-mobile', FORECAST_GRADIENT_OPACITY_BOTTOM_MOBILE);
   document.documentElement.style.setProperty('--forecast-gradient-blend-mode', FORECAST_GRADIENT_BLEND_MODE);
+
+  // =========================================================================
+  // --- CONFIG: 24-HOUR GRID - Temp Reflection Gradient Tinges (JCV) ---
+  // (Applies EXCLUSIVELY to the 24-Hour Forecast Image cells; does NOT affect 8-Day)
+  // =========================================================================
+  const HOURLY_GRADIENTS_ENABLED = true;                            // EDITABLE: Enable/disable 24-hour reflection gradient tinge row
+  const HOURLY_GRADIENT_HEIGHT_DESKTOP = '45%';                     // EDITABLE Desktop: 24-hour height of gradient flush to top (e.g. '45%', '50%')
+  const HOURLY_GRADIENT_HEIGHT_MOBILE = '45%';                      // EDITABLE Mobile: 24-hour height of gradient flush to top
+  const HOURLY_GRADIENT_HEIGHT = HOURLY_GRADIENT_HEIGHT_DESKTOP;   // Fallback alias
+
+  const HOURLY_GRADIENT_OPACITY_TOP_DESKTOP = .5;                  // EDITABLE Desktop: 24-hour top opacity (1.0 = 100%)
+  const HOURLY_GRADIENT_OPACITY_TOP_MOBILE = .5;                   // EDITABLE Mobile: 24-hour top opacity (1.0 = 100%)
+
+  const HOURLY_GRADIENT_OPACITY_MID_DESKTOP = 0.5;                  // EDITABLE Desktop: 24-hour midpoint opacity (0.5 = 50%)
+  const HOURLY_GRADIENT_OPACITY_MID_MOBILE = 0.5;                   // EDITABLE Mobile: 24-hour midpoint opacity (0.5 = 50%)
+
+  const HOURLY_GRADIENT_OPACITY_BOTTOM_DESKTOP = 0.0;               // EDITABLE Desktop: 24-hour bottom opacity (0.0 = 0%)
+  const HOURLY_GRADIENT_OPACITY_BOTTOM_MOBILE = 0.0;                // EDITABLE Mobile: 24-hour bottom opacity (0.0 = 0%)
+
+  const HOURLY_GRADIENT_MID_POINT_DESKTOP = '25%';                  // EDITABLE Desktop: 24-hour midpoint position (e.g. '50%' = halfway)
+  const HOURLY_GRADIENT_MID_POINT_MOBILE = '25%';                   // EDITABLE Mobile: 24-hour midpoint position (e.g. '50%' = halfway)
+  const HOURLY_GRADIENT_MID_POINT = HOURLY_GRADIENT_MID_POINT_DESKTOP; // Fallback alias
+
+  const HOURLY_GRADIENT_BLEND_MODE = 'normal';                      // EDITABLE: 24-hour blend mode ('normal', 'screen', 'overlay', 'soft-light')
+
+  document.documentElement.style.setProperty('--hourly-gradient-height-desktop', HOURLY_GRADIENT_HEIGHT_DESKTOP);
+  document.documentElement.style.setProperty('--hourly-gradient-height-mobile', HOURLY_GRADIENT_HEIGHT_MOBILE);
+  document.documentElement.style.setProperty('--hourly-gradient-height', HOURLY_GRADIENT_HEIGHT);
+  document.documentElement.style.setProperty('--hourly-gradient-mid-point-desktop', HOURLY_GRADIENT_MID_POINT_DESKTOP);
+  document.documentElement.style.setProperty('--hourly-gradient-mid-point-mobile', HOURLY_GRADIENT_MID_POINT_MOBILE);
+  document.documentElement.style.setProperty('--hourly-gradient-mid-point', HOURLY_GRADIENT_MID_POINT);
+  document.documentElement.style.setProperty('--hourly-gradient-opacity-top-desktop', HOURLY_GRADIENT_OPACITY_TOP_DESKTOP);
+  document.documentElement.style.setProperty('--hourly-gradient-opacity-top-mobile', HOURLY_GRADIENT_OPACITY_TOP_MOBILE);
+  document.documentElement.style.setProperty('--hourly-gradient-opacity-mid-desktop', HOURLY_GRADIENT_OPACITY_MID_DESKTOP);
+  document.documentElement.style.setProperty('--hourly-gradient-opacity-mid-mobile', HOURLY_GRADIENT_OPACITY_MID_MOBILE);
+  document.documentElement.style.setProperty('--hourly-gradient-opacity-bottom-desktop', HOURLY_GRADIENT_OPACITY_BOTTOM_DESKTOP);
+  document.documentElement.style.setProperty('--hourly-gradient-opacity-bottom-mobile', HOURLY_GRADIENT_OPACITY_BOTTOM_MOBILE);
+  document.documentElement.style.setProperty('--hourly-gradient-blend-mode', HOURLY_GRADIENT_BLEND_MODE);
 
   // --- CONFIG: Clock Grid (8 Countdown Circles Row) ---
   const CLOCK_GRID_SIZE = '11vw';         // EDITABLE: Width and height of each circle widget
@@ -2021,6 +2062,7 @@ import weatherConditions from '../data/weather-conditions.json';
   const HOURLY_TEMP_COLOR = 'var(--theBrown)'; // Color of the temperature number inside the bar
   const HOURLY_BAR_BORDER_RADIUS = '.5vw 0.5vw 0.5 0.5'; // EDITABLE: Temp bars rounded corners
   const HOURLY_IMAGE_BORDER_RADIUS = '0.5vw';         // EDITABLE: Weather images rounded corners
+  document.documentElement.style.setProperty('--hourly-image-border-radius', HOURLY_IMAGE_BORDER_RADIUS);
   const HOURLY_MIN_HEIGHT_VW = 5.5; // EDITABLE: Minimum height for single-temperature 24-hour bars
 
   // EDITABLE: F&C Dual Temp mode strictly for 24-hour bars
@@ -6619,7 +6661,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1093';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1097';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
@@ -10929,8 +10971,17 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const barsContainer = document.createElement('div');
     barsContainer.className = 'hourly-bars-container';
     
+    const imagesWrapper = document.createElement('div');
+    imagesWrapper.className = 'hourly-images-wrapper';
+
     const imagesContainer = document.createElement('div');
     imagesContainer.className = 'hourly-images-container';
+
+    let gradientsContainer = null;
+    if (HOURLY_GRADIENTS_ENABLED) {
+      gradientsContainer = document.createElement('div');
+      gradientsContainer.className = 'hourly-gradients-container';
+    }
     
     const labelsContainer = document.createElement('div');
     labelsContainer.className = 'hourly-labels-container';
@@ -11016,6 +11067,35 @@ Plan ahead for significantly warmer conditions tomorrow!`
           imgCell.style.backgroundImage = `url('img/desc-rem.jpg')`;
       }
       imagesContainer.appendChild(imgCell);
+
+      // 2b. Hourly Reflection Gradient Tinge Cell (Duplicate cell overlapping top of image)
+      if (HOURLY_GRADIENTS_ENABLED && gradientsContainer) {
+        const gradCell = document.createElement('div');
+        gradCell.className = `hourly-gradient-cell hourly-gradient-cell-${index}`;
+        gradCell.style.borderRadius = HOURLY_IMAGE_BORDER_RADIUS;
+
+        const hourColor = tempToColor(tempF);
+        if (hourColor) {
+          const isMobile = window.innerWidth <= 767;
+          const topA = isMobile ? HOURLY_GRADIENT_OPACITY_TOP_MOBILE : HOURLY_GRADIENT_OPACITY_TOP_DESKTOP;
+          const midA = isMobile ? HOURLY_GRADIENT_OPACITY_MID_MOBILE : HOURLY_GRADIENT_OPACITY_MID_DESKTOP;
+          const botA = isMobile ? HOURLY_GRADIENT_OPACITY_BOTTOM_MOBILE : HOURLY_GRADIENT_OPACITY_BOTTOM_DESKTOP;
+
+          const hsl = parseHslString(hourColor);
+          if (hsl) {
+            const [h, s, l] = hsl;
+            gradCell.style.setProperty('--hourly-cell-gradient-top', `hsla(${h}, ${s}%, ${l}%, ${topA})`);
+            gradCell.style.setProperty('--hourly-cell-gradient-mid', `hsla(${h}, ${s}%, ${l}%, ${midA})`);
+            gradCell.style.setProperty('--hourly-cell-gradient-bottom', `hsla(${h}, ${s}%, ${l}%, ${botA})`);
+          } else {
+            gradCell.style.setProperty('--hourly-cell-gradient-top', `color-mix(in srgb, ${hourColor} ${Math.round(topA * 100)}%, transparent)`);
+            gradCell.style.setProperty('--hourly-cell-gradient-mid', `color-mix(in srgb, ${hourColor} ${Math.round(midA * 100)}%, transparent)`);
+            gradCell.style.setProperty('--hourly-cell-gradient-bottom', `color-mix(in srgb, ${hourColor} ${Math.round(botA * 100)}%, transparent)`);
+          }
+          gradCell.title = `Hour ${index + 1}: ${tempF}°`;
+        }
+        gradientsContainer.appendChild(gradCell);
+      }
       
       // 3. Label
       const label = document.createElement('div');
@@ -11054,8 +11134,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
       rainContainer.appendChild(rainCell);
     });
     
+    imagesWrapper.appendChild(imagesContainer);
+    if (gradientsContainer) {
+      imagesWrapper.appendChild(gradientsContainer);
+    }
+
     wrapper.appendChild(barsContainer);
-    wrapper.appendChild(imagesContainer);
+    wrapper.appendChild(imagesWrapper);
     wrapper.appendChild(labelsContainer);
     wrapper.appendChild(rainContainer);
 
@@ -11063,6 +11148,43 @@ Plan ahead for significantly warmer conditions tomorrow!`
     requestAnimationFrame(() => {
       updateLowerGradientPosition();
       initHourlyResizeObserver();
+    });
+  }
+
+  // Update hourly reflection gradient colors on resize or data change
+  function updateHourlyGradients(data) {
+    const gradContainer = document.querySelector('.hourly-gradients-container');
+    if (!gradContainer) return;
+    if (!HOURLY_GRADIENTS_ENABLED) {
+      gradContainer.style.display = 'none';
+      return;
+    }
+    gradContainer.style.display = '';
+    const gradCells = gradContainer.querySelectorAll('.hourly-gradient-cell');
+    const hourlyData = (data?.hourly || []).slice(0, 24);
+    const isMobile = window.innerWidth <= 767;
+    const topA = isMobile ? HOURLY_GRADIENT_OPACITY_TOP_MOBILE : HOURLY_GRADIENT_OPACITY_TOP_DESKTOP;
+    const midA = isMobile ? HOURLY_GRADIENT_OPACITY_MID_MOBILE : HOURLY_GRADIENT_OPACITY_MID_DESKTOP;
+    const botA = isMobile ? HOURLY_GRADIENT_OPACITY_BOTTOM_MOBILE : HOURLY_GRADIENT_OPACITY_BOTTOM_DESKTOP;
+
+    gradCells.forEach((gradCell, index) => {
+      const hour = hourlyData[index];
+      if (!hour) return;
+      const tempF = typeof hour.temp === 'number' ? Math.round(hour.temp) : 0;
+      const hourColor = tempToColor(tempF);
+      if (!hourColor) return;
+
+      const hsl = parseHslString(hourColor);
+      if (hsl) {
+        const [h, s, l] = hsl;
+        gradCell.style.setProperty('--hourly-cell-gradient-top', `hsla(${h}, ${s}%, ${l}%, ${topA})`);
+        gradCell.style.setProperty('--hourly-cell-gradient-mid', `hsla(${h}, ${s}%, ${l}%, ${midA})`);
+        gradCell.style.setProperty('--hourly-cell-gradient-bottom', `hsla(${h}, ${s}%, ${l}%, ${botA})`);
+      } else {
+        gradCell.style.setProperty('--hourly-cell-gradient-top', `color-mix(in srgb, ${hourColor} ${Math.round(topA * 100)}%, transparent)`);
+        gradCell.style.setProperty('--hourly-cell-gradient-mid', `color-mix(in srgb, ${hourColor} ${Math.round(midA * 100)}%, transparent)`);
+        gradCell.style.setProperty('--hourly-cell-gradient-bottom', `color-mix(in srgb, ${hourColor} ${Math.round(botA * 100)}%, transparent)`);
+      }
     });
   }
 
@@ -13258,6 +13380,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         updateTempPointer(lastWeatherData);
         updateDay0TempLines(lastWeatherData);
         updateForecastImages(lastWeatherData);
+        updateHourlyGradients(lastWeatherData);
         updateDailySummary(lastWeatherData);
         updateVersionDisplay();
         updateFeelsLike(lastWeatherData);
