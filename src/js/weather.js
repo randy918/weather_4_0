@@ -31,9 +31,13 @@ import weatherConditions from '../data/weather-conditions.json';
   const forceSnow = urlParams.get('snow') === 'true' || urlParams.get('snow') === '1' || urlParams.get('test_snow') === 'true';
   const forceRain = urlParams.get('rain') === 'true' || urlParams.get('rain') === '1' || urlParams.get('test_rain') === 'true';
   const forceStars = urlParams.get('stars') === 'true' || urlParams.get('stars') === '1' || urlParams.get('test_stars') === 'true';
-  const testMeteorParam = urlParams.get('testMeteor') || urlParams.get('meteor');
-  const testMeteorCountdownParam = urlParams.get('meteorCountdown') === 'true' || urlParams.get('test_meteor_countdown') === 'true';
-  const testMeteorLiveParam = urlParams.get('meteorLive') === 'true' || urlParams.get('test_meteor_live') === 'true';
+  // Automatically strip any leftover meteor test query parameters from browser URL address bar
+  if (urlParams.has('meteorLive') || urlParams.has('testMeteor') || urlParams.has('meteorCountdown') || urlParams.has('meteor') || urlParams.has('test_meteor_live') || urlParams.has('test_meteor_countdown')) {
+    try {
+      const cleanUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+    } catch (e) {}
+  }
 
   // --- CONFIG: Season Starts Test / Preview & Styling (JCV) ---
   const TEST_SHOW_SEASON_COUNTDOWN_PREVIEW = false; // EDITABLE: Set to true to force-show a countdown for testing
@@ -865,8 +869,8 @@ import weatherConditions from '../data/weather-conditions.json';
 
   // 14. Meteor Shower Live Event & Banner Configuration (JCV)
   let METEOR_SHOWER_TEST_MODE = null;                     // EDITABLE: null (auto by date/weather), 'coming' (force 12h countdown banner), 'occurring' (force active banner & 20x meteors)
-  const METEOR_SHOWER_OCCURRENCE_MULTIPLIER_DESKTOP = 20; // EDITABLE Desktop: Shooting star occurrence frequency multiplier during visual shower (20X)
-  const METEOR_SHOWER_OCCURRENCE_MULTIPLIER_MOBILE = 20;  // EDITABLE Mobile: Shooting star occurrence frequency multiplier during visual shower (20X)
+  const METEOR_SHOWER_OCCURRENCE_MULTIPLIER_DESKTOP = 10; // EDITABLE Desktop: Shooting star occurrence frequency multiplier during visual shower (20X)
+  const METEOR_SHOWER_OCCURRENCE_MULTIPLIER_MOBILE = 10;  // EDITABLE Mobile: Shooting star occurrence frequency multiplier during visual shower (20X)
   const METEOR_SHOWER_COUNTDOWN_HOURS_DESKTOP = 12;       // EDITABLE Desktop: Advance warning countdown window in hours (12 hours)
   const METEOR_SHOWER_COUNTDOWN_HOURS_MOBILE = 12;        // EDITABLE Mobile: Advance warning countdown window in hours (12 hours)
   const METEOR_SHOWER_MAX_CLOUD_COVER_DESKTOP = 30;       // EDITABLE Desktop: Max cloud cover % threshold (<= 30%)
@@ -1578,7 +1582,7 @@ import weatherConditions from '../data/weather-conditions.json';
   }
 
   function calculateStarfieldOpacity(data) {
-    const isLiveTest = TEST_SHOW_METEOR_LIVE_PREVIEW || testMeteorLiveParam || testMeteorParam === 'occurring' || testMeteorParam === 'live' || METEOR_SHOWER_TEST_MODE === 'occurring';
+    const isLiveTest = TEST_SHOW_METEOR_LIVE_PREVIEW || METEOR_SHOWER_TEST_MODE === 'occurring';
     if (STARFIELD_TEST_MODE || forceStars || isLiveTest) {
       return 1.0;
     }
@@ -1882,6 +1886,20 @@ import weatherConditions from '../data/weather-conditions.json';
       updateStarfieldOpacity(lastWeatherData);
     }
     console.log(`🌠 Meteor live event test preview: ${TEST_SHOW_METEOR_LIVE_PREVIEW}`);
+  };
+  window.Weather.clearMeteorTests = () => {
+    TEST_SHOW_METEOR_COUNTDOWN_PREVIEW = false;
+    TEST_SHOW_METEOR_LIVE_PREVIEW = false;
+    METEOR_SHOWER_TEST_MODE = null;
+    setMeteorShowerOccurring(false);
+    try {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } catch (e) {}
+    if (lastWeatherData) {
+      updateAlerts(lastWeatherData);
+      updateStarfieldOpacity(lastWeatherData);
+    }
+    console.log('🌠 All meteor test modes turned OFF.');
   };
   window.Weather.getMeteorShowerStatus = () => ({
     isOccurring: isMeteorShowerOccurring,
@@ -4171,12 +4189,12 @@ import weatherConditions from '../data/weather-conditions.json';
   function checkMeteorShowerConditions(data) {
     if (!data) return { active: false, state: null, shower: null };
 
-    // Support Test Mode override from 2 explicit boolean toggles, URL parameters, or console
+    // Support Test Mode override: ONLY active if an explicit test toggle is true in code or console
     const effectiveTestMode = (() => {
-      if (TEST_SHOW_METEOR_LIVE_PREVIEW || testMeteorLiveParam || testMeteorParam === 'occurring' || testMeteorParam === 'live' || METEOR_SHOWER_TEST_MODE === 'occurring') {
+      if (TEST_SHOW_METEOR_LIVE_PREVIEW || METEOR_SHOWER_TEST_MODE === 'occurring') {
         return 'occurring';
       }
-      if (TEST_SHOW_METEOR_COUNTDOWN_PREVIEW || testMeteorCountdownParam || testMeteorParam === 'coming' || testMeteorParam === 'countdown' || testMeteorParam === 'true' || testMeteorParam === '1' || METEOR_SHOWER_TEST_MODE === 'coming') {
+      if (TEST_SHOW_METEOR_COUNTDOWN_PREVIEW || METEOR_SHOWER_TEST_MODE === 'coming') {
         return 'coming';
       }
       return null;
@@ -6417,7 +6435,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1063';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1065';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
