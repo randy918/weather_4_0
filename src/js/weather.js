@@ -179,15 +179,19 @@ import weatherConditions from '../data/weather-conditions.json';
   const DAY0_LINES_ENABLED = true;                          // EDITABLE: Show horizontal 10° marker lines on Day 0 high bar
   const DAY0_LINES_COLOR_MODE = 'current_plus_10';         // EDITABLE: 'current_plus_10', 'current_minus_10', 'line_temp', or 'custom'
   const DAY0_LINES_CUSTOM_COLOR = '';                       // EDITABLE: Set explicit color (e.g. 'white', 'rgba(255,255,255,0.7)') or leave empty for dynamic
-  const DAY0_LINES_HEIGHT_DESKTOP = '0.2vw';                // EDITABLE Desktop: Thickness of horizontal lines
-  const DAY0_LINES_HEIGHT_MOBILE = '0.3vw';                 // EDITABLE Mobile: Thickness of horizontal lines
-  const DAY0_LINES_OPACITY = 0.85;                          // EDITABLE: Opacity of the horizontal lines (0.0 to 1.0)
+  const DAY0_LINES_HEIGHT_DESKTOP = '0.15vw';                // EDITABLE Desktop: Thickness of horizontal lines
+  const DAY0_LINES_HEIGHT_MOBILE = '0.35vw';                 // EDITABLE Mobile: Thickness of horizontal lines
+  const DAY0_LINES_OPACITY_DESKTOP = 0.35;                   // EDITABLE Desktop: Opacity of the horizontal lines (0.0 to 1.0, 50%)
+  const DAY0_LINES_OPACITY_MOBILE =.25;                    // EDITABLE Mobile: Opacity of the horizontal lines (0.0 to 1.0, 50%)
+  const DAY0_LINES_OPACITY = DAY0_LINES_OPACITY_DESKTOP;    // Fallback alias
   const DAY0_LINES_Z_INDEX = 15;                            // EDITABLE: Stacking order (in front of bars, behind temperature number and wedge pointer)
   const HI_BAR_TEXT_Z_INDEX = 25;                           // EDITABLE: Stacking order for high bar temperature number (on top of lines, behind wedge pointer)
   const DAY0_LINES_ANIMATE_WITH_BAR = true;                 // EDITABLE: Animate 10° lines down and up in lockstep with Day 0 high temp changes
 
   document.documentElement.style.setProperty('--day0-lines-height-desktop', DAY0_LINES_HEIGHT_DESKTOP);
   document.documentElement.style.setProperty('--day0-lines-height-mobile', DAY0_LINES_HEIGHT_MOBILE);
+  document.documentElement.style.setProperty('--day0-lines-opacity-desktop', DAY0_LINES_OPACITY_DESKTOP);
+  document.documentElement.style.setProperty('--day0-lines-opacity-mobile', DAY0_LINES_OPACITY_MOBILE);
   document.documentElement.style.setProperty('--day0-lines-opacity', DAY0_LINES_OPACITY);
   document.documentElement.style.setProperty('--day0-lines-z-index', DAY0_LINES_Z_INDEX);
   document.documentElement.style.setProperty('--hi-bar-text-z-index', HI_BAR_TEXT_Z_INDEX);
@@ -6580,7 +6584,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1087';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1089';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
@@ -11518,7 +11522,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       line.style.height = lineHeight;
       line.style.transform = 'translateY(-50%)';
       line.style.backgroundColor = lineColor;
-      line.style.opacity = String(DAY0_LINES_OPACITY);
+      line.style.opacity = isMobile ? 'var(--day0-lines-opacity-mobile, 0.5)' : 'var(--day0-lines-opacity-desktop, 0.5)';
       line.setAttribute('data-temp', deg);
       line.title = `${deg}°`;
     });
@@ -11658,7 +11662,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       line.classList.add('animating-change');
       line.style.top = `${targetLineY}px`;
-      line.style.opacity = String(DAY0_LINES_OPACITY);
+      line.style.opacity = isMobile ? 'var(--day0-lines-opacity-mobile, 0.5)' : 'var(--day0-lines-opacity-desktop, 0.5)';
     });
   }
 
@@ -13147,10 +13151,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const isMobile = window.innerWidth <= 767;
     document.documentElement.style.setProperty('--circle-cell-top', isMobile ? CIRCLE_CELL_TOP_MOBILE : CIRCLE_CELL_TOP_DESKTOP);
     document.documentElement.style.setProperty('--fragile-y-offset', isMobile ? FRAGILE_ELEMENTS_Y_OFFSET_MOBILE : FRAGILE_ELEMENTS_Y_OFFSET_DESKTOP);
+    document.documentElement.style.setProperty('--day0-lines-opacity', isMobile ? DAY0_LINES_OPACITY_MOBILE : DAY0_LINES_OPACITY_DESKTOP);
     if (lastWeatherData) {
       // Delay to ensure DOM has settled after resize
       setTimeout(() => {
         updateTempPointer(lastWeatherData);
+        updateDay0TempLines(lastWeatherData);
         updateDailySummary(lastWeatherData);
         updateVersionDisplay();
         updateFeelsLike(lastWeatherData);
