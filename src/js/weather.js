@@ -750,7 +750,7 @@ import weatherConditions from '../data/weather-conditions.json';
   let STARFIELD_TEST_MODE = false; // EDITABLE: Toggle true to force starfield visible during daytime (set false for auto day/night)
 
   // 2. Day/Night Opacity Fade Window (in minutes)
-  const STARFIELD_FADE_WINDOW_MINUTES = 60; // EDITABLE: Minutes before sunset to fade in / minutes after sunrise to fade out
+  const STARFIELD_FADE_WINDOW_MINUTES = 60; // EDITABLE: Minutes after sunset to fade in (dusk) / minutes before sunrise to fade out (dawn)
 
   // 3. Container Dimensions, Position & Stacking Order (JCV)
   const STARFIELD_CONTAINER_TOP_DESKTOP = '0vw';    // EDITABLE Desktop: Vertical top position of starfield container
@@ -1411,20 +1411,20 @@ import weatherConditions from '../data/weather-conditions.json';
       return (hr >= 20 || hr < 6) ? 1.0 : 0.0;
     }
 
-    if (nowSec >= sunsetSec) {
-      // After sunset -> full night
+    if (nowSec >= sunsetSec + fadeSec) {
+      // Full night after dusk -> 1.0
       return 1.0;
-    } else if (nowSec >= sunsetSec - fadeSec) {
-      // 60 minutes PRECEDING sunset -> fade from 0 to 1
-      return Math.max(0, Math.min(1, (nowSec - (sunsetSec - fadeSec)) / fadeSec));
-    } else if (nowSec > sunriseSec + fadeSec) {
-      // Full daytime -> 0
-      return 0.0;
+    } else if (nowSec >= sunsetSec) {
+      // 60 minutes AFTER sunset (dusk) -> fade IN from 0 to 1
+      return Math.max(0, Math.min(1, (nowSec - sunsetSec) / fadeSec));
     } else if (nowSec >= sunriseSec) {
-      // 60 minutes POST sunrise -> fade from 1 to 0
-      return Math.max(0, Math.min(1, 1 - (nowSec - sunriseSec) / fadeSec));
+      // Full daytime between sunrise and sunset -> 0.0
+      return 0.0;
+    } else if (nowSec >= sunriseSec - fadeSec) {
+      // 60 minutes PRECEDING sunrise (dawn) -> fade OUT from 1 to 0
+      return Math.max(0, Math.min(1, (sunriseSec - nowSec) / fadeSec));
     } else {
-      // Before today's sunrise -> full night
+      // Full night before dawn -> 1.0
       return 1.0;
     }
   }
@@ -5985,7 +5985,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1057';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1058';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
