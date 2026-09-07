@@ -784,6 +784,67 @@ main {
     }
 }
 
+// 8-Day Forecast Condition Images & Low Temp Reflection Gradient Tinges
+.forecast-images-wrapper {
+    display: grid;
+    grid-template-columns: 1fr;
+    position: relative;
+    width: 100%;
+    padding-top: 1.05vw;
+    margin-bottom: -0.5vw;
+}
+
+.forecast-images-container,
+.forecast-gradients-container {
+    grid-area: 1 / 1;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 1vw;
+    width: 100%;
+    margin: 0 auto;
+    padding-top: 0;
+    margin-bottom: 0;
+    align-items: center;
+}
+
+.forecast-gradients-container {
+    pointer-events: none;
+    z-index: 5;
+}
+
+.forecast-image-cell,
+.forecast-gradient-cell {
+    padding: 0 !important;
+    box-sizing: border-box;
+}
+
+.forecast-gradient-cell {
+    aspect-ratio: 1 / 1;
+    border-radius: 1vw;
+    overflow: hidden;
+    pointer-events: none;
+    mix-blend-mode: var(--forecast-gradient-blend-mode, normal);
+    background-image: linear-gradient(
+        to bottom,
+        var(--cell-gradient-top, transparent) 0%,
+        var(--cell-gradient-mid, transparent) var(--forecast-gradient-mid-point-desktop, var(--forecast-gradient-mid-point, 50%)),
+        var(--cell-gradient-bottom, transparent) 100%
+    );
+    background-size: 100% var(--forecast-gradient-height-desktop, var(--forecast-gradient-height, 45%));
+    background-repeat: no-repeat;
+    background-position: top left;
+
+    @media (max-width: 767px) {
+        background-image: linear-gradient(
+            to bottom,
+            var(--cell-gradient-top, transparent) 0%,
+            var(--cell-gradient-mid, transparent) var(--forecast-gradient-mid-point-mobile, var(--forecast-gradient-mid-point, 50%)),
+            var(--cell-gradient-bottom, transparent) 100%
+        );
+        background-size: 100% var(--forecast-gradient-height-mobile, var(--forecast-gradient-height, 45%));
+    }
+}
+
 .dayContainer {
     width: 100%;
     margin: 0 auto;

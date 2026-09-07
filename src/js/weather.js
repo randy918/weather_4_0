@@ -224,6 +224,41 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--lo-temp-shadow-mobile', loTempShadowMobile);
   document.documentElement.style.setProperty('--lo-temp-shadow-blend-mode', LO_TEMP_SHADOW_BLEND_MODE);
 
+  // --- CONFIG: 8-Day Low Temp Reflection Gradient Tinges on Forecast Images (JCV) ---
+  const FORECAST_GRADIENTS_ENABLED = true;                          // EDITABLE: Enable/disable reflection gradient tinge row
+  const FORECAST_GRADIENT_HEIGHT_DESKTOP = '45%';                   // EDITABLE Desktop: Height of gradient flush to top (e.g. '45%', '50%', '2.0vw')
+  const FORECAST_GRADIENT_HEIGHT_MOBILE = '45%';                    // EDITABLE Mobile: Height of gradient flush to top
+  const FORECAST_GRADIENT_HEIGHT = FORECAST_GRADIENT_HEIGHT_DESKTOP; // Fallback alias
+
+  const FORECAST_GRADIENT_OPACITY_TOP_DESKTOP = 1.0;                // EDITABLE Desktop: Top opacity (1.0 = 100%)
+  const FORECAST_GRADIENT_OPACITY_TOP_MOBILE = 1.0;                 // EDITABLE Mobile: Top opacity (1.0 = 100%)
+
+  const FORECAST_GRADIENT_OPACITY_MID_DESKTOP = 0.5;                // EDITABLE Desktop: Midpoint opacity (0.5 = 50%)
+  const FORECAST_GRADIENT_OPACITY_MID_MOBILE = 0.5;                 // EDITABLE Mobile: Midpoint opacity (0.5 = 50%)
+
+  const FORECAST_GRADIENT_OPACITY_BOTTOM_DESKTOP = 0.0;             // EDITABLE Desktop: Bottom opacity (0.0 = 0%)
+  const FORECAST_GRADIENT_OPACITY_BOTTOM_MOBILE = 0.0;              // EDITABLE Mobile: Bottom opacity (0.0 = 0%)
+
+  const FORECAST_GRADIENT_MID_POINT_DESKTOP = '50%';                // EDITABLE Desktop: Position of gradient midpoint (e.g. '50%' = halfway)
+  const FORECAST_GRADIENT_MID_POINT_MOBILE = '50%';                 // EDITABLE Mobile: Position of gradient midpoint (e.g. '50%' = halfway)
+  const FORECAST_GRADIENT_MID_POINT = FORECAST_GRADIENT_MID_POINT_DESKTOP; // Fallback alias
+
+  const FORECAST_GRADIENT_BLEND_MODE = 'normal';                    // EDITABLE: Blend mode ('normal', 'screen', 'overlay', 'soft-light')
+
+  document.documentElement.style.setProperty('--forecast-gradient-height-desktop', FORECAST_GRADIENT_HEIGHT_DESKTOP);
+  document.documentElement.style.setProperty('--forecast-gradient-height-mobile', FORECAST_GRADIENT_HEIGHT_MOBILE);
+  document.documentElement.style.setProperty('--forecast-gradient-height', FORECAST_GRADIENT_HEIGHT);
+  document.documentElement.style.setProperty('--forecast-gradient-mid-point-desktop', FORECAST_GRADIENT_MID_POINT_DESKTOP);
+  document.documentElement.style.setProperty('--forecast-gradient-mid-point-mobile', FORECAST_GRADIENT_MID_POINT_MOBILE);
+  document.documentElement.style.setProperty('--forecast-gradient-mid-point', FORECAST_GRADIENT_MID_POINT);
+  document.documentElement.style.setProperty('--forecast-gradient-opacity-top-desktop', FORECAST_GRADIENT_OPACITY_TOP_DESKTOP);
+  document.documentElement.style.setProperty('--forecast-gradient-opacity-top-mobile', FORECAST_GRADIENT_OPACITY_TOP_MOBILE);
+  document.documentElement.style.setProperty('--forecast-gradient-opacity-mid-desktop', FORECAST_GRADIENT_OPACITY_MID_DESKTOP);
+  document.documentElement.style.setProperty('--forecast-gradient-opacity-mid-mobile', FORECAST_GRADIENT_OPACITY_MID_MOBILE);
+  document.documentElement.style.setProperty('--forecast-gradient-opacity-bottom-desktop', FORECAST_GRADIENT_OPACITY_BOTTOM_DESKTOP);
+  document.documentElement.style.setProperty('--forecast-gradient-opacity-bottom-mobile', FORECAST_GRADIENT_OPACITY_BOTTOM_MOBILE);
+  document.documentElement.style.setProperty('--forecast-gradient-blend-mode', FORECAST_GRADIENT_BLEND_MODE);
+
   // --- CONFIG: Clock Grid (8 Countdown Circles Row) ---
   const CLOCK_GRID_SIZE = '11vw';         // EDITABLE: Width and height of each circle widget
   const CLOCK_GRID_GAP = '1vw';          // EDITABLE: Gap between cells
@@ -6584,7 +6619,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1089';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1093';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
@@ -11043,8 +11078,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (!hiItems.length || !loItems.length) return;
 
     // Safely find or create the day container and items
-    let dayContainer = document.querySelector('.dayContainer:not(.forecast-images-container)');
-    let dayItems = document.querySelectorAll('.dayItem:not(.forecast-image-cell)');
+    let dayContainer = document.querySelector('.dayContainer:not(.forecast-images-container):not(.forecast-gradients-container):not(.forecast-images-wrapper)');
+    let dayItems = document.querySelectorAll('.dayItem:not(.forecast-image-cell):not(.forecast-gradient-cell)');
     if (!dayContainer && dayItems.length === 0) {
       const dualContainer = document.querySelector('.dualContainer');
       if (dualContainer && dualContainer.parentNode) {
@@ -11678,46 +11713,75 @@ Plan ahead for significantly warmer conditions tomorrow!`
   }
 
   // Create and update the 8 side-scrolling image cells for the 8-day forecast
+  // and the duplicate row of low-temperature reflection gradient cells
   function updateForecastImages(data) {
+    let wrapper = document.querySelector('.forecast-images-wrapper');
     let container = document.querySelector('.forecast-images-container');
+    let gradContainer = document.querySelector('.forecast-gradients-container');
     
-    if (!container) {
-      const dayContainer = document.querySelector('.dayContainer:not(.forecast-images-container)');
+    if (!wrapper || !container) {
+      const dayContainer = document.querySelector('.dayContainer:not(.forecast-images-container):not(.forecast-gradients-container):not(.forecast-images-wrapper)');
       if (dayContainer && dayContainer.parentNode) {
-        container = document.createElement('div');
-        // Inherit the exact width and gap positioning from dayContainer
-        container.className = 'forecast-images-container dayContainer';
-        container.style.alignItems = 'center';
-        container.style.paddingTop = '1.05vw'; /* EDITABLE: Gap above 8 forecast images (0.25vw base + 0.8vw added) */
-        container.style.marginBottom = '-.5vw'; /* EDITABLE: Gap BELOW forecast images (= gap ABOVE day dates row) */
-        
-        for (let i = 0; i < 8; i++) {
-          const cell = document.createElement('div');
-          // Inherit the exact column width from dayItem
-          cell.className = 'forecast-image-cell dayItem';
-          cell.style.aspectRatio = '1 / 1';
-          cell.style.borderRadius = '1vw';
-          cell.style.backgroundImage = "url('img/desc-rem.jpg')";
-          cell.style.backgroundSize = 'auto 100%';
-          cell.style.backgroundRepeat = 'repeat-x';
-          cell.style.backgroundPosition = '0 center';
-          // Random animation delay to start each image at different scroll position
-          const randomDelay = -Math.random() * WEATHER_IMAGE_SCROLL_SPEED_S;
-          cell.style.setProperty('animation', `scroll-weather-bg ${WEATHER_IMAGE_SCROLL_SPEED_S}s linear infinite`, 'important'); // Endless side-scrolling like upper-right image
-          cell.style.setProperty('animation-delay', `${randomDelay}s`, 'important');
-          cell.style.overflow = 'hidden';
-          container.appendChild(cell);
+        if (!wrapper) {
+          wrapper = document.createElement('div');
+          wrapper.className = 'forecast-images-wrapper';
+        }
+
+        if (!container) {
+          container = document.createElement('div');
+          container.className = 'forecast-images-container';
+          
+          for (let i = 0; i < 8; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'forecast-image-cell dayItem';
+            cell.style.aspectRatio = '1 / 1';
+            cell.style.borderRadius = '1vw';
+            cell.style.backgroundImage = "url('img/desc-rem.jpg')";
+            cell.style.backgroundSize = 'auto 100%';
+            cell.style.backgroundRepeat = 'repeat-x';
+            cell.style.backgroundPosition = '0 center';
+            const randomDelay = -Math.random() * WEATHER_IMAGE_SCROLL_SPEED_S;
+            cell.style.setProperty('animation', `scroll-weather-bg ${WEATHER_IMAGE_SCROLL_SPEED_S}s linear infinite`, 'important');
+            cell.style.setProperty('animation-delay', `${randomDelay}s`, 'important');
+            cell.style.overflow = 'hidden';
+            container.appendChild(cell);
+          }
+        }
+        if (!container.parentNode || container.parentNode !== wrapper) {
+          wrapper.appendChild(container);
+        }
+
+        if (FORECAST_GRADIENTS_ENABLED && !gradContainer) {
+          gradContainer = document.createElement('div');
+          gradContainer.className = 'forecast-gradients-container';
+          for (let i = 0; i < 8; i++) {
+            const gradCell = document.createElement('div');
+            gradCell.className = `forecast-gradient-cell forecast-gradient-cell-${i}`;
+            gradContainer.appendChild(gradCell);
+          }
+          wrapper.appendChild(gradContainer);
         }
         
-        dayContainer.parentNode.insertBefore(container, dayContainer);
+        if (!wrapper.parentNode) {
+          dayContainer.parentNode.insertBefore(wrapper, dayContainer);
+        }
       }
+    } else if (FORECAST_GRADIENTS_ENABLED && !gradContainer && wrapper) {
+      gradContainer = document.createElement('div');
+      gradContainer.className = 'forecast-gradients-container';
+      for (let i = 0; i < 8; i++) {
+        const gradCell = document.createElement('div');
+        gradCell.className = `forecast-gradient-cell forecast-gradient-cell-${i}`;
+        gradContainer.appendChild(gradCell);
+      }
+      wrapper.appendChild(gradContainer);
     }
     
     if (!container) return;
     
     // Update the images mapping from API description
     const cells = container.querySelectorAll('.forecast-image-cell');
-    const dailyData = data.daily || [];
+    const dailyData = data?.daily || [];
     
     // Console report: 8-day descriptions from API
     /* eslint-disable */console.log(...oo_oo(`2266558813_9692_4_9692_62_4`,'📅 === 8-Day DAILY Weather Descriptions ==='));
@@ -11746,6 +11810,42 @@ Plan ahead for significantly warmer conditions tomorrow!`
       };
       imgPreload.src = imgPath;
     });
+
+    // Update the 8-day low temp reflection gradient tinges
+    if (gradContainer) {
+      if (FORECAST_GRADIENTS_ENABLED) {
+        gradContainer.style.display = '';
+        const gradCells = gradContainer.querySelectorAll('.forecast-gradient-cell');
+        const isMobile = window.innerWidth <= 767;
+        const topA = isMobile ? FORECAST_GRADIENT_OPACITY_TOP_MOBILE : FORECAST_GRADIENT_OPACITY_TOP_DESKTOP;
+        const midA = isMobile ? FORECAST_GRADIENT_OPACITY_MID_MOBILE : FORECAST_GRADIENT_OPACITY_MID_DESKTOP;
+        const botA = isMobile ? FORECAST_GRADIENT_OPACITY_BOTTOM_MOBILE : FORECAST_GRADIENT_OPACITY_BOTTOM_DESKTOP;
+
+        gradCells.forEach((gradCell, index) => {
+          const dayData = dailyData[index];
+          const loTemp = dayData?.temp?.min;
+          if (typeof loTemp !== 'number') return;
+          const loTempF = Math.round(loTemp);
+          const loColor = tempToColor(loTempF);
+          if (!loColor) return;
+
+          const hsl = parseHslString(loColor);
+          if (hsl) {
+            const [h, s, l] = hsl;
+            gradCell.style.setProperty('--cell-gradient-top', `hsla(${h}, ${s}%, ${l}%, ${topA})`);
+            gradCell.style.setProperty('--cell-gradient-mid', `hsla(${h}, ${s}%, ${l}%, ${midA})`);
+            gradCell.style.setProperty('--cell-gradient-bottom', `hsla(${h}, ${s}%, ${l}%, ${botA})`);
+          } else {
+            gradCell.style.setProperty('--cell-gradient-top', `color-mix(in srgb, ${loColor} ${Math.round(topA * 100)}%, transparent)`);
+            gradCell.style.setProperty('--cell-gradient-mid', `color-mix(in srgb, ${loColor} ${Math.round(midA * 100)}%, transparent)`);
+            gradCell.style.setProperty('--cell-gradient-bottom', `color-mix(in srgb, ${loColor} ${Math.round(botA * 100)}%, transparent)`);
+          }
+          gradCell.title = `Day ${index + 1} Low: ${loTempF}°`;
+        });
+      } else {
+        gradContainer.style.display = 'none';
+      }
+    }
   }
 
   // Ensure the wind / humidity gauges sit directly under the 7-day dates row
@@ -13157,6 +13257,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       setTimeout(() => {
         updateTempPointer(lastWeatherData);
         updateDay0TempLines(lastWeatherData);
+        updateForecastImages(lastWeatherData);
         updateDailySummary(lastWeatherData);
         updateVersionDisplay();
         updateFeelsLike(lastWeatherData);
