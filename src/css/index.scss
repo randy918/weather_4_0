@@ -1388,6 +1388,16 @@ main {
     align-items: center !important;
     justify-content: center !important;
 
+    .feels-like-current-temp.optical-center-digits {
+        .odometer-degree {
+            width: 0 !important;
+            flex: 0 0 0px !important;
+            overflow: visible !important;
+            white-space: nowrap !important;
+            transform: translate(var(--current-temp-degree-x, 0vw), var(--current-temp-degree-y, 0vw));
+        }
+    }
+
     .feels-like-val-container {
         .odometer-digit {
             margin-right: var(--feels-like-temp-letter-spacing, 0vw);

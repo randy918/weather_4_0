@@ -5260,8 +5260,17 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const CURRENT_TEMP_TOP_MARGIN_MOBILE = '-2vw';         // EDITABLE Mobile: Gap ABOVE standalone temp (under city)
   const CURRENT_TEMP_BOTTOM_MARGIN_DESKTOP = '0vw';     // EDITABLE Desktop: Gap BELOW standalone temp
   const CURRENT_TEMP_BOTTOM_MARGIN_MOBILE = '0vw';      // EDITABLE Mobile: Gap BELOW standalone temp
+  const CURRENT_TEMP_X_OFFSET_DESKTOP = '0vw';          // EDITABLE Desktop: Fine horizontal nudge (+ right, - left)
+  const CURRENT_TEMP_X_OFFSET_MOBILE = '0vw';           // EDITABLE Mobile: Fine horizontal nudge (+ right, - left)
   const CURRENT_TEMP_Y_OFFSET_DESKTOP = '0vw';          // EDITABLE Desktop: Fine vertical nudge (+ down, - up)
   const CURRENT_TEMP_Y_OFFSET_MOBILE = '0vw';           // EDITABLE Mobile: Fine vertical nudge (+ down, - up)
+
+  // Visual / Optical Centering (centers digits as if degree symbol isn't there - NON "feels like" modes only)
+  const CURRENT_TEMP_OPTICAL_CENTERING = true;          // EDITABLE: Center digits disregarding degree symbol width
+  const CURRENT_TEMP_DEGREE_X_OFFSET_DESKTOP = '0vw';   // EDITABLE Desktop: Fine horizontal nudge for degree symbol
+  const CURRENT_TEMP_DEGREE_X_OFFSET_MOBILE = '0vw';    // EDITABLE Mobile: Fine horizontal nudge for degree symbol
+  const CURRENT_TEMP_DEGREE_Y_OFFSET_DESKTOP = '0vw';   // EDITABLE Desktop: Fine vertical nudge for degree symbol
+  const CURRENT_TEMP_DEGREE_Y_OFFSET_MOBILE = '0vw';    // EDITABLE Mobile: Fine vertical nudge for degree symbol
 
   // =========================================================================
   // --- 2. "FEELS LIKE" ACTIVE MODE (When difference >= 10°, WITH "feels like XX°") ---
@@ -5349,6 +5358,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
         } else {
           const staticEl = document.createElement('span');
           staticEl.className = 'odometer-static';
+          if (char === '°') {
+            staticEl.classList.add('odometer-degree');
+          }
           staticEl.textContent = char;
           container.appendChild(staticEl);
         }
@@ -5370,6 +5382,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
         } else {
           if (child.textContent !== char) {
             child.textContent = char;
+          }
+          if (char === '°') {
+            child.classList.add('odometer-degree');
+          } else {
+            child.classList.remove('odometer-degree');
           }
         }
       });
@@ -5465,6 +5482,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
       ? (isPhone ? FEELS_LIKE_Y_OFFSET_MOBILE : FEELS_LIKE_Y_OFFSET_DESKTOP)
       : (isPhone ? CURRENT_TEMP_Y_OFFSET_MOBILE : CURRENT_TEMP_Y_OFFSET_DESKTOP);
 
+    const activeXOffset = hasSignificantFeelsLike
+      ? '0vw'
+      : (isPhone ? CURRENT_TEMP_X_OFFSET_MOBILE : CURRENT_TEMP_X_OFFSET_DESKTOP);
+
+    const degreeX = isPhone ? CURRENT_TEMP_DEGREE_X_OFFSET_MOBILE : CURRENT_TEMP_DEGREE_X_OFFSET_DESKTOP;
+    const degreeY = isPhone ? CURRENT_TEMP_DEGREE_Y_OFFSET_MOBILE : CURRENT_TEMP_DEGREE_Y_OFFSET_DESKTOP;
+
     // Always apply styling so hot-reloading works
     el.style.margin = `0 auto`;
     el.style.marginTop = activeTopMargin;
@@ -5481,8 +5505,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
     el.style.setProperty('--current-temp-top-margin-mobile', CURRENT_TEMP_TOP_MARGIN_MOBILE);
     el.style.setProperty('--current-temp-bottom-margin-desktop', CURRENT_TEMP_BOTTOM_MARGIN_DESKTOP);
     el.style.setProperty('--current-temp-bottom-margin-mobile', CURRENT_TEMP_BOTTOM_MARGIN_MOBILE);
+    el.style.setProperty('--current-temp-x-offset', activeXOffset);
     el.style.setProperty('--current-temp-y-offset-desktop', CURRENT_TEMP_Y_OFFSET_DESKTOP);
     el.style.setProperty('--current-temp-y-offset-mobile', CURRENT_TEMP_Y_OFFSET_MOBILE);
+    el.style.setProperty('--current-temp-degree-x', degreeX);
+    el.style.setProperty('--current-temp-degree-y', degreeY);
 
     el.style.setProperty('--feels-like-top-margin-desktop', FEELS_LIKE_TOP_MARGIN_DESKTOP);
     el.style.setProperty('--feels-like-top-margin-mobile', FEELS_LIKE_TOP_MARGIN_MOBILE);
@@ -5494,7 +5521,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
     el.style.setProperty('--feels-like-core-temp-size-mobile', FEELS_LIKE_CORE_TEMP_SIZE_MOBILE);
     el.style.setProperty('--feels-like-temp-size-desktop', FEELS_LIKE_TEMP_SIZE_DESKTOP);
     el.style.setProperty('--feels-like-temp-size-mobile', FEELS_LIKE_TEMP_SIZE_MOBILE);
-    el.style.transform = `translate(var(--middle-text-x-offset, 0vw), var(--feels-like-y-offset, 0vw))`;
+    const currentTempX = hasSignificantFeelsLike
+      ? `var(--middle-text-x-offset, 0vw)`
+      : `calc(var(--middle-text-x-offset, 0vw) + var(--current-temp-x-offset, 0vw))`;
+    el.style.transform = `translate(${currentTempX}, var(--feels-like-y-offset, 0vw))`;
     
     if (typeof currentTemp === 'number' || typeof feelsLike === 'number') {
       // --- EDITABLE: "feels like" text styles ---
@@ -5585,6 +5615,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
         currentTempContainer.style.setProperty('font-size', currentTempTopSize, 'important');
         currentTempContainer.style.color = currClr;
         currentTempContainer.style.transition = 'color 0.5s ease';
+        
+        if (!hasSignificantFeelsLike && CURRENT_TEMP_OPTICAL_CENTERING) {
+          currentTempContainer.classList.add('optical-center-digits');
+        } else {
+          currentTempContainer.classList.remove('optical-center-digits');
+        }
         
         let currentText = '';
         if (displayUnit === 'BOTH') {
@@ -6510,7 +6546,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1072';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1075';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
