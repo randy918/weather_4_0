@@ -5329,6 +5329,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const FEELS_LIKE_TEMP_SIZE_DUAL_DESKTOP = '6.25vw';   // EDITABLE Desktop: Size of feels-like temp (dual mode)
   const FEELS_LIKE_TEMP_SIZE_DUAL_MOBILE = '6.25vw';    // EDITABLE Mobile: Size of feels-like temp (dual mode)
 
+  // (d) Leading space before first number in "feels like" mode
+  const FEELS_LIKE_FIRST_TEMP_LEADING_SPACE = true;     // EDITABLE: Add a space just before first temp in feels like line only (e.g. " 99° feels...")
+
   // --- Odometer Digit "1" Kerning Config ---
   const ODOMETER_ONE_MARGIN_LEFT = '-0.06em';  // EDITABLE: Left margin adjustment for digit 1 to tighten kerning
   const ODOMETER_ONE_MARGIN_RIGHT = '-0.06em'; // EDITABLE: Right margin adjustment for digit 1 to tighten kerning
@@ -5381,7 +5384,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
           if (char === '°') {
             staticEl.classList.add('odometer-degree');
           }
-          staticEl.textContent = char;
+          if (char === ' ' || char === '\u00A0') {
+            staticEl.innerHTML = '&nbsp;';
+            staticEl.style.whiteSpace = 'pre';
+          } else {
+            staticEl.textContent = char;
+          }
           container.appendChild(staticEl);
         }
       });
@@ -5400,7 +5408,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
             }
           }
         } else {
-          if (child.textContent !== char) {
+          if (char === ' ' || char === '\u00A0') {
+            child.innerHTML = '&nbsp;';
+            child.style.whiteSpace = 'pre';
+          } else if (child.textContent !== char) {
             child.textContent = char;
           }
           if (char === '°') {
@@ -5650,6 +5661,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
         } else {
           const displayCurrent = displayUnit === 'C' ? (currentTemp - 32) * 5 / 9 : currentTemp;
           currentText = `${Math.round(displayCurrent)}°`;
+        }
+        if (hasSignificantFeelsLike && FEELS_LIKE_FIRST_TEMP_LEADING_SPACE) {
+          currentText = ' ' + currentText;
         }
         updateOdometer(currentTempContainer, currentText);
       } else {
@@ -6566,7 +6580,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1083';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1086';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
