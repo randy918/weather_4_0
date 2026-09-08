@@ -179,10 +179,10 @@ import weatherConditions from '../data/weather-conditions.json';
   const DAY0_LINES_ENABLED = true;                          // EDITABLE: Show horizontal 10° marker lines on Day 0 high bar
   const DAY0_LINES_COLOR_MODE = 'current_plus_10';         // EDITABLE: 'current_plus_10', 'current_minus_10', 'line_temp', or 'custom'
   const DAY0_LINES_CUSTOM_COLOR = '';                       // EDITABLE: Set explicit color (e.g. 'white', 'rgba(255,255,255,0.7)') or leave empty for dynamic
-  const DAY0_LINES_HEIGHT_DESKTOP = '0.15vw';                // EDITABLE Desktop: Thickness of horizontal lines
-  const DAY0_LINES_HEIGHT_MOBILE = '0.35vw';                 // EDITABLE Mobile: Thickness of horizontal lines
-  const DAY0_LINES_OPACITY_DESKTOP = 0.35;                   // EDITABLE Desktop: Opacity of the horizontal lines (0.0 to 1.0, 50%)
-  const DAY0_LINES_OPACITY_MOBILE =.25;                    // EDITABLE Mobile: Opacity of the horizontal lines (0.0 to 1.0, 50%)
+  const DAY0_LINES_HEIGHT_DESKTOP = '0.22vw';                // EDITABLE Desktop: Thickness of horizontal lines
+  const DAY0_LINES_HEIGHT_MOBILE = '0.40vw';                 // EDITABLE Mobile: Thickness of horizontal lines
+  const DAY0_LINES_OPACITY_DESKTOP = 0.55;                   // EDITABLE Desktop: Opacity of the horizontal lines (0.0 to 1.0, 55%)
+  const DAY0_LINES_OPACITY_MOBILE = 0.50;                    // EDITABLE Mobile: Opacity of the horizontal lines (0.0 to 1.0, 50%)
   const DAY0_LINES_OPACITY = DAY0_LINES_OPACITY_DESKTOP;    // Fallback alias
   const DAY0_LINES_Z_INDEX = 15;                            // EDITABLE: Stacking order (in front of bars, behind temperature number and wedge pointer)
   const HI_BAR_TEXT_Z_INDEX = 25;                           // EDITABLE: Stacking order for high bar temperature number (on top of lines, behind wedge pointer)
@@ -271,8 +271,8 @@ import weatherConditions from '../data/weather-conditions.json';
   const HOURLY_GRADIENT_HEIGHT_MOBILE = '45%';                      // EDITABLE Mobile: 24-hour height of gradient flush to top
   const HOURLY_GRADIENT_HEIGHT = HOURLY_GRADIENT_HEIGHT_DESKTOP;   // Fallback alias
 
-  const HOURLY_GRADIENT_OPACITY_TOP_DESKTOP = .5;                  // EDITABLE Desktop: 24-hour top opacity (1.0 = 100%)
-  const HOURLY_GRADIENT_OPACITY_TOP_MOBILE = .5;                   // EDITABLE Mobile: 24-hour top opacity (1.0 = 100%)
+  const HOURLY_GRADIENT_OPACITY_TOP_DESKTOP = 1;                  // EDITABLE Desktop: 24-hour top opacity (1.0 = 100%)
+  const HOURLY_GRADIENT_OPACITY_TOP_MOBILE = 1;                   // EDITABLE Mobile: 24-hour top opacity (1.0 = 100%)
 
   const HOURLY_GRADIENT_OPACITY_MID_DESKTOP = 0.5;                  // EDITABLE Desktop: 24-hour midpoint opacity (0.5 = 50%)
   const HOURLY_GRADIENT_OPACITY_MID_MOBILE = 0.5;                   // EDITABLE Mobile: 24-hour midpoint opacity (0.5 = 50%)
@@ -280,8 +280,8 @@ import weatherConditions from '../data/weather-conditions.json';
   const HOURLY_GRADIENT_OPACITY_BOTTOM_DESKTOP = 0.0;               // EDITABLE Desktop: 24-hour bottom opacity (0.0 = 0%)
   const HOURLY_GRADIENT_OPACITY_BOTTOM_MOBILE = 0.0;                // EDITABLE Mobile: 24-hour bottom opacity (0.0 = 0%)
 
-  const HOURLY_GRADIENT_MID_POINT_DESKTOP = '25%';                  // EDITABLE Desktop: 24-hour midpoint position (e.g. '50%' = halfway)
-  const HOURLY_GRADIENT_MID_POINT_MOBILE = '25%';                   // EDITABLE Mobile: 24-hour midpoint position (e.g. '50%' = halfway)
+  const HOURLY_GRADIENT_MID_POINT_DESKTOP = '50%';                  // EDITABLE Desktop: 24-hour midpoint position (e.g. '50%' = halfway)
+  const HOURLY_GRADIENT_MID_POINT_MOBILE = '50%';                   // EDITABLE Mobile: 24-hour midpoint position (e.g. '50%' = halfway)
   const HOURLY_GRADIENT_MID_POINT = HOURLY_GRADIENT_MID_POINT_DESKTOP; // Fallback alias
 
   const HOURLY_GRADIENT_BLEND_MODE = 'normal';                      // EDITABLE: 24-hour blend mode ('normal', 'screen', 'overlay', 'soft-light')
@@ -6661,7 +6661,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1097';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1106';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
@@ -11047,22 +11047,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       if (hour.weather && hour.weather[0]) {
           const desc = hour.weather[0].description;
-          const icon = hour.weather[0].icon;
-          const isNight = icon.includes('n');
           const baseFileName = 'desc-' + desc.toLowerCase().replace(/\s+/g, '-') + '.jpg';
           const imgPath = 'img/' + baseFileName;
-          const nightImgPath = 'img/dark-' + baseFileName;
-          const finalPath = isNight ? nightImgPath : imgPath;
           
           const imgPreload = new Image();
-          imgPreload.onload = () => { imgCell.style.backgroundImage = `url('${finalPath}')`; };
+          imgPreload.onload = () => { imgCell.style.backgroundImage = `url('${imgPath}')`; };
           imgPreload.onerror = () => {
-            const fallback = new Image();
-            fallback.onload = () => { imgCell.style.backgroundImage = `url('${imgPath}')`; };
-            fallback.onerror = () => { imgCell.style.backgroundImage = `url('img/desc-rem.jpg')`; };
-            fallback.src = imgPath;
+            imgCell.style.backgroundImage = `url('img/desc-rem.jpg')`;
+            recordMissingAsset(imgPath);
           };
-          imgPreload.src = finalPath;
+          imgPreload.src = imgPath;
       } else {
           imgCell.style.backgroundImage = `url('img/desc-rem.jpg')`;
       }
@@ -11325,6 +11319,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
         }
         item.style.backgroundColor = tempToColor(hiTempF) || '';
         item.style.opacity = '1';
+        if (index === 0) {
+          updateDay0TempLines(data);
+        }
       }
 
       // Track the high temp
@@ -11606,16 +11603,31 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
     const hiTop = hiRect.top;
     const loTop = loRect.top;
-    const barRange = loTop - hiTop;
+    let barRange = loTop - hiTop;
     const tempRange = hiTemp - loTemp;
 
-    if (tempRange <= 0 || barRange <= 0) {
+    if (tempRange <= 0) {
       linesContainer.innerHTML = '';
       return;
     }
 
+    // Mathematical fallback if DOM layout measurements are not yet settled (barRange <= 0)
+    let collapseTopY = loTop - containerRect.top;
+    if (barRange <= 0 || containerRect.height <= 0) {
+      const range = tempRangeMax - tempRangeMin;
+      const hiRatio = range > 0 ? (hiTemp - tempRangeMin) / range : 0.5;
+      const loRatio = range > 0 ? (loTemp - tempRangeMin) / range : 0.5;
+      const minHeightPx = window.innerWidth * (MIN_TEMP_BAR_HEIGHT_VW / 100);
+      const availableH = (containerRect.height || (window.innerWidth * 0.35)) - minHeightPx;
+      const targetHiHeight = minHeightPx + availableH * hiRatio;
+      const loHeight = minHeightPx + availableH * loRatio;
+      barRange = Math.max(1, targetHiHeight - loHeight);
+      collapseTopY = ((hiRect.bottom || loRect.bottom) - containerRect.top) - loHeight;
+    }
+
     const isMobile = window.innerWidth <= 767;
     const lineHeight = isMobile ? DAY0_LINES_HEIGHT_MOBILE : DAY0_LINES_HEIGHT_DESKTOP;
+    const lineOpacity = isMobile ? DAY0_LINES_OPACITY_MOBILE : DAY0_LINES_OPACITY_DESKTOP;
     const lineLeft = hiRect.left - containerRect.left;
     const lineWidth = hiRect.width;
 
@@ -11662,7 +11674,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       const tempF = isCelsius ? (deg * 9 / 5) + 32 : deg;
       const ratio = Math.max(0, Math.min(1, (tempF - loTemp) / tempRange));
-      const lineY = (loTop - containerRect.top) - (ratio * barRange);
+      const lineY = collapseTopY - (ratio * barRange);
 
       let lineColor = defaultLineColor;
       if (DAY0_LINES_COLOR_MODE === 'line_temp') {
@@ -11673,13 +11685,15 @@ Plan ahead for significantly warmer conditions tomorrow!`
         lineColor = tempToColor(tempF + 10) || defaultLineColor;
       }
 
+      line.classList.remove('animating-change');
       line.style.left = `${lineLeft}px`;
       line.style.width = `${lineWidth}px`;
       line.style.top = `${lineY}px`;
       line.style.height = lineHeight;
       line.style.transform = 'translateY(-50%)';
       line.style.backgroundColor = lineColor;
-      line.style.opacity = isMobile ? 'var(--day0-lines-opacity-mobile, 0.5)' : 'var(--day0-lines-opacity-desktop, 0.5)';
+      line.style.opacity = String(lineOpacity);
+      line.style.setProperty('opacity', String(lineOpacity));
       line.setAttribute('data-temp', deg);
       line.title = `${deg}°`;
     });
@@ -11817,9 +11831,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const ratio = Math.max(0, Math.min(1, (tempF - loTemp) / tempRange));
       const targetLineY = collapseTopY - (ratio * targetBarRange);
 
+      const lineOpacity = isMobile ? DAY0_LINES_OPACITY_MOBILE : DAY0_LINES_OPACITY_DESKTOP;
       line.classList.add('animating-change');
       line.style.top = `${targetLineY}px`;
-      line.style.opacity = isMobile ? 'var(--day0-lines-opacity-mobile, 0.5)' : 'var(--day0-lines-opacity-desktop, 0.5)';
+      line.style.opacity = String(lineOpacity);
+      line.style.setProperty('opacity', String(lineOpacity));
     });
   }
 
