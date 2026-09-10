@@ -2468,18 +2468,25 @@ import weatherConditions from '../data/weather-conditions.json';
 
 
 
+  // EDITABLE: Moon Phase Window Thresholds (OpenWeather 0.0 to 1.0 scale)
+  // In the 29.53-day lunar cycle, each day is ~0.034.
+  // 0.05 creates a ~3-day window (~1.5 days on either side: day before, day of, and day after).
+  const NEW_MOON_THRESHOLD = 0.05;   // EDITABLE: Day on either side of New Moon (3-day window: [0.95, 1.0] and [0.0, 0.05])
+  const FULL_MOON_THRESHOLD = 0.05;  // EDITABLE: Day on either side of Full Moon (3-day window: [0.45, 0.55])
+
   function getMoonPhaseName(phase) {
     if (typeof phase !== 'number') return '';
     // Based on standard OpenWeather API moon_phase values (0..1)
     // Primary phases use a range so that "Full Moon", "New Moon", etc. cover full calendar days
-    if (phase < 0.04 || phase > 0.96) return 'New Moon';
-    if (phase >= 0.04 && phase < 0.21) return 'Waxing Crescent';
+    // 3-day window: day before, day of, and day after New Moon (matching Full Moon's 3-day window)
+    if (phase <= NEW_MOON_THRESHOLD || phase >= (1 - NEW_MOON_THRESHOLD)) return 'New Moon';
+    if (phase > NEW_MOON_THRESHOLD && phase < 0.21) return 'Waxing Crescent';
     if (phase >= 0.21 && phase <= 0.29) return 'First Quarter';
-    if (phase > 0.29 && phase < 0.45) return 'Waxing Gibbous';
-    if (phase >= 0.45 && phase <= 0.55) return 'Full Moon'; // 3-day window: day before, day of, and day after Full Moon
-    if (phase > 0.55 && phase < 0.71) return 'Waning Gibbous';
+    if (phase > 0.29 && phase < (0.5 - FULL_MOON_THRESHOLD)) return 'Waxing Gibbous';
+    if (phase >= (0.5 - FULL_MOON_THRESHOLD) && phase <= (0.5 + FULL_MOON_THRESHOLD)) return 'Full Moon'; // 3-day window: day before, day of, and day after Full Moon
+    if (phase > (0.5 + FULL_MOON_THRESHOLD) && phase < 0.71) return 'Waning Gibbous';
     if (phase >= 0.71 && phase <= 0.79) return 'Last Quarter';
-    if (phase > 0.79 && phase <= 0.96) return 'Waning Crescent';
+    if (phase > 0.79 && phase < (1 - NEW_MOON_THRESHOLD)) return 'Waning Crescent';
     return '';
   }
 
@@ -6722,7 +6729,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1109';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1110';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
