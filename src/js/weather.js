@@ -82,6 +82,19 @@ import weatherConditions from '../data/weather-conditions.json';
   const RAIN_DROP_TAIL_OPACITY = 0.0;                // Opacity of the trailing end of the tail (fading)
   const RAIN_WIND_TILT_RATIO = 2.0;                  // Ratio of tilt degrees per 1 mph of East-West wind speed
   
+  // --- CONFIG: Rain Area Layout, Fading & Opacity (JCV) ---
+  const RAIN_AREA_HEIGHT_DESKTOP = '50vw';           // EDITABLE Desktop: Height of entire rain animation area (starts flush with top)
+  const RAIN_AREA_HEIGHT_MOBILE = '50vw';            // EDITABLE Mobile: Height of entire rain animation area (starts flush with top)
+
+  const RAIN_FADE_TOP_DESKTOP = '5vw';               // EDITABLE Desktop: Top fade zone from 0% to 100% opacity (e.g. '5vw', '0vw' for none)
+  const RAIN_FADE_TOP_MOBILE = '5vw';                // EDITABLE Mobile: Top fade zone from 0% to 100% opacity (e.g. '5vw', '0vw' for none)
+
+  const RAIN_FADE_BOTTOM_DESKTOP = '10vw';           // EDITABLE Desktop: Bottom fade zone from 100% to 0% opacity (e.g. '10vw', '0vw' for none)
+  const RAIN_FADE_BOTTOM_MOBILE = '10vw';            // EDITABLE Mobile: Bottom fade zone from 100% to 0% opacity (e.g. '10vw', '0vw' for none)
+
+  const RAIN_OPACITY_DESKTOP = 1.0;                  // EDITABLE Desktop: Overall opacity for rain graphics (0.0 to 1.0, e.g. 1.0 = 100%)
+  const RAIN_OPACITY_MOBILE = 1.0;                   // EDITABLE Mobile: Overall opacity for rain graphics (0.0 to 1.0, e.g. 1.0 = 100%)
+
   // --- CONFIG: Dynamic Rain Density ---
   const RAIN_MIN_SPAWN_INTERVAL_MS = 50;             // Downpour speed (heavy rain) in milliseconds
   const RAIN_MAX_SPAWN_INTERVAL_MS = 3000;           // Drizzle speed (light rain) in milliseconds
@@ -103,6 +116,30 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--rain-light-threshold-mm', RAIN_LIGHT_THRESHOLD_MM);
   document.documentElement.style.setProperty('--rain-heavy-threshold-mm', RAIN_HEAVY_THRESHOLD_MM);
   document.documentElement.style.setProperty('--rain-spawn-interval-ms', currentRainSpawnIntervalMs + 'ms');
+
+  document.documentElement.style.setProperty('--rain-area-height-desktop', RAIN_AREA_HEIGHT_DESKTOP);
+  document.documentElement.style.setProperty('--rain-area-height-mobile', RAIN_AREA_HEIGHT_MOBILE);
+  document.documentElement.style.setProperty('--rain-area-height', window.innerWidth <= 767 ? RAIN_AREA_HEIGHT_MOBILE : RAIN_AREA_HEIGHT_DESKTOP);
+
+  document.documentElement.style.setProperty('--rain-fade-top-desktop', RAIN_FADE_TOP_DESKTOP);
+  document.documentElement.style.setProperty('--rain-fade-top-mobile', RAIN_FADE_TOP_MOBILE);
+  document.documentElement.style.setProperty('--rain-fade-top', window.innerWidth <= 767 ? RAIN_FADE_TOP_MOBILE : RAIN_FADE_TOP_DESKTOP);
+
+  document.documentElement.style.setProperty('--rain-fade-bottom-desktop', RAIN_FADE_BOTTOM_DESKTOP);
+  document.documentElement.style.setProperty('--rain-fade-bottom-mobile', RAIN_FADE_BOTTOM_MOBILE);
+  document.documentElement.style.setProperty('--rain-fade-bottom', window.innerWidth <= 767 ? RAIN_FADE_BOTTOM_MOBILE : RAIN_FADE_BOTTOM_DESKTOP);
+
+  document.documentElement.style.setProperty('--rain-opacity-desktop', RAIN_OPACITY_DESKTOP);
+  document.documentElement.style.setProperty('--rain-opacity-mobile', RAIN_OPACITY_MOBILE);
+  document.documentElement.style.setProperty('--rain-opacity', window.innerWidth <= 767 ? RAIN_OPACITY_MOBILE : RAIN_OPACITY_DESKTOP);
+
+  window.addEventListener('resize', () => {
+    const isMobile = window.innerWidth <= 767;
+    document.documentElement.style.setProperty('--rain-area-height', isMobile ? RAIN_AREA_HEIGHT_MOBILE : RAIN_AREA_HEIGHT_DESKTOP);
+    document.documentElement.style.setProperty('--rain-fade-top', isMobile ? RAIN_FADE_TOP_MOBILE : RAIN_FADE_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--rain-fade-bottom', isMobile ? RAIN_FADE_BOTTOM_MOBILE : RAIN_FADE_BOTTOM_DESKTOP);
+    document.documentElement.style.setProperty('--rain-opacity', isMobile ? RAIN_OPACITY_MOBILE : RAIN_OPACITY_DESKTOP);
+  });
 
   // --- CONFIG: Snow Flake Animation ---
   const SNOW_ENABLED = true;                         // Set to false to disable all canvas drawing
@@ -3854,9 +3891,16 @@ import weatherConditions from '../data/weather-conditions.json';
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     
+    function getRainAreaHeightPx() {
+      const isMobile = window.innerWidth <= 767;
+      const heightStr = isMobile ? RAIN_AREA_HEIGHT_MOBILE : RAIN_AREA_HEIGHT_DESKTOP;
+      const heightVal = parseFloat(heightStr) || 50;
+      return Math.round((heightVal / 100) * window.innerWidth);
+    }
+
     function resize() {
       canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      canvas.height = getRainAreaHeightPx();
     }
     window.addEventListener('resize', resize);
     resize();
@@ -3871,43 +3915,28 @@ import weatherConditions from '../data/weather-conditions.json';
       const shouldRain = (RAIN_ENABLED && isRainingCurrently && !forceSnow) || (forceRain && !forceSnow);
       
       if (shouldRain) {
-        // Calculate dynamic vertical boundaries in pixels
-        const alertsContainer = document.getElementById('alerts-container');
-        const rainBanner = document.getElementById('rain-forecast-banner');
-        let bannerHeightVw = 0;
-        if (alertsContainer) {
-          bannerHeightVw += parseFloat(alertsContainer.style.height) || 0;
-        }
-        if (rainBanner) {
-          bannerHeightVw += parseFloat(rainBanner.style.height) || 0;
-        }
-        
-        const startY = (bannerHeightVw / 100) * window.innerWidth;
-        const loContainer = document.querySelector('.loContainer');
-        const endY = loContainer ? loContainer.getBoundingClientRect().bottom : canvas.height;
-        
         const time = currentTime || performance.now();
+        if (activeDrops.length === 0) {
+          // Pre-populate initial scattered raindrops across the rain area
+          const initialCount = Math.min(12, Math.floor(canvas.height / 35));
+          for (let i = 0; i < initialCount; i++) {
+            activeDrops.push(createDrop(canvas, Math.random() * canvas.height));
+          }
+        }
+
         if (time - lastSpawnTime >= currentRainSpawnIntervalMs) {
-          activeDrops.push(createDrop(canvas, startY));
+          activeDrops.push(createDrop(canvas, 0));
           lastSpawnTime = time;
         }
         
-        // Clip rendering to startY and endY boundaries
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(0, startY, canvas.width, Math.max(0, endY - startY));
-        ctx.clip();
-        
         activeDrops = activeDrops.filter(drop => {
           drop.update();
-          if (drop.isOffScreen(endY)) {
+          if (drop.isOffScreen(canvas.height)) {
             return false;
           }
           drop.draw(ctx);
           return true;
         });
-        
-        ctx.restore();
       } else {
         activeDrops = [];
       }
@@ -4092,6 +4121,7 @@ import weatherConditions from '../data/weather-conditions.json';
     const gradientUpper = document.querySelector('.scrolling-gradient-overlay');
     const gradientLower = document.querySelector('.scrolling-gradient-overlay-lower');
     const starfieldContainer = document.getElementById('starfield-container');
+    const rainCanvas = document.getElementById('weather-rain-canvas');
     if (moon) moon.style.setProperty('--alert-push', '0vw');
     if (descImg) descImg.style.setProperty('--alert-push', '0vw');
     if (descImgLeft) descImgLeft.style.setProperty('--alert-push', '0vw');
@@ -4101,6 +4131,7 @@ import weatherConditions from '../data/weather-conditions.json';
     if (gradientUpper) gradientUpper.style.setProperty('--alert-push', '0vw');
     if (gradientLower) gradientLower.style.setProperty('--alert-push', '0vw');
     if (starfieldContainer) starfieldContainer.style.setProperty('--alert-push', '0vw');
+    if (rainCanvas) rainCanvas.style.setProperty('--alert-push', '0vw');
     setTimeout(() => document.body.classList.add('transitions-ready'), 100);
   } else {
     document.addEventListener('DOMContentLoaded', () => {
@@ -4118,6 +4149,7 @@ import weatherConditions from '../data/weather-conditions.json';
       const gradientUpper = document.querySelector('.scrolling-gradient-overlay');
       const gradientLower = document.querySelector('.scrolling-gradient-overlay-lower');
       const starfieldContainer = document.getElementById('starfield-container');
+      const rainCanvas = document.getElementById('weather-rain-canvas');
       if (moon) moon.style.setProperty('--alert-push', '0vw');
       if (descImg) descImg.style.setProperty('--alert-push', '0vw');
       if (descImgLeft) descImgLeft.style.setProperty('--alert-push', '0vw');
@@ -4127,6 +4159,7 @@ import weatherConditions from '../data/weather-conditions.json';
       if (gradientUpper) gradientUpper.style.setProperty('--alert-push', '0vw');
       if (gradientLower) gradientLower.style.setProperty('--alert-push', '0vw');
       if (starfieldContainer) starfieldContainer.style.setProperty('--alert-push', '0vw');
+      if (rainCanvas) rainCanvas.style.setProperty('--alert-push', '0vw');
       setTimeout(() => document.body.classList.add('transitions-ready'), 100);
     });
   }
@@ -4199,6 +4232,10 @@ import weatherConditions from '../data/weather-conditions.json';
     }
     if (starfieldContainer) {
       starfieldContainer.style.setProperty('--alert-push', pushValue);
+    }
+    const rainCanvas = document.getElementById('weather-rain-canvas');
+    if (rainCanvas) {
+      rainCanvas.style.setProperty('--alert-push', pushValue);
     }
     updateLowerGradientPosition();
     setTimeout(updateStarfieldMask, 50);
@@ -6796,7 +6833,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1116';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1117';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
@@ -13654,8 +13691,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
         if (stemColor) {
           gridWindCenterDot.style.backgroundColor = stemColor;
         }
- 9-10-26-1240   
- 9-10-26-1240   
       });
       
       lastWindDirection = deg;
