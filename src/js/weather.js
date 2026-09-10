@@ -2099,6 +2099,32 @@ import weatherConditions from '../data/weather-conditions.json';
   const ALERT_MODAL_LINE_HEIGHT = '3.025vw'; // EDITABLE: Line spacing INSIDE the modal paragraphs
   const ALERT_MODAL_TITLE_LINE_HEIGHT = '.95'; // EDITABLE: Line spacing for the uppercase TITLE inside the modal
   const ALERT_MODAL_BODY_TOP_MARGIN = '3.0vw'; // EDITABLE: Additional linespace above body copy of alert/warning
+  const ALERT_DROP_ICON_TRANSFORM = 'scaleY(-1)'; // EDITABLE: Vertical reversal transform to indicate downward temperature drop
+  const ALERT_BANNER_LINE_HEIGHT = '1.1'; // EDITABLE: Line height for banner text to ensure vertical centering
+
+  // --- EDITABLE: Temperature Advisory Vertical Centering (JCV) ---
+  // Fine vertical nudge for type (text) and symbol (icon) (+ moves DOWN, - moves UP)
+  const ALERT_TEMP_DROP_TYPE_Y_OFFSET_DESKTOP = '0.3vw';  // EDITABLE Desktop: Vertical nudge for Temperature Drop text
+  const ALERT_TEMP_DROP_TYPE_Y_OFFSET_MOBILE = '0.3vw';   // EDITABLE Mobile: Vertical nudge for Temperature Drop text
+  const ALERT_TEMP_DROP_ICON_Y_OFFSET_DESKTOP = '0.4vw';  // EDITABLE Desktop: Vertical nudge for Temperature Drop icon
+  const ALERT_TEMP_DROP_ICON_Y_OFFSET_MOBILE = '0.4vw';   // EDITABLE Mobile: Vertical nudge for Temperature Drop icon
+
+  const ALERT_TEMP_RISE_TYPE_Y_OFFSET_DESKTOP = '0.3vw';  // EDITABLE Desktop: Vertical nudge for Temperature Rise text
+  const ALERT_TEMP_RISE_TYPE_Y_OFFSET_MOBILE = '0.3vw';   // EDITABLE Mobile: Vertical nudge for Temperature Rise text
+  const ALERT_TEMP_RISE_ICON_Y_OFFSET_DESKTOP = '-0.15vw'; // EDITABLE Desktop: Vertical nudge for Temperature Rise icon
+  const ALERT_TEMP_RISE_ICON_Y_OFFSET_MOBILE = '-0.15vw';  // EDITABLE Mobile: Vertical nudge for Temperature Rise icon
+
+  document.documentElement.style.setProperty('--alert-banner-line-height', ALERT_BANNER_LINE_HEIGHT);
+
+  document.documentElement.style.setProperty('--alert-temp-drop-type-y-offset-desktop', ALERT_TEMP_DROP_TYPE_Y_OFFSET_DESKTOP);
+  document.documentElement.style.setProperty('--alert-temp-drop-type-y-offset-mobile', ALERT_TEMP_DROP_TYPE_Y_OFFSET_MOBILE);
+  document.documentElement.style.setProperty('--alert-temp-drop-icon-y-offset-desktop', ALERT_TEMP_DROP_ICON_Y_OFFSET_DESKTOP);
+  document.documentElement.style.setProperty('--alert-temp-drop-icon-y-offset-mobile', ALERT_TEMP_DROP_ICON_Y_OFFSET_MOBILE);
+
+  document.documentElement.style.setProperty('--alert-temp-rise-type-y-offset-desktop', ALERT_TEMP_RISE_TYPE_Y_OFFSET_DESKTOP);
+  document.documentElement.style.setProperty('--alert-temp-rise-type-y-offset-mobile', ALERT_TEMP_RISE_TYPE_Y_OFFSET_MOBILE);
+  document.documentElement.style.setProperty('--alert-temp-rise-icon-y-offset-desktop', ALERT_TEMP_RISE_ICON_Y_OFFSET_DESKTOP);
+  document.documentElement.style.setProperty('--alert-temp-rise-icon-y-offset-mobile', ALERT_TEMP_RISE_ICON_Y_OFFSET_MOBILE);
 
   const ALERT_COLORS = {
     "DEFAULT": "rgba(0,0,0, 0.75)", // Default translucent red for anything else
@@ -3208,6 +3234,20 @@ import weatherConditions from '../data/weather-conditions.json';
     const style = document.createElement('style');
     style.id = 'alerts-style';
     style.textContent = `
+      :root {
+        --alert-temp-drop-type-y-offset: var(--alert-temp-drop-type-y-offset-desktop, 0.3vw);
+        --alert-temp-drop-icon-y-offset: var(--alert-temp-drop-icon-y-offset-desktop, 0.4vw);
+        --alert-temp-rise-type-y-offset: var(--alert-temp-rise-type-y-offset-desktop, 0.3vw);
+        --alert-temp-rise-icon-y-offset: var(--alert-temp-rise-icon-y-offset-desktop, -0.15vw);
+      }
+      @media (max-width: 767px) {
+        :root {
+          --alert-temp-drop-type-y-offset: var(--alert-temp-drop-type-y-offset-mobile, 0.3vw);
+          --alert-temp-drop-icon-y-offset: var(--alert-temp-drop-icon-y-offset-mobile, 0.4vw);
+          --alert-temp-rise-type-y-offset: var(--alert-temp-rise-type-y-offset-mobile, 0.3vw);
+          --alert-temp-rise-icon-y-offset: var(--alert-temp-rise-icon-y-offset-mobile, -0.15vw);
+        }
+      }
       html, body {
         margin: 0 !important;
       }
@@ -3299,6 +3339,7 @@ import weatherConditions from '../data/weather-conditions.json';
         font-family: 'bold', sans-serif;
         text-transform: uppercase;
         letter-spacing: 0.05em;
+        line-height: var(--alert-banner-line-height, 1.1);
         color: #ffffff;
       }
       .alert-expires {
@@ -4254,6 +4295,9 @@ import weatherConditions from '../data/weather-conditions.json';
     const modalIconMarginTop = '0vw';
     const modalIconMarginBottom = '2vw';
     
+    const isTempDrop = (alert.event || '').toUpperCase().includes('TEMPERATURE DROP ADVISORY');
+    const modalIconTransform = isTempDrop ? ` transform: ${ALERT_DROP_ICON_TRANSFORM};` : '';
+
     // Icon element using CSS mask to colorize the SVG to match the alert color
     const iconElement = icon ? `
       <div style="
@@ -4268,7 +4312,7 @@ import weatherConditions from '../data/weather-conditions.json';
         mask-image: url('${icon}');
         mask-size: contain;
         mask-repeat: no-repeat;
-        mask-position: center;
+        mask-position: center;${modalIconTransform}
       "></div>
     ` : '';
     
@@ -4858,7 +4902,9 @@ Plan ahead for shifting weather conditions tomorrow!`
     
     // EDITABLE preview mode: set to true to force-show test banners for TEMPERATURE DROP ADVISORY and TEMPERATURE RISE ADVISORY
     const TEST_SHOW_TEMP_ADVISORIES_PREVIEW = false; // Set to false for normal live operation
-    if (TEST_SHOW_TEMP_ADVISORIES_PREVIEW) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const showTempAdvisoriesPreview = TEST_SHOW_TEMP_ADVISORIES_PREVIEW || urlParams.get('temp_advisories') === 'true' || urlParams.get('test_alerts') === 'true';
+    if (showTempAdvisoriesPreview) {
       alerts.push({
         event: "TEMPERATURE DROP ADVISORY",
         sender_name: "24-Hour Forecast Analysis",
@@ -4976,9 +5022,19 @@ Plan ahead for significantly warmer conditions tomorrow!`
       
       // Use custom SVG icon
       const svgSize = '7vw';
+      const isTempDrop = eventName.includes('TEMPERATURE DROP');
+      const isTempRise = !isTempDrop && eventName.includes('TEMPERATURE RISE');
+      
+      let iconTransform = '';
+      if (isTempDrop) {
+        iconTransform = `transform: translateY(var(--alert-temp-drop-icon-y-offset, 0vw)) ${ALERT_DROP_ICON_TRANSFORM};`;
+      } else if (isTempRise) {
+        iconTransform = `transform: translateY(var(--alert-temp-rise-icon-y-offset, 0vw));`;
+      }
+      const bannerIconTransform = iconTransform ? ` ${iconTransform}` : '';
       
       const svgIcon = `
-        <img src="${bannerIcon}" style="width: ${svgSize}; height: ${svgSize}; flex-shrink: 0;" alt="Alert">
+        <img src="${bannerIcon}" style="width: ${svgSize}; height: ${svgSize}; flex-shrink: 0;${bannerIconTransform}" alt="Alert">
       `;
       
       // Create the content container (sits above background)
@@ -4990,6 +5046,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
       textWrapper.style.flexDirection = 'column';
       textWrapper.style.justifyContent = 'center';
       textWrapper.style.alignItems = 'flex-start';
+      if (isTempDrop) {
+        textWrapper.style.transform = 'translateY(var(--alert-temp-drop-type-y-offset, 0vw))';
+      } else if (isTempRise) {
+        textWrapper.style.transform = 'translateY(var(--alert-temp-rise-type-y-offset, 0vw))';
+      }
 
       const text = document.createElement('div');
       text.className = 'alert-text';
@@ -6661,7 +6722,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1106';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1109';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)

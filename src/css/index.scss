@@ -1410,6 +1410,10 @@ main {
     --clock-grid-margin-top: var(--clock-grid-margin-top-desktop, 2.2vw);
     --circle-cell-top: var(--circle-cell-top-desktop, 0vw);
     --fragile-y-offset: var(--fragile-y-offset-desktop, 2vw);
+    --alert-temp-drop-type-y-offset: var(--alert-temp-drop-type-y-offset-desktop, 0.3vw);
+    --alert-temp-drop-icon-y-offset: var(--alert-temp-drop-icon-y-offset-desktop, 0.4vw);
+    --alert-temp-rise-type-y-offset: var(--alert-temp-rise-type-y-offset-desktop, 0.3vw);
+    --alert-temp-rise-icon-y-offset: var(--alert-temp-rise-icon-y-offset-desktop, -0.15vw);
     --radar-threshold-left: 150;
     --radar-threshold-right: 300;
 
@@ -1445,6 +1449,10 @@ main {
         --clock-grid-margin-top: var(--clock-grid-margin-top-mobile, 3vw);
         --circle-cell-top: var(--circle-cell-top-mobile, 0vw);
         --fragile-y-offset: var(--fragile-y-offset-mobile, 2vw);
+        --alert-temp-drop-type-y-offset: var(--alert-temp-drop-type-y-offset-mobile, 0.3vw);
+        --alert-temp-drop-icon-y-offset: var(--alert-temp-drop-icon-y-offset-mobile, 0.4vw);
+        --alert-temp-rise-type-y-offset: var(--alert-temp-rise-type-y-offset-mobile, 0.3vw);
+        --alert-temp-rise-icon-y-offset: var(--alert-temp-rise-icon-y-offset-mobile, -0.15vw);
     }
 
     .grid-wind-speed-text {
