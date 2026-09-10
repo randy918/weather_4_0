@@ -196,6 +196,30 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--day0-lines-z-index', DAY0_LINES_Z_INDEX);
   document.documentElement.style.setProperty('--hi-bar-text-z-index', HI_BAR_TEXT_Z_INDEX);
 
+  // --- CONFIG: Close Hi/Lo Temperature Layering (8-Day Forecast Bars) ---
+  // In close high and low situations, ensures the low bar & low temp text layer z-wise ABOVE the high bar & high temp text
+  const CLOSE_HI_LO_DIFF_THRESHOLD_DESKTOP = 5;       // EDITABLE Desktop: Max difference (°F) between high & low considered "close" (e.g. 5° or less)
+  const CLOSE_HI_LO_DIFF_THRESHOLD_MOBILE = 5;        // EDITABLE Mobile: Max difference (°F) between high & low considered "close"
+  const LO_BAR_Z_INDEX_DESKTOP = 2;                   // EDITABLE Desktop: Default stacking order for low bars
+  const LO_BAR_Z_INDEX_MOBILE = 2;                    // EDITABLE Mobile: Default stacking order for low bars
+  const HI_BAR_Z_INDEX_DESKTOP = 1;                   // EDITABLE Desktop: Default stacking order for high bars
+  const HI_BAR_Z_INDEX_MOBILE = 1;                    // EDITABLE Mobile: Default stacking order for high bars
+  const LO_BAR_CLOSE_Z_INDEX_DESKTOP = 30;            // EDITABLE Desktop: Stacking order for low bar in close situations (above hi bar & hi text)
+  const LO_BAR_CLOSE_Z_INDEX_MOBILE = 30;             // EDITABLE Mobile: Stacking order for low bar in close situations
+  const LO_BAR_CLOSE_TEXT_Z_INDEX_DESKTOP = 35;       // EDITABLE Desktop: Stacking order for low bar text in close situations (above hi bar & hi text)
+  const LO_BAR_CLOSE_TEXT_Z_INDEX_MOBILE = 35;        // EDITABLE Mobile: Stacking order for low bar text in close situations
+
+  document.documentElement.style.setProperty('--close-hi-lo-diff-threshold-desktop', CLOSE_HI_LO_DIFF_THRESHOLD_DESKTOP);
+  document.documentElement.style.setProperty('--close-hi-lo-diff-threshold-mobile', CLOSE_HI_LO_DIFF_THRESHOLD_MOBILE);
+  document.documentElement.style.setProperty('--lo-bar-z-index-desktop', LO_BAR_Z_INDEX_DESKTOP);
+  document.documentElement.style.setProperty('--lo-bar-z-index-mobile', LO_BAR_Z_INDEX_MOBILE);
+  document.documentElement.style.setProperty('--hi-bar-z-index-desktop', HI_BAR_Z_INDEX_DESKTOP);
+  document.documentElement.style.setProperty('--hi-bar-z-index-mobile', HI_BAR_Z_INDEX_MOBILE);
+  document.documentElement.style.setProperty('--lo-bar-close-z-index-desktop', LO_BAR_CLOSE_Z_INDEX_DESKTOP);
+  document.documentElement.style.setProperty('--lo-bar-close-z-index-mobile', LO_BAR_CLOSE_Z_INDEX_MOBILE);
+  document.documentElement.style.setProperty('--lo-bar-close-text-z-index-desktop', LO_BAR_CLOSE_TEXT_Z_INDEX_DESKTOP);
+  document.documentElement.style.setProperty('--lo-bar-close-text-z-index-mobile', LO_BAR_CLOSE_TEXT_Z_INDEX_MOBILE);
+
   // --- CONFIG: 8-Day Forecast Temperature Bar Padding (Hi & Lo Degrees) ---
   const HI_BAR_PADDING_TOP_DESKTOP = '0.4vw';         // EDITABLE Desktop: Top padding hugging degrees to top of hi bar
   const HI_BAR_PADDING_TOP_MOBILE = '0.4vw';          // EDITABLE Mobile: Top padding hugging degrees to top of hi bar
@@ -6729,7 +6753,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1110';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1112';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
@@ -11291,6 +11315,19 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       const hiTempF = Math.round(dayData.temp.max);
       const loTempF = Math.round(dayData.temp.min);
+
+      const isPhone = window.innerWidth < 768;
+      const closeThreshold = isPhone ? CLOSE_HI_LO_DIFF_THRESHOLD_MOBILE : CLOSE_HI_LO_DIFF_THRESHOLD_DESKTOP;
+      const isCloseHiLo = (hiTempF - loTempF) <= closeThreshold;
+      const loItem = loItems[index];
+
+      if (isCloseHiLo) {
+        item.classList.add('close-hi-lo');
+        if (loItem) loItem.classList.add('close-hi-lo');
+      } else {
+        item.classList.remove('close-hi-lo');
+        if (loItem) loItem.classList.remove('close-hi-lo');
+      }
       
       const hiTempDisplay = displayUnit === 'C' ? Math.round((hiTempF - 32) * 5 / 9) : hiTempF;
       const loTempDisplay = displayUnit === 'C' ? Math.round((loTempF - 32) * 5 / 9) : loTempF;
@@ -11396,8 +11433,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
       prevHighTemps[index] = hiTempF;
 
       // Set height, text, and color for Low bars
-      const loItem = loItems[index];
       if (loItem) {
+        const loTextZIndex = isCloseHiLo ? (isPhone ? LO_BAR_CLOSE_TEXT_Z_INDEX_MOBILE : LO_BAR_CLOSE_TEXT_Z_INDEX_DESKTOP) : 10;
         const shouldAnimateLow = prevLowTemps[index] !== null && prevLowTemps[index] !== loTempF;
 
         if (shouldAnimateLow) {
@@ -11407,9 +11444,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
           const oldLoHeightStr = `calc(${MIN_TEMP_BAR_HEIGHT_VW}vw + (100% - ${MIN_TEMP_BAR_HEIGHT_VW}vw) * ${oldLoRatio})`;
           const targetLoHeightStr = `calc(${MIN_TEMP_BAR_HEIGHT_VW}vw + (100% - ${MIN_TEMP_BAR_HEIGHT_VW}vw) * ${loRatio})`;
 
-          // Instantly set to old height, set overflow to hidden to mask the text, and lift to z-index 11 (on top of high bar's 10)
+          // Instantly set to old height, set overflow to hidden to mask the text, and lift to z-index (on top of high bar)
           loItem.style.height = oldLoHeightStr;
-          loItem.style.zIndex = '11';
+          loItem.style.zIndex = isCloseHiLo ? String(LO_BAR_CLOSE_Z_INDEX_DESKTOP) : '11';
           loItem.style.overflow = 'hidden';
           loItem.classList.add('animating-change');
 
@@ -11418,9 +11455,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
           if (displayUnit === 'BOTH') {
             const oldLoTempC = Math.round((oldLoTemp - 32) * 5 / 9);
             const colorStyle = oldLoTemp >= 100 ? 'color: hsl(30, 100%, 50%) !important;' : 'color: var(--theBrown);';
-            loItem.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: 10; top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${oldLoTemp}${formatSlash()}${oldLoTempC}</span>`;
+            loItem.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: ${loTextZIndex}; top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${oldLoTemp}${formatSlash()}${oldLoTempC}</span>`;
           } else {
-            const colorStyle = oldLoTemp >= 100 ? 'style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: 10;"' : 'style="color: var(--theBrown); position: relative; z-index: 10;"';
+            const colorStyle = oldLoTemp >= 100 ? `style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: ${loTextZIndex};"` : `style="color: var(--theBrown); position: relative; z-index: ${loTextZIndex};"`;
             loItem.innerHTML = `<span ${colorStyle}>${oldLoTempDisplay}°</span>`;
           }
           loItem.style.backgroundColor = tempToColor(oldLoTemp) || '';
@@ -11441,9 +11478,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
             if (displayUnit === 'BOTH') {
               const loTempC = Math.round((loTempF - 32) * 5 / 9);
               const colorStyle = loTempF >= 100 ? 'color: hsl(30, 100%, 50%) !important;' : 'color: var(--theBrown);';
-              loItem.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: 10; top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${loTempF}${formatSlash()}${loTempC}</span>`;
+              loItem.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: ${loTextZIndex}; top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${loTempF}${formatSlash()}${loTempC}</span>`;
             } else {
-              const colorStyle = loTempF >= 100 ? 'style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: 10;"' : 'style="color: var(--theBrown); position: relative; z-index: 10;"';
+              const colorStyle = loTempF >= 100 ? `style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: ${loTextZIndex};"` : `style="color: var(--theBrown); position: relative; z-index: ${loTextZIndex};"`;
               loItem.innerHTML = `<span ${colorStyle}>${loTempDisplay}°</span>`;
             }
 
@@ -11468,9 +11505,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
           if (displayUnit === 'BOTH') {
             const loTempC = Math.round((loTempF - 32) * 5 / 9);
             const colorStyle = loTempF >= 100 ? 'color: hsl(30, 100%, 50%) !important;' : 'color: var(--theBrown);';
-            loItem.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: 10; top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${loTempF}${formatSlash()}${loTempC}</span>`;
+            loItem.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: ${loTextZIndex}; top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${loTempF}${formatSlash()}${loTempC}</span>`;
           } else {
-            const colorStyle = loTempF >= 100 ? 'style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: 10;"' : 'style="color: var(--theBrown); position: relative; z-index: 10;"';
+            const colorStyle = loTempF >= 100 ? `style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: ${loTextZIndex};"` : `style="color: var(--theBrown); position: relative; z-index: ${loTextZIndex};"`;
             loItem.innerHTML = `<span ${colorStyle}>${loTempDisplay}°</span>`;
           }
           loItem.style.backgroundColor = tempToColor(loTempF) || '';

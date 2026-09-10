@@ -763,7 +763,7 @@ main {
 }
 
 .loContainer {
-    z-index: 2;
+    z-index: auto; // Allow individual loItems to stack relative to hiItems in dualContainer
 }
 
 .hiContainer {
@@ -799,6 +799,7 @@ main {
 }
 
 .hiItem {
+    z-index: var(--hi-bar-z-index, 1);
     padding-top: var(--hi-bar-padding-top-desktop, 0.4vw);
     box-shadow: 0 0.4vw 1.2vw 0 rgba(0, 0, 0, 1);
 
@@ -808,11 +809,21 @@ main {
 }
 
 .loItem {
+    z-index: var(--lo-bar-z-index, 2);
     padding-top: var(--lo-bar-padding-top-desktop, 0.4vw);
     box-shadow: none; // Disable standard downward shadow
 
     @media (max-width: 767px) {
         padding-top: var(--lo-bar-padding-top-mobile, 0.4vw);
+    }
+
+    // In close high and low situations, layer low bar and its text above high bar and its text
+    &.close-hi-lo {
+        z-index: var(--lo-bar-close-z-index, 30) !important;
+
+        span {
+            z-index: var(--lo-bar-close-text-z-index, 35) !important;
+        }
     }
 
     // EDITABLE: Upward multiply shadow cast from low bars onto the high bars beneath them
@@ -1414,6 +1425,10 @@ main {
     --alert-temp-drop-icon-y-offset: var(--alert-temp-drop-icon-y-offset-desktop, 0.4vw);
     --alert-temp-rise-type-y-offset: var(--alert-temp-rise-type-y-offset-desktop, 0.3vw);
     --alert-temp-rise-icon-y-offset: var(--alert-temp-rise-icon-y-offset-desktop, -0.15vw);
+    --lo-bar-z-index: var(--lo-bar-z-index-desktop, 2);
+    --hi-bar-z-index: var(--hi-bar-z-index-desktop, 1);
+    --lo-bar-close-z-index: var(--lo-bar-close-z-index-desktop, 30);
+    --lo-bar-close-text-z-index: var(--lo-bar-close-text-z-index-desktop, 35);
     --radar-threshold-left: 150;
     --radar-threshold-right: 300;
 
@@ -1453,6 +1468,10 @@ main {
         --alert-temp-drop-icon-y-offset: var(--alert-temp-drop-icon-y-offset-mobile, 0.4vw);
         --alert-temp-rise-type-y-offset: var(--alert-temp-rise-type-y-offset-mobile, 0.3vw);
         --alert-temp-rise-icon-y-offset: var(--alert-temp-rise-icon-y-offset-mobile, -0.15vw);
+        --lo-bar-z-index: var(--lo-bar-z-index-mobile, 2);
+        --hi-bar-z-index: var(--hi-bar-z-index-mobile, 1);
+        --lo-bar-close-z-index: var(--lo-bar-close-z-index-mobile, 30);
+        --lo-bar-close-text-z-index: var(--lo-bar-close-text-z-index-mobile, 35);
     }
 
     .grid-wind-speed-text {
