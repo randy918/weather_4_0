@@ -1429,6 +1429,11 @@ main {
     --hi-bar-z-index: var(--hi-bar-z-index-desktop, 1);
     --lo-bar-close-z-index: var(--lo-bar-close-z-index-desktop, 30);
     --lo-bar-close-text-z-index: var(--lo-bar-close-text-z-index-desktop, 35);
+
+    --radar-center-dot-color: #ffffff;
+    --radar-center-dot-opacity: 1;
+    --radar-center-dot-z-index: var(--radar-center-dot-z-index-desktop, 100);
+    --radar-center-dot-size: var(--radar-center-dot-size-desktop, 1.0vw);
     --radar-threshold-left: 150;
     --radar-threshold-right: 300;
 
@@ -1472,6 +1477,9 @@ main {
         --hi-bar-z-index: var(--hi-bar-z-index-mobile, 1);
         --lo-bar-close-z-index: var(--lo-bar-close-z-index-mobile, 30);
         --lo-bar-close-text-z-index: var(--lo-bar-close-text-z-index-mobile, 35);
+
+        --radar-center-dot-z-index: var(--radar-center-dot-z-index-mobile, 100);
+        --radar-center-dot-size: var(--radar-center-dot-size-mobile, 1.2vw);
     }
 
     .grid-wind-speed-text {
@@ -1550,6 +1558,20 @@ main {
     z-index: 95;
     pointer-events: none;
     will-change: transform;
+}
+
+.radar-center-dot {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    width: var(--radar-center-dot-size, 1.0vw) !important;
+    height: var(--radar-center-dot-size, 1.0vw) !important;
+    background-color: var(--radar-center-dot-color, #ffffff) !important;
+    opacity: var(--radar-center-dot-opacity, 1.0) !important;
+    border-radius: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: var(--radar-center-dot-z-index, 100) !important;
+    pointer-events: none !important;
 }
 
 #weather-feels-like {

@@ -348,6 +348,7 @@ import weatherConditions from '../data/weather-conditions.json';
   const CLOCK_GRID_CELESTIAL_DOT_FILL = 'rgba(0,0,0,0.5)'; // EDITABLE: Fill color for the celestial dots
   const CLOCK_GRID_WIND_SPEED_TEXT_SHADOW = '2px 2px 0px black)'; // EDITABLE: Text shadow for wind speed number (offset-x offset-y blur color)
   const CLOCK_GRID_ROW2_MARGIN_TOP = '2vw'; // EDITABLE: Margin top for the 2nd row of 4x2 dials
+
   // EDITABLE: Moon Phase photo sizing and position inside the dial track ring (DESKTOP)
   const GRID_MOON_PHASE_SIZE_DESKTOP = '93%';       // EDITABLE: Desktop size of moon phase photo (e.g. '92%', '95%', '100%')
   const GRID_MOON_PHASE_X_OFFSET_DESKTOP = '0vw';    // EDITABLE: Desktop horizontal offset (e.g. '0vw', '-0.2vw', '0.2vw' - positive moves RIGHT, negative moves LEFT)
@@ -552,7 +553,14 @@ import weatherConditions from '../data/weather-conditions.json';
   // as well as adjusting CIRCLE_CELL_TOP above.
   const CIRCLE_CELL_MARGIN_BOTTOM = '2vw';  // Legacy margin-bottom (see CLOCK_GRID_MARGIN_TOP for gap to dials)
   const WEATHER_IMAGE_BORDER_RADIUS = '50%'; // EDITABLE: Circle shape rounding (keep at 50%)
-  const RADAR_CENTER_DOT_SIZE = '1.0vw';      // EDITABLE: Size of the radar center dot (middle dot)
+  // EDITABLE: Doppler Radar center dot configuration (both Left & Right radar circles)
+  const RADAR_CENTER_DOT_SIZE_DESKTOP = '1.0vw'; // EDITABLE Desktop: Size of the radar center dot (middle dot)
+  const RADAR_CENTER_DOT_SIZE_MOBILE = '1.2vw';  // EDITABLE Mobile: Size of the radar center dot (middle dot)
+  const RADAR_CENTER_DOT_COLOR = '#ffffff';      // EDITABLE: 100% solid white
+  const RADAR_CENTER_DOT_OPACITY = '1.0';        // EDITABLE: 100% opaque, not transparent
+  const RADAR_CENTER_DOT_Z_INDEX_DESKTOP = 100;  // EDITABLE Desktop: z-index above radar animation & sweep line (95)
+  const RADAR_CENTER_DOT_Z_INDEX_MOBILE = 100;   // EDITABLE Mobile: z-index above radar animation & sweep line (95)
+  const RADAR_CENTER_DOT_SIZE = RADAR_CENTER_DOT_SIZE_DESKTOP;
 
   // Compatibility aliases
   const CIRCLE_CELL_SIZE = CIRCLE_CELL_SIZE_DESKTOP;
@@ -566,7 +574,14 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--circle-cell-left', CIRCLE_CELL_LEFT);
   document.documentElement.style.setProperty('--circle-cell-right', CIRCLE_CELL_RIGHT);
   document.documentElement.style.setProperty('--circle-cell-margin-bottom', CIRCLE_CELL_MARGIN_BOTTOM);
-  document.documentElement.style.setProperty('--radar-center-dot-size', RADAR_CENTER_DOT_SIZE);
+  document.documentElement.style.setProperty('--radar-center-dot-size-desktop', RADAR_CENTER_DOT_SIZE_DESKTOP);
+  document.documentElement.style.setProperty('--radar-center-dot-size-mobile', RADAR_CENTER_DOT_SIZE_MOBILE);
+  document.documentElement.style.setProperty('--radar-center-dot-size', window.innerWidth <= 767 ? RADAR_CENTER_DOT_SIZE_MOBILE : RADAR_CENTER_DOT_SIZE_DESKTOP);
+  document.documentElement.style.setProperty('--radar-center-dot-color', RADAR_CENTER_DOT_COLOR);
+  document.documentElement.style.setProperty('--radar-center-dot-opacity', RADAR_CENTER_DOT_OPACITY);
+  document.documentElement.style.setProperty('--radar-center-dot-z-index-desktop', String(RADAR_CENTER_DOT_Z_INDEX_DESKTOP));
+  document.documentElement.style.setProperty('--radar-center-dot-z-index-mobile', String(RADAR_CENTER_DOT_Z_INDEX_MOBILE));
+  document.documentElement.style.setProperty('--radar-center-dot-z-index', String(window.innerWidth <= 767 ? RADAR_CENTER_DOT_Z_INDEX_MOBILE : RADAR_CENTER_DOT_Z_INDEX_DESKTOP));
   document.documentElement.style.setProperty('--radar-sweep-duration', `${RADAR_FRAME_COUNT * RADAR_LOOP_SPEED_MS}ms`);
   document.documentElement.style.setProperty('--radar-fade-timing', RADAR_FADE_TRANSITION_TIMING);
   document.documentElement.style.setProperty('--radar-blur-amount', RADAR_BLUR_AMOUNT);
@@ -3557,17 +3572,19 @@ import weatherConditions from '../data/weather-conditions.json';
         pointer-events: none;
       }
       #weather-desc-image.radar-mode::after,
-      #weather-desc-image-left.radar-mode::after {
+      #weather-desc-image-left.radar-mode::after,
+      .radar-center-dot {
         content: '';
         position: absolute;
         top: 50%;
         left: 50%;
-        width: var(--radar-center-dot-size, 0.5vw);
-        height: var(--radar-center-dot-size, 0.5vw);
-        background-color: var(--clock-grid-track-color, rgba(255, 255, 255, 0.2));
+        width: var(--radar-center-dot-size, 1.0vw);
+        height: var(--radar-center-dot-size, 1.0vw);
+        background-color: var(--radar-center-dot-color, #ffffff) !important;
+        opacity: var(--radar-center-dot-opacity, 1.0) !important;
         border-radius: 50%;
         transform: translate(-50%, -50%);
-        z-index: 100;
+        z-index: var(--radar-center-dot-z-index, 100) !important;
         pointer-events: none;
       }
       .hiItem.animating-change,
@@ -6182,10 +6199,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
             const gridLeftPct = (0.5 - dX_new) * 100;
             const gridTopPct = (0.5 - dY_new) * 100;
 
+            let targetParentRight = descImageEl.querySelector('.radar-screen') || descImageEl;
+
             if (framesRight.length !== RADAR_FRAME_COUNT || descImageEl.getAttribute('data-zoom-level') !== String(zoomRight)) {
               descImageEl.setAttribute('data-zoom-level', String(zoomRight));
               descImageEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
               descImageEl.querySelectorAll('.radar-sweep-line').forEach(l => l.remove());
+              descImageEl.querySelectorAll('.radar-center-dot').forEach(d => d.remove());
               descImageEl.querySelectorAll('.radar-frames-container').forEach(c => c.remove());
               descImageEl.querySelectorAll('.radar-map-bg').forEach(m => m.remove());
               descImageEl.querySelectorAll('.radar-oklahoma-outline').forEach(o => o.remove());
@@ -6196,6 +6216,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
               const screenContainer = document.createElement('div');
               screenContainer.className = 'radar-screen';
               descImageEl.appendChild(screenContainer);
+              targetParentRight = screenContainer;
 
               const mapBg = document.createElement('div');
               mapBg.className = 'radar-map-bg';
@@ -6249,6 +6270,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
               const sweepLine = document.createElement('div');
               sweepLine.className = 'radar-sweep-line';
               screenContainer.appendChild(sweepLine);
+
+              // Create the center dot element (100% solid white, z above animation)
+              const centerDot = document.createElement('div');
+              centerDot.className = 'radar-center-dot';
+              screenContainer.appendChild(centerDot);
             } else {
               framesRight.forEach(frame => {
                 frame.style.left = `${gridLeftPct}%`;
@@ -6259,9 +6285,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
                 mapBg.style.left = `${gridLeftPct}%`;
                 mapBg.style.top = `${gridTopPct}%`;
               }
+              if (!descImageEl.querySelector('.radar-center-dot')) {
+                const centerDot = document.createElement('div');
+                centerDot.className = 'radar-center-dot';
+                targetParentRight.appendChild(centerDot);
+              }
             }
-
-            const targetParentRight = descImageEl.querySelector('.radar-screen') || descImageEl;
 
             // Create/update or remove Oklahoma state outline depending on whether current location is Tulsa
             if (isTulsaArea(LAT, LON)) {
@@ -6310,6 +6339,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
             descImageEl.classList.remove('radar-mode');
             descImageEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
             descImageEl.querySelectorAll('.radar-sweep-line').forEach(l => l.remove());
+            descImageEl.querySelectorAll('.radar-center-dot').forEach(d => d.remove());
             descImageEl.querySelectorAll('.radar-frames-container').forEach(c => c.remove());
             descImageEl.querySelectorAll('.radar-map-bg').forEach(m => m.remove());
             descImageEl.querySelectorAll('.radar-oklahoma-outline').forEach(o => o.remove());
@@ -6361,10 +6391,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
             const frameLeftPct = 50 - dX_new * 100 * RADAR_SCALE_FACTOR;
             const frameTopPct = 50 - dY_new * 100 * RADAR_SCALE_FACTOR;
 
+            let targetParentLeft = descImageLeftEl.querySelector('.radar-screen') || descImageLeftEl;
+
             if (framesLeft.length !== RADAR_FRAME_COUNT || descImageLeftEl.getAttribute('data-zoom-level') !== String(zoomLeft)) {
               descImageLeftEl.setAttribute('data-zoom-level', String(zoomLeft));
               descImageLeftEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
               descImageLeftEl.querySelectorAll('.radar-sweep-line').forEach(l => l.remove());
+              descImageLeftEl.querySelectorAll('.radar-center-dot').forEach(d => d.remove());
               descImageLeftEl.querySelectorAll('.radar-frames-container').forEach(c => c.remove());
               descImageLeftEl.querySelectorAll('.radar-map-bg').forEach(m => m.remove());
               descImageLeftEl.querySelectorAll('.radar-oklahoma-outline').forEach(o => o.remove());
@@ -6375,6 +6408,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
               const screenLeft = document.createElement('div');
               screenLeft.className = 'radar-screen';
               descImageLeftEl.appendChild(screenLeft);
+              targetParentLeft = screenLeft;
 
               const mapBg = document.createElement('div');
               mapBg.className = 'radar-map-bg';
@@ -6428,6 +6462,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
               const sweepLine = document.createElement('div');
               sweepLine.className = 'radar-sweep-line';
               screenLeft.appendChild(sweepLine);
+
+              // Create the center dot element (100% solid white, z above animation)
+              const centerDot = document.createElement('div');
+              centerDot.className = 'radar-center-dot';
+              screenLeft.appendChild(centerDot);
             } else {
               framesLeft.forEach(frame => {
                 frame.style.left = `${frameLeftPct}%`;
@@ -6438,9 +6477,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
                 mapBg.style.left = `${frameLeftPct}%`;
                 mapBg.style.top = `${frameTopPct}%`;
               }
+              if (!descImageLeftEl.querySelector('.radar-center-dot')) {
+                const centerDot = document.createElement('div');
+                centerDot.className = 'radar-center-dot';
+                targetParentLeft.appendChild(centerDot);
+              }
             }
-
-            const targetParentLeft = descImageLeftEl.querySelector('.radar-screen') || descImageLeftEl;
 
             // Create/update or remove Oklahoma state outline depending on whether current location is Tulsa
             if (isTulsaArea(LAT, LON)) {
@@ -6481,6 +6523,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
             descImageLeftEl.classList.remove('radar-mode');
             descImageLeftEl.querySelectorAll('.radar-frame').forEach(f => f.remove());
             descImageLeftEl.querySelectorAll('.radar-sweep-line').forEach(l => l.remove());
+            descImageLeftEl.querySelectorAll('.radar-center-dot').forEach(d => d.remove());
             descImageLeftEl.querySelectorAll('.radar-frames-container').forEach(c => c.remove());
             descImageLeftEl.querySelectorAll('.radar-map-bg').forEach(m => m.remove());
             descImageLeftEl.querySelectorAll('.radar-oklahoma-outline').forEach(o => o.remove());
@@ -6753,7 +6796,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1112';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1116';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
@@ -13611,6 +13654,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
         if (stemColor) {
           gridWindCenterDot.style.backgroundColor = stemColor;
         }
+ 9-10-26-1240   
+ 9-10-26-1240   
       });
       
       lastWindDirection = deg;
