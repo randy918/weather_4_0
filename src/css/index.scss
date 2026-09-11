@@ -1471,6 +1471,17 @@ main {
     --rain-fade-bottom: var(--rain-fade-bottom-desktop, 10vw);
     --rain-opacity: var(--rain-opacity-desktop, 1);
 
+    /* Sun Image (GOES-19 SUVI Fe195 Å) */
+    --sun-image-width: var(--sun-image-width-desktop, 68vw);
+    --sun-image-margin-top: var(--sun-image-margin-top-desktop, 2vw);
+    --sun-image-margin-bottom: var(--sun-image-margin-bottom-desktop, 2vw);
+    --sun-image-inner-scale: var(--sun-image-inner-scale-desktop, 108%);
+    --sun-image-offset-y: var(--sun-image-offset-y-desktop, -1%);
+    --sun-mask-radius: var(--sun-mask-radius-desktop, 49.5%);
+    --sun-mask-position-y: var(--sun-mask-position-y-desktop, 50%);
+    --sun-image-opacity: var(--sun-image-opacity-desktop, 1);
+    --sun-image-blend-mode: var(--sun-image-blend-mode-desktop, lighten);
+
     /* Doppler Radar Experiment: "Lighten Only" HUD overlay on the page background */
     /* Option A: Lighten HUD Overlay on page background (Default) */
     --radar-blend-mode: lighten;
@@ -1518,6 +1529,16 @@ main {
         --rain-fade-top: var(--rain-fade-top-mobile, 5vw);
         --rain-fade-bottom: var(--rain-fade-bottom-mobile, 10vw);
         --rain-opacity: var(--rain-opacity-mobile, 1);
+
+        --sun-image-width: var(--sun-image-width-mobile, 85vw);
+        --sun-image-margin-top: var(--sun-image-margin-top-mobile, 4vw);
+        --sun-image-margin-bottom: var(--sun-image-margin-bottom-mobile, 3vw);
+        --sun-image-inner-scale: var(--sun-image-inner-scale-mobile, 108%);
+        --sun-image-offset-y: var(--sun-image-offset-y-mobile, -1%);
+        --sun-mask-radius: var(--sun-mask-radius-mobile, 49.5%);
+        --sun-mask-position-y: var(--sun-mask-position-y-mobile, 50%);
+        --sun-image-opacity: var(--sun-image-opacity-mobile, 1);
+        --sun-image-blend-mode: var(--sun-image-blend-mode-mobile, lighten);
     }
 
     .grid-wind-speed-text {
@@ -1561,6 +1582,16 @@ main {
         --rain-fade-top: var(--rain-fade-top-desktop, 5vw);
         --rain-fade-bottom: var(--rain-fade-bottom-desktop, 10vw);
         --rain-opacity: var(--rain-opacity-desktop, 1);
+
+        --sun-image-width: var(--sun-image-width-desktop, 68vw);
+        --sun-image-margin-top: var(--sun-image-margin-top-desktop, 2vw);
+        --sun-image-margin-bottom: var(--sun-image-margin-bottom-desktop, 2vw);
+        --sun-image-inner-scale: var(--sun-image-inner-scale-desktop, 108%);
+        --sun-image-offset-y: var(--sun-image-offset-y-desktop, -1%);
+        --sun-mask-radius: var(--sun-mask-radius-desktop, 49.5%);
+        --sun-mask-position-y: var(--sun-mask-position-y-desktop, 50%);
+        --sun-image-opacity: var(--sun-image-opacity-desktop, 1);
+        --sun-image-blend-mode: var(--sun-image-blend-mode-desktop, lighten);
     }
     .clockGridContainer7,
     .clockGridLabelsContainer7 {
@@ -1775,4 +1806,37 @@ main {
         margin-top: var(--weather-version-margin-top-mobile, 2vw);
         margin-bottom: var(--weather-version-margin-bottom-mobile, 2vw);
     }
+}
+
+// Live Sun Image (GOES-19 SUVI Fe195 Å)
+#sun-image-container {
+    width: var(--sun-image-width, 68vw);
+    height: var(--sun-image-width, 68vw);
+    margin: var(--sun-image-margin-top, 2vw) auto 0;
+    border-radius: 50%;
+    overflow: hidden;
+    clip-path: circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%));
+    -webkit-clip-path: circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%));
+    position: relative;
+    opacity: 0;
+    transition: opacity 1s ease;
+    mix-blend-mode: var(--sun-image-blend-mode, lighten);
+}
+
+#sun-image {
+    width: var(--sun-image-inner-scale, 108%);
+    height: var(--sun-image-inner-scale, 108%);
+    position: absolute;
+    top: var(--sun-image-offset-y, -1%);
+    left: 50%;
+    transform: translateX(-50%);
+    object-fit: cover;
+    mix-blend-mode: var(--sun-image-blend-mode, lighten);
+    display: block;
+    opacity: var(--sun-image-opacity, 1);
+}
+
+#sun-image-spacer {
+    height: var(--sun-image-margin-bottom, 2vw);
+    width: 100%;
 }

@@ -6799,6 +6799,80 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const MOON_LABEL_FONT_SIZE = '4.5vw'; // EDITABLE: Font size for moon labels
   const MOON_MARGIN_BOTTOM = '-8vw';    // EDITABLE: Gap below the moon dots row
 
+  // --- Live Sun Image Config (GOES-19 SUVI Fe195 Å) ---
+  // Live Sunspot & Coronal image from NOAA GOES-19 Solar Ultraviolet Imager
+  // Band: Fe195 Å (Iron XII, 195 Ångströms, signature orange-red)
+  // Website: https://www.star.nesdis.noaa.gov/goes/SUVI_band.php?sat=G19&band=Fe195&length=60
+  const SUN_IMAGE_URL = 'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/latest.jpg';
+
+  const SUN_IMAGE_WIDTH_DESKTOP = '68vw';             // EDITABLE Desktop: Width & height of the sun container
+  const SUN_IMAGE_WIDTH_MOBILE = '85vw';              // EDITABLE Mobile: Width & height of the sun container
+
+  const SUN_IMAGE_MARGIN_TOP_DESKTOP = '2vw';         // EDITABLE Desktop: Gap above the sun image
+  const SUN_IMAGE_MARGIN_TOP_MOBILE = '4vw';          // EDITABLE Mobile: Gap above the sun image
+
+  const SUN_IMAGE_MARGIN_BOTTOM_DESKTOP = '2vw';      // EDITABLE Desktop: Gap below the sun image
+  const SUN_IMAGE_MARGIN_BOTTOM_MOBILE = '3vw';       // EDITABLE Mobile: Gap below the sun image
+
+  const SUN_IMAGE_INNER_SCALE_DESKTOP = '108%';       // EDITABLE Desktop: Inner scale to crop bottom timestamp & NOAA logo
+  const SUN_IMAGE_INNER_SCALE_MOBILE = '108%';        // EDITABLE Mobile: Inner scale to crop bottom timestamp & NOAA logo
+
+  const SUN_IMAGE_OFFSET_Y_DESKTOP = '-1%';           // EDITABLE Desktop: Vertical nudge inside circle
+  const SUN_IMAGE_OFFSET_Y_MOBILE = '-1%';            // EDITABLE Mobile: Vertical nudge inside circle
+
+  const SUN_MASK_RADIUS_DESKTOP = '49.5%';            // EDITABLE Desktop: Circular mask radius
+  const SUN_MASK_RADIUS_MOBILE = '49.5%';             // EDITABLE Mobile: Circular mask radius
+
+  const SUN_MASK_POSITION_Y_DESKTOP = '50%';          // EDITABLE Desktop: Mask center Y position
+  const SUN_MASK_POSITION_Y_MOBILE = '50%';           // EDITABLE Mobile: Mask center Y position
+
+  const SUN_IMAGE_OPACITY_DESKTOP = 1.0;              // EDITABLE Desktop: Overall opacity (0.0 to 1.0)
+  const SUN_IMAGE_OPACITY_MOBILE = 1.0;               // EDITABLE Mobile: Overall opacity (0.0 to 1.0)
+
+  const SUN_IMAGE_BLEND_MODE_DESKTOP = 'lighten';     // EDITABLE Desktop: Blend mode on dark background ('lighten', 'screen', etc.)
+  const SUN_IMAGE_BLEND_MODE_MOBILE = 'lighten';      // EDITABLE Mobile: Blend mode on dark background
+
+  function applySunImageConfig() {
+    const isMobile = window.innerWidth <= 767;
+    document.documentElement.style.setProperty('--sun-image-width-desktop', SUN_IMAGE_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--sun-image-width-mobile', SUN_IMAGE_WIDTH_MOBILE);
+    document.documentElement.style.setProperty('--sun-image-width', isMobile ? SUN_IMAGE_WIDTH_MOBILE : SUN_IMAGE_WIDTH_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-image-margin-top-desktop', SUN_IMAGE_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--sun-image-margin-top-mobile', SUN_IMAGE_MARGIN_TOP_MOBILE);
+    document.documentElement.style.setProperty('--sun-image-margin-top', isMobile ? SUN_IMAGE_MARGIN_TOP_MOBILE : SUN_IMAGE_MARGIN_TOP_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-image-margin-bottom-desktop', SUN_IMAGE_MARGIN_BOTTOM_DESKTOP);
+    document.documentElement.style.setProperty('--sun-image-margin-bottom-mobile', SUN_IMAGE_MARGIN_BOTTOM_MOBILE);
+    document.documentElement.style.setProperty('--sun-image-margin-bottom', isMobile ? SUN_IMAGE_MARGIN_BOTTOM_MOBILE : SUN_IMAGE_MARGIN_BOTTOM_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-image-inner-scale-desktop', SUN_IMAGE_INNER_SCALE_DESKTOP);
+    document.documentElement.style.setProperty('--sun-image-inner-scale-mobile', SUN_IMAGE_INNER_SCALE_MOBILE);
+    document.documentElement.style.setProperty('--sun-image-inner-scale', isMobile ? SUN_IMAGE_INNER_SCALE_MOBILE : SUN_IMAGE_INNER_SCALE_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-image-offset-y-desktop', SUN_IMAGE_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--sun-image-offset-y-mobile', SUN_IMAGE_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--sun-image-offset-y', isMobile ? SUN_IMAGE_OFFSET_Y_MOBILE : SUN_IMAGE_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-mask-radius-desktop', SUN_MASK_RADIUS_DESKTOP);
+    document.documentElement.style.setProperty('--sun-mask-radius-mobile', SUN_MASK_RADIUS_MOBILE);
+    document.documentElement.style.setProperty('--sun-mask-radius', isMobile ? SUN_MASK_RADIUS_MOBILE : SUN_MASK_RADIUS_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-mask-position-y-desktop', SUN_MASK_POSITION_Y_DESKTOP);
+    document.documentElement.style.setProperty('--sun-mask-position-y-mobile', SUN_MASK_POSITION_Y_MOBILE);
+    document.documentElement.style.setProperty('--sun-mask-position-y', isMobile ? SUN_MASK_POSITION_Y_MOBILE : SUN_MASK_POSITION_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-image-opacity-desktop', String(SUN_IMAGE_OPACITY_DESKTOP));
+    document.documentElement.style.setProperty('--sun-image-opacity-mobile', String(SUN_IMAGE_OPACITY_MOBILE));
+    document.documentElement.style.setProperty('--sun-image-opacity', String(isMobile ? SUN_IMAGE_OPACITY_MOBILE : SUN_IMAGE_OPACITY_DESKTOP));
+
+    document.documentElement.style.setProperty('--sun-image-blend-mode-desktop', SUN_IMAGE_BLEND_MODE_DESKTOP);
+    document.documentElement.style.setProperty('--sun-image-blend-mode-mobile', SUN_IMAGE_BLEND_MODE_MOBILE);
+    document.documentElement.style.setProperty('--sun-image-blend-mode', isMobile ? SUN_IMAGE_BLEND_MODE_MOBILE : SUN_IMAGE_BLEND_MODE_DESKTOP);
+  }
+  applySunImageConfig();
+  window.addEventListener('resize', applySunImageConfig);
+
   // --- Earth Image Config ---
   // Settings for the live Earth image from NOAA GOES satellite
   const EARTH_IMAGE_WIDTH = '68vw';  // Width of the container (2% smaller to crop bottom text)
@@ -6833,7 +6907,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1117';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1119';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
@@ -10401,6 +10475,83 @@ Plan ahead for significantly warmer conditions tomorrow!`
     mainClock.addEventListener('click', handleTimeDialReset);
   }
 
+  /* --- Live Sun Image (NOAA GOES-19 SUVI Fe195 Å) --- */
+  function createSunImageIfMissing() {
+    if (document.getElementById('sun-image-container')) return;
+
+    const container = document.createElement('div');
+    container.id = 'sun-image-container';
+    container.className = 'sun-image-container';
+    container.style.width = 'var(--sun-image-width, 68vw)';
+    container.style.height = 'var(--sun-image-width, 68vw)';
+    container.style.margin = 'var(--sun-image-margin-top, 2vw) auto 0';
+    container.style.borderRadius = '50%';
+    container.style.overflow = 'hidden';
+    container.style.clipPath = 'circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%))';
+    container.style.WebkitClipPath = 'circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%))';
+    container.style.position = 'relative';
+    container.style.opacity = '0';
+    container.style.transition = 'opacity 1s ease';
+    container.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
+
+    const img = document.createElement('img');
+    img.id = 'sun-image';
+    img.className = 'sun-image';
+    img.src = SUN_IMAGE_URL;
+    img.alt = 'Live Sunspot & Coronal Image from GOES-19 SUVI Fe195';
+    img.style.width = 'var(--sun-image-inner-scale, 108%)';
+    img.style.height = 'var(--sun-image-inner-scale, 108%)';
+    img.style.position = 'absolute';
+    img.style.top = 'var(--sun-image-offset-y, -1%)';
+    img.style.left = '50%';
+    img.style.transform = 'translateX(-50%)';
+    img.style.objectFit = 'cover';
+    img.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
+    img.style.display = 'block';
+
+    // Reload image every 5 minutes to get the latest solar observation
+    setInterval(() => {
+      img.src = SUN_IMAGE_URL + '?t=' + Date.now();
+    }, 5 * 60 * 1000);
+
+    container.appendChild(img);
+
+    // Dedicated spacer to prevent margin collapse
+    const spacer = document.createElement('div');
+    spacer.id = 'sun-image-spacer';
+    spacer.className = 'sun-image-spacer';
+    spacer.style.height = 'var(--sun-image-margin-bottom, 2vw)';
+    spacer.style.width = '100%';
+
+    // Position above Earth image (below 24-hour condition images)
+    const earthContainer = document.getElementById('earth-image-container');
+    const locSwitcher = document.getElementById('weather-location-switcher');
+    const missingAssets = document.getElementById('weather-missing-assets');
+    const lastUpdated = document.getElementById('weather-last-updated');
+    const secondGauge = document.querySelector('.second-gauge-container');
+
+    if (earthContainer && earthContainer.parentNode) {
+      earthContainer.parentNode.insertBefore(container, earthContainer);
+      earthContainer.parentNode.insertBefore(spacer, earthContainer);
+    } else if (locSwitcher && locSwitcher.parentNode) {
+      locSwitcher.parentNode.insertBefore(container, locSwitcher);
+      locSwitcher.parentNode.insertBefore(spacer, locSwitcher);
+    } else if (missingAssets && missingAssets.parentNode) {
+      missingAssets.parentNode.insertBefore(container, missingAssets);
+      missingAssets.parentNode.insertBefore(spacer, missingAssets);
+    } else if (lastUpdated && lastUpdated.parentNode) {
+      lastUpdated.parentNode.insertBefore(container, lastUpdated);
+      lastUpdated.parentNode.insertBefore(spacer, lastUpdated);
+    } else if (secondGauge && secondGauge.parentNode) {
+      secondGauge.parentNode.insertBefore(container, secondGauge.nextSibling);
+      secondGauge.parentNode.insertBefore(spacer, container.nextSibling);
+    } else {
+      const parent = document.querySelector('main') || document.body;
+      parent.appendChild(container);
+      parent.appendChild(spacer);
+    }
+  }
+
   /* --- Live Earth Image (NOAA GOES satellite) --- */
   function createEarthImageIfMissing() {
     if (document.getElementById('earth-image-container')) return;
@@ -12937,8 +13088,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
         console.warn('Error updating days UI:', e);
       }
 
-      // Draw the Earth image and Last Updated text last, after the grid has expanded
+      // Draw the Earth & Sun images, and Last Updated text last, after the grid has expanded
       createEarthImageIfMissing();
+      createSunImageIfMissing();
 
       const now = new Date();
       console.info('Weather updated:', now.toISOString());
@@ -12946,6 +13098,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
       
       // Smoothly fade them in now that they are safely pushed to the bottom
       setTimeout(() => {
+        const sun = document.getElementById('sun-image-container');
+        if (sun) sun.style.opacity = 'var(--sun-image-opacity, 1)';
         const earth = document.getElementById('earth-image-container');
         if (earth) earth.style.opacity = '1';
         const lastUpd = document.getElementById('weather-last-updated');
