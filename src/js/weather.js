@@ -6799,20 +6799,60 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const MOON_LABEL_FONT_SIZE = '4.5vw'; // EDITABLE: Font size for moon labels
   const MOON_MARGIN_BOTTOM = '-8vw';    // EDITABLE: Gap below the moon dots row
 
-  // --- Live Sun Image Config (GOES-19 SUVI Fe195 Å) ---
+  // --- Live Sun Image & 27-Day Animation Config (GOES-19 SUVI Fe195 Å) ---
   // Live Sunspot & Coronal image from NOAA GOES-19 Solar Ultraviolet Imager
   // Band: Fe195 Å (Iron XII, 195 Ångströms, signature orange-red)
   // Website: https://www.star.nesdis.noaa.gov/goes/SUVI_band.php?sat=G19&band=Fe195&length=60
+  const SUN_IMAGE_BASE_URL = 'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/';
   const SUN_IMAGE_URL = 'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/latest.jpg';
 
-  const SUN_IMAGE_WIDTH_DESKTOP = '68vw';             // EDITABLE Desktop: Width & height of the sun container
-  const SUN_IMAGE_WIDTH_MOBILE = '85vw';              // EDITABLE Mobile: Width & height of the sun container
+  // Animation Controls (JCV)
+  const SUN_ANIMATION_ENABLED = true;                 // EDITABLE: Enable/disable time-span rotation animation
+  const SUN_ANIMATION_DAYS = 27;                      // EDITABLE: Number of data days in time span (27 = full solar synodic rotation)
+  const SUN_ANIMATION_FPS = 6;                        // EDITABLE: Frames per second (playback speed, e.g. 6 = ~4.5s per rotation cycle)
+  const SUN_ANIMATION_LOOP_PAUSE_MS = 1200;           // EDITABLE: Pause in ms on the latest frame before repeating loop
+  const SUN_ANIMATION_RESOLUTION = '600x600';         // EDITABLE: Resolution ('600x600' or '300x300')
 
-  const SUN_IMAGE_MARGIN_TOP_DESKTOP = '2vw';         // EDITABLE Desktop: Gap above the sun image
-  const SUN_IMAGE_MARGIN_TOP_MOBILE = '4vw';          // EDITABLE Mobile: Gap above the sun image
+  // Verified 27-day historical frame sequence (1 daily noon snapshot per day across 27 days)
+  const SUN_ANIMATION_FRAMES = [
+    '20262281200422_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262291200453_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262301200483_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262311200514_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262321200544_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262331200575_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262341201005_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262351201036_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262361201066_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262371201096_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262381200026_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262391200057_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262401200087_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262411200117_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262421200147_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262431200178_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262441200208_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262451200238_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262461200268_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262471200298_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262481200327_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262491200357_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262501200387_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262511200417_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262521200415_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262531200445_GOES19-SUVI-Fe195-600x600.jpg',
+    'latest.jpg'
+  ];
 
-  const SUN_IMAGE_MARGIN_BOTTOM_DESKTOP = '2vw';      // EDITABLE Desktop: Gap below the sun image
-  const SUN_IMAGE_MARGIN_BOTTOM_MOBILE = '3vw';       // EDITABLE Mobile: Gap below the sun image
+  // Sizing & Layout (Half size per user request)
+  const SUN_IMAGE_WIDTH_DESKTOP = '34vw';             // EDITABLE Desktop: Width & height (half Earth's 68vw)
+  const SUN_IMAGE_WIDTH_MOBILE = '42vw';              // EDITABLE Mobile: Width & height (half Earth's 85vw)
+
+  const SUN_IMAGE_MARGIN_TOP_DESKTOP = '2vw';         // EDITABLE Desktop: Gap above sun image
+  const SUN_IMAGE_MARGIN_TOP_MOBILE = '3vw';          // EDITABLE Mobile: Gap above sun image
+
+  const SUN_IMAGE_MARGIN_BOTTOM_DESKTOP = '2vw';      // EDITABLE Desktop: Gap below sun image
+  const SUN_IMAGE_MARGIN_BOTTOM_MOBILE = '3vw';       // EDITABLE Mobile: Gap below sun image
 
   const SUN_IMAGE_INNER_SCALE_DESKTOP = '108%';       // EDITABLE Desktop: Inner scale to crop bottom timestamp & NOAA logo
   const SUN_IMAGE_INNER_SCALE_MOBILE = '108%';        // EDITABLE Mobile: Inner scale to crop bottom timestamp & NOAA logo
@@ -6869,6 +6909,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--sun-image-blend-mode-desktop', SUN_IMAGE_BLEND_MODE_DESKTOP);
     document.documentElement.style.setProperty('--sun-image-blend-mode-mobile', SUN_IMAGE_BLEND_MODE_MOBILE);
     document.documentElement.style.setProperty('--sun-image-blend-mode', isMobile ? SUN_IMAGE_BLEND_MODE_MOBILE : SUN_IMAGE_BLEND_MODE_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-animation-fps', String(SUN_ANIMATION_FPS));
+    document.documentElement.style.setProperty('--sun-animation-days', String(SUN_ANIMATION_DAYS));
   }
   applySunImageConfig();
   window.addEventListener('resize', applySunImageConfig);
@@ -6907,7 +6950,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1119';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1120';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
@@ -10475,15 +10518,17 @@ Plan ahead for significantly warmer conditions tomorrow!`
     mainClock.addEventListener('click', handleTimeDialReset);
   }
 
-  /* --- Live Sun Image (NOAA GOES-19 SUVI Fe195 Å) --- */
+  /* --- Live Sun Image & 27-Day Rotation Animation (NOAA GOES-19 SUVI Fe195 Å) --- */
+  let sunAnimationTimeoutId = null;
+
   function createSunImageIfMissing() {
     if (document.getElementById('sun-image-container')) return;
 
     const container = document.createElement('div');
     container.id = 'sun-image-container';
     container.className = 'sun-image-container';
-    container.style.width = 'var(--sun-image-width, 68vw)';
-    container.style.height = 'var(--sun-image-width, 68vw)';
+    container.style.width = 'var(--sun-image-width, 34vw)';
+    container.style.height = 'var(--sun-image-width, 34vw)';
     container.style.margin = 'var(--sun-image-margin-top, 2vw) auto 0';
     container.style.borderRadius = '50%';
     container.style.overflow = 'hidden';
@@ -10498,7 +10543,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     img.id = 'sun-image';
     img.className = 'sun-image';
     img.src = SUN_IMAGE_URL;
-    img.alt = 'Live Sunspot & Coronal Image from GOES-19 SUVI Fe195';
+    img.alt = 'Live Sunspot & Coronal 27-Day Rotation Animation from GOES-19 SUVI Fe195';
     img.style.width = 'var(--sun-image-inner-scale, 108%)';
     img.style.height = 'var(--sun-image-inner-scale, 108%)';
     img.style.position = 'absolute';
@@ -10508,11 +10553,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
     img.style.objectFit = 'cover';
     img.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
     img.style.display = 'block';
-
-    // Reload image every 5 minutes to get the latest solar observation
-    setInterval(() => {
-      img.src = SUN_IMAGE_URL + '?t=' + Date.now();
-    }, 5 * 60 * 1000);
 
     container.appendChild(img);
 
@@ -10549,6 +10589,63 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const parent = document.querySelector('main') || document.body;
       parent.appendChild(container);
       parent.appendChild(spacer);
+    }
+
+    // --- 27-Day Repeating Solar Rotation Animation Engine ---
+    if (SUN_ANIMATION_ENABLED && Array.isArray(SUN_ANIMATION_FRAMES) && SUN_ANIMATION_FRAMES.length > 0) {
+      // Limit to configured number of days (e.g. 27 for full solar rotation)
+      const activeFrameNames = SUN_ANIMATION_FRAMES.slice(-Math.max(1, SUN_ANIMATION_DAYS));
+
+      // Build URLs based on selected resolution
+      const frameUrls = activeFrameNames.map(name => {
+        let fn = name;
+        if (SUN_ANIMATION_RESOLUTION === '300x300' && fn.includes('600x600')) {
+          fn = fn.replace('600x600', '300x300');
+        }
+        return fn === 'latest.jpg' ? (SUN_IMAGE_URL + '?t=' + Date.now()) : (SUN_IMAGE_BASE_URL + fn);
+      });
+
+      // Preload all frames in memory for smooth, flicker-free playback
+      const preloadedImages = [];
+      let loadedCount = 0;
+
+      frameUrls.forEach((url) => {
+        const pImg = new Image();
+        pImg.onload = () => {
+          loadedCount++;
+          // Start animation loop once first few frames are ready
+          if (loadedCount >= Math.min(3, frameUrls.length) && !sunAnimationTimeoutId) {
+            runAnimationLoop();
+          }
+        };
+        pImg.onerror = () => {
+          loadedCount++;
+        };
+        pImg.src = url;
+        preloadedImages.push(pImg);
+      });
+
+      let currentFrameIndex = 0;
+      function runAnimationLoop() {
+        if (!SUN_ANIMATION_ENABLED || preloadedImages.length <= 1) return;
+
+        const nextImg = preloadedImages[currentFrameIndex];
+        if (nextImg && (nextImg.complete || nextImg.naturalWidth > 0)) {
+          img.src = nextImg.src;
+        }
+
+        const isLastFrame = currentFrameIndex === preloadedImages.length - 1;
+        currentFrameIndex = (currentFrameIndex + 1) % preloadedImages.length;
+
+        // Pause on the latest live frame before repeating loop
+        const delay = isLastFrame ? SUN_ANIMATION_LOOP_PAUSE_MS : Math.round(1000 / SUN_ANIMATION_FPS);
+        sunAnimationTimeoutId = setTimeout(runAnimationLoop, delay);
+      }
+    } else {
+      // Fallback: periodic refresh of single image every 5 minutes
+      setInterval(() => {
+        img.src = SUN_IMAGE_URL + '?t=' + Date.now();
+      }, 5 * 60 * 1000);
     }
   }
 

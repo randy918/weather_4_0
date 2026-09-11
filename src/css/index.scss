@@ -1472,7 +1472,7 @@ main {
     --rain-opacity: var(--rain-opacity-desktop, 1);
 
     /* Sun Image (GOES-19 SUVI Fe195 Å) */
-    --sun-image-width: var(--sun-image-width-desktop, 68vw);
+    --sun-image-width: var(--sun-image-width-desktop, 34vw);
     --sun-image-margin-top: var(--sun-image-margin-top-desktop, 2vw);
     --sun-image-margin-bottom: var(--sun-image-margin-bottom-desktop, 2vw);
     --sun-image-inner-scale: var(--sun-image-inner-scale-desktop, 108%);
@@ -1530,8 +1530,8 @@ main {
         --rain-fade-bottom: var(--rain-fade-bottom-mobile, 10vw);
         --rain-opacity: var(--rain-opacity-mobile, 1);
 
-        --sun-image-width: var(--sun-image-width-mobile, 85vw);
-        --sun-image-margin-top: var(--sun-image-margin-top-mobile, 4vw);
+        --sun-image-width: var(--sun-image-width-mobile, 42vw);
+        --sun-image-margin-top: var(--sun-image-margin-top-mobile, 3vw);
         --sun-image-margin-bottom: var(--sun-image-margin-bottom-mobile, 3vw);
         --sun-image-inner-scale: var(--sun-image-inner-scale-mobile, 108%);
         --sun-image-offset-y: var(--sun-image-offset-y-mobile, -1%);
@@ -1583,7 +1583,7 @@ main {
         --rain-fade-bottom: var(--rain-fade-bottom-desktop, 10vw);
         --rain-opacity: var(--rain-opacity-desktop, 1);
 
-        --sun-image-width: var(--sun-image-width-desktop, 68vw);
+        --sun-image-width: var(--sun-image-width-desktop, 34vw);
         --sun-image-margin-top: var(--sun-image-margin-top-desktop, 2vw);
         --sun-image-margin-bottom: var(--sun-image-margin-bottom-desktop, 2vw);
         --sun-image-inner-scale: var(--sun-image-inner-scale-desktop, 108%);
@@ -1810,8 +1810,8 @@ main {
 
 // Live Sun Image (GOES-19 SUVI Fe195 Å)
 #sun-image-container {
-    width: var(--sun-image-width, 68vw);
-    height: var(--sun-image-width, 68vw);
+    width: var(--sun-image-width, 34vw);
+    height: var(--sun-image-width, 34vw);
     margin: var(--sun-image-margin-top, 2vw) auto 0;
     border-radius: 50%;
     overflow: hidden;
