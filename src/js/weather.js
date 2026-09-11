@@ -7016,6 +7016,126 @@ Plan ahead for significantly warmer conditions tomorrow!`
   applySunImageConfig();
   window.addEventListener('resize', applySunImageConfig);
 
+  // ==========================================
+  // --- EDITABLE: World Clocks Row Config (JCV) ---
+  // ==========================================
+  const WORLD_CLOCKS_ENABLED = true;                         // EDITABLE: Enable/disable 5-clock world time row (Pacific, Mountain, Central, Eastern, UK)
+  const WORLD_CLOCK_SIZE_DESKTOP = '13.5vw';                 // EDITABLE Desktop: Dial diameter for each clock
+  const WORLD_CLOCK_SIZE_MOBILE = '16.0vw';                  // EDITABLE Mobile: Dial diameter for each clock
+  const WORLD_CLOCKS_GAP_DESKTOP = '2.5vw';                  // EDITABLE Desktop: Spacing between each clock column
+  const WORLD_CLOCKS_GAP_MOBILE = '1.8vw';                   // EDITABLE Mobile: Spacing between each clock column
+  const WORLD_CLOCKS_MARGIN_TOP_DESKTOP = '2.5vw';           // EDITABLE Desktop: Margin above the clocks row
+  const WORLD_CLOCKS_MARGIN_TOP_MOBILE = '3.0vw';            // EDITABLE Mobile: Margin above the clocks row
+  const WORLD_CLOCKS_MARGIN_BOTTOM_DESKTOP = '1.0vw';        // EDITABLE Desktop: Margin below the clocks row
+  const WORLD_CLOCKS_MARGIN_BOTTOM_MOBILE = '1.5vw';         // EDITABLE Mobile: Margin below the clocks row
+
+  // Dial Track (outer ring without 5-min countdown)
+  const WORLD_CLOCK_TRACK_COLOR_DESKTOP = 'rgba(255, 255, 255, 0.2)'; // EDITABLE Desktop: Track stroke color
+  const WORLD_CLOCK_TRACK_COLOR_MOBILE = 'rgba(255, 255, 255, 0.2)';  // EDITABLE Mobile: Track stroke color
+  const WORLD_CLOCK_TRACK_WIDTH_DESKTOP = 4;                 // EDITABLE Desktop: Track stroke thickness
+  const WORLD_CLOCK_TRACK_WIDTH_MOBILE = 4;                  // EDITABLE Mobile: Track stroke thickness
+
+  // Hands & Dot styling
+  const WORLD_CLOCK_HANDS_COLOR_MODE = 'temp';               // EDITABLE: 'temp' (matches current temp color) or 'white' or custom string (e.g. 'rgba(255,255,255,0.9)')
+  const WORLD_CLOCK_HANDS_COLOR_DESKTOP = 'rgba(255, 255, 255, 0.9)'; // EDITABLE Desktop: Base hands color when mode is not temp
+  const WORLD_CLOCK_HANDS_COLOR_MOBILE = 'rgba(255, 255, 255, 0.9)';  // EDITABLE Mobile: Base hands color when mode is not temp
+  const WORLD_CLOCK_SECOND_HAND_COLOR = 'rgba(255, 255, 255, 0.2)';   // EDITABLE: Subtle second hand color matching clock dial
+  const WORLD_CLOCK_CENTER_DOT_OPACITY = 0;                  // EDITABLE: 0 to hide center dot (matching clock dial), 1 to show
+
+  // Labels below dials (e.g. "Pacific 6:51a")
+  const WORLD_CLOCK_LABEL_ENABLED = true;                    // EDITABLE: Show labels under dials
+  const WORLD_CLOCK_LABEL_SHOW_TIME = true;                  // EDITABLE: Include dynamic time string (e.g. "6:51a") with region name
+  const WORLD_CLOCK_LABEL_LAYOUT_DESKTOP = 'row';            // EDITABLE Desktop: 'row' (side-by-side: "Pacific  6:51a") or 'column' (stacked: "Pacific" over "6:51a")
+  const WORLD_CLOCK_LABEL_LAYOUT_MOBILE = 'row';             // EDITABLE Mobile: 'row' or 'column'
+  const WORLD_CLOCK_LABEL_SPACES = 2;                        // EDITABLE: Number of typographic spaces between region name and time
+  const WORLD_CLOCK_LABEL_GAP_DESKTOP = '0vw';               // EDITABLE Desktop: Extra spacing beyond the two spaces
+  const WORLD_CLOCK_LABEL_GAP_MOBILE = '0vw';                // EDITABLE Mobile: Extra spacing beyond the two spaces
+  const WORLD_CLOCK_LABEL_FONT_SIZE_DESKTOP = '1.35vw';      // EDITABLE Desktop: Label font size
+  const WORLD_CLOCK_LABEL_FONT_SIZE_MOBILE = '1.75vw';       // EDITABLE Mobile: Label font size
+  const WORLD_CLOCK_LABEL_MARGIN_TOP_DESKTOP = '0.8vw';      // EDITABLE Desktop: Margin above label
+  const WORLD_CLOCK_LABEL_MARGIN_TOP_MOBILE = '1.0vw';       // EDITABLE Mobile: Margin above label
+  const WORLD_CLOCK_LABEL_LETTER_SPACING_DESKTOP = '0.04vw'; // EDITABLE Desktop: Letter spacing
+  const WORLD_CLOCK_LABEL_LETTER_SPACING_MOBILE = '0.02vw';  // EDITABLE Mobile: Letter spacing
+  const WORLD_CLOCK_LABEL_FONT_FAMILY_DESKTOP = "'light', sans-serif"; // EDITABLE Desktop: Font family
+  const WORLD_CLOCK_LABEL_FONT_FAMILY_MOBILE = "'light', sans-serif";  // EDITABLE Mobile: Font family
+  const WORLD_CLOCK_LABEL_COLOR_DESKTOP = '#ffffff';         // EDITABLE Desktop: Text color
+  const WORLD_CLOCK_LABEL_COLOR_MOBILE = '#ffffff';          // EDITABLE Mobile: Text color
+  const WORLD_CLOCK_LABEL_OPACITY_DESKTOP = 0.85;            // EDITABLE Desktop: Label opacity
+  const WORLD_CLOCK_LABEL_OPACITY_MOBILE = 0.85;             // EDITABLE Mobile: Label opacity
+  const WORLD_CLOCK_TIME_COLOR_DESKTOP = '#ffffff';          // EDITABLE Desktop: Time text color
+  const WORLD_CLOCK_TIME_COLOR_MOBILE = '#ffffff';           // EDITABLE Mobile: Time text color
+  const WORLD_CLOCK_TIME_OPACITY_DESKTOP = 0.85;             // EDITABLE Desktop: Time opacity
+  const WORLD_CLOCK_TIME_OPACITY_MOBILE = 0.85;              // EDITABLE Mobile: Time opacity
+
+  function applyWorldClocksConfig() {
+    const isMobile = window.innerWidth <= 767;
+    document.documentElement.style.setProperty('--world-clock-size-desktop', WORLD_CLOCK_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--world-clock-size-mobile', WORLD_CLOCK_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--world-clock-size', isMobile ? WORLD_CLOCK_SIZE_MOBILE : WORLD_CLOCK_SIZE_DESKTOP);
+
+    document.documentElement.style.setProperty('--world-clocks-gap-desktop', WORLD_CLOCKS_GAP_DESKTOP);
+    document.documentElement.style.setProperty('--world-clocks-gap-mobile', WORLD_CLOCKS_GAP_MOBILE);
+    document.documentElement.style.setProperty('--world-clocks-gap', isMobile ? WORLD_CLOCKS_GAP_MOBILE : WORLD_CLOCKS_GAP_DESKTOP);
+
+    document.documentElement.style.setProperty('--world-clocks-margin-top-desktop', WORLD_CLOCKS_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--world-clocks-margin-top-mobile', WORLD_CLOCKS_MARGIN_TOP_MOBILE);
+    document.documentElement.style.setProperty('--world-clocks-margin-top', isMobile ? WORLD_CLOCKS_MARGIN_TOP_MOBILE : WORLD_CLOCKS_MARGIN_TOP_DESKTOP);
+
+    document.documentElement.style.setProperty('--world-clocks-margin-bottom-desktop', WORLD_CLOCKS_MARGIN_BOTTOM_DESKTOP);
+    document.documentElement.style.setProperty('--world-clocks-margin-bottom-mobile', WORLD_CLOCKS_MARGIN_BOTTOM_MOBILE);
+    document.documentElement.style.setProperty('--world-clocks-margin-bottom', isMobile ? WORLD_CLOCKS_MARGIN_BOTTOM_MOBILE : WORLD_CLOCKS_MARGIN_BOTTOM_DESKTOP);
+
+    document.documentElement.style.setProperty('--world-clock-track-color-desktop', WORLD_CLOCK_TRACK_COLOR_DESKTOP);
+    document.documentElement.style.setProperty('--world-clock-track-color-mobile', WORLD_CLOCK_TRACK_COLOR_MOBILE);
+    document.documentElement.style.setProperty('--world-clock-track-color', isMobile ? WORLD_CLOCK_TRACK_COLOR_MOBILE : WORLD_CLOCK_TRACK_COLOR_DESKTOP);
+
+    document.documentElement.style.setProperty('--world-clock-track-width-desktop', String(WORLD_CLOCK_TRACK_WIDTH_DESKTOP));
+    document.documentElement.style.setProperty('--world-clock-track-width-mobile', String(WORLD_CLOCK_TRACK_WIDTH_MOBILE));
+    document.documentElement.style.setProperty('--world-clock-track-width', String(isMobile ? WORLD_CLOCK_TRACK_WIDTH_MOBILE : WORLD_CLOCK_TRACK_WIDTH_DESKTOP));
+
+    document.documentElement.style.setProperty('--world-clock-label-layout-desktop', WORLD_CLOCK_LABEL_LAYOUT_DESKTOP);
+    document.documentElement.style.setProperty('--world-clock-label-layout-mobile', WORLD_CLOCK_LABEL_LAYOUT_MOBILE);
+    document.documentElement.style.setProperty('--world-clock-label-layout', isMobile ? WORLD_CLOCK_LABEL_LAYOUT_MOBILE : WORLD_CLOCK_LABEL_LAYOUT_DESKTOP);
+
+    document.documentElement.style.setProperty('--world-clock-label-gap-desktop', WORLD_CLOCK_LABEL_GAP_DESKTOP);
+    document.documentElement.style.setProperty('--world-clock-label-gap-mobile', WORLD_CLOCK_LABEL_GAP_MOBILE);
+    document.documentElement.style.setProperty('--world-clock-label-gap', isMobile ? WORLD_CLOCK_LABEL_GAP_MOBILE : WORLD_CLOCK_LABEL_GAP_DESKTOP);
+
+    document.documentElement.style.setProperty('--world-clock-label-font-size-desktop', WORLD_CLOCK_LABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--world-clock-label-font-size-mobile', WORLD_CLOCK_LABEL_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--world-clock-label-font-size', isMobile ? WORLD_CLOCK_LABEL_FONT_SIZE_MOBILE : WORLD_CLOCK_LABEL_FONT_SIZE_DESKTOP);
+
+    document.documentElement.style.setProperty('--world-clock-label-margin-top-desktop', WORLD_CLOCK_LABEL_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--world-clock-label-margin-top-mobile', WORLD_CLOCK_LABEL_MARGIN_TOP_MOBILE);
+    document.documentElement.style.setProperty('--world-clock-label-margin-top', isMobile ? WORLD_CLOCK_LABEL_MARGIN_TOP_MOBILE : WORLD_CLOCK_LABEL_MARGIN_TOP_DESKTOP);
+
+    document.documentElement.style.setProperty('--world-clock-label-letter-spacing-desktop', WORLD_CLOCK_LABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--world-clock-label-letter-spacing-mobile', WORLD_CLOCK_LABEL_LETTER_SPACING_MOBILE);
+    document.documentElement.style.setProperty('--world-clock-label-letter-spacing', isMobile ? WORLD_CLOCK_LABEL_LETTER_SPACING_MOBILE : WORLD_CLOCK_LABEL_LETTER_SPACING_DESKTOP);
+
+    document.documentElement.style.setProperty('--world-clock-label-font-family-desktop', WORLD_CLOCK_LABEL_FONT_FAMILY_DESKTOP);
+    document.documentElement.style.setProperty('--world-clock-label-font-family-mobile', WORLD_CLOCK_LABEL_FONT_FAMILY_MOBILE);
+    document.documentElement.style.setProperty('--world-clock-label-font-family', isMobile ? WORLD_CLOCK_LABEL_FONT_FAMILY_MOBILE : WORLD_CLOCK_LABEL_FONT_FAMILY_DESKTOP);
+
+    document.documentElement.style.setProperty('--world-clock-label-color-desktop', WORLD_CLOCK_LABEL_COLOR_DESKTOP);
+    document.documentElement.style.setProperty('--world-clock-label-color-mobile', WORLD_CLOCK_LABEL_COLOR_MOBILE);
+    document.documentElement.style.setProperty('--world-clock-label-color', isMobile ? WORLD_CLOCK_LABEL_COLOR_MOBILE : WORLD_CLOCK_LABEL_COLOR_DESKTOP);
+
+    document.documentElement.style.setProperty('--world-clock-label-opacity-desktop', String(WORLD_CLOCK_LABEL_OPACITY_DESKTOP));
+    document.documentElement.style.setProperty('--world-clock-label-opacity-mobile', String(WORLD_CLOCK_LABEL_OPACITY_MOBILE));
+    document.documentElement.style.setProperty('--world-clock-label-opacity', String(isMobile ? WORLD_CLOCK_LABEL_OPACITY_MOBILE : WORLD_CLOCK_LABEL_OPACITY_DESKTOP));
+
+    document.documentElement.style.setProperty('--world-clock-time-color-desktop', WORLD_CLOCK_TIME_COLOR_DESKTOP);
+    document.documentElement.style.setProperty('--world-clock-time-color-mobile', WORLD_CLOCK_TIME_COLOR_MOBILE);
+    document.documentElement.style.setProperty('--world-clock-time-color', isMobile ? WORLD_CLOCK_TIME_COLOR_MOBILE : WORLD_CLOCK_TIME_COLOR_DESKTOP);
+
+    document.documentElement.style.setProperty('--world-clock-time-opacity-desktop', String(WORLD_CLOCK_TIME_OPACITY_DESKTOP));
+    document.documentElement.style.setProperty('--world-clock-time-opacity-mobile', String(WORLD_CLOCK_TIME_OPACITY_MOBILE));
+    document.documentElement.style.setProperty('--world-clock-time-opacity', String(isMobile ? WORLD_CLOCK_TIME_OPACITY_MOBILE : WORLD_CLOCK_TIME_OPACITY_DESKTOP));
+  }
+  applyWorldClocksConfig();
+  window.addEventListener('resize', applyWorldClocksConfig);
+
   // --- Earth Image Config ---
   // Settings for the live Earth image from NOAA GOES satellite
   const EARTH_IMAGE_WIDTH = '68vw';  // Width of the container (2% smaller to crop bottom text)
@@ -7050,7 +7170,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1134';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1138';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
@@ -10618,6 +10738,229 @@ Plan ahead for significantly warmer conditions tomorrow!`
     mainClock.addEventListener('click', handleTimeDialReset);
   }
 
+  /* --- World Clocks Row (Pacific, Mountain, Central, Eastern, UK) --- */
+  const WORLD_CLOCK_ZONES = [
+    { id: 'pacific', name: 'Pacific', timeZone: 'America/Los_Angeles' },
+    { id: 'mountain', name: 'Mountain', timeZone: 'America/Denver' },
+    { id: 'central', name: 'Central', timeZone: 'America/Chicago' },
+    { id: 'eastern', name: 'Eastern', timeZone: 'America/New_York' },
+    { id: 'uk', name: 'UK', timeZone: 'Europe/London' }
+  ];
+
+  const worldClockFormatters = WORLD_CLOCK_ZONES.map(z => {
+    const hourFormatter = new Intl.DateTimeFormat('en-US', { timeZone: z.timeZone, hour: 'numeric', hour12: false });
+    const timeFormatter = new Intl.DateTimeFormat('en-US', { timeZone: z.timeZone, hour: 'numeric', minute: '2-digit', hour12: true });
+    return {
+      id: z.id,
+      name: z.name,
+      timeZone: z.timeZone,
+      formatter: hourFormatter,
+      hourFormatter,
+      timeFormatter
+    };
+  });
+
+  function createWorldClocksIfMissing() {
+    if (!WORLD_CLOCKS_ENABLED) {
+      const existing = document.getElementById('world-clocks-row-wrapper');
+      if (existing) existing.remove();
+      return;
+    }
+    const existingWrapper = document.getElementById('world-clocks-row-wrapper');
+    if (existingWrapper) {
+      // Hot-reload guard: ensure spacer and time spans exist inside existing labels
+      if (WORLD_CLOCK_LABEL_SHOW_TIME) {
+        const spacesHtml = '&nbsp;'.repeat(WORLD_CLOCK_LABEL_SPACES || 2);
+        WORLD_CLOCK_ZONES.forEach(zone => {
+          const label = document.getElementById(`world-clock-label-${zone.id}`);
+          if (label) {
+            label.innerHTML = `
+              <span class="world-clock-name">${zone.name}</span><span class="world-clock-spacer">${spacesHtml}</span><span class="world-clock-time" id="world-clock-time-${zone.id}"></span>
+            `;
+          }
+        });
+      }
+      updateWorldClockHands();
+      return;
+    }
+
+    const wrapper = document.createElement('div');
+    wrapper.id = 'world-clocks-row-wrapper';
+    wrapper.className = 'world-clocks-row-wrapper';
+
+    WORLD_CLOCK_ZONES.forEach(zone => {
+      const col = document.createElement('div');
+      col.className = `world-clock-column world-clock-column-${zone.id}`;
+      col.id = `world-clock-${zone.id}`;
+
+      // Dial container based on the clock dial (subtle outer track circle, but no 5-min countdown ring)
+      const dial = document.createElement('div');
+      dial.className = 'world-clock-dial';
+      dial.id = `world-clock-dial-${zone.id}`;
+      dial.setAttribute('data-timezone', zone.timeZone);
+      dial.setAttribute('title', `${zone.name} Time`);
+      dial.style.cursor = 'pointer';
+      dial.addEventListener('click', handleTimeDialReset);
+
+      dial.innerHTML = `
+        <svg class="clock-timer-svg" viewBox="0 0 100 100">
+          <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+        </svg>
+        <div class="clock-face">
+          <div class="clock-hour-hand"></div>
+          <div class="clock-minute-hand"></div>
+          <div class="clock-second-hand"></div>
+          <div class="clock-center-dot"></div>
+        </div>
+      `;
+
+      col.appendChild(dial);
+
+      if (WORLD_CLOCK_LABEL_ENABLED) {
+        const label = document.createElement('div');
+        label.className = 'world-clock-label';
+        label.id = `world-clock-label-${zone.id}`;
+
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'world-clock-name';
+        nameSpan.textContent = zone.name;
+        label.appendChild(nameSpan);
+
+        if (WORLD_CLOCK_LABEL_SHOW_TIME) {
+          const spacerSpan = document.createElement('span');
+          spacerSpan.className = 'world-clock-spacer';
+          spacerSpan.innerHTML = '&nbsp;'.repeat(WORLD_CLOCK_LABEL_SPACES || 2);
+          label.appendChild(spacerSpan);
+
+          const timeSpan = document.createElement('span');
+          timeSpan.className = 'world-clock-time';
+          timeSpan.id = `world-clock-time-${zone.id}`;
+          timeSpan.textContent = '';
+          label.appendChild(timeSpan);
+        }
+
+        col.appendChild(label);
+      }
+
+      wrapper.appendChild(col);
+    });
+
+    // Placement: "the row is just above the two suns row"
+    const sunsRow = document.getElementById('suns-row-wrapper') || document.querySelector('.sun-column.single-mode');
+    if (sunsRow && sunsRow.parentNode) {
+      sunsRow.parentNode.insertBefore(wrapper, sunsRow);
+    } else {
+      const earthContainer = document.getElementById('earth-image-container');
+      const locSwitcher = document.getElementById('weather-location-switcher');
+      const missingAssets = document.getElementById('weather-missing-assets');
+      const lastUpdated = document.getElementById('weather-last-updated');
+      const secondGauge = document.querySelector('.second-gauge-container');
+
+      if (earthContainer && earthContainer.parentNode) {
+        earthContainer.parentNode.insertBefore(wrapper, earthContainer);
+      } else if (locSwitcher && locSwitcher.parentNode) {
+        locSwitcher.parentNode.insertBefore(wrapper, locSwitcher);
+      } else if (missingAssets && missingAssets.parentNode) {
+        missingAssets.parentNode.insertBefore(wrapper, missingAssets);
+      } else if (lastUpdated && lastUpdated.parentNode) {
+        lastUpdated.parentNode.insertBefore(wrapper, lastUpdated);
+      } else if (secondGauge && secondGauge.parentNode) {
+        secondGauge.parentNode.insertBefore(wrapper, secondGauge.nextSibling);
+      } else {
+        const parent = document.querySelector('main') || document.body;
+        parent.appendChild(wrapper);
+      }
+    }
+
+    updateWorldClockHands();
+
+    requestAnimationFrame(() => {
+      wrapper.style.opacity = '1';
+    });
+  }
+
+  function updateWorldClockHands() {
+    const wrapper = document.getElementById('world-clocks-row-wrapper');
+    if (!wrapper) return;
+
+    const now = new Date();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+    const milliseconds = now.getMilliseconds();
+
+    const minuteRotation = (minutes * 6) + (seconds * 0.1);
+    const secondRotation = (seconds * 6) + (milliseconds * 0.006);
+
+    let handsColor = null;
+    if (WORLD_CLOCK_HANDS_COLOR_MODE === 'temp') {
+      if (window.lastWeatherData && window.lastWeatherData.current && typeof window.lastWeatherData.current.temp === 'number') {
+        handsColor = tempToColor(window.lastWeatherData.current.temp);
+      }
+    } else if (WORLD_CLOCK_HANDS_COLOR_MODE && WORLD_CLOCK_HANDS_COLOR_MODE !== 'white') {
+      handsColor = WORLD_CLOCK_HANDS_COLOR_MODE;
+    }
+
+    worldClockFormatters.forEach(({ id, formatter, timeFormatter }) => {
+      const dial = document.getElementById(`world-clock-dial-${id}`);
+      if (!dial) return;
+
+      const rawH = parseInt(formatter.format(now), 10);
+      const hours = isNaN(rawH) ? 0 : rawH % 12;
+      const hourRotation = (hours * 30) + (minutes * 0.5);
+
+      dial.style.setProperty('--hour-rotation', `${hourRotation}deg`);
+      dial.style.setProperty('--minute-rotation', `${minuteRotation}deg`);
+      dial.style.setProperty('--second-rotation', `${secondRotation}deg`);
+
+      if (handsColor) {
+        dial.style.setProperty('--world-clock-hands-color', handsColor);
+      }
+
+      const hourHand = dial.querySelector('.clock-hour-hand');
+      const minuteHand = dial.querySelector('.clock-minute-hand');
+      const secondHand = dial.querySelector('.clock-second-hand');
+      const centerDot = dial.querySelector('.clock-center-dot');
+
+      if (hourHand) {
+        if (!isClockSpinning) {
+          hourHand.style.transform = `translateX(-50%) rotate(${hourRotation}deg)`;
+        }
+        if (handsColor) hourHand.style.backgroundColor = handsColor;
+      }
+      if (minuteHand) {
+        if (!isClockSpinning) {
+          minuteHand.style.transform = `translateX(-50%) rotate(${minuteRotation}deg)`;
+        }
+        if (handsColor) minuteHand.style.backgroundColor = handsColor;
+      }
+      if (secondHand) {
+        secondHand.style.transform = `translateX(-50%) rotate(${secondRotation}deg)`;
+      }
+      if (centerDot && handsColor) {
+        centerDot.style.backgroundColor = handsColor;
+      }
+
+      // Update dynamic time text under dial (e.g. "Pacific 6:51a")
+      if (WORLD_CLOCK_LABEL_SHOW_TIME) {
+        const timeSpan = document.getElementById(`world-clock-time-${id}`);
+        if (timeSpan && timeFormatter) {
+          const parts = timeFormatter.formatToParts(now);
+          let h = '', m = '', dayPeriod = 'a';
+          for (const p of parts) {
+            if (p.type === 'hour') h = p.value;
+            else if (p.type === 'minute') m = p.value;
+            else if (p.type === 'dayPeriod') dayPeriod = p.value.toLowerCase();
+          }
+          const ampm = dayPeriod.startsWith('p') ? 'p' : 'a';
+          const formattedTime = `${h}:${m}${ampm}`;
+          if (timeSpan.textContent !== formattedTime) {
+            timeSpan.textContent = formattedTime;
+          }
+        }
+      }
+    });
+  }
+
   /* --- Live Sun Image & Solar Animations (NOAA GOES-19 SUVI Fe195 Å) --- */
   let sunAnimationTimeoutId = null;
   let sunSizzleTimeoutId = null;
@@ -10759,14 +11102,18 @@ Plan ahead for significantly warmer conditions tomorrow!`
     spacer.style.height = 'var(--sun-image-margin-bottom, 2vw)';
     spacer.style.width = '100%';
 
-    // Position above Earth image (below 24-hour condition images)
+    // Position above Earth image (below 24-hour condition images and world clocks)
+    const worldClocks = document.getElementById('world-clocks-row-wrapper');
     const earthContainer = document.getElementById('earth-image-container');
     const locSwitcher = document.getElementById('weather-location-switcher');
     const missingAssets = document.getElementById('weather-missing-assets');
     const lastUpdated = document.getElementById('weather-last-updated');
     const secondGauge = document.querySelector('.second-gauge-container');
 
-    if (earthContainer && earthContainer.parentNode) {
+    if (worldClocks && worldClocks.parentNode) {
+      worldClocks.parentNode.insertBefore(mainWrapper, worldClocks.nextSibling);
+      worldClocks.parentNode.insertBefore(spacer, mainWrapper.nextSibling);
+    } else if (earthContainer && earthContainer.parentNode) {
       earthContainer.parentNode.insertBefore(mainWrapper, earthContainer);
       earthContainer.parentNode.insertBefore(spacer, earthContainer);
     } else if (locSwitcher && locSwitcher.parentNode) {
@@ -13482,8 +13829,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
         console.warn('Error updating days UI:', e);
       }
 
-      // Draw the Earth & Sun images, and Last Updated text last, after the grid has expanded
+      // Draw the Earth & Sun images, World Clocks, and Last Updated text last, after the grid has expanded
       createEarthImageIfMissing();
+      createWorldClocksIfMissing();
       createSunImageIfMissing();
 
       const now = new Date();
@@ -13492,6 +13840,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
       
       // Smoothly fade them in now that they are safely pushed to the bottom
       setTimeout(() => {
+        const worldClocks = document.getElementById('world-clocks-row-wrapper');
+        if (worldClocks) worldClocks.style.opacity = '1';
         const sun = document.getElementById('sun-image-container');
         if (sun) sun.style.opacity = 'var(--sun-image-opacity, 1)';
         const sunsRow = document.getElementById('suns-row-wrapper');
@@ -13706,25 +14056,49 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const hourRotation = (hours * 30) + (minutes * 0.5);
     const minuteRotation = (minutes * 6) + (now.getSeconds() * 0.1);
     
-    const hourHands = document.querySelectorAll('.clock-hour-hand');
-    const minuteHands = document.querySelectorAll('.clock-minute-hand');
+    // Base clock hands (Tulsa local)
+    const baseHourHands = document.querySelectorAll('.clockGridItem-0 .clock-hour-hand, #analog-clock .clock-hour-hand');
+    const baseMinuteHands = document.querySelectorAll('.clockGridItem-0 .clock-minute-hand, #analog-clock .clock-minute-hand');
     
-    hourHands.forEach(hand => {
+    baseHourHands.forEach(hand => {
       hand.style.setProperty('--current-rotation', hourRotation + 'deg');
       hand.classList.add('spin-clockwise-anim');
     });
     
-    minuteHands.forEach(hand => {
+    baseMinuteHands.forEach(hand => {
       hand.style.setProperty('--current-rotation', minuteRotation + 'deg');
       hand.classList.add('spin-counter-clockwise-anim');
     });
+
+    // World clock hands spin from their respective timezone hour rotations
+    if (typeof worldClockFormatters !== 'undefined') {
+      worldClockFormatters.forEach(({ id, formatter }) => {
+        const dial = document.getElementById(`world-clock-dial-${id}`);
+        if (!dial) return;
+        const rawH = parseInt(formatter.format(now), 10);
+        const zHours = isNaN(rawH) ? 0 : rawH % 12;
+        const zHourRot = (zHours * 30) + (minutes * 0.5);
+        const hHand = dial.querySelector('.clock-hour-hand');
+        const mHand = dial.querySelector('.clock-minute-hand');
+        if (hHand) {
+          hHand.style.setProperty('--current-rotation', zHourRot + 'deg');
+          hHand.classList.add('spin-clockwise-anim');
+        }
+        if (mHand) {
+          mHand.style.setProperty('--current-rotation', minuteRotation + 'deg');
+          mHand.classList.add('spin-counter-clockwise-anim');
+        }
+      });
+    }
     
     // Reset back to normal tracking after the animation finishes
+    const allHourHands = document.querySelectorAll('.clock-hour-hand');
+    const allMinuteHands = document.querySelectorAll('.clock-minute-hand');
     setTimeout(() => {
-      hourHands.forEach(hand => {
+      allHourHands.forEach(hand => {
         hand.classList.remove('spin-clockwise-anim');
       });
-      minuteHands.forEach(hand => {
+      allMinuteHands.forEach(hand => {
         hand.classList.remove('spin-counter-clockwise-anim');
       });
       isClockSpinning = false;
@@ -13764,7 +14138,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const gridRow7 = document.getElementById('clock-grid-container-7');
     const gridRow4_1 = document.getElementById('clock-grid-container-4-1');
     const gridRow4_2 = document.getElementById('clock-grid-container-4-2');
-    if (!container && gridItem0s.length === 0 && !gridRow && !gridRow7 && !gridRow4_1 && !gridRow4_2) return;
+    const worldClocks = document.getElementById('world-clocks-row-wrapper');
+    if (!container && gridItem0s.length === 0 && !gridRow && !gridRow7 && !gridRow4_1 && !gridRow4_2 && !worldClocks) return;
     
     const now = new Date();
     const hours = now.getHours() % 12;
@@ -13877,6 +14252,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
     timeLabelVals.forEach(val => {
        val.innerText = timeText;
     });
+
+    // Update the 5 world clock hands (Pacific, Mountain, Central, Eastern, UK)
+    if (typeof updateWorldClockHands === 'function') {
+      updateWorldClockHands();
+    }
   }
 
   // Dynamic digital time display with seconds for left circle cell (replaces date)
@@ -14097,6 +14477,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   // Initialize placeholders immediately, then start auto-refresh
   setPlaceholders();
+  if (typeof createWorldClocksIfMissing === 'function') createWorldClocksIfMissing();
   if (typeof updateMissingAssetsDisplay === 'function') updateMissingAssetsDisplay(); // Show list immediately if it existed from a previous session
   initWeatherWithGeolocation();
   initRadarInteractions();
@@ -14128,6 +14509,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // Reposition temperature pointer and wind arrow on window resize
   window.addEventListener('resize', () => {
     const isMobile = window.innerWidth <= 767;
+    if (typeof applyWorldClocksConfig === 'function') applyWorldClocksConfig();
+    if (typeof updateWorldClockHands === 'function') updateWorldClockHands();
     document.documentElement.style.setProperty('--circle-cell-top', isMobile ? CIRCLE_CELL_TOP_MOBILE : CIRCLE_CELL_TOP_DESKTOP);
     document.documentElement.style.setProperty('--fragile-y-offset', isMobile ? FRAGILE_ELEMENTS_Y_OFFSET_MOBILE : FRAGILE_ELEMENTS_Y_OFFSET_DESKTOP);
     document.documentElement.style.setProperty('--day0-lines-opacity', isMobile ? DAY0_LINES_OPACITY_MOBILE : DAY0_LINES_OPACITY_DESKTOP);
