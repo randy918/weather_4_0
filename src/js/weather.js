@@ -7170,8 +7170,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1138';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1142';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
+
+  // Keep browser tab title synchronized with the current app version
+  if (typeof document !== 'undefined') {
+    document.title = `Weather ${VERSION_NUMBER}`;
+  }
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
   const VERSION_FONT_SIZE_DESKTOP = '5vw';         // EDITABLE Desktop: Font size (matches Tulsa/Traverse City 5vw)
@@ -10321,6 +10326,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
     }
 
     el.textContent = `${VERSION_PREFIX}${VERSION_NUMBER}`;
+    if (typeof document !== 'undefined') {
+      document.title = `Weather ${VERSION_NUMBER}`;
+    }
     el.style.fontFamily = VERSION_FONT_FAMILY;
     el.style.fontSize = versionFontSize;
     el.style.letterSpacing = versionLetterSpacing;
