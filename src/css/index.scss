@@ -498,6 +498,8 @@ $loader-logo-offset-y: 25vw;
 .day0-temp-line {
     position: absolute;
     pointer-events: none;
+    left: 0;
+    width: 100%;
     height: var(--day0-lines-height-desktop, 0.22vw);
     opacity: var(--day0-lines-opacity-desktop, var(--day0-lines-opacity, 0.55));
     transition: top 0.5s ease-out, background-color 0.5s ease, opacity 0.5s ease;
@@ -1484,6 +1486,16 @@ main {
     --sun-duo-gap: var(--sun-duo-gap-desktop, 3vw);
     --sun-trio-gap: var(--sun-trio-gap-desktop, 2vw);
     --sun-row-gap: var(--sun-trio-gap, var(--sun-duo-gap, 2vw));
+    --sun-label-font-size: var(--sun-label-font-size-desktop, 2.0vw);
+    --sun-label-margin-top: var(--sun-label-margin-top-desktop, 0.8vw);
+    --sun-label-letter-spacing: var(--sun-label-letter-spacing-desktop, 0.08vw);
+    --sun-label-font-family: var(--sun-label-font-family-desktop, "'light', sans-serif");
+    --sun-label-color: var(--sun-label-color-desktop, #ffffff);
+    --sun-label-opacity: var(--sun-label-opacity-desktop, 0.70);
+    --sun-label-text-transform: var(--sun-label-text-transform-desktop, capitalize);
+    --sun-label-offset-x: var(--sun-label-offset-x-desktop, 0vw);
+    --sun-label-left-offset-x: var(--sun-label-left-offset-x-desktop, 0vw);
+    --sun-label-right-offset-x: var(--sun-label-right-offset-x-desktop, 0vw);
 
     /* Doppler Radar Experiment: "Lighten Only" HUD overlay on the page background */
     /* Option A: Lighten HUD Overlay on page background (Default) */
@@ -1545,6 +1557,12 @@ main {
         --sun-duo-gap: var(--sun-duo-gap-mobile, 2vw);
         --sun-trio-gap: var(--sun-trio-gap-mobile, 2vw);
         --sun-row-gap: var(--sun-trio-gap, var(--sun-duo-gap, 2vw));
+        --sun-label-font-size: var(--sun-label-font-size-mobile, 2.6vw);
+        --sun-label-margin-top: var(--sun-label-margin-top-mobile, 1.2vw);
+        --sun-label-letter-spacing: var(--sun-label-letter-spacing-mobile, 0.06vw);
+        --sun-label-offset-x: var(--sun-label-offset-x-mobile, 0vw);
+        --sun-label-left-offset-x: var(--sun-label-left-offset-x-mobile, 0vw);
+        --sun-label-right-offset-x: var(--sun-label-right-offset-x-mobile, 0vw);
     }
 
     .grid-wind-speed-text {
@@ -1601,6 +1619,12 @@ main {
         --sun-duo-gap: var(--sun-duo-gap-desktop, 3vw);
         --sun-trio-gap: var(--sun-trio-gap-desktop, 2vw);
         --sun-row-gap: var(--sun-trio-gap, var(--sun-duo-gap, 2vw));
+        --sun-label-font-size: var(--sun-label-font-size-desktop, 2.0vw);
+        --sun-label-margin-top: var(--sun-label-margin-top-desktop, 0.8vw);
+        --sun-label-letter-spacing: var(--sun-label-letter-spacing-desktop, 0.08vw);
+        --sun-label-offset-x: var(--sun-label-offset-x-desktop, 0vw);
+        --sun-label-left-offset-x: var(--sun-label-left-offset-x-desktop, 0vw);
+        --sun-label-right-offset-x: var(--sun-label-right-offset-x-desktop, 0vw);
     }
     .clockGridContainer7,
     .clockGridLabelsContainer7 {
@@ -1818,16 +1842,33 @@ main {
 }
 
 // Live Sun Image & Sizzling Sun Duo Mode (GOES-19 SUVI Fe195 Å)
-#suns-row-wrapper {
+#suns-row-wrapper,
+.suns-row-wrapper {
     display: flex;
     flex-direction: row;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     width: 100%;
     gap: var(--sun-duo-gap, 3vw);
     margin: var(--sun-image-margin-top, 2vw) auto 0;
     opacity: 0;
     transition: opacity 1s ease;
+    mix-blend-mode: var(--sun-image-blend-mode, lighten);
+}
+
+.sun-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: var(--sun-image-width, 34vw);
+    position: relative;
+    flex-shrink: 0;
+    mix-blend-mode: var(--sun-image-blend-mode, lighten);
+}
+
+.sun-column.single-mode {
+    margin: var(--sun-image-margin-top, 2vw) auto 0;
 }
 
 #sun-image-container,
@@ -1845,10 +1886,6 @@ main {
     flex-shrink: 0;
 }
 
-#sun-image-container.single-mode {
-    margin: var(--sun-image-margin-top, 2vw) auto 0;
-}
-
 #sun-image,
 #sun-image-right {
     width: var(--sun-image-inner-scale, 108%);
@@ -1861,6 +1898,33 @@ main {
     mix-blend-mode: var(--sun-image-blend-mode, lighten);
     display: block;
     opacity: var(--sun-image-opacity, 1);
+}
+
+.sun-label {
+    width: 100%;
+    max-width: 100%;
+    display: block;
+    font-family: var(--sun-label-font-family, 'light', sans-serif);
+    font-size: var(--sun-label-font-size, 2.0vw);
+    letter-spacing: var(--sun-label-letter-spacing, 0.08vw);
+    padding-left: var(--sun-label-letter-spacing, 0.08vw);
+    color: var(--sun-label-color, #ffffff);
+    opacity: var(--sun-label-opacity, 0.70);
+    text-transform: var(--sun-label-text-transform, capitalize);
+    margin-top: var(--sun-label-margin-top, 0.8vw);
+    text-align: center;
+    white-space: nowrap;
+    user-select: none;
+    line-height: 1.2;
+    box-sizing: border-box;
+}
+
+#sun-label-left {
+    transform: translateX(calc(var(--sun-label-offset-x, 0vw) + var(--sun-label-left-offset-x, 0vw)));
+}
+
+#sun-label-right {
+    transform: translateX(calc(var(--sun-label-offset-x, 0vw) + var(--sun-label-right-offset-x, 0vw)));
 }
 
 #sun-image-spacer {

@@ -221,8 +221,12 @@ import weatherConditions from '../data/weather-conditions.json';
   const DAY0_LINES_OPACITY_DESKTOP = 0.55;                   // EDITABLE Desktop: Opacity of the horizontal lines (0.0 to 1.0, 55%)
   const DAY0_LINES_OPACITY_MOBILE = 0.50;                    // EDITABLE Mobile: Opacity of the horizontal lines (0.0 to 1.0, 50%)
   const DAY0_LINES_OPACITY = DAY0_LINES_OPACITY_DESKTOP;    // Fallback alias
-  const DAY0_LINES_Z_INDEX = 15;                            // EDITABLE: Stacking order (in front of bars, behind temperature number and wedge pointer)
-  const HI_BAR_TEXT_Z_INDEX = 25;                           // EDITABLE: Stacking order for high bar temperature number (on top of lines, behind wedge pointer)
+  const DAY0_LINES_Z_INDEX_DESKTOP = 15;                    // EDITABLE Desktop: Stacking order (in front of bars, behind temperature number and wedge pointer)
+  const DAY0_LINES_Z_INDEX_MOBILE = 15;                     // EDITABLE Mobile: Stacking order for lines on mobile
+  const DAY0_LINES_Z_INDEX = DAY0_LINES_Z_INDEX_DESKTOP;    // Fallback alias
+  const HI_BAR_TEXT_Z_INDEX_DESKTOP = 25;                   // EDITABLE Desktop: Stacking order for high bar temperature number (on top of lines, behind wedge pointer)
+  const HI_BAR_TEXT_Z_INDEX_MOBILE = 25;                    // EDITABLE Mobile: Stacking order for high bar temperature number on mobile
+  const HI_BAR_TEXT_Z_INDEX = HI_BAR_TEXT_Z_INDEX_DESKTOP;  // Fallback alias
   const DAY0_LINES_ANIMATE_WITH_BAR = true;                 // EDITABLE: Animate 10° lines down and up in lockstep with Day 0 high temp changes
 
   document.documentElement.style.setProperty('--day0-lines-height-desktop', DAY0_LINES_HEIGHT_DESKTOP);
@@ -230,7 +234,11 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--day0-lines-opacity-desktop', DAY0_LINES_OPACITY_DESKTOP);
   document.documentElement.style.setProperty('--day0-lines-opacity-mobile', DAY0_LINES_OPACITY_MOBILE);
   document.documentElement.style.setProperty('--day0-lines-opacity', DAY0_LINES_OPACITY);
+  document.documentElement.style.setProperty('--day0-lines-z-index-desktop', DAY0_LINES_Z_INDEX_DESKTOP);
+  document.documentElement.style.setProperty('--day0-lines-z-index-mobile', DAY0_LINES_Z_INDEX_MOBILE);
   document.documentElement.style.setProperty('--day0-lines-z-index', DAY0_LINES_Z_INDEX);
+  document.documentElement.style.setProperty('--hi-bar-text-z-index-desktop', HI_BAR_TEXT_Z_INDEX_DESKTOP);
+  document.documentElement.style.setProperty('--hi-bar-text-z-index-mobile', HI_BAR_TEXT_Z_INDEX_MOBILE);
   document.documentElement.style.setProperty('--hi-bar-text-z-index', HI_BAR_TEXT_Z_INDEX);
 
   // --- CONFIG: Close Hi/Lo Temperature Layering (8-Day Forecast Bars) ---
@@ -6898,6 +6906,37 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SUN_IMAGE_BLEND_MODE_DESKTOP = 'lighten';     // EDITABLE Desktop: Blend mode on dark background ('lighten', 'screen', etc.)
   const SUN_IMAGE_BLEND_MODE_MOBILE = 'lighten';      // EDITABLE Mobile: Blend mode on dark background
 
+  // --- Sun Labels Config (JCV) ---
+  // Centered labels beneath each sun circle
+  const SUN_LABEL_ENABLED = true;                     // EDITABLE: Enable/disable centered labels under each sun
+  const SUN_LABEL_LEFT_TEXT = '27-Day Rotation';       // EDITABLE: Label under left rotating sun (e.g. '27-DAY ROTATION', '27-DAY CYCLE')
+  const SUN_LABEL_RIGHT_TEXT = 'Live';         // EDITABLE: Label under right sizzling sun (e.g. 'LIVE FLARES', 'LIVE ACTIVITY', 'REAL TIME')
+
+  const SUN_LABEL_FONT_SIZE_DESKTOP = '2.0vw';        // EDITABLE Desktop: Font size for sun labels
+  const SUN_LABEL_FONT_SIZE_MOBILE = '2.6vw';         // EDITABLE Mobile: Font size for sun labels
+
+  const SUN_LABEL_MARGIN_TOP_DESKTOP = '0.8vw';       // EDITABLE Desktop: Gap between sun circle and label
+  const SUN_LABEL_MARGIN_TOP_MOBILE = '1.2vw';        // EDITABLE Mobile: Gap between sun circle and label
+
+  const SUN_LABEL_FONT_FAMILY = "'light', sans-serif";// EDITABLE: Font family (matches UI aesthetic)
+  const SUN_LABEL_LETTER_SPACING_DESKTOP = '0.08vw';  // EDITABLE Desktop: Letter spacing / kerning
+  const SUN_LABEL_LETTER_SPACING_MOBILE = '0.06vw';   // EDITABLE Mobile: Letter spacing / kerning
+
+  const SUN_LABEL_COLOR = '#ffffff';                  // EDITABLE: Text color
+  const SUN_LABEL_OPACITY = '0.70';                   // EDITABLE: Opacity (0.0 to 1.0)
+  const SUN_LABEL_TEXT_TRANSFORM = 'capitalize';       // EDITABLE: 'uppercase', 'capitalize', 'none'
+
+  // Horizontal Nudge / Alignment Offsets (JCV)
+  // Positive nudges label to the right, negative nudges label to the left
+  const SUN_LABEL_OFFSET_X_DESKTOP = '0vw';        // EDITABLE Desktop: Global label horizontal nudge
+  const SUN_LABEL_OFFSET_X_MOBILE = '0vw';         // EDITABLE Mobile: Global label horizontal nudge
+
+  const SUN_LABEL_LEFT_OFFSET_X_DESKTOP = '0vw';   // EDITABLE Desktop: Left label specific horizontal nudge
+  const SUN_LABEL_LEFT_OFFSET_X_MOBILE = '0vw';    // EDITABLE Mobile: Left label specific horizontal nudge
+
+  const SUN_LABEL_RIGHT_OFFSET_X_DESKTOP = '0vw';  // EDITABLE Desktop: Right label specific horizontal nudge
+  const SUN_LABEL_RIGHT_OFFSET_X_MOBILE = '0vw';   // EDITABLE Mobile: Right label specific horizontal nudge
+
   function applySunImageConfig() {
     const isMobile = window.innerWidth <= 767;
     document.documentElement.style.setProperty('--sun-image-width-desktop', SUN_IMAGE_WIDTH_DESKTOP);
@@ -6939,6 +6978,35 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--sun-duo-gap-desktop', SUN_DUO_GAP_DESKTOP);
     document.documentElement.style.setProperty('--sun-duo-gap-mobile', SUN_DUO_GAP_MOBILE);
     document.documentElement.style.setProperty('--sun-duo-gap', isMobile ? SUN_DUO_GAP_MOBILE : SUN_DUO_GAP_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-label-font-size-desktop', SUN_LABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--sun-label-font-size-mobile', SUN_LABEL_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--sun-label-font-size', isMobile ? SUN_LABEL_FONT_SIZE_MOBILE : SUN_LABEL_FONT_SIZE_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-label-margin-top-desktop', SUN_LABEL_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--sun-label-margin-top-mobile', SUN_LABEL_MARGIN_TOP_MOBILE);
+    document.documentElement.style.setProperty('--sun-label-margin-top', isMobile ? SUN_LABEL_MARGIN_TOP_MOBILE : SUN_LABEL_MARGIN_TOP_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-label-letter-spacing-desktop', SUN_LABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--sun-label-letter-spacing-mobile', SUN_LABEL_LETTER_SPACING_MOBILE);
+    document.documentElement.style.setProperty('--sun-label-letter-spacing', isMobile ? SUN_LABEL_LETTER_SPACING_MOBILE : SUN_LABEL_LETTER_SPACING_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-label-offset-x-desktop', SUN_LABEL_OFFSET_X_DESKTOP);
+    document.documentElement.style.setProperty('--sun-label-offset-x-mobile', SUN_LABEL_OFFSET_X_MOBILE);
+    document.documentElement.style.setProperty('--sun-label-offset-x', isMobile ? SUN_LABEL_OFFSET_X_MOBILE : SUN_LABEL_OFFSET_X_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-label-left-offset-x-desktop', SUN_LABEL_LEFT_OFFSET_X_DESKTOP);
+    document.documentElement.style.setProperty('--sun-label-left-offset-x-mobile', SUN_LABEL_LEFT_OFFSET_X_MOBILE);
+    document.documentElement.style.setProperty('--sun-label-left-offset-x', isMobile ? SUN_LABEL_LEFT_OFFSET_X_MOBILE : SUN_LABEL_LEFT_OFFSET_X_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-label-right-offset-x-desktop', SUN_LABEL_RIGHT_OFFSET_X_DESKTOP);
+    document.documentElement.style.setProperty('--sun-label-right-offset-x-mobile', SUN_LABEL_RIGHT_OFFSET_X_MOBILE);
+    document.documentElement.style.setProperty('--sun-label-right-offset-x', isMobile ? SUN_LABEL_RIGHT_OFFSET_X_MOBILE : SUN_LABEL_RIGHT_OFFSET_X_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-label-font-family', SUN_LABEL_FONT_FAMILY);
+    document.documentElement.style.setProperty('--sun-label-color', SUN_LABEL_COLOR);
+    document.documentElement.style.setProperty('--sun-label-opacity', SUN_LABEL_OPACITY);
+    document.documentElement.style.setProperty('--sun-label-text-transform', SUN_LABEL_TEXT_TRANSFORM);
 
     document.documentElement.style.setProperty('--sun-animation-fps', String(SUN_ANIMATION_FPS));
     document.documentElement.style.setProperty('--sun-animation-days', String(SUN_ANIMATION_DAYS));
@@ -6982,7 +7050,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1127';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1134';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
@@ -10593,6 +10661,51 @@ Plan ahead for significantly warmer conditions tomorrow!`
       return { container: c, img: im };
     }
 
+    // Helper to build a vertical column containing the circular sun and its centered label
+    function buildSunColumn(colId, sunCircleObj, labelText, labelId) {
+      const col = document.createElement('div');
+      col.id = colId;
+      col.className = 'sun-column';
+      col.style.display = 'flex';
+      col.style.flexDirection = 'column';
+      col.style.alignItems = 'center';
+      col.style.justifyContent = 'flex-start';
+      col.style.width = 'var(--sun-image-width, 34vw)';
+      col.style.position = 'relative';
+      col.style.flexShrink = '0';
+      col.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
+
+      col.appendChild(sunCircleObj.container);
+
+      if (SUN_LABEL_ENABLED && labelText) {
+        const isLeft = colId === 'sun-col-left';
+        const lbl = document.createElement('div');
+        lbl.id = labelId;
+        lbl.className = 'sun-label';
+        lbl.textContent = labelText;
+        lbl.style.width = '100%';
+        lbl.style.maxWidth = '100%';
+        lbl.style.display = 'block';
+        lbl.style.fontFamily = "var(--sun-label-font-family, 'light', sans-serif)";
+        lbl.style.fontSize = 'var(--sun-label-font-size, 2.0vw)';
+        lbl.style.letterSpacing = 'var(--sun-label-letter-spacing, 0.08vw)';
+        lbl.style.paddingLeft = 'var(--sun-label-letter-spacing, 0.08vw)'; // Balances trailing letter spacing
+        lbl.style.color = 'var(--sun-label-color, #ffffff)';
+        lbl.style.opacity = 'var(--sun-label-opacity, 0.70)';
+        lbl.style.textTransform = 'var(--sun-label-text-transform, capitalize)';
+        lbl.style.marginTop = 'var(--sun-label-margin-top, 0.8vw)';
+        lbl.style.textAlign = 'center';
+        lbl.style.whiteSpace = 'nowrap';
+        lbl.style.userSelect = 'none';
+        lbl.style.lineHeight = '1.2';
+        lbl.style.boxSizing = 'border-box';
+        lbl.style.transform = `translateX(calc(var(--sun-label-offset-x, 0vw) + var(--sun-label-${isLeft ? 'left' : 'right'}-offset-x, 0vw)))`;
+        col.appendChild(lbl);
+      }
+
+      return col;
+    }
+
     // Left Sun (27-Day Rotation Loop)
     const leftSun = buildSunCircle(
       'sun-image-container',
@@ -10600,6 +10713,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       SUN_IMAGE_URL,
       'Live Sunspot & Coronal 27-Day Rotation Animation from GOES-19 SUVI Fe195'
     );
+    const leftCol = buildSunColumn('sun-col-left', leftSun, SUN_LABEL_LEFT_TEXT, 'sun-label-left');
 
     let mainWrapper = null;
     let rightSun = null;
@@ -10612,12 +10726,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
       mainWrapper.style.display = 'flex';
       mainWrapper.style.flexDirection = 'row';
       mainWrapper.style.justifyContent = 'center';
-      mainWrapper.style.alignItems = 'center';
+      mainWrapper.style.alignItems = 'flex-start';
       mainWrapper.style.width = '100%';
       mainWrapper.style.gap = 'var(--sun-duo-gap, 3vw)';
       mainWrapper.style.margin = 'var(--sun-image-margin-top, 2vw) auto 0';
       mainWrapper.style.opacity = '0';
       mainWrapper.style.transition = 'opacity 1s ease';
+      mainWrapper.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
 
       rightSun = buildSunCircle(
         'sun-image-container-right',
@@ -10625,14 +10740,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
         SUN_SIZZLE_FRAMES_SEED[SUN_SIZZLE_FRAMES_SEED.length - 1] || SUN_IMAGE_URL,
         'Live Sizzling Solar Flare Activity from GOES-19 SUVI Fe195'
       );
+      const rightCol = buildSunColumn('sun-col-right', rightSun, SUN_LABEL_RIGHT_TEXT, 'sun-label-right');
 
-      mainWrapper.appendChild(leftSun.container);
-      mainWrapper.appendChild(rightSun.container);
+      mainWrapper.appendChild(leftCol);
+      mainWrapper.appendChild(rightCol);
     } else {
       // Single Sun Mode
-      leftSun.container.classList.add('single-mode');
-      leftSun.container.style.margin = 'var(--sun-image-margin-top, 2vw) auto 0';
-      mainWrapper = leftSun.container;
+      leftCol.classList.add('single-mode');
+      leftCol.style.margin = 'var(--sun-image-margin-top, 2vw) auto 0';
+      leftCol.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
+      mainWrapper = leftCol;
     }
 
     // Dedicated spacer to prevent margin collapse at bottom
@@ -11839,15 +11956,27 @@ Plan ahead for significantly warmer conditions tomorrow!`
         item.style.zIndex = '10'; // Bring in front of low bar (which is z-index 2)
         item.classList.add('animating-change');
         
+        const setHiItemContent = (el, isDay0, html) => {
+          if (isDay0) {
+            const linesEl = el.querySelector('#day0-temp-lines');
+            el.innerHTML = html;
+            if (linesEl) {
+              el.insertBefore(linesEl, el.firstChild);
+            }
+          } else {
+            el.innerHTML = html;
+          }
+        };
+
         // Populate the OLD temperature text initially
         const oldHiTempDisplay = displayUnit === 'C' ? Math.round((oldHiTemp - 32) * 5 / 9) : oldHiTemp;
         if (displayUnit === 'BOTH') {
           const oldHiTempC = Math.round((oldHiTemp - 32) * 5 / 9);
           const colorStyle = oldHiTemp >= 100 ? 'color: hsl(30, 100%, 50%) !important;' : 'color: var(--theBrown);';
-          item.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: var(--hi-bar-text-z-index, 25); top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${oldHiTemp}${formatSlash()}${oldHiTempC}</span>`;
+          setHiItemContent(item, index === 0, `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: var(--hi-bar-text-z-index, 25); top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${oldHiTemp}${formatSlash()}${oldHiTempC}</span>`);
         } else {
           const colorStyle = oldHiTemp >= 100 ? 'style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: var(--hi-bar-text-z-index, 25);"' : 'style="color: var(--theBrown); position: relative; z-index: var(--hi-bar-text-z-index, 25);"';
-          item.innerHTML = `<span ${colorStyle}>${oldHiTempDisplay}°</span>`;
+          setHiItemContent(item, index === 0, `<span ${colorStyle}>${oldHiTempDisplay}°</span>`);
         }
         item.style.backgroundColor = tempToColor(oldHiTemp) || '';
         item.style.opacity = '1';
@@ -11871,10 +12000,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
           if (displayUnit === 'BOTH') {
             const hiTempC = Math.round((hiTempF - 32) * 5 / 9);
             const colorStyle = hiTempF >= 100 ? 'color: hsl(30, 100%, 50%) !important;' : 'color: var(--theBrown);';
-            item.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: var(--hi-bar-text-z-index, 25); top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${hiTempF}${formatSlash()}${hiTempC}</span>`;
+            setHiItemContent(item, index === 0, `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: var(--hi-bar-text-z-index, 25); top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${hiTempF}${formatSlash()}${hiTempC}</span>`);
           } else {
             const colorStyle = hiTempF >= 100 ? 'style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: var(--hi-bar-text-z-index, 25);"' : 'style="color: var(--theBrown); position: relative; z-index: var(--hi-bar-text-z-index, 25);"';
-            item.innerHTML = `<span ${colorStyle}>${hiTempDisplay}°</span>`;
+            setHiItemContent(item, index === 0, `<span ${colorStyle}>${hiTempDisplay}°</span>`);
           }
           
           // Animate back up to the new high cell height
@@ -11899,13 +12028,24 @@ Plan ahead for significantly warmer conditions tomorrow!`
       } else {
         // Normal update (non-animated)
         item.style.height = `calc(${MIN_TEMP_BAR_HEIGHT_VW}vw + (100% - ${MIN_TEMP_BAR_HEIGHT_VW}vw) * ${hiRatio})`;
+        const setHiItemContent = (el, isDay0, html) => {
+          if (isDay0) {
+            const linesEl = el.querySelector('#day0-temp-lines');
+            el.innerHTML = html;
+            if (linesEl) {
+              el.insertBefore(linesEl, el.firstChild);
+            }
+          } else {
+            el.innerHTML = html;
+          }
+        };
         if (displayUnit === 'BOTH') {
           const hiTempC = Math.round((hiTempF - 32) * 5 / 9);
           const colorStyle = hiTempF >= 100 ? 'color: hsl(30, 100%, 50%) !important;' : 'color: var(--theBrown);';
-          item.innerHTML = `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: var(--hi-bar-text-z-index, 25); top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${hiTempF}${formatSlash()}${hiTempC}</span>`;
+          setHiItemContent(item, index === 0, `<span class="fc-mode-text" style="font-family: 'boldcond', sans-serif; font-size: ${DUAL_BAR_FONT_SIZE} !important; line-height: ${DUAL_BAR_LINE_HEIGHT} !important; position: relative; z-index: var(--hi-bar-text-z-index, 25); top: ${DUAL_BAR_TOP_OFFSET}; ${colorStyle}">${hiTempF}${formatSlash()}${hiTempC}</span>`);
         } else {
           const colorStyle = hiTempF >= 100 ? 'style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: var(--hi-bar-text-z-index, 25);"' : 'style="color: var(--theBrown); position: relative; z-index: var(--hi-bar-text-z-index, 25);"';
-          item.innerHTML = `<span ${colorStyle}>${hiTempDisplay}°</span>`;
+          setHiItemContent(item, index === 0, `<span ${colorStyle}>${hiTempDisplay}°</span>`);
         }
         item.style.backgroundColor = tempToColor(hiTempF) || '';
         item.style.opacity = '1';
@@ -12179,12 +12319,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
       linesContainer = document.createElement('div');
       linesContainer.id = 'day0-temp-lines';
       linesContainer.className = 'day0-temp-lines';
-      const pointer = document.getElementById('temp-pointer');
-      if (pointer && pointer.parentNode) {
-        pointer.parentNode.insertBefore(linesContainer, pointer);
-      } else {
-        dualContainer.appendChild(linesContainer);
-      }
+      hiItem.insertBefore(linesContainer, hiItem.firstChild);
+    } else if (!hiItem.contains(linesContainer)) {
+      hiItem.insertBefore(linesContainer, hiItem.firstChild);
     }
 
     const containerRect = dualContainer.getBoundingClientRect();
@@ -12202,7 +12339,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
     }
 
     // Mathematical fallback if DOM layout measurements are not yet settled (barRange <= 0)
-    let collapseTopY = loTop - containerRect.top;
     if (barRange <= 0 || containerRect.height <= 0) {
       const range = tempRangeMax - tempRangeMin;
       const hiRatio = range > 0 ? (hiTemp - tempRangeMin) / range : 0.5;
@@ -12212,14 +12348,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const targetHiHeight = minHeightPx + availableH * hiRatio;
       const loHeight = minHeightPx + availableH * loRatio;
       barRange = Math.max(1, targetHiHeight - loHeight);
-      collapseTopY = ((hiRect.bottom || loRect.bottom) - containerRect.top) - loHeight;
     }
 
     const isMobile = window.innerWidth <= 767;
     const lineHeight = isMobile ? DAY0_LINES_HEIGHT_MOBILE : DAY0_LINES_HEIGHT_DESKTOP;
     const lineOpacity = isMobile ? DAY0_LINES_OPACITY_MOBILE : DAY0_LINES_OPACITY_DESKTOP;
-    const lineLeft = hiRect.left - containerRect.left;
-    const lineWidth = hiRect.width;
 
     // The color of the horizontal line
     let defaultLineColor;
@@ -12264,7 +12397,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       const tempF = isCelsius ? (deg * 9 / 5) + 32 : deg;
       const ratio = Math.max(0, Math.min(1, (tempF - loTemp) / tempRange));
-      const lineY = collapseTopY - (ratio * barRange);
+      const lineY = (1 - ratio) * barRange;
 
       let lineColor = defaultLineColor;
       if (DAY0_LINES_COLOR_MODE === 'line_temp') {
@@ -12276,8 +12409,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }
 
       line.classList.remove('animating-change');
-      line.style.left = `${lineLeft}px`;
-      line.style.width = `${lineWidth}px`;
+      line.style.left = '0';
+      line.style.width = '100%';
       line.style.top = `${lineY}px`;
       line.style.height = lineHeight;
       line.style.transform = 'translateY(-50%)';
@@ -12287,24 +12420,31 @@ Plan ahead for significantly warmer conditions tomorrow!`
       line.setAttribute('data-temp', deg);
       line.title = `${deg}°`;
     });
+
+    // Ensure the temperature text span in hiItem sits above the lines
+    const span = hiItem.querySelector('span');
+    if (span) {
+      span.style.position = 'relative';
+      span.style.zIndex = 'var(--hi-bar-text-z-index, 25)';
+    }
   }
 
   // EDITABLE: Animate Day 0 10° lines down to low cell top during bar dip animation
   function animateDay0TempLinesDown() {
     if (!DAY0_LINES_ENABLED || !DAY0_LINES_ANIMATE_WITH_BAR) return;
     const linesContainer = document.getElementById('day0-temp-lines');
+    const hiItem = document.querySelector('.hiItem-0');
     const loItem = document.querySelector('.loItem-0');
-    const dualContainer = document.querySelector('.dualContainer');
-    if (!linesContainer || !loItem || !dualContainer) return;
+    if (!linesContainer || !hiItem || !loItem) return;
 
     const loRect = loItem.getBoundingClientRect();
-    const containerRect = dualContainer.getBoundingClientRect();
-    const collapseTopY = loRect.top - containerRect.top;
+    const hiRect = hiItem.getBoundingClientRect();
+    const collapseY = Math.max(0, loRect.top - hiRect.top);
 
     const lines = linesContainer.querySelectorAll('.day0-temp-line');
     lines.forEach(line => {
       line.classList.add('animating-change');
-      line.style.top = `${collapseTopY}px`;
+      line.style.top = `${collapseY}px`;
       line.style.opacity = '0';
     });
   }
@@ -12327,11 +12467,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
       updateDay0TempLines(data);
       return;
     }
+    if (!hiItem.contains(linesContainer)) {
+      hiItem.insertBefore(linesContainer, hiItem.firstChild);
+    }
 
     const containerRect = dualContainer.getBoundingClientRect();
     const loRect = loItem.getBoundingClientRect();
     const hiRect = hiItem.getBoundingClientRect();
-    const collapseTopY = loRect.top - containerRect.top;
 
     const tempRange = hiTemp - loTemp;
     if (tempRange <= 0) return;
@@ -12347,8 +12489,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
     const isMobile = window.innerWidth <= 767;
     const lineHeight = isMobile ? DAY0_LINES_HEIGHT_MOBILE : DAY0_LINES_HEIGHT_DESKTOP;
-    const lineLeft = hiRect.left - containerRect.left;
-    const lineWidth = hiRect.width;
 
     let defaultLineColor;
     if (DAY0_LINES_CUSTOM_COLOR) {
@@ -12388,11 +12528,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const line = lineElements[i];
       if (!line) return;
       line.classList.remove('animating-change');
-      line.style.left = `${lineLeft}px`;
-      line.style.width = `${lineWidth}px`;
+      line.style.left = '0';
+      line.style.width = '100%';
       line.style.height = lineHeight;
       line.style.transform = 'translateY(-50%)';
-      line.style.top = `${collapseTopY}px`;
+      line.style.top = `${targetBarRange}px`;
       line.style.opacity = '0';
 
       const tempF = isCelsius ? (deg * 9 / 5) + 32 : deg;
@@ -12419,7 +12559,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       const tempF = isCelsius ? (deg * 9 / 5) + 32 : deg;
       const ratio = Math.max(0, Math.min(1, (tempF - loTemp) / tempRange));
-      const targetLineY = collapseTopY - (ratio * targetBarRange);
+      const targetLineY = (1 - ratio) * targetBarRange;
 
       const lineOpacity = isMobile ? DAY0_LINES_OPACITY_MOBILE : DAY0_LINES_OPACITY_DESKTOP;
       line.classList.add('animating-change');
@@ -13358,6 +13498,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
         if (sunsRow) sunsRow.style.opacity = 'var(--sun-image-opacity, 1)';
         const sunRight = document.getElementById('sun-image-container-right');
         if (sunRight) sunRight.style.opacity = 'var(--sun-image-opacity, 1)';
+        const sunColLeft = document.getElementById('sun-col-left');
+        if (sunColLeft) sunColLeft.style.opacity = '1';
+        const sunColRight = document.getElementById('sun-col-right');
+        if (sunColRight) sunColRight.style.opacity = '1';
         const earth = document.getElementById('earth-image-container');
         if (earth) earth.style.opacity = '1';
         const lastUpd = document.getElementById('weather-last-updated');
@@ -13987,6 +14131,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--circle-cell-top', isMobile ? CIRCLE_CELL_TOP_MOBILE : CIRCLE_CELL_TOP_DESKTOP);
     document.documentElement.style.setProperty('--fragile-y-offset', isMobile ? FRAGILE_ELEMENTS_Y_OFFSET_MOBILE : FRAGILE_ELEMENTS_Y_OFFSET_DESKTOP);
     document.documentElement.style.setProperty('--day0-lines-opacity', isMobile ? DAY0_LINES_OPACITY_MOBILE : DAY0_LINES_OPACITY_DESKTOP);
+    document.documentElement.style.setProperty('--day0-lines-z-index', isMobile ? DAY0_LINES_Z_INDEX_MOBILE : DAY0_LINES_Z_INDEX_DESKTOP);
+    document.documentElement.style.setProperty('--hi-bar-text-z-index', isMobile ? HI_BAR_TEXT_Z_INDEX_MOBILE : HI_BAR_TEXT_Z_INDEX_DESKTOP);
     if (lastWeatherData) {
       // Delay to ensure DOM has settled after resize
       setTimeout(() => {
