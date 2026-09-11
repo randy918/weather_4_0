@@ -1481,6 +1481,9 @@ main {
     --sun-mask-position-y: var(--sun-mask-position-y-desktop, 50%);
     --sun-image-opacity: var(--sun-image-opacity-desktop, 1);
     --sun-image-blend-mode: var(--sun-image-blend-mode-desktop, lighten);
+    --sun-duo-gap: var(--sun-duo-gap-desktop, 3vw);
+    --sun-trio-gap: var(--sun-trio-gap-desktop, 2vw);
+    --sun-row-gap: var(--sun-trio-gap, var(--sun-duo-gap, 2vw));
 
     /* Doppler Radar Experiment: "Lighten Only" HUD overlay on the page background */
     /* Option A: Lighten HUD Overlay on page background (Default) */
@@ -1539,6 +1542,9 @@ main {
         --sun-mask-position-y: var(--sun-mask-position-y-mobile, 50%);
         --sun-image-opacity: var(--sun-image-opacity-mobile, 1);
         --sun-image-blend-mode: var(--sun-image-blend-mode-mobile, lighten);
+        --sun-duo-gap: var(--sun-duo-gap-mobile, 2vw);
+        --sun-trio-gap: var(--sun-trio-gap-mobile, 2vw);
+        --sun-row-gap: var(--sun-trio-gap, var(--sun-duo-gap, 2vw));
     }
 
     .grid-wind-speed-text {
@@ -1592,6 +1598,9 @@ main {
         --sun-mask-position-y: var(--sun-mask-position-y-desktop, 50%);
         --sun-image-opacity: var(--sun-image-opacity-desktop, 1);
         --sun-image-blend-mode: var(--sun-image-blend-mode-desktop, lighten);
+        --sun-duo-gap: var(--sun-duo-gap-desktop, 3vw);
+        --sun-trio-gap: var(--sun-trio-gap-desktop, 2vw);
+        --sun-row-gap: var(--sun-trio-gap, var(--sun-duo-gap, 2vw));
     }
     .clockGridContainer7,
     .clockGridLabelsContainer7 {
@@ -1808,11 +1817,23 @@ main {
     }
 }
 
-// Live Sun Image (GOES-19 SUVI Fe195 Å)
-#sun-image-container {
+// Live Sun Image & Sizzling Sun Duo Mode (GOES-19 SUVI Fe195 Å)
+#suns-row-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    gap: var(--sun-duo-gap, 3vw);
+    margin: var(--sun-image-margin-top, 2vw) auto 0;
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+#sun-image-container,
+#sun-image-container-right {
     width: var(--sun-image-width, 34vw);
     height: var(--sun-image-width, 34vw);
-    margin: var(--sun-image-margin-top, 2vw) auto 0;
     border-radius: 50%;
     overflow: hidden;
     clip-path: circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%));
@@ -1821,9 +1842,15 @@ main {
     opacity: 0;
     transition: opacity 1s ease;
     mix-blend-mode: var(--sun-image-blend-mode, lighten);
+    flex-shrink: 0;
 }
 
-#sun-image {
+#sun-image-container.single-mode {
+    margin: var(--sun-image-margin-top, 2vw) auto 0;
+}
+
+#sun-image,
+#sun-image-right {
     width: var(--sun-image-inner-scale, 108%);
     height: var(--sun-image-inner-scale, 108%);
     position: absolute;

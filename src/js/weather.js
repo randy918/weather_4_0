@@ -6799,14 +6799,19 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const MOON_LABEL_FONT_SIZE = '4.5vw'; // EDITABLE: Font size for moon labels
   const MOON_MARGIN_BOTTOM = '-8vw';    // EDITABLE: Gap below the moon dots row
 
-  // --- Live Sun Image & 27-Day Animation Config (GOES-19 SUVI Fe195 Å) ---
+  // --- Live Sun Image & Solar Animation Config (GOES-19 SUVI Fe195 Å) ---
   // Live Sunspot & Coronal image from NOAA GOES-19 Solar Ultraviolet Imager
   // Band: Fe195 Å (Iron XII, 195 Ångströms, signature orange-red)
   // Website: https://www.star.nesdis.noaa.gov/goes/SUVI_band.php?sat=G19&band=Fe195&length=60
   const SUN_IMAGE_BASE_URL = 'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/';
   const SUN_IMAGE_URL = 'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/latest.jpg';
 
-  // Animation Controls (JCV)
+  // Duo Sun Mode (Side-by-Side) Controls (JCV)
+  const SUN_DUO_MODE = true;                          // EDITABLE: true = two suns side-by-side (Left: 27-day, Right: Sizzling); false = single sun
+  const SUN_DUO_GAP_DESKTOP = '3vw';                  // EDITABLE Desktop: Gap between the two side-by-side suns
+  const SUN_DUO_GAP_MOBILE = '2vw';                   // EDITABLE Mobile: Gap between the two side-by-side suns
+
+  // Left Sun: 27-Day Solar Rotation Animation Controls (JCV)
   const SUN_ANIMATION_ENABLED = true;                 // EDITABLE: Enable/disable time-span rotation animation
   const SUN_ANIMATION_DAYS = 27;                      // EDITABLE: Number of data days in time span (27 = full solar synodic rotation)
   const SUN_ANIMATION_FPS = 6;                        // EDITABLE: Frames per second (playback speed, e.g. 6 = ~4.5s per rotation cycle)
@@ -6842,6 +6847,27 @@ Plan ahead for significantly warmer conditions tomorrow!`
     '20262521200415_GOES19-SUVI-Fe195-600x600.jpg',
     '20262531200445_GOES19-SUVI-Fe195-600x600.jpg',
     'latest.jpg'
+  ];
+
+  // Right Sun ("Sizzling Current Sun") Controls (JCV)
+  // Plays back recent rapid frames back-and-forth (ping-pong: 1..32..1) to show live solar flare activity
+  const SUN_SIZZLE_ENABLED = true;                    // EDITABLE: Enable/disable animation for right sizzling sun
+  const SUN_SIZZLE_FRAME_COUNT = 32;                  // EDITABLE: Number of recent frames to loop (e.g. 32, or user can pick fewer like 8, 16)
+  const SUN_SIZZLE_FPS = 16;                          // EDITABLE: Playback speed in frames per second (e.g. 16 fps for sizzling flare dynamics)
+  const SUN_SIZZLE_PAUSE_END_MS = 150;                // EDITABLE: Pause in ms at ends (frame 1 and frame 32) before reversing direction (0 for instant)
+  const SUN_SIZZLE_PLAYBACK_MODE = 'pingpong';        // EDITABLE: 'pingpong' (1..32..1) or 'forward' (1..32, 1..32)
+  const SUN_SIZZLE_AUTO_REFRESH_MS = 3 * 60 * 1000;   // EDITABLE: Auto-fetch fresh SUVI frames every 3 minutes
+
+  // Seed list of latest real-time NOAA SUVI Fe195 frames (50-70s cadence)
+  const SUN_SIZZLE_FRAMES_SEED = [
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262540049360_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262540050461_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262540051561_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262540052461_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262540053361_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262540054461_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262540055561_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262540056461_GOES19-SUVI-Fe195-600x600.jpg'
   ];
 
   // Sizing & Layout (Half size per user request)
@@ -6910,8 +6936,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--sun-image-blend-mode-mobile', SUN_IMAGE_BLEND_MODE_MOBILE);
     document.documentElement.style.setProperty('--sun-image-blend-mode', isMobile ? SUN_IMAGE_BLEND_MODE_MOBILE : SUN_IMAGE_BLEND_MODE_DESKTOP);
 
+    document.documentElement.style.setProperty('--sun-duo-gap-desktop', SUN_DUO_GAP_DESKTOP);
+    document.documentElement.style.setProperty('--sun-duo-gap-mobile', SUN_DUO_GAP_MOBILE);
+    document.documentElement.style.setProperty('--sun-duo-gap', isMobile ? SUN_DUO_GAP_MOBILE : SUN_DUO_GAP_DESKTOP);
+
     document.documentElement.style.setProperty('--sun-animation-fps', String(SUN_ANIMATION_FPS));
     document.documentElement.style.setProperty('--sun-animation-days', String(SUN_ANIMATION_DAYS));
+    document.documentElement.style.setProperty('--sun-sizzle-fps', String(SUN_SIZZLE_FPS));
+    document.documentElement.style.setProperty('--sun-sizzle-frame-count', String(SUN_SIZZLE_FRAME_COUNT));
   }
   applySunImageConfig();
   window.addEventListener('resize', applySunImageConfig);
@@ -6950,7 +6982,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1120';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1127';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Font style & size (default style/size of "Tulsa" / "Traverse City", which is 5vw)
@@ -10518,45 +10550,92 @@ Plan ahead for significantly warmer conditions tomorrow!`
     mainClock.addEventListener('click', handleTimeDialReset);
   }
 
-  /* --- Live Sun Image & 27-Day Rotation Animation (NOAA GOES-19 SUVI Fe195 Å) --- */
+  /* --- Live Sun Image & Solar Animations (NOAA GOES-19 SUVI Fe195 Å) --- */
   let sunAnimationTimeoutId = null;
+  let sunSizzleTimeoutId = null;
 
   function createSunImageIfMissing() {
-    if (document.getElementById('sun-image-container')) return;
+    if (document.getElementById('sun-image-container') || document.getElementById('suns-row-wrapper')) return;
 
-    const container = document.createElement('div');
-    container.id = 'sun-image-container';
-    container.className = 'sun-image-container';
-    container.style.width = 'var(--sun-image-width, 34vw)';
-    container.style.height = 'var(--sun-image-width, 34vw)';
-    container.style.margin = 'var(--sun-image-margin-top, 2vw) auto 0';
-    container.style.borderRadius = '50%';
-    container.style.overflow = 'hidden';
-    container.style.clipPath = 'circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%))';
-    container.style.WebkitClipPath = 'circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%))';
-    container.style.position = 'relative';
-    container.style.opacity = '0';
-    container.style.transition = 'opacity 1s ease';
-    container.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
+    // Helper to build a styled circular sun element
+    function buildSunCircle(containerId, imgId, initialUrl, altText) {
+      const c = document.createElement('div');
+      c.id = containerId;
+      c.className = 'sun-image-container';
+      c.style.width = 'var(--sun-image-width, 34vw)';
+      c.style.height = 'var(--sun-image-width, 34vw)';
+      c.style.borderRadius = '50%';
+      c.style.overflow = 'hidden';
+      c.style.clipPath = 'circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%))';
+      c.style.WebkitClipPath = 'circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%))';
+      c.style.position = 'relative';
+      c.style.opacity = '0';
+      c.style.transition = 'opacity 1s ease';
+      c.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
+      c.style.flexShrink = '0';
 
-    const img = document.createElement('img');
-    img.id = 'sun-image';
-    img.className = 'sun-image';
-    img.src = SUN_IMAGE_URL;
-    img.alt = 'Live Sunspot & Coronal 27-Day Rotation Animation from GOES-19 SUVI Fe195';
-    img.style.width = 'var(--sun-image-inner-scale, 108%)';
-    img.style.height = 'var(--sun-image-inner-scale, 108%)';
-    img.style.position = 'absolute';
-    img.style.top = 'var(--sun-image-offset-y, -1%)';
-    img.style.left = '50%';
-    img.style.transform = 'translateX(-50%)';
-    img.style.objectFit = 'cover';
-    img.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
-    img.style.display = 'block';
+      const im = document.createElement('img');
+      im.id = imgId;
+      im.className = 'sun-image';
+      im.src = initialUrl;
+      im.alt = altText;
+      im.style.width = 'var(--sun-image-inner-scale, 108%)';
+      im.style.height = 'var(--sun-image-inner-scale, 108%)';
+      im.style.position = 'absolute';
+      im.style.top = 'var(--sun-image-offset-y, -1%)';
+      im.style.left = '50%';
+      im.style.transform = 'translateX(-50%)';
+      im.style.objectFit = 'cover';
+      im.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
+      im.style.display = 'block';
 
-    container.appendChild(img);
+      c.appendChild(im);
+      return { container: c, img: im };
+    }
 
-    // Dedicated spacer to prevent margin collapse
+    // Left Sun (27-Day Rotation Loop)
+    const leftSun = buildSunCircle(
+      'sun-image-container',
+      'sun-image',
+      SUN_IMAGE_URL,
+      'Live Sunspot & Coronal 27-Day Rotation Animation from GOES-19 SUVI Fe195'
+    );
+
+    let mainWrapper = null;
+    let rightSun = null;
+
+    if (SUN_DUO_MODE) {
+      // Duo Mode: Side-by-side row wrapper
+      mainWrapper = document.createElement('div');
+      mainWrapper.id = 'suns-row-wrapper';
+      mainWrapper.className = 'suns-row-wrapper';
+      mainWrapper.style.display = 'flex';
+      mainWrapper.style.flexDirection = 'row';
+      mainWrapper.style.justifyContent = 'center';
+      mainWrapper.style.alignItems = 'center';
+      mainWrapper.style.width = '100%';
+      mainWrapper.style.gap = 'var(--sun-duo-gap, 3vw)';
+      mainWrapper.style.margin = 'var(--sun-image-margin-top, 2vw) auto 0';
+      mainWrapper.style.opacity = '0';
+      mainWrapper.style.transition = 'opacity 1s ease';
+
+      rightSun = buildSunCircle(
+        'sun-image-container-right',
+        'sun-image-right',
+        SUN_SIZZLE_FRAMES_SEED[SUN_SIZZLE_FRAMES_SEED.length - 1] || SUN_IMAGE_URL,
+        'Live Sizzling Solar Flare Activity from GOES-19 SUVI Fe195'
+      );
+
+      mainWrapper.appendChild(leftSun.container);
+      mainWrapper.appendChild(rightSun.container);
+    } else {
+      // Single Sun Mode
+      leftSun.container.classList.add('single-mode');
+      leftSun.container.style.margin = 'var(--sun-image-margin-top, 2vw) auto 0';
+      mainWrapper = leftSun.container;
+    }
+
+    // Dedicated spacer to prevent margin collapse at bottom
     const spacer = document.createElement('div');
     spacer.id = 'sun-image-spacer';
     spacer.className = 'sun-image-spacer';
@@ -10571,32 +10650,29 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const secondGauge = document.querySelector('.second-gauge-container');
 
     if (earthContainer && earthContainer.parentNode) {
-      earthContainer.parentNode.insertBefore(container, earthContainer);
+      earthContainer.parentNode.insertBefore(mainWrapper, earthContainer);
       earthContainer.parentNode.insertBefore(spacer, earthContainer);
     } else if (locSwitcher && locSwitcher.parentNode) {
-      locSwitcher.parentNode.insertBefore(container, locSwitcher);
+      locSwitcher.parentNode.insertBefore(mainWrapper, locSwitcher);
       locSwitcher.parentNode.insertBefore(spacer, locSwitcher);
     } else if (missingAssets && missingAssets.parentNode) {
-      missingAssets.parentNode.insertBefore(container, missingAssets);
+      missingAssets.parentNode.insertBefore(mainWrapper, missingAssets);
       missingAssets.parentNode.insertBefore(spacer, missingAssets);
     } else if (lastUpdated && lastUpdated.parentNode) {
-      lastUpdated.parentNode.insertBefore(container, lastUpdated);
+      lastUpdated.parentNode.insertBefore(mainWrapper, lastUpdated);
       lastUpdated.parentNode.insertBefore(spacer, lastUpdated);
     } else if (secondGauge && secondGauge.parentNode) {
-      secondGauge.parentNode.insertBefore(container, secondGauge.nextSibling);
-      secondGauge.parentNode.insertBefore(spacer, container.nextSibling);
+      secondGauge.parentNode.insertBefore(mainWrapper, secondGauge.nextSibling);
+      secondGauge.parentNode.insertBefore(spacer, mainWrapper.nextSibling);
     } else {
       const parent = document.querySelector('main') || document.body;
-      parent.appendChild(container);
+      parent.appendChild(mainWrapper);
       parent.appendChild(spacer);
     }
 
-    // --- 27-Day Repeating Solar Rotation Animation Engine ---
+    // --- Left Sun: 27-Day Repeating Solar Rotation Animation Engine ---
     if (SUN_ANIMATION_ENABLED && Array.isArray(SUN_ANIMATION_FRAMES) && SUN_ANIMATION_FRAMES.length > 0) {
-      // Limit to configured number of days (e.g. 27 for full solar rotation)
       const activeFrameNames = SUN_ANIMATION_FRAMES.slice(-Math.max(1, SUN_ANIMATION_DAYS));
-
-      // Build URLs based on selected resolution
       const frameUrls = activeFrameNames.map(name => {
         let fn = name;
         if (SUN_ANIMATION_RESOLUTION === '300x300' && fn.includes('600x600')) {
@@ -10605,7 +10681,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
         return fn === 'latest.jpg' ? (SUN_IMAGE_URL + '?t=' + Date.now()) : (SUN_IMAGE_BASE_URL + fn);
       });
 
-      // Preload all frames in memory for smooth, flicker-free playback
       const preloadedImages = [];
       let loadedCount = 0;
 
@@ -10613,39 +10688,121 @@ Plan ahead for significantly warmer conditions tomorrow!`
         const pImg = new Image();
         pImg.onload = () => {
           loadedCount++;
-          // Start animation loop once first few frames are ready
           if (loadedCount >= Math.min(3, frameUrls.length) && !sunAnimationTimeoutId) {
-            runAnimationLoop();
+            runLeftAnimationLoop();
           }
         };
-        pImg.onerror = () => {
-          loadedCount++;
-        };
+        pImg.onerror = () => { loadedCount++; };
         pImg.src = url;
         preloadedImages.push(pImg);
       });
 
       let currentFrameIndex = 0;
-      function runAnimationLoop() {
+      function runLeftAnimationLoop() {
         if (!SUN_ANIMATION_ENABLED || preloadedImages.length <= 1) return;
 
         const nextImg = preloadedImages[currentFrameIndex];
         if (nextImg && (nextImg.complete || nextImg.naturalWidth > 0)) {
-          img.src = nextImg.src;
+          leftSun.img.src = nextImg.src;
         }
 
         const isLastFrame = currentFrameIndex === preloadedImages.length - 1;
         currentFrameIndex = (currentFrameIndex + 1) % preloadedImages.length;
 
-        // Pause on the latest live frame before repeating loop
         const delay = isLastFrame ? SUN_ANIMATION_LOOP_PAUSE_MS : Math.round(1000 / SUN_ANIMATION_FPS);
-        sunAnimationTimeoutId = setTimeout(runAnimationLoop, delay);
+        sunAnimationTimeoutId = setTimeout(runLeftAnimationLoop, delay);
       }
     } else {
-      // Fallback: periodic refresh of single image every 5 minutes
       setInterval(() => {
-        img.src = SUN_IMAGE_URL + '?t=' + Date.now();
+        leftSun.img.src = SUN_IMAGE_URL + '?t=' + Date.now();
       }, 5 * 60 * 1000);
+    }
+
+    // --- Right Sun: Sizzling Ping-Pong Animation Engine (1..32..1) ---
+    if (SUN_DUO_MODE && rightSun && SUN_SIZZLE_ENABLED) {
+      let currentSizzleUrls = [...SUN_SIZZLE_FRAMES_SEED];
+      let preloadedSizzleImages = [];
+
+      function setupSizzleFrames(urls) {
+        const frameLimit = Math.max(2, SUN_SIZZLE_FRAME_COUNT);
+        const selectedUrls = urls.slice(-frameLimit).map(u => {
+          if (SUN_ANIMATION_RESOLUTION === '300x300') {
+            return u.replace('600x600', '300x300');
+          }
+          return u;
+        });
+
+        preloadedSizzleImages = selectedUrls.map(u => {
+          const imgObj = new Image();
+          imgObj.src = u;
+          return imgObj;
+        });
+
+        if (!sunSizzleTimeoutId && preloadedSizzleImages.length > 1) {
+          startSizzleLoop();
+        }
+      }
+
+      let sizzleIndex = 0;
+      let sizzleDirection = 1; // 1 = forward, -1 = backward
+
+      function startSizzleLoop() {
+        if (!SUN_SIZZLE_ENABLED || preloadedSizzleImages.length <= 1) return;
+
+        const curImg = preloadedSizzleImages[sizzleIndex];
+        if (curImg && (curImg.complete || curImg.naturalWidth > 0)) {
+          rightSun.img.src = curImg.src;
+        }
+
+        const totalFrames = preloadedSizzleImages.length;
+        let delay = Math.round(1000 / SUN_SIZZLE_FPS);
+
+        if (SUN_SIZZLE_PLAYBACK_MODE === 'pingpong') {
+          if (sizzleDirection === 1 && sizzleIndex >= totalFrames - 1) {
+            sizzleDirection = -1;
+            sizzleIndex = totalFrames - 2;
+            if (SUN_SIZZLE_PAUSE_END_MS > 0) delay += SUN_SIZZLE_PAUSE_END_MS;
+          } else if (sizzleDirection === -1 && sizzleIndex <= 0) {
+            sizzleDirection = 1;
+            sizzleIndex = 1;
+            if (SUN_SIZZLE_PAUSE_END_MS > 0) delay += SUN_SIZZLE_PAUSE_END_MS;
+          } else {
+            sizzleIndex += sizzleDirection;
+          }
+        } else {
+          const isEnd = sizzleIndex >= totalFrames - 1;
+          sizzleIndex = (sizzleIndex + 1) % totalFrames;
+          if (isEnd && SUN_SIZZLE_PAUSE_END_MS > 0) delay += SUN_SIZZLE_PAUSE_END_MS;
+        }
+
+        sunSizzleTimeoutId = setTimeout(startSizzleLoop, delay);
+      }
+
+      // Initialize with seed frames immediately
+      setupSizzleFrames(currentSizzleUrls);
+
+      // Auto-fetch freshest live frames from NOAA STAR SUVI Fe195
+      async function refreshLiveSizzleFrames() {
+        try {
+          const res = await fetch('https://www.star.nesdis.noaa.gov/goes/SUVI_band.php?sat=G19&band=Fe195&length=60');
+          if (!res.ok) return;
+          const html = await res.text();
+          const matches = [...html.matchAll(/'(https:\/\/cdn\.star\.nesdis\.noaa\.gov\/GOES19\/SUVI\/FD\/Fe195\/[0-9]+_GOES19-SUVI-Fe195-600x600\.jpg)'/g)];
+          if (matches && matches.length >= 2) {
+            const freshUrls = matches.map(m => m[1]);
+            currentSizzleUrls = freshUrls;
+            setupSizzleFrames(currentSizzleUrls);
+          }
+        } catch (err) {
+          console.warn('Auto-refresh of SUVI frames skipped (using active frames):', err);
+        }
+      }
+
+      // Initial fetch after page settle
+      setTimeout(refreshLiveSizzleFrames, 2500);
+
+      // Periodic auto-refresh every SUN_SIZZLE_AUTO_REFRESH_MS (default 3 min)
+      setInterval(refreshLiveSizzleFrames, SUN_SIZZLE_AUTO_REFRESH_MS);
     }
   }
 
@@ -13197,6 +13354,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
       setTimeout(() => {
         const sun = document.getElementById('sun-image-container');
         if (sun) sun.style.opacity = 'var(--sun-image-opacity, 1)';
+        const sunsRow = document.getElementById('suns-row-wrapper');
+        if (sunsRow) sunsRow.style.opacity = 'var(--sun-image-opacity, 1)';
+        const sunRight = document.getElementById('sun-image-container-right');
+        if (sunRight) sunRight.style.opacity = 'var(--sun-image-opacity, 1)';
         const earth = document.getElementById('earth-image-container');
         if (earth) earth.style.opacity = '1';
         const lastUpd = document.getElementById('weather-last-updated');
