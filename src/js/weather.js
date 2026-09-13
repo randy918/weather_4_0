@@ -7301,8 +7301,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   // --- Dynamic Earth Animation Engine Controls (JCV) ---
   const EARTH_ANIMATION_ENABLED = true;             // EDITABLE: Enable/disable animation (true = animated weather loop; false = static image)
-  const EARTH_ANIMATION_MODE = 'weather';           // EDITABLE SWITCH: 'weather' (Mode A: 2-4h live cloud/storm flow) or 'daynight' (Mode B: 24h day/night & city lights cycle)
-  const EARTH_ANIMATION_RESOLUTION = '339x339';     // EDITABLE: Resolution: '339x339' (lightweight ~128KB, fast & crisp) or '678x678' (~450KB)
+  const EARTH_ANIMATION_MODE = 'daynight';           // EDITABLE SWITCH: 'weather' (Mode A: 2-4h live cloud/storm flow) or 'daynight' (Mode B: 24h day/night & city lights cycle)
+  const EARTH_ANIMATION_RESOLUTION = '678x678';     // EDITABLE: Resolution: '339x339' (lightweight ~128KB, fast & crisp) or '678x678' (~450KB)
 
   // Mode A: "Living Weather" (Recent 2-4 Hours Storm & Cloud Flow)
   const EARTH_WEATHER_FETCH_LENGTH = 24;            // EDITABLE: NOAA buffer (24 = 4 hours of 10-minute satellite captures)
@@ -7325,11 +7325,17 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const EARTH_ANIMATION_CROSSFADE_MS = 80;          // EDITABLE: Cross-fade duration in milliseconds (50-100ms)
   const EARTH_ANIMATION_AUTO_REFRESH_MS = 10 * 60 * 1000; // EDITABLE: Auto-fetch fresh frames every 10 minutes (matches NOAA capture interval)
 
+  // Subpixel Anti-Aliasing & Soft-Meld Blur (JCV)
+  // Melds adjacent pixels, sensor noise, and JPEG blockiness into a smooth photograph without sacrificing coastline/continental definition
+  const EARTH_IMAGE_BLUR_DESKTOP = '0.8px';        // EDITABLE Desktop: Subpixel blur (e.g. 0.5px to 1.2px melds pixels without getting blurry; 0px = raw pixels)
+  const EARTH_IMAGE_BLUR_MOBILE = '0.5px';         // EDITABLE Mobile: Subpixel blur on mobile
+
   function applyEarthImageConfig() {
     const isMobile = window.innerWidth <= 767;
     const width = isMobile ? EARTH_IMAGE_WIDTH_MOBILE : EARTH_IMAGE_WIDTH_DESKTOP;
     const marginTop = isMobile ? EARTH_IMAGE_MARGIN_TOP_MOBILE : EARTH_IMAGE_MARGIN_TOP_DESKTOP;
     const marginBottom = isMobile ? EARTH_IMAGE_MARGIN_BOTTOM_MOBILE : EARTH_IMAGE_MARGIN_BOTTOM_DESKTOP;
+    const blur = isMobile ? EARTH_IMAGE_BLUR_MOBILE : EARTH_IMAGE_BLUR_DESKTOP;
 
     document.documentElement.style.setProperty('--earth-image-width-desktop', EARTH_IMAGE_WIDTH_DESKTOP);
     document.documentElement.style.setProperty('--earth-image-width-mobile', EARTH_IMAGE_WIDTH_MOBILE);
@@ -7343,6 +7349,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--earth-image-margin-bottom-mobile', EARTH_IMAGE_MARGIN_BOTTOM_MOBILE);
     document.documentElement.style.setProperty('--earth-image-margin-bottom', marginBottom);
 
+    document.documentElement.style.setProperty('--earth-image-blur-desktop', EARTH_IMAGE_BLUR_DESKTOP);
+    document.documentElement.style.setProperty('--earth-image-blur-mobile', EARTH_IMAGE_BLUR_MOBILE);
+    document.documentElement.style.setProperty('--earth-image-blur', blur);
+
     document.documentElement.style.setProperty('--earth-mask-radius', EARTH_MASK_RADIUS);
     document.documentElement.style.setProperty('--earth-mask-position-y', EARTH_MASK_POSITION_Y);
 
@@ -7354,6 +7364,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
       container.style.clipPath = `circle(${EARTH_MASK_RADIUS} at 50% ${EARTH_MASK_POSITION_Y})`;
       container.style.WebkitClipPath = `circle(${EARTH_MASK_RADIUS} at 50% ${EARTH_MASK_POSITION_Y})`;
     }
+    const imgA = document.getElementById('earth-image');
+    if (imgA) imgA.style.filter = `blur(${blur})`;
+    const imgB = document.getElementById('earth-image-b');
+    if (imgB) imgB.style.filter = `blur(${blur})`;
+
     const spacer = document.getElementById('earth-image-spacer');
     if (spacer) {
       spacer.style.height = marginBottom;
@@ -7387,7 +7402,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1159';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1162';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -11788,6 +11803,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     imgA.style.display = 'block';
     imgA.style.zIndex = '1';
     imgA.style.opacity = '1';
+    imgA.style.filter = `blur(var(--earth-image-blur, ${isMobile ? EARTH_IMAGE_BLUR_MOBILE : EARTH_IMAGE_BLUR_DESKTOP}))`;
     imgA.style.transition = `opacity ${EARTH_ANIMATION_CROSSFADE_MS}ms ease-in-out`;
 
     // Layer B (Dual-buffer for smooth cross-dissolve)
@@ -11807,6 +11823,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     imgB.style.display = 'block';
     imgB.style.zIndex = '2';
     imgB.style.opacity = '0';
+    imgB.style.filter = `blur(var(--earth-image-blur, ${isMobile ? EARTH_IMAGE_BLUR_MOBILE : EARTH_IMAGE_BLUR_DESKTOP}))`;
     imgB.style.transition = `opacity ${EARTH_ANIMATION_CROSSFADE_MS}ms ease-in-out`;
 
     container.appendChild(imgA);
