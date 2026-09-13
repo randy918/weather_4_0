@@ -6903,9 +6903,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // Plays back recent rapid frames back-and-forth (ping-pong) to show live solar flare activity
   const SUN_SIZZLE_ENABLED = true;                    // EDITABLE: Enable/disable animation for right sizzling sun
   const SUN_SIZZLE_BAND = 'Fe195';                    // EDITABLE: NOAA SUVI band: 'Fe195' (coronal loops/bronze), 'Fe094' (hot solar flares/blue), 'He304' (prominence eruptions/red)
-  const SUN_SIZZLE_FETCH_LENGTH = 120;                // EDITABLE: Historical buffer to pull from NOAA (60 = ~1 hr, 120 = ~2 hrs, 240 = ~4 hrs)
-  const SUN_SIZZLE_FRAME_STEP = 2;                    // EDITABLE: Cadence step (1 = every frame ~1m, 2 = every 2nd frame ~2m, 3 = ~3m apart for more visible sizzle/flares)
-  const SUN_SIZZLE_FRAME_COUNT = 48;                  // EDITABLE: Number of recent frames in loop (e.g. 32, 48, 64)
+  const SUN_SIZZLE_FETCH_LENGTH = 240;                // EDITABLE: Historical buffer to pull from NOAA (60 = ~1 hr, 120 = ~2 hrs, 240 = ~4 hrs)
+  const SUN_SIZZLE_FRAME_STEP = 3;                    // EDITABLE: Cadence step (1 = every frame ~1m, 2 = every 2nd frame ~2m, 3 = ~3m apart for more visible sizzle/flares)
+  const SUN_SIZZLE_FRAME_COUNT = 60;                  // EDITABLE: Number of recent frames in loop (e.g. 32, 48, 64)
   const SUN_SIZZLE_FPS = 14;                          // EDITABLE: Playback speed in frames per second (12–16 FPS allows eye to track flare eruptions without blurring)
   const SUN_SIZZLE_PAUSE_END_MS = 0;                  // EDITABLE: Pause in ms at ends (frame 1 and live frame) before reversing (0 for instant)
   const SUN_SIZZLE_PLAYBACK_MODE = 'pingpong';        // EDITABLE: 'pingpong' or 'forward'
@@ -7314,7 +7314,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1157';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1158';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
