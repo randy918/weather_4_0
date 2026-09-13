@@ -6909,6 +6909,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SUN_SIZZLE_FPS = 14;                          // EDITABLE: Playback speed in frames per second (12–16 FPS allows eye to track flare eruptions without blurring)
   const SUN_SIZZLE_PAUSE_END_MS = 0;                  // EDITABLE: Pause in ms at ends (frame 1 and live frame) before reversing (0 for instant)
   const SUN_SIZZLE_PLAYBACK_MODE = 'pingpong';        // EDITABLE: 'pingpong' or 'forward'
+  const SUN_SIZZLE_CROSSFADE_MS_DESKTOP = 35;         // EDITABLE Desktop: Cross-fade transition in ms between rapid sizzle frames (eliminates iPad/Safari flicker)
+  const SUN_SIZZLE_CROSSFADE_MS_MOBILE = 35;          // EDITABLE Mobile: Cross-fade transition in ms between rapid sizzle frames
   const SUN_SIZZLE_AUTO_REFRESH_MS = 3 * 60 * 1000;   // EDITABLE: Auto-fetch fresh SUVI frames every 3 minutes
 
   // Seed list of latest real-time NOAA SUVI Fe195 frames (50-70s cadence)
@@ -7084,6 +7086,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--sun-animation-crossfade-duration-desktop', `${SUN_ANIMATION_CROSSFADE_MS_DESKTOP}ms`);
     document.documentElement.style.setProperty('--sun-animation-crossfade-duration-mobile', `${SUN_ANIMATION_CROSSFADE_MS_MOBILE}ms`);
     document.documentElement.style.setProperty('--sun-animation-crossfade-duration', `${isMobile ? SUN_ANIMATION_CROSSFADE_MS_MOBILE : SUN_ANIMATION_CROSSFADE_MS_DESKTOP}ms`);
+
+    document.documentElement.style.setProperty('--sun-sizzle-crossfade-duration-desktop', `${SUN_SIZZLE_CROSSFADE_MS_DESKTOP}ms`);
+    document.documentElement.style.setProperty('--sun-sizzle-crossfade-duration-mobile', `${SUN_SIZZLE_CROSSFADE_MS_MOBILE}ms`);
+    document.documentElement.style.setProperty('--sun-sizzle-crossfade-duration', `${isMobile ? SUN_SIZZLE_CROSSFADE_MS_MOBILE : SUN_SIZZLE_CROSSFADE_MS_DESKTOP}ms`);
 
     document.documentElement.style.setProperty('--sun-animation-ease-enabled', SUN_ANIMATION_EASE_ENABLED ? '1' : '0');
     document.documentElement.style.setProperty('--sun-animation-ease-frames-desktop', String(SUN_ANIMATION_EASE_FRAMES_DESKTOP));
@@ -7322,7 +7328,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   // Smooth Cross-Fade Dynamics
   const EARTH_ANIMATION_CROSSFADE_ENABLED = true;   // EDITABLE: Smooth dual-buffer cross-dissolve between frames
-  const EARTH_ANIMATION_CROSSFADE_MS = 80;          // EDITABLE: Cross-fade duration in milliseconds (50-100ms)
+  const EARTH_ANIMATION_CROSSFADE_MS_DESKTOP = 80;  // EDITABLE Desktop: Cross-fade duration in milliseconds (50-100ms)
+  const EARTH_ANIMATION_CROSSFADE_MS_MOBILE = 80;   // EDITABLE Mobile: Cross-fade duration in milliseconds (50-100ms)
+  const EARTH_ANIMATION_CROSSFADE_MS = EARTH_ANIMATION_CROSSFADE_MS_DESKTOP;
   const EARTH_ANIMATION_AUTO_REFRESH_MS = 10 * 60 * 1000; // EDITABLE: Auto-fetch fresh frames every 10 minutes (matches NOAA capture interval)
 
   // Subpixel Anti-Aliasing & Soft-Meld Blur (JCV)
@@ -7336,6 +7344,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const marginTop = isMobile ? EARTH_IMAGE_MARGIN_TOP_MOBILE : EARTH_IMAGE_MARGIN_TOP_DESKTOP;
     const marginBottom = isMobile ? EARTH_IMAGE_MARGIN_BOTTOM_MOBILE : EARTH_IMAGE_MARGIN_BOTTOM_DESKTOP;
     const blur = isMobile ? EARTH_IMAGE_BLUR_MOBILE : EARTH_IMAGE_BLUR_DESKTOP;
+    const crossfadeMs = isMobile ? EARTH_ANIMATION_CROSSFADE_MS_MOBILE : EARTH_ANIMATION_CROSSFADE_MS_DESKTOP;
 
     document.documentElement.style.setProperty('--earth-image-width-desktop', EARTH_IMAGE_WIDTH_DESKTOP);
     document.documentElement.style.setProperty('--earth-image-width-mobile', EARTH_IMAGE_WIDTH_MOBILE);
@@ -7353,6 +7362,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--earth-image-blur-mobile', EARTH_IMAGE_BLUR_MOBILE);
     document.documentElement.style.setProperty('--earth-image-blur', blur);
 
+    document.documentElement.style.setProperty('--earth-animation-crossfade-duration-desktop', `${EARTH_ANIMATION_CROSSFADE_MS_DESKTOP}ms`);
+    document.documentElement.style.setProperty('--earth-animation-crossfade-duration-mobile', `${EARTH_ANIMATION_CROSSFADE_MS_MOBILE}ms`);
+    document.documentElement.style.setProperty('--earth-animation-crossfade-duration', `${crossfadeMs}ms`);
+
     document.documentElement.style.setProperty('--earth-mask-radius', EARTH_MASK_RADIUS);
     document.documentElement.style.setProperty('--earth-mask-position-y', EARTH_MASK_POSITION_Y);
 
@@ -7363,11 +7376,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
       container.style.marginTop = marginTop;
       container.style.clipPath = `circle(${EARTH_MASK_RADIUS} at 50% ${EARTH_MASK_POSITION_Y})`;
       container.style.WebkitClipPath = `circle(${EARTH_MASK_RADIUS} at 50% ${EARTH_MASK_POSITION_Y})`;
+      container.style.filter = blur ? `blur(${blur})` : 'none';
     }
-    const imgA = document.getElementById('earth-image');
-    if (imgA) imgA.style.filter = `blur(${blur})`;
-    const imgB = document.getElementById('earth-image-b');
-    if (imgB) imgB.style.filter = `blur(${blur})`;
 
     const spacer = document.getElementById('earth-image-spacer');
     if (spacer) {
@@ -7402,7 +7412,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1162';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1165';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -11293,7 +11303,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (document.getElementById('sun-image-container') || document.getElementById('suns-row-wrapper')) return;
 
     // Helper to build a styled circular sun element
-    function buildSunCircle(containerId, imgId, initialUrl, altText, enableDualBuffer = false) {
+    function buildSunCircle(containerId, imgId, initialUrl, altText, enableDualBuffer = false, isRightSizzle = false) {
       const c = document.createElement('div');
       c.id = containerId;
       c.className = 'sun-image-container';
@@ -11308,6 +11318,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
       c.style.transition = 'opacity 1s ease';
       c.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
       c.style.flexShrink = '0';
+      c.style.webkitBackfaceVisibility = 'hidden';
+      c.style.backfaceVisibility = 'hidden';
+      c.style.webkitTransform = 'translate3d(0, 0, 0)';
+      c.style.transform = 'translate3d(0, 0, 0)';
+      c.style.webkitMaskImage = '-webkit-radial-gradient(white, black)';
+
+      const durVar = isRightSizzle ? '--sun-sizzle-crossfade-duration, 35ms' : '--sun-animation-crossfade-duration, 60ms';
 
       const im = document.createElement('img');
       im.id = imgId;
@@ -11319,14 +11336,17 @@ Plan ahead for significantly warmer conditions tomorrow!`
       im.style.position = 'absolute';
       im.style.top = 'var(--sun-image-offset-y, -1%)';
       im.style.left = '50%';
-      im.style.transform = 'translateX(-50%)';
+      im.style.transform = 'translate3d(-50%, 0, 0)';
+      im.style.webkitTransform = 'translate3d(-50%, 0, 0)';
+      im.style.webkitBackfaceVisibility = 'hidden';
+      im.style.backfaceVisibility = 'hidden';
+      im.style.willChange = 'opacity';
       im.style.objectFit = 'cover';
-      im.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
       im.style.display = 'block';
       im.style.zIndex = '1';
       im.style.opacity = '1';
       if (enableDualBuffer) {
-        im.style.transition = 'opacity var(--sun-animation-crossfade-duration, 60ms) ease-in-out';
+        im.style.transition = `opacity var(${durVar}) ease-in-out`;
       }
 
       c.appendChild(im);
@@ -11343,13 +11363,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
         imB.style.position = 'absolute';
         imB.style.top = 'var(--sun-image-offset-y, -1%)';
         imB.style.left = '50%';
-        imB.style.transform = 'translateX(-50%)';
+        imB.style.transform = 'translate3d(-50%, 0, 0)';
+        imB.style.webkitTransform = 'translate3d(-50%, 0, 0)';
+        imB.style.webkitBackfaceVisibility = 'hidden';
+        imB.style.backfaceVisibility = 'hidden';
+        imB.style.willChange = 'opacity';
         imB.style.objectFit = 'cover';
-        imB.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
         imB.style.display = 'block';
         imB.style.zIndex = '2';
         imB.style.opacity = '0';
-        imB.style.transition = 'opacity var(--sun-animation-crossfade-duration, 60ms) ease-in-out';
+        imB.style.transition = `opacity var(${durVar}) ease-in-out`;
         c.appendChild(imB);
       }
 
@@ -11368,7 +11391,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
       col.style.width = 'var(--sun-image-width, 34vw)';
       col.style.position = 'relative';
       col.style.flexShrink = '0';
-      col.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
 
       col.appendChild(sunCircleObj.container);
 
@@ -11407,7 +11429,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
       'sun-image',
       SUN_IMAGE_URL,
       'Live Sunspot & Coronal 27-Day Rotation Animation from GOES-19 SUVI Fe195',
-      SUN_ANIMATION_CROSSFADE_ENABLED
+      SUN_ANIMATION_CROSSFADE_ENABLED,
+      false
     );
     const leftCol = buildSunColumn('sun-col-left', leftSun, SUN_LABEL_LEFT_TEXT, 'sun-label-left');
 
@@ -11428,13 +11451,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
       mainWrapper.style.margin = 'var(--sun-image-margin-top, 2vw) auto 0';
       mainWrapper.style.opacity = '0';
       mainWrapper.style.transition = 'opacity 1s ease';
-      mainWrapper.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
 
       rightSun = buildSunCircle(
         'sun-image-container-right',
         'sun-image-right',
         `${SUN_IMAGE_BASE_URL}600x600.jpg?t=${Date.now()}`,
-        'Live Sizzling Solar Flare Activity from GOES-19 SUVI Fe195'
+        'Live Sizzling Solar Flare Activity from GOES-19 SUVI Fe195',
+        true, // Dual buffer enabled to eliminate iPad flicker
+        true  // Sizzle mode timing
       );
       const rightCol = buildSunColumn('sun-col-right', rightSun, SUN_LABEL_RIGHT_TEXT, 'sun-label-right');
 
@@ -11444,7 +11468,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
       // Single Sun Mode
       leftCol.classList.add('single-mode');
       leftCol.style.margin = 'var(--sun-image-margin-top, 2vw) auto 0';
-      leftCol.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
       mainWrapper = leftCol;
     }
 
@@ -11512,6 +11535,17 @@ Plan ahead for significantly warmer conditions tomorrow!`
         pImg.onload = () => {
           loadedCount++;
           if (loadedCount >= Math.min(3, frameUrls.length) && !sunAnimationTimeoutId) {
+            // Prime both layers before starting playback
+            if (preloadedImages.length > 0 && leftSun && leftSun.img) {
+              leftSun.img.src = preloadedImages[0].src;
+              if (leftSun.img.decode) leftSun.img.decode().catch(() => {});
+            }
+            if (preloadedImages.length > 1 && leftSun && leftSun.imgB) {
+              leftSun.imgB.src = preloadedImages[1].src;
+              if (leftSun.imgB.decode) leftSun.imgB.decode().catch(() => {});
+            }
+            currentFrameIndex = 1;
+            activeLayer = 'a';
             runLeftAnimationLoop();
           }
         };
@@ -11563,40 +11597,51 @@ Plan ahead for significantly warmer conditions tomorrow!`
         }
 
         // Dynamically calibrate cross-fade transition duration to match current frame speed
-        if (SUN_ANIMATION_CROSSFADE_ENABLED && leftSun && leftSun.container) {
+        if (SUN_ANIMATION_CROSSFADE_ENABLED && leftSun) {
           const baseFade = isMobile ? SUN_ANIMATION_CROSSFADE_MS_MOBILE : SUN_ANIMATION_CROSSFADE_MS_DESKTOP;
           const dynamicFade = SUN_ANIMATION_EASE_ENABLED && !isLastFrame
             ? Math.round(Math.min(delay * 0.72, baseFade * 2.5))
             : baseFade;
-          leftSun.container.style.setProperty('--sun-animation-crossfade-duration', `${dynamicFade}ms`);
+          if (leftSun.img) leftSun.img.style.transitionDuration = `${dynamicFade}ms`;
+          if (leftSun.imgB) leftSun.imgB.style.transitionDuration = `${dynamicFade}ms`;
         }
 
-        const nextImg = preloadedImages[frameIdx];
-        if (nextImg && (nextImg.complete || nextImg.naturalWidth > 0 || nextImg.src)) {
-          if (SUN_ANIMATION_CROSSFADE_ENABLED && leftSun && leftSun.imgB) {
-            if (activeLayer === 'a') {
-              // Seamlessly cross-fade to Layer B
-              leftSun.imgB.src = nextImg.src;
-              leftSun.imgB.style.zIndex = '2';
-              leftSun.img.style.zIndex = '1';
-              leftSun.imgB.style.opacity = '1';
-              leftSun.img.style.opacity = '0';
-              activeLayer = 'b';
-            } else {
-              // Seamlessly cross-fade to Layer A
+        const nextIdx = (frameIdx + 1) % totalFrames;
+
+        if (SUN_ANIMATION_CROSSFADE_ENABLED && leftSun && leftSun.imgB) {
+          if (activeLayer === 'a') {
+            // Layer B already has frameUrls[frameIdx] primed and decoded!
+            // Fade in Layer B, fade out Layer A
+            leftSun.imgB.style.opacity = '1';
+            leftSun.img.style.opacity = '0';
+            activeLayer = 'b';
+
+            // Cue up following frame on Layer A while it is hidden
+            const nextImg = preloadedImages[nextIdx];
+            if (nextImg && nextImg.src) {
               leftSun.img.src = nextImg.src;
-              leftSun.img.style.zIndex = '2';
-              leftSun.imgB.style.zIndex = '1';
-              leftSun.img.style.opacity = '1';
-              leftSun.imgB.style.opacity = '0';
-              activeLayer = 'a';
+              if (leftSun.img.decode) leftSun.img.decode().catch(() => {});
             }
           } else {
-            leftSun.img.src = nextImg.src;
+            // Layer A already has frameUrls[frameIdx] primed and decoded!
+            // Fade in Layer A, fade out Layer B
+            leftSun.img.style.opacity = '1';
+            leftSun.imgB.style.opacity = '0';
+            activeLayer = 'a';
+
+            // Cue up following frame on Layer B while it is hidden
+            const nextImg = preloadedImages[nextIdx];
+            if (nextImg && nextImg.src) {
+              leftSun.imgB.src = nextImg.src;
+              if (leftSun.imgB.decode) leftSun.imgB.decode().catch(() => {});
+            }
           }
+        } else if (leftSun && leftSun.img) {
+          const curImg = preloadedImages[frameIdx];
+          if (curImg && curImg.src) leftSun.img.src = curImg.src;
         }
 
-        currentFrameIndex = (frameIdx + 1) % totalFrames;
+        currentFrameIndex = nextIdx;
         sunAnimationTimeoutId = setTimeout(runLeftAnimationLoop, delay);
       }
     } else {
@@ -11632,6 +11677,18 @@ Plan ahead for significantly warmer conditions tomorrow!`
             return imgObj;
           });
 
+          // Prime dual buffers up front
+          if (preloadedSizzleImages.length > 0 && rightSun && rightSun.img) {
+            rightSun.img.src = preloadedSizzleImages[0].src;
+            if (rightSun.img.decode) rightSun.img.decode().catch(() => {});
+          }
+          if (preloadedSizzleImages.length > 1 && rightSun && rightSun.imgB) {
+            rightSun.imgB.src = preloadedSizzleImages[1].src;
+            if (rightSun.imgB.decode) rightSun.imgB.decode().catch(() => {});
+          }
+          sizzleIndex = 1;
+          sizzleActiveLayer = 'a';
+
           if (!sunSizzleTimeoutId && preloadedSizzleImages.length > 1) {
             startSizzleLoop();
           }
@@ -11660,6 +11717,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       let sizzleIndex = 0;
       let sizzleDirection = 1; // 1 = forward, -1 = backward
+      let sizzleActiveLayer = 'a'; // 'a' or 'b' for dual-buffer smooth cross-dissolve
 
       function startSizzleLoop() {
         if (!SUN_SIZZLE_ENABLED || preloadedSizzleImages.length <= 1) return;
@@ -11669,38 +11727,69 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
         // Ensure index is strictly clamped within bounds
         sizzleIndex = Math.max(0, Math.min(totalFrames - 1, sizzleIndex));
+        const frameIdx = sizzleIndex;
 
-        const curImg = preloadedSizzleImages[sizzleIndex];
-        if (curImg && (curImg.complete || curImg.naturalWidth > 0 || curImg.src)) {
-          rightSun.img.src = curImg.src;
-        }
-
+        let nextIndex = frameIdx;
         let delay = Math.round(1000 / SUN_SIZZLE_FPS);
 
         if (SUN_SIZZLE_PLAYBACK_MODE === 'pingpong') {
           if (sizzleDirection === 1) {
-            if (sizzleIndex >= totalFrames - 1) {
+            if (frameIdx >= totalFrames - 1) {
               sizzleDirection = -1;
-              sizzleIndex = totalFrames - 2;
+              nextIndex = totalFrames - 2;
               if (SUN_SIZZLE_PAUSE_END_MS > 0) delay += SUN_SIZZLE_PAUSE_END_MS;
             } else {
-              sizzleIndex++;
+              nextIndex = frameIdx + 1;
             }
           } else {
-            if (sizzleIndex <= 0) {
+            if (frameIdx <= 0) {
               sizzleDirection = 1;
-              sizzleIndex = 1;
+              nextIndex = 1;
               if (SUN_SIZZLE_PAUSE_END_MS > 0) delay += SUN_SIZZLE_PAUSE_END_MS;
             } else {
-              sizzleIndex--;
+              nextIndex = frameIdx - 1;
             }
           }
         } else {
-          const isEnd = sizzleIndex >= totalFrames - 1;
-          sizzleIndex = (sizzleIndex + 1) % totalFrames;
+          const isEnd = frameIdx >= totalFrames - 1;
+          nextIndex = (frameIdx + 1) % totalFrames;
           if (isEnd && SUN_SIZZLE_PAUSE_END_MS > 0) delay += SUN_SIZZLE_PAUSE_END_MS;
         }
 
+        nextIndex = Math.max(0, Math.min(totalFrames - 1, nextIndex));
+
+        if (rightSun && rightSun.imgB) {
+          if (sizzleActiveLayer === 'a') {
+            // Layer B was already primed with frameIdx! Fade in B, fade out A
+            rightSun.imgB.style.opacity = '1';
+            rightSun.img.style.opacity = '0';
+            sizzleActiveLayer = 'b';
+
+            // Cue nextIndex on Layer A while it is hidden
+            const nextImg = preloadedSizzleImages[nextIndex];
+            if (nextImg && nextImg.src) {
+              rightSun.img.src = nextImg.src;
+              if (rightSun.img.decode) rightSun.img.decode().catch(() => {});
+            }
+          } else {
+            // Layer A was already primed with frameIdx! Fade in A, fade out B
+            rightSun.img.style.opacity = '1';
+            rightSun.imgB.style.opacity = '0';
+            sizzleActiveLayer = 'a';
+
+            // Cue nextIndex on Layer B while it is hidden
+            const nextImg = preloadedSizzleImages[nextIndex];
+            if (nextImg && nextImg.src) {
+              rightSun.imgB.src = nextImg.src;
+              if (rightSun.imgB.decode) rightSun.imgB.decode().catch(() => {});
+            }
+          }
+        } else if (rightSun && rightSun.img) {
+          const curImg = preloadedSizzleImages[frameIdx];
+          if (curImg && curImg.src) rightSun.img.src = curImg.src;
+        }
+
+        sizzleIndex = nextIndex;
         sunSizzleTimeoutId = setTimeout(startSizzleLoop, delay);
       }
 
@@ -11770,6 +11859,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const width = isMobile ? EARTH_IMAGE_WIDTH_MOBILE : EARTH_IMAGE_WIDTH_DESKTOP;
     const marginTop = isMobile ? EARTH_IMAGE_MARGIN_TOP_MOBILE : EARTH_IMAGE_MARGIN_TOP_DESKTOP;
     const marginBottom = isMobile ? EARTH_IMAGE_MARGIN_BOTTOM_MOBILE : EARTH_IMAGE_MARGIN_BOTTOM_DESKTOP;
+    const blur = isMobile ? EARTH_IMAGE_BLUR_MOBILE : EARTH_IMAGE_BLUR_DESKTOP;
+    const crossfadeMs = isMobile ? EARTH_ANIMATION_CROSSFADE_MS_MOBILE : EARTH_ANIMATION_CROSSFADE_MS_DESKTOP;
 
     const container = document.createElement('div');
     container.id = 'earth-image-container';
@@ -11784,7 +11875,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
     container.style.opacity = '0'; // Hide initially to prevent center-screen flashing
     container.style.transition = 'opacity 1s ease'; // Smooth fade in
     container.style.mixBlendMode = 'lighten'; // Force container to blend with the page gradient
-    // No background color - allows lighten blend mode to work with page gradient
+    container.style.flexShrink = '0';
+    container.style.webkitBackfaceVisibility = 'hidden';
+    container.style.backfaceVisibility = 'hidden';
+    container.style.webkitTransform = 'translate3d(0, 0, 0)';
+    container.style.transform = 'translate3d(0, 0, 0)';
+    container.style.webkitMaskImage = '-webkit-radial-gradient(white, black)';
+    container.style.filter = blur ? `blur(${blur})` : 'none';
     
     // Layer A (Active image layer)
     const imgA = document.createElement('img');
@@ -11797,14 +11894,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
     imgA.style.position = 'absolute';
     imgA.style.top = '0';
     imgA.style.left = '50%';
-    imgA.style.transform = 'translateX(-50%)';
+    imgA.style.transform = 'translate3d(-50%, 0, 0)';
+    imgA.style.webkitTransform = 'translate3d(-50%, 0, 0)';
+    imgA.style.webkitBackfaceVisibility = 'hidden';
+    imgA.style.backfaceVisibility = 'hidden';
     imgA.style.objectFit = 'cover';
-    imgA.style.mixBlendMode = 'lighten';
     imgA.style.display = 'block';
     imgA.style.zIndex = '1';
     imgA.style.opacity = '1';
-    imgA.style.filter = `blur(var(--earth-image-blur, ${isMobile ? EARTH_IMAGE_BLUR_MOBILE : EARTH_IMAGE_BLUR_DESKTOP}))`;
-    imgA.style.transition = `opacity ${EARTH_ANIMATION_CROSSFADE_MS}ms ease-in-out`;
+    imgA.style.willChange = 'opacity';
+    imgA.style.transition = `opacity ${crossfadeMs}ms ease-in-out`;
 
     // Layer B (Dual-buffer for smooth cross-dissolve)
     const imgB = document.createElement('img');
@@ -11817,14 +11916,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
     imgB.style.position = 'absolute';
     imgB.style.top = '0';
     imgB.style.left = '50%';
-    imgB.style.transform = 'translateX(-50%)';
+    imgB.style.transform = 'translate3d(-50%, 0, 0)';
+    imgB.style.webkitTransform = 'translate3d(-50%, 0, 0)';
+    imgB.style.webkitBackfaceVisibility = 'hidden';
+    imgB.style.backfaceVisibility = 'hidden';
     imgB.style.objectFit = 'cover';
-    imgB.style.mixBlendMode = 'lighten';
     imgB.style.display = 'block';
     imgB.style.zIndex = '2';
     imgB.style.opacity = '0';
-    imgB.style.filter = `blur(var(--earth-image-blur, ${isMobile ? EARTH_IMAGE_BLUR_MOBILE : EARTH_IMAGE_BLUR_DESKTOP}))`;
-    imgB.style.transition = `opacity ${EARTH_ANIMATION_CROSSFADE_MS}ms ease-in-out`;
+    imgB.style.willChange = 'opacity';
+    imgB.style.transition = `opacity ${crossfadeMs}ms ease-in-out`;
 
     container.appendChild(imgA);
     container.appendChild(imgB);
@@ -11905,6 +12006,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
           img.onload = () => {
             loaded++;
             if (loaded >= Math.min(3, selectedUrls.length) && !earthAnimationTimeoutId) {
+              if (preloadedImages.length > 0 && imgA) {
+                imgA.src = preloadedImages[0].src;
+                if (imgA.decode) imgA.decode().catch(() => {});
+              }
+              if (preloadedImages.length > 1 && imgB) {
+                imgB.src = preloadedImages[1].src;
+                if (imgB.decode) imgB.decode().catch(() => {});
+              }
+              currentFrameIndex = 1;
+              activeLayer = 'a';
               startEarthLoop();
             }
           };
@@ -11942,57 +12053,69 @@ Plan ahead for significantly warmer conditions tomorrow!`
       if (totalFrames <= 1) return;
 
       currentFrameIndex = Math.max(0, Math.min(totalFrames - 1, currentFrameIndex));
-      const curImg = preloadedImages[currentFrameIndex];
-      const isNewestFrame = currentFrameIndex === totalFrames - 1;
+      const frameIdx = currentFrameIndex;
 
-      if (curImg && (curImg.complete || curImg.naturalWidth > 0 || curImg.src)) {
-        if (EARTH_ANIMATION_CROSSFADE_ENABLED) {
-          if (activeLayer === 'a') {
-            imgB.src = curImg.src;
-            imgB.style.opacity = '1';
-            imgA.style.opacity = '0';
-            activeLayer = 'b';
-          } else {
-            imgA.src = curImg.src;
-            imgA.style.opacity = '1';
-            imgB.style.opacity = '0';
-            activeLayer = 'a';
-          }
-        } else {
-          imgA.src = curImg.src;
-          imgA.style.opacity = '1';
-        }
-      }
-
+      let nextIndex = frameIdx;
       let delay = Math.round(1000 / Math.max(1, fps));
 
       if (playbackMode === 'pingpong') {
         if (direction === 1) {
-          if (currentFrameIndex >= totalFrames - 1) {
+          if (frameIdx >= totalFrames - 1) {
             direction = -1;
-            currentFrameIndex = totalFrames - 2;
+            nextIndex = totalFrames - 2;
             if (loopPauseMs > 0) delay += loopPauseMs;
           } else {
-            currentFrameIndex++;
+            nextIndex = frameIdx + 1;
           }
         } else {
-          if (currentFrameIndex <= 0) {
+          if (frameIdx <= 0) {
             direction = 1;
-            currentFrameIndex = 1;
+            nextIndex = 1;
             if (loopPauseMs > 0) delay += loopPauseMs;
           } else {
-            currentFrameIndex--;
+            nextIndex = frameIdx - 1;
           }
         }
       } else {
-        if (isNewestFrame) {
-          delay += loopPauseMs;
-          currentFrameIndex = 0;
-        } else {
-          currentFrameIndex++;
-        }
+        const isEnd = frameIdx >= totalFrames - 1;
+        nextIndex = (frameIdx + 1) % totalFrames;
+        if (isEnd && loopPauseMs > 0) delay += loopPauseMs;
       }
 
+      nextIndex = Math.max(0, Math.min(totalFrames - 1, nextIndex));
+
+      if (EARTH_ANIMATION_CROSSFADE_ENABLED && imgA && imgB) {
+        if (activeLayer === 'a') {
+          // Layer B was already primed with frameIdx! Fade in B, fade out A
+          imgB.style.opacity = '1';
+          imgA.style.opacity = '0';
+          activeLayer = 'b';
+
+          // Cue nextIndex on Layer A while it is hidden
+          const nextImg = preloadedImages[nextIndex];
+          if (nextImg && nextImg.src) {
+            imgA.src = nextImg.src;
+            if (imgA.decode) imgA.decode().catch(() => {});
+          }
+        } else {
+          // Layer A was already primed with frameIdx! Fade in A, fade out B
+          imgA.style.opacity = '1';
+          imgB.style.opacity = '0';
+          activeLayer = 'a';
+
+          // Cue nextIndex on Layer B while it is hidden
+          const nextImg = preloadedImages[nextIndex];
+          if (nextImg && nextImg.src) {
+            imgB.src = nextImg.src;
+            if (imgB.decode) imgB.decode().catch(() => {});
+          }
+        }
+      } else if (imgA) {
+        const curImg = preloadedImages[frameIdx];
+        if (curImg && curImg.src) imgA.src = curImg.src;
+      }
+
+      currentFrameIndex = nextIndex;
       earthAnimationTimeoutId = setTimeout(startEarthLoop, delay);
     }
 
