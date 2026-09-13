@@ -7280,14 +7280,87 @@ Plan ahead for significantly warmer conditions tomorrow!`
   applyWorldClocksConfig();
   window.addEventListener('resize', applyWorldClocksConfig);
 
-  // --- Earth Image Config ---
-  // Settings for the live Earth image from NOAA GOES satellite
-  const EARTH_IMAGE_WIDTH = '68vw';  // Width of the container (2% smaller to crop bottom text)
+  // ==========================================
+  // --- Earth Image & Living Weather Config (JCV) ---
+  // ==========================================
+  // Settings for the live Earth image & animation from NOAA GOES-19 satellite (GeoColor ABI Full Disk)
+  const EARTH_IMAGE_WIDTH_DESKTOP = '68vw';         // EDITABLE Desktop: Width of the Earth container
+  const EARTH_IMAGE_WIDTH_MOBILE = '85vw';          // EDITABLE Mobile: Width of the Earth container
+  const EARTH_IMAGE_MARGIN_TOP_DESKTOP = '2vw';     // EDITABLE Desktop: Gap above Earth image
+  const EARTH_IMAGE_MARGIN_TOP_MOBILE = '3vw';      // EDITABLE Mobile: Gap above Earth image
+  const EARTH_IMAGE_MARGIN_BOTTOM_DESKTOP = '4vw';  // EDITABLE Desktop: Gap below Earth image
+  const EARTH_IMAGE_MARGIN_BOTTOM_MOBILE = '5vw';   // EDITABLE Mobile: Gap below Earth image
+  const EARTH_MASK_RADIUS = '49.5%';                // EDITABLE: Shrink circle slightly to hide edge artifacts (49.5% = 99% size)
+  const EARTH_MASK_POSITION_Y = '50.25%';           // EDITABLE: Shift mask down to crop exactly 0.5% more from top
   const EARTH_IMAGE_URL = 'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/678x678.jpg';
-  const EARTH_IMAGE_MARGIN_TOP = '2vw';  // Gap above the Earth image
-  const EARTH_IMAGE_MARGIN_BOTTOM = '4vw';  // Gap below the Earth image
-  const EARTH_MASK_RADIUS = '49.5%'; // EDITABLE: Shrink circle slightly to hide edge artifacts (49.5% = 99% size)
-  const EARTH_MASK_POSITION_Y = '50.25%'; // EDITABLE: Shift mask down to crop exactly 0.5% more from the top only
+
+  // Compatibility aliases
+  const EARTH_IMAGE_WIDTH = EARTH_IMAGE_WIDTH_DESKTOP;
+  const EARTH_IMAGE_MARGIN_TOP = EARTH_IMAGE_MARGIN_TOP_DESKTOP;
+  const EARTH_IMAGE_MARGIN_BOTTOM = EARTH_IMAGE_MARGIN_BOTTOM_DESKTOP;
+
+  // --- Dynamic Earth Animation Engine Controls (JCV) ---
+  const EARTH_ANIMATION_ENABLED = true;             // EDITABLE: Enable/disable animation (true = animated weather loop; false = static image)
+  const EARTH_ANIMATION_MODE = 'weather';           // EDITABLE SWITCH: 'weather' (Mode A: 2-4h live cloud/storm flow) or 'daynight' (Mode B: 24h day/night & city lights cycle)
+  const EARTH_ANIMATION_RESOLUTION = '339x339';     // EDITABLE: Resolution: '339x339' (lightweight ~128KB, fast & crisp) or '678x678' (~450KB)
+
+  // Mode A: "Living Weather" (Recent 2-4 Hours Storm & Cloud Flow)
+  const EARTH_WEATHER_FETCH_LENGTH = 24;            // EDITABLE: NOAA buffer (24 = 4 hours of 10-minute satellite captures)
+  const EARTH_WEATHER_FRAME_STEP = 1;               // EDITABLE: Cadence step (1 = every 10m frame, 2 = every 20m)
+  const EARTH_WEATHER_FRAME_COUNT = 18;             // EDITABLE: Number of frames in loop (18 = 3 hours of cloud motion)
+  const EARTH_WEATHER_FPS = 8;                      // EDITABLE: Playback speed in frames per second (6-10 FPS provides smooth atmospheric drift)
+  const EARTH_WEATHER_LOOP_PAUSE_MS = 1200;         // EDITABLE: Pause in ms on the live newest frame before restarting loop
+  const EARTH_WEATHER_PLAYBACK_MODE = 'forward';    // EDITABLE: 'forward' (clouds flow forward, pause on live) or 'pingpong'
+
+  // Mode B: "Day & Night Cycle" (24 Hours of Sunlight & Night Lights)
+  const EARTH_DAYNIGHT_FETCH_LENGTH = 144;          // EDITABLE: NOAA 24-hour buffer (144 frames @ 10m cadence)
+  const EARTH_DAYNIGHT_FRAME_STEP = 4;              // EDITABLE: Cadence step (4 = ~40m intervals; 6 = ~60m intervals)
+  const EARTH_DAYNIGHT_FRAME_COUNT = 36;            // EDITABLE: Number of frames in 24h cycle (36 frames @ 40m = 24h)
+  const EARTH_DAYNIGHT_FPS = 10;                    // EDITABLE: Playback speed in frames per second (8-12 FPS)
+  const EARTH_DAYNIGHT_LOOP_PAUSE_MS = 1200;        // EDITABLE: Pause in ms on the live newest frame before restarting loop
+  const EARTH_DAYNIGHT_PLAYBACK_MODE = 'forward';   // EDITABLE: 'forward' (shadow sweeps across globe) or 'pingpong'
+
+  // Smooth Cross-Fade Dynamics
+  const EARTH_ANIMATION_CROSSFADE_ENABLED = true;   // EDITABLE: Smooth dual-buffer cross-dissolve between frames
+  const EARTH_ANIMATION_CROSSFADE_MS = 80;          // EDITABLE: Cross-fade duration in milliseconds (50-100ms)
+  const EARTH_ANIMATION_AUTO_REFRESH_MS = 10 * 60 * 1000; // EDITABLE: Auto-fetch fresh frames every 10 minutes (matches NOAA capture interval)
+
+  function applyEarthImageConfig() {
+    const isMobile = window.innerWidth <= 767;
+    const width = isMobile ? EARTH_IMAGE_WIDTH_MOBILE : EARTH_IMAGE_WIDTH_DESKTOP;
+    const marginTop = isMobile ? EARTH_IMAGE_MARGIN_TOP_MOBILE : EARTH_IMAGE_MARGIN_TOP_DESKTOP;
+    const marginBottom = isMobile ? EARTH_IMAGE_MARGIN_BOTTOM_MOBILE : EARTH_IMAGE_MARGIN_BOTTOM_DESKTOP;
+
+    document.documentElement.style.setProperty('--earth-image-width-desktop', EARTH_IMAGE_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--earth-image-width-mobile', EARTH_IMAGE_WIDTH_MOBILE);
+    document.documentElement.style.setProperty('--earth-image-width', width);
+
+    document.documentElement.style.setProperty('--earth-image-margin-top-desktop', EARTH_IMAGE_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--earth-image-margin-top-mobile', EARTH_IMAGE_MARGIN_TOP_MOBILE);
+    document.documentElement.style.setProperty('--earth-image-margin-top', marginTop);
+
+    document.documentElement.style.setProperty('--earth-image-margin-bottom-desktop', EARTH_IMAGE_MARGIN_BOTTOM_DESKTOP);
+    document.documentElement.style.setProperty('--earth-image-margin-bottom-mobile', EARTH_IMAGE_MARGIN_BOTTOM_MOBILE);
+    document.documentElement.style.setProperty('--earth-image-margin-bottom', marginBottom);
+
+    document.documentElement.style.setProperty('--earth-mask-radius', EARTH_MASK_RADIUS);
+    document.documentElement.style.setProperty('--earth-mask-position-y', EARTH_MASK_POSITION_Y);
+
+    const container = document.getElementById('earth-image-container');
+    if (container) {
+      container.style.width = width;
+      container.style.height = width;
+      container.style.marginTop = marginTop;
+      container.style.clipPath = `circle(${EARTH_MASK_RADIUS} at 50% ${EARTH_MASK_POSITION_Y})`;
+      container.style.WebkitClipPath = `circle(${EARTH_MASK_RADIUS} at 50% ${EARTH_MASK_POSITION_Y})`;
+    }
+    const spacer = document.getElementById('earth-image-spacer');
+    if (spacer) {
+      spacer.style.height = marginBottom;
+    }
+  }
+  applyEarthImageConfig();
+  window.addEventListener('resize', applyEarthImageConfig);
 
   // --- EDITABLE: Location Switcher Config (Positioned above Weather Last Updated) ---
   const LOCATION_SWITCHER_CONFIG = [
@@ -7314,7 +7387,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1158';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1159';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -11672,15 +11745,22 @@ Plan ahead for significantly warmer conditions tomorrow!`
     }
   }
 
-  /* --- Live Earth Image (NOAA GOES satellite) --- */
+  /* --- Live Earth Image & Living Weather Animation Engine (NOAA GOES satellite) --- */
+  let earthAnimationTimeoutId = null;
+
   function createEarthImageIfMissing() {
     if (document.getElementById('earth-image-container')) return;
     
+    const isMobile = window.innerWidth <= 767;
+    const width = isMobile ? EARTH_IMAGE_WIDTH_MOBILE : EARTH_IMAGE_WIDTH_DESKTOP;
+    const marginTop = isMobile ? EARTH_IMAGE_MARGIN_TOP_MOBILE : EARTH_IMAGE_MARGIN_TOP_DESKTOP;
+    const marginBottom = isMobile ? EARTH_IMAGE_MARGIN_BOTTOM_MOBILE : EARTH_IMAGE_MARGIN_BOTTOM_DESKTOP;
+
     const container = document.createElement('div');
     container.id = 'earth-image-container';
-    container.style.width = EARTH_IMAGE_WIDTH;
-    container.style.height = EARTH_IMAGE_WIDTH;  // Square container
-    container.style.margin = `${EARTH_IMAGE_MARGIN_TOP} auto 0`; // Bottom margin handled by dedicated spacer to prevent collapse
+    container.style.width = width;
+    container.style.height = width;  // Square container
+    container.style.margin = `${marginTop} auto 0`; // Bottom margin handled by dedicated spacer to prevent collapse
     container.style.borderRadius = '50%';  // Make it circular
     container.style.overflow = 'hidden';
     container.style.clipPath = `circle(${EARTH_MASK_RADIUS} at 50% ${EARTH_MASK_POSITION_Y})`; // Strict mask to hide anti-aliasing bleed
@@ -11691,31 +11771,51 @@ Plan ahead for significantly warmer conditions tomorrow!`
     container.style.mixBlendMode = 'lighten'; // Force container to blend with the page gradient
     // No background color - allows lighten blend mode to work with page gradient
     
-    const img = document.createElement('img');
-    img.id = 'earth-image';
-    img.src = EARTH_IMAGE_URL;
-    img.alt = 'Live Earth from GOES Satellite';
-    img.style.width = '115%';
-    img.style.height = '115%';
-    img.style.position = 'absolute';
-    img.style.top = '0';
-    img.style.left = '50%';
-    img.style.transform = 'translateX(-50%)';
-    img.style.objectFit = 'cover';
-    img.style.mixBlendMode = 'lighten';  // Match Photoshop's "Lighten" blend mode exactly
-    img.style.display = 'block';
-    
-    // Reload image every 5 minutes to get the latest satellite view
-    setInterval(() => {
-      img.src = EARTH_IMAGE_URL + '?t=' + Date.now();
-    }, 5 * 60 * 1000);
-    
-    container.appendChild(img);
+    // Layer A (Active image layer)
+    const imgA = document.createElement('img');
+    imgA.id = 'earth-image';
+    imgA.className = 'earth-image earth-layer-a';
+    imgA.src = EARTH_IMAGE_URL;
+    imgA.alt = 'Live Earth from GOES Satellite';
+    imgA.style.width = '115%';
+    imgA.style.height = '115%';
+    imgA.style.position = 'absolute';
+    imgA.style.top = '0';
+    imgA.style.left = '50%';
+    imgA.style.transform = 'translateX(-50%)';
+    imgA.style.objectFit = 'cover';
+    imgA.style.mixBlendMode = 'lighten';
+    imgA.style.display = 'block';
+    imgA.style.zIndex = '1';
+    imgA.style.opacity = '1';
+    imgA.style.transition = `opacity ${EARTH_ANIMATION_CROSSFADE_MS}ms ease-in-out`;
+
+    // Layer B (Dual-buffer for smooth cross-dissolve)
+    const imgB = document.createElement('img');
+    imgB.id = 'earth-image-b';
+    imgB.className = 'earth-image earth-layer-b';
+    imgB.src = EARTH_IMAGE_URL;
+    imgB.alt = 'Live Earth from GOES Satellite Buffer';
+    imgB.style.width = '115%';
+    imgB.style.height = '115%';
+    imgB.style.position = 'absolute';
+    imgB.style.top = '0';
+    imgB.style.left = '50%';
+    imgB.style.transform = 'translateX(-50%)';
+    imgB.style.objectFit = 'cover';
+    imgB.style.mixBlendMode = 'lighten';
+    imgB.style.display = 'block';
+    imgB.style.zIndex = '2';
+    imgB.style.opacity = '0';
+    imgB.style.transition = `opacity ${EARTH_ANIMATION_CROSSFADE_MS}ms ease-in-out`;
+
+    container.appendChild(imgA);
+    container.appendChild(imgB);
     
     // Dedicated spacer to prevent margin collapse at the bottom of the page
     const spacer = document.createElement('div');
     spacer.id = 'earth-image-spacer';
-    spacer.style.height = EARTH_IMAGE_MARGIN_BOTTOM;
+    spacer.style.height = marginBottom;
     spacer.style.width = '100%';
     
     // Ensure Earth goes ABOVE the Cities Location Switcher or Last Updated text
@@ -11741,6 +11841,165 @@ Plan ahead for significantly warmer conditions tomorrow!`
       parent.appendChild(container);
       parent.appendChild(spacer);
     }
+
+    if (EARTH_ANIMATION_ENABLED) {
+      initEarthAnimationEngine(imgA, imgB);
+    } else {
+      // Reload static image every 5 minutes to get latest view
+      setInterval(() => {
+        imgA.src = EARTH_IMAGE_URL + '?t=' + Date.now();
+      }, 5 * 60 * 1000);
+    }
+  }
+
+  function initEarthAnimationEngine(imgA, imgB) {
+    let preloadedImages = [];
+    let currentFrameIndex = 0;
+    let activeLayer = 'a'; // 'a' or 'b'
+    let direction = 1; // 1 = forward, -1 = reverse (for pingpong)
+
+    const isDayNight = EARTH_ANIMATION_MODE === 'daynight';
+    const fetchLength = isDayNight ? EARTH_DAYNIGHT_FETCH_LENGTH : EARTH_WEATHER_FETCH_LENGTH;
+    const frameStep = Math.max(1, Math.round(isDayNight ? EARTH_DAYNIGHT_FRAME_STEP : EARTH_WEATHER_FRAME_STEP));
+    const frameCount = isDayNight ? EARTH_DAYNIGHT_FRAME_COUNT : EARTH_WEATHER_FRAME_COUNT;
+    const fps = isDayNight ? EARTH_DAYNIGHT_FPS : EARTH_WEATHER_FPS;
+    const loopPauseMs = isDayNight ? EARTH_DAYNIGHT_LOOP_PAUSE_MS : EARTH_WEATHER_LOOP_PAUSE_MS;
+    const playbackMode = isDayNight ? EARTH_DAYNIGHT_PLAYBACK_MODE : EARTH_WEATHER_PLAYBACK_MODE;
+    const resSize = EARTH_ANIMATION_RESOLUTION === '339x339' ? '339x339' : '678x678';
+
+    function setupEarthFrames(rawUrls) {
+      const uniqueUrls = Array.from(new Set(rawUrls)).sort();
+      if (uniqueUrls.length === 0) return;
+
+      // Apply cadence step stepping backwards from newest frame
+      const steppedUrls = frameStep > 1
+        ? uniqueUrls.filter((_, idx) => (uniqueUrls.length - 1 - idx) % frameStep === 0)
+        : uniqueUrls;
+
+      const frameLimit = Math.max(2, Math.min(steppedUrls.length, frameCount));
+      const selectedUrls = steppedUrls.slice(-frameLimit).map(u => {
+        return u.replace('1808x1808', resSize);
+      });
+
+      if (preloadedImages.length === 0) {
+        let loaded = 0;
+        preloadedImages = selectedUrls.map(url => {
+          const img = new Image();
+          img.onload = () => {
+            loaded++;
+            if (loaded >= Math.min(3, selectedUrls.length) && !earthAnimationTimeoutId) {
+              startEarthLoop();
+            }
+          };
+          img.onerror = () => { loaded++; };
+          img.src = url;
+          return img;
+        });
+      } else {
+        // Seamless background hot-swap
+        let loaded = 0;
+        const newImages = selectedUrls.map(url => {
+          const img = new Image();
+          img.onload = () => { loaded++; };
+          img.onerror = () => { loaded++; };
+          img.src = url;
+          return img;
+        });
+
+        const swapWhenReady = () => {
+          if (loaded >= Math.min(6, selectedUrls.length)) {
+            preloadedImages = newImages;
+            currentFrameIndex = Math.max(0, Math.min(preloadedImages.length - 1, currentFrameIndex));
+          } else {
+            setTimeout(swapWhenReady, 100);
+          }
+        };
+        swapWhenReady();
+      }
+    }
+
+    function startEarthLoop() {
+      if (!EARTH_ANIMATION_ENABLED || preloadedImages.length <= 1) return;
+
+      const totalFrames = preloadedImages.length;
+      if (totalFrames <= 1) return;
+
+      currentFrameIndex = Math.max(0, Math.min(totalFrames - 1, currentFrameIndex));
+      const curImg = preloadedImages[currentFrameIndex];
+      const isNewestFrame = currentFrameIndex === totalFrames - 1;
+
+      if (curImg && (curImg.complete || curImg.naturalWidth > 0 || curImg.src)) {
+        if (EARTH_ANIMATION_CROSSFADE_ENABLED) {
+          if (activeLayer === 'a') {
+            imgB.src = curImg.src;
+            imgB.style.opacity = '1';
+            imgA.style.opacity = '0';
+            activeLayer = 'b';
+          } else {
+            imgA.src = curImg.src;
+            imgA.style.opacity = '1';
+            imgB.style.opacity = '0';
+            activeLayer = 'a';
+          }
+        } else {
+          imgA.src = curImg.src;
+          imgA.style.opacity = '1';
+        }
+      }
+
+      let delay = Math.round(1000 / Math.max(1, fps));
+
+      if (playbackMode === 'pingpong') {
+        if (direction === 1) {
+          if (currentFrameIndex >= totalFrames - 1) {
+            direction = -1;
+            currentFrameIndex = totalFrames - 2;
+            if (loopPauseMs > 0) delay += loopPauseMs;
+          } else {
+            currentFrameIndex++;
+          }
+        } else {
+          if (currentFrameIndex <= 0) {
+            direction = 1;
+            currentFrameIndex = 1;
+            if (loopPauseMs > 0) delay += loopPauseMs;
+          } else {
+            currentFrameIndex--;
+          }
+        }
+      } else {
+        if (isNewestFrame) {
+          delay += loopPauseMs;
+          currentFrameIndex = 0;
+        } else {
+          currentFrameIndex++;
+        }
+      }
+
+      earthAnimationTimeoutId = setTimeout(startEarthLoop, delay);
+    }
+
+    async function refreshLiveEarthFrames() {
+      try {
+        const url = `https://www.star.nesdis.noaa.gov/goes/fulldisk_band.php?sat=G19&band=GEOCOLOR&length=${fetchLength}&_t=${Date.now()}`;
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`NOAA Earth HTTP ${res.status}`);
+        const html = await res.text();
+        const matches = [...html.matchAll(/'(https:\/\/cdn\.star\.nesdis\.noaa\.gov\/GOES19\/ABI\/FD\/GEOCOLOR\/[0-9]+_GOES19-ABI-FD-GEOCOLOR-1808x1808\.jpg)'/g)];
+        if (matches && matches.length >= 2) {
+          const rawUrls = matches.map(m => m[1]);
+          setupEarthFrames(rawUrls);
+        }
+      } catch (err) {
+        console.warn('Auto-refresh of Earth satellite frames skipped:', err);
+      }
+    }
+
+    // Initial fetch after page settle
+    setTimeout(refreshLiveEarthFrames, 1500);
+
+    // Periodic auto-refresh every 10 minutes
+    setInterval(refreshLiveEarthFrames, EARTH_ANIMATION_AUTO_REFRESH_MS);
   }
 
   // Earth image is now initialized dynamically at the end of getLocalWeather()
