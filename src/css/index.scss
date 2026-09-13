@@ -1504,17 +1504,30 @@ main {
     --world-clocks-margin-bottom: var(--world-clocks-margin-bottom-desktop, 1.0vw);
     --world-clock-track-color: var(--world-clock-track-color-desktop, rgba(255, 255, 255, 0.2));
     --world-clock-track-width: var(--world-clock-track-width-desktop, 4);
-    --world-clock-label-layout: var(--world-clock-label-layout-desktop, row);
+    --world-clock-user-track-color: var(--world-clock-user-track-color-desktop, var(--temp-color, var(--world-clock-track-color)));
+    --world-clock-label-layout: var(--world-clock-label-layout-desktop, column);
     --world-clock-label-gap: var(--world-clock-label-gap-desktop, 0vw);
-    --world-clock-label-font-size: var(--world-clock-label-font-size-desktop, 1.35vw);
+    --world-clock-label-line-gap: var(--world-clock-label-line-gap-desktop, 0.2vw);
     --world-clock-label-margin-top: var(--world-clock-label-margin-top-desktop, 0.8vw);
+    --world-clock-label-font-size: var(--world-clock-label-font-size-desktop, 1.75vw);
     --world-clock-label-letter-spacing: var(--world-clock-label-letter-spacing-desktop, 0.04vw);
     --world-clock-label-font-family: var(--world-clock-label-font-family-desktop, "'light', sans-serif");
     --world-clock-label-color: var(--world-clock-label-color-desktop, #ffffff);
     --world-clock-label-opacity: var(--world-clock-label-opacity-desktop, 0.85);
-    --world-clock-time-font-family: inherit;
+
+    /* Line 1: Zone Name (Where) */
+    --world-clock-name-font-size: var(--world-clock-name-font-size-desktop, 1.75vw);
+    --world-clock-name-font-family: var(--world-clock-name-font-family-desktop, "'light', sans-serif");
+    --world-clock-name-color: var(--world-clock-name-color-desktop, #ffffff);
+    --world-clock-name-opacity: var(--world-clock-name-opacity-desktop, 0.85);
+    --world-clock-name-letter-spacing: var(--world-clock-name-letter-spacing-desktop, 0.04vw);
+
+    /* Line 2: Actual Time */
+    --world-clock-time-font-size: var(--world-clock-time-font-size-desktop, 1.75vw);
+    --world-clock-time-font-family: var(--world-clock-time-font-family-desktop, "'light', sans-serif");
     --world-clock-time-color: var(--world-clock-time-color-desktop, #ffffff);
     --world-clock-time-opacity: var(--world-clock-time-opacity-desktop, 0.85);
+    --world-clock-time-letter-spacing: var(--world-clock-time-letter-spacing-desktop, 0.04vw);
 
     /* Doppler Radar Experiment: "Lighten Only" HUD overlay on the page background */
     /* Option A: Lighten HUD Overlay on page background (Default) */
@@ -1589,17 +1602,30 @@ main {
         --world-clocks-margin-bottom: var(--world-clocks-margin-bottom-mobile, 1.5vw);
         --world-clock-track-color: var(--world-clock-track-color-mobile, rgba(255, 255, 255, 0.2));
         --world-clock-track-width: var(--world-clock-track-width-mobile, 4);
-        --world-clock-label-layout: var(--world-clock-label-layout-mobile, row);
+        --world-clock-user-track-color: var(--world-clock-user-track-color-mobile, var(--temp-color, var(--world-clock-track-color)));
+        --world-clock-label-layout: var(--world-clock-label-layout-mobile, column);
         --world-clock-label-gap: var(--world-clock-label-gap-mobile, 0vw);
-        --world-clock-label-font-size: var(--world-clock-label-font-size-mobile, 1.75vw);
+        --world-clock-label-line-gap: var(--world-clock-label-line-gap-mobile, 0.3vw);
         --world-clock-label-margin-top: var(--world-clock-label-margin-top-mobile, 1.0vw);
+        --world-clock-label-font-size: var(--world-clock-label-font-size-mobile, 2.3vw);
         --world-clock-label-letter-spacing: var(--world-clock-label-letter-spacing-mobile, 0.02vw);
         --world-clock-label-font-family: var(--world-clock-label-font-family-mobile, "'light', sans-serif");
         --world-clock-label-color: var(--world-clock-label-color-mobile, #ffffff);
         --world-clock-label-opacity: var(--world-clock-label-opacity-mobile, 0.85);
-        --world-clock-time-font-family: inherit;
+
+        /* Line 1: Zone Name (Where) Mobile */
+        --world-clock-name-font-size: var(--world-clock-name-font-size-mobile, 2.3vw);
+        --world-clock-name-font-family: var(--world-clock-name-font-family-mobile, "'light', sans-serif");
+        --world-clock-name-color: var(--world-clock-name-color-mobile, #ffffff);
+        --world-clock-name-opacity: var(--world-clock-name-opacity-mobile, 0.85);
+        --world-clock-name-letter-spacing: var(--world-clock-name-letter-spacing-mobile, 0.02vw);
+
+        /* Line 2: Actual Time Mobile */
+        --world-clock-time-font-size: var(--world-clock-time-font-size-mobile, 2.3vw);
+        --world-clock-time-font-family: var(--world-clock-time-font-family-mobile, "'light', sans-serif");
         --world-clock-time-color: var(--world-clock-time-color-mobile, #ffffff);
         --world-clock-time-opacity: var(--world-clock-time-opacity-mobile, 0.85);
+        --world-clock-time-letter-spacing: var(--world-clock-time-letter-spacing-mobile, 0.02vw);
     }
 
     .grid-wind-speed-text {
@@ -1669,17 +1695,30 @@ main {
         --world-clocks-margin-bottom: var(--world-clocks-margin-bottom-desktop, 1.0vw);
         --world-clock-track-color: var(--world-clock-track-color-desktop, rgba(255, 255, 255, 0.2));
         --world-clock-track-width: var(--world-clock-track-width-desktop, 4);
-        --world-clock-label-layout: var(--world-clock-label-layout-desktop, row);
+        --world-clock-user-track-color: var(--world-clock-user-track-color-desktop, var(--temp-color, var(--world-clock-track-color)));
+        --world-clock-label-layout: var(--world-clock-label-layout-desktop, column);
         --world-clock-label-gap: var(--world-clock-label-gap-desktop, 0vw);
-        --world-clock-label-font-size: var(--world-clock-label-font-size-desktop, 1.35vw);
+        --world-clock-label-line-gap: var(--world-clock-label-line-gap-desktop, 0.2vw);
         --world-clock-label-margin-top: var(--world-clock-label-margin-top-desktop, 0.8vw);
+        --world-clock-label-font-size: var(--world-clock-label-font-size-desktop, 1.75vw);
         --world-clock-label-letter-spacing: var(--world-clock-label-letter-spacing-desktop, 0.04vw);
         --world-clock-label-font-family: var(--world-clock-label-font-family-desktop, "'light', sans-serif");
         --world-clock-label-color: var(--world-clock-label-color-desktop, #ffffff);
         --world-clock-label-opacity: var(--world-clock-label-opacity-desktop, 0.85);
-        --world-clock-time-font-family: inherit;
+
+        /* Line 1: Zone Name (Where) Desktop */
+        --world-clock-name-font-size: var(--world-clock-name-font-size-desktop, 1.75vw);
+        --world-clock-name-font-family: var(--world-clock-name-font-family-desktop, "'light', sans-serif");
+        --world-clock-name-color: var(--world-clock-name-color-desktop, #ffffff);
+        --world-clock-name-opacity: var(--world-clock-name-opacity-desktop, 0.85);
+        --world-clock-name-letter-spacing: var(--world-clock-name-letter-spacing-desktop, 0.04vw);
+
+        /* Line 2: Actual Time Desktop */
+        --world-clock-time-font-size: var(--world-clock-time-font-size-desktop, 1.75vw);
+        --world-clock-time-font-family: var(--world-clock-time-font-family-desktop, "'light', sans-serif");
         --world-clock-time-color: var(--world-clock-time-color-desktop, #ffffff);
         --world-clock-time-opacity: var(--world-clock-time-opacity-desktop, 0.85);
+        --world-clock-time-letter-spacing: var(--world-clock-time-letter-spacing-desktop, 0.04vw);
     }
     .clockGridContainer7,
     .clockGridLabelsContainer7 {
@@ -1946,6 +1985,11 @@ main {
         .countdown-track {
             stroke: var(--world-clock-track-color, rgba(255, 255, 255, 0.2));
             stroke-width: var(--world-clock-track-width, 4);
+            transition: stroke 0.3s ease;
+        }
+
+        &.is-user-timezone .countdown-track {
+            stroke: var(--world-clock-user-track-color, var(--temp-color, var(--world-clock-track-color, rgba(255, 255, 255, 0.2))));
         }
     }
 
@@ -2017,43 +2061,52 @@ main {
     width: 100%;
     max-width: 100%;
     display: flex;
-    flex-direction: var(--world-clock-label-layout, row);
+    flex-direction: var(--world-clock-label-layout, column);
     justify-content: center;
     align-items: center;
-    gap: var(--world-clock-label-gap, 0vw);
+    gap: var(--world-clock-label-line-gap, 0.2vw);
     font-family: var(--world-clock-label-font-family, 'light', sans-serif);
-    font-size: var(--world-clock-label-font-size, 1.35vw);
+    font-size: var(--world-clock-label-font-size, 1.75vw);
     letter-spacing: var(--world-clock-label-letter-spacing, 0.04vw);
     padding-left: var(--world-clock-label-letter-spacing, 0.04vw);
     color: var(--world-clock-label-color, #ffffff);
     opacity: var(--world-clock-label-opacity, 0.85);
     margin-top: var(--world-clock-label-margin-top, 0.8vw);
     text-align: center;
-    white-space: nowrap;
+    white-space: normal;
     user-select: none;
-    line-height: 1.2;
+    line-height: 1.15;
     box-sizing: border-box;
 
     .world-clock-name {
-        display: inline-block;
-        font-family: inherit !important;
-        font-size: inherit;
-        color: inherit;
+        display: block;
+        font-family: var(--world-clock-name-font-family, var(--world-clock-label-font-family, 'light', sans-serif)) !important;
+        font-size: var(--world-clock-name-font-size, var(--world-clock-label-font-size, 1.75vw));
+        color: var(--world-clock-name-color, var(--world-clock-label-color, #ffffff));
+        opacity: var(--world-clock-name-opacity, var(--world-clock-label-opacity, 0.85));
+        letter-spacing: var(--world-clock-name-letter-spacing, var(--world-clock-label-letter-spacing, 0.04vw));
+        padding-left: var(--world-clock-name-letter-spacing, var(--world-clock-label-letter-spacing, 0.04vw));
+        line-height: 1.15;
+        white-space: nowrap;
     }
 
     .world-clock-spacer {
-        display: var(--world-clock-spacer-display, inline-block);
+        display: var(--world-clock-spacer-display, none);
         font-family: inherit !important;
         font-size: inherit;
         white-space: pre;
     }
 
     .world-clock-time {
-        display: inline-block;
-        font-family: inherit !important;
-        font-size: inherit;
-        color: var(--world-clock-time-color, inherit);
-        opacity: var(--world-clock-time-opacity, 1);
+        display: block;
+        font-family: var(--world-clock-time-font-family, inherit) !important;
+        font-size: var(--world-clock-time-font-size, var(--world-clock-label-font-size, 1.75vw));
+        color: var(--world-clock-time-color, #ffffff);
+        opacity: var(--world-clock-time-opacity, 0.85);
+        letter-spacing: var(--world-clock-time-letter-spacing, var(--world-clock-label-letter-spacing, 0.04vw));
+        padding-left: var(--world-clock-time-letter-spacing, var(--world-clock-label-letter-spacing, 0.04vw));
+        line-height: 1.15;
+        white-space: nowrap;
     }
 }
 

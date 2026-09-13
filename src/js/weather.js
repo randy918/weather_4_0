@@ -6868,25 +6868,27 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   // Seed list of latest real-time NOAA SUVI Fe195 frames (50-70s cadence)
   const SUN_SIZZLE_FRAMES_SEED = [
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262540049360_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262540050461_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262540051561_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262540052461_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262540053361_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262540054461_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262540055561_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262540056461_GOES19-SUVI-Fe195-600x600.jpg'
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561433437_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561434537_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561436037_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561436537_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561437437_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561438537_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561440037_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561440537_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561441437_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561442537_GOES19-SUVI-Fe195-600x600.jpg'
   ];
 
   // Sizing & Layout (Half size per user request)
   const SUN_IMAGE_WIDTH_DESKTOP = '34vw';             // EDITABLE Desktop: Width & height (half Earth's 68vw)
   const SUN_IMAGE_WIDTH_MOBILE = '42vw';              // EDITABLE Mobile: Width & height (half Earth's 85vw)
 
-  const SUN_IMAGE_MARGIN_TOP_DESKTOP = '2vw';         // EDITABLE Desktop: Gap above sun image
-  const SUN_IMAGE_MARGIN_TOP_MOBILE = '3vw';          // EDITABLE Mobile: Gap above sun image
+  const SUN_IMAGE_MARGIN_TOP_DESKTOP = '0vw';         // EDITABLE Desktop: Gap above sun image
+  const SUN_IMAGE_MARGIN_TOP_MOBILE = '1vw';          // EDITABLE Mobile: Gap above sun image
 
   const SUN_IMAGE_MARGIN_BOTTOM_DESKTOP = '2vw';      // EDITABLE Desktop: Gap below sun image
-  const SUN_IMAGE_MARGIN_BOTTOM_MOBILE = '3vw';       // EDITABLE Mobile: Gap below sun image
+  const SUN_IMAGE_MARGIN_BOTTOM_MOBILE = '0vw';       // EDITABLE Mobile: Gap below sun image
 
   const SUN_IMAGE_INNER_SCALE_DESKTOP = '108%';       // EDITABLE Desktop: Inner scale to crop bottom timestamp & NOAA logo
   const SUN_IMAGE_INNER_SCALE_MOBILE = '108%';        // EDITABLE Mobile: Inner scale to crop bottom timestamp & NOAA logo
@@ -6909,14 +6911,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // --- Sun Labels Config (JCV) ---
   // Centered labels beneath each sun circle
   const SUN_LABEL_ENABLED = true;                     // EDITABLE: Enable/disable centered labels under each sun
-  const SUN_LABEL_LEFT_TEXT = '27-Day Rotation';       // EDITABLE: Label under left rotating sun (e.g. '27-DAY ROTATION', '27-DAY CYCLE')
-  const SUN_LABEL_RIGHT_TEXT = 'Live';         // EDITABLE: Label under right sizzling sun (e.g. 'LIVE FLARES', 'LIVE ACTIVITY', 'REAL TIME')
+  const SUN_LABEL_LEFT_TEXT = '\u00A0\u00A0\u00A0\u00A0\u00A027-Day Rotation';       // EDITABLE: Label under left rotating sun (e.g. '27-DAY ROTATION', '27-DAY CYCLE')
+  const SUN_LABEL_RIGHT_TEXT = '\u00A0\u00A0\u00A0\u00A0\u00A0Live';         // EDITABLE: Label under right sizzling sun (e.g. 'LIVE FLARES', 'LIVE ACTIVITY', 'REAL TIME')
 
   const SUN_LABEL_FONT_SIZE_DESKTOP = '2.0vw';        // EDITABLE Desktop: Font size for sun labels
   const SUN_LABEL_FONT_SIZE_MOBILE = '2.6vw';         // EDITABLE Mobile: Font size for sun labels
 
-  const SUN_LABEL_MARGIN_TOP_DESKTOP = '0.8vw';       // EDITABLE Desktop: Gap between sun circle and label
-  const SUN_LABEL_MARGIN_TOP_MOBILE = '1.2vw';        // EDITABLE Mobile: Gap between sun circle and label
+  const SUN_LABEL_MARGIN_TOP_DESKTOP = '-2.5vw';       // EDITABLE Desktop: Gap between sun circle and label
+  const SUN_LABEL_MARGIN_TOP_MOBILE = '-2vw';        // EDITABLE Mobile: Gap between sun circle and label
 
   const SUN_LABEL_FONT_FAMILY = "'light', sans-serif";// EDITABLE: Font family (matches UI aesthetic)
   const SUN_LABEL_LETTER_SPACING_DESKTOP = '0.08vw';  // EDITABLE Desktop: Letter spacing / kerning
@@ -7024,16 +7026,22 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const WORLD_CLOCK_SIZE_MOBILE = '16.0vw';                  // EDITABLE Mobile: Dial diameter for each clock
   const WORLD_CLOCKS_GAP_DESKTOP = '2.5vw';                  // EDITABLE Desktop: Spacing between each clock column
   const WORLD_CLOCKS_GAP_MOBILE = '1.8vw';                   // EDITABLE Mobile: Spacing between each clock column
-  const WORLD_CLOCKS_MARGIN_TOP_DESKTOP = '2.5vw';           // EDITABLE Desktop: Margin above the clocks row
-  const WORLD_CLOCKS_MARGIN_TOP_MOBILE = '3.0vw';            // EDITABLE Mobile: Margin above the clocks row
-  const WORLD_CLOCKS_MARGIN_BOTTOM_DESKTOP = '1.0vw';        // EDITABLE Desktop: Margin below the clocks row
-  const WORLD_CLOCKS_MARGIN_BOTTOM_MOBILE = '1.5vw';         // EDITABLE Mobile: Margin below the clocks row
+  const WORLD_CLOCKS_MARGIN_TOP_DESKTOP = '-5vw';           // EDITABLE Desktop: Margin above the clocks row
+  const WORLD_CLOCKS_MARGIN_TOP_MOBILE = '-5.0vw';            // EDITABLE Mobile: Margin above the clocks row
+  const WORLD_CLOCKS_MARGIN_BOTTOM_DESKTOP = '-1vw';        // EDITABLE Desktop: Margin below the clocks row
+  const WORLD_CLOCKS_MARGIN_BOTTOM_MOBILE = '-4vw';         // EDITABLE Mobile: Margin below the clocks row
 
   // Dial Track (outer ring without 5-min countdown)
-  const WORLD_CLOCK_TRACK_COLOR_DESKTOP = 'rgba(255, 255, 255, 0.2)'; // EDITABLE Desktop: Track stroke color
-  const WORLD_CLOCK_TRACK_COLOR_MOBILE = 'rgba(255, 255, 255, 0.2)';  // EDITABLE Mobile: Track stroke color
+  const WORLD_CLOCK_TRACK_COLOR_DESKTOP = 'rgba(255, 255, 255, 0.2)'; // EDITABLE Desktop: Default track stroke color
+  const WORLD_CLOCK_TRACK_COLOR_MOBILE = 'rgba(255, 255, 255, 0.2)';  // EDITABLE Mobile: Default track stroke color
   const WORLD_CLOCK_TRACK_WIDTH_DESKTOP = 4;                 // EDITABLE Desktop: Track stroke thickness
   const WORLD_CLOCK_TRACK_WIDTH_MOBILE = 4;                  // EDITABLE Mobile: Track stroke thickness
+
+  // User Timezone Track Color Highlight (Matches current temperature color)
+  const WORLD_CLOCK_USER_TIMEZONE_TRACK_COLOR_MODE = 'temp'; // EDITABLE: 'temp' (matches current temp color) or custom color
+  const WORLD_CLOCK_USER_TIMEZONE_TRACK_COLOR_DESKTOP = 'temp'; // EDITABLE Desktop: User timezone track color ('temp' or color string)
+  const WORLD_CLOCK_USER_TIMEZONE_TRACK_COLOR_MOBILE = 'temp';  // EDITABLE Mobile: User timezone track color ('temp' or color string)
+  const WORLD_CLOCK_USER_TIMEZONE_OVERRIDE = null;           // EDITABLE: Manual override (e.g. 'central', 'pacific', 'mountain', 'eastern', 'uk') or null for auto-detect
 
   // Hands & Dot styling
   const WORLD_CLOCK_HANDS_COLOR_MODE = 'temp';               // EDITABLE: 'temp' (matches current temp color) or 'white' or custom string (e.g. 'rgba(255,255,255,0.9)')
@@ -7042,30 +7050,54 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const WORLD_CLOCK_SECOND_HAND_COLOR = 'rgba(255, 255, 255, 0.2)';   // EDITABLE: Subtle second hand color matching clock dial
   const WORLD_CLOCK_CENTER_DOT_OPACITY = 0;                  // EDITABLE: 0 to hide center dot (matching clock dial), 1 to show
 
-  // Labels below dials (e.g. "Pacific 6:51a")
+  // Labels below dials (Two lines: Line 1 Zone Name "where", Line 2 Actual Time "time")
   const WORLD_CLOCK_LABEL_ENABLED = true;                    // EDITABLE: Show labels under dials
   const WORLD_CLOCK_LABEL_SHOW_TIME = true;                  // EDITABLE: Include dynamic time string (e.g. "6:51a") with region name
-  const WORLD_CLOCK_LABEL_LAYOUT_DESKTOP = 'row';            // EDITABLE Desktop: 'row' (side-by-side: "Pacific  6:51a") or 'column' (stacked: "Pacific" over "6:51a")
-  const WORLD_CLOCK_LABEL_LAYOUT_MOBILE = 'row';             // EDITABLE Mobile: 'row' or 'column'
-  const WORLD_CLOCK_LABEL_SPACES = 2;                        // EDITABLE: Number of typographic spaces between region name and time
-  const WORLD_CLOCK_LABEL_GAP_DESKTOP = '0vw';               // EDITABLE Desktop: Extra spacing beyond the two spaces
-  const WORLD_CLOCK_LABEL_GAP_MOBILE = '0vw';                // EDITABLE Mobile: Extra spacing beyond the two spaces
-  const WORLD_CLOCK_LABEL_FONT_SIZE_DESKTOP = '1.35vw';      // EDITABLE Desktop: Label font size
-  const WORLD_CLOCK_LABEL_FONT_SIZE_MOBILE = '1.75vw';       // EDITABLE Mobile: Label font size
+  const WORLD_CLOCK_LABEL_LAYOUT_DESKTOP = 'column';         // EDITABLE Desktop: 'column' (two lines) or 'row' (side-by-side)
+  const WORLD_CLOCK_LABEL_LAYOUT_MOBILE = 'column';          // EDITABLE Mobile: 'column' (two lines) or 'row' (side-by-side)
+  const WORLD_CLOCK_LABEL_SPACES = 2;                        // EDITABLE: Number of typographic spaces if used in single row
+  const WORLD_CLOCK_LABEL_GAP_DESKTOP = '0vw';               // EDITABLE Desktop: Extra spacing when in row layout
+  const WORLD_CLOCK_LABEL_GAP_MOBILE = '0vw';                // EDITABLE Mobile: Extra spacing when in row layout
+  const WORLD_CLOCK_LABEL_LINE_GAP_DESKTOP = '0.2vw';        // EDITABLE Desktop: Vertical space between zone name and actual time
+  const WORLD_CLOCK_LABEL_LINE_GAP_MOBILE = '0.3vw';         // EDITABLE Mobile: Vertical space between zone name and actual time
   const WORLD_CLOCK_LABEL_MARGIN_TOP_DESKTOP = '0.8vw';      // EDITABLE Desktop: Margin above label
   const WORLD_CLOCK_LABEL_MARGIN_TOP_MOBILE = '1.0vw';       // EDITABLE Mobile: Margin above label
-  const WORLD_CLOCK_LABEL_LETTER_SPACING_DESKTOP = '0.04vw'; // EDITABLE Desktop: Letter spacing
-  const WORLD_CLOCK_LABEL_LETTER_SPACING_MOBILE = '0.02vw';  // EDITABLE Mobile: Letter spacing
-  const WORLD_CLOCK_LABEL_FONT_FAMILY_DESKTOP = "'light', sans-serif"; // EDITABLE Desktop: Font family
-  const WORLD_CLOCK_LABEL_FONT_FAMILY_MOBILE = "'light', sans-serif";  // EDITABLE Mobile: Font family
-  const WORLD_CLOCK_LABEL_COLOR_DESKTOP = '#ffffff';         // EDITABLE Desktop: Text color
-  const WORLD_CLOCK_LABEL_COLOR_MOBILE = '#ffffff';          // EDITABLE Mobile: Text color
-  const WORLD_CLOCK_LABEL_OPACITY_DESKTOP = 0.85;            // EDITABLE Desktop: Label opacity
-  const WORLD_CLOCK_LABEL_OPACITY_MOBILE = 0.85;             // EDITABLE Mobile: Label opacity
+
+  // Line 1: Zone Name ("where" - enlarged 30% from 1.35vw/1.75vw to 1.75vw/2.3vw)
+  const WORLD_CLOCK_NAME_FONT_SIZE_DESKTOP = '1.75vw';       // EDITABLE Desktop: Zone name (where) font size (+30%)
+  const WORLD_CLOCK_NAME_FONT_SIZE_MOBILE = '2.3vw';         // EDITABLE Mobile: Zone name (where) font size (+30%)
+  const WORLD_CLOCK_NAME_FONT_FAMILY_DESKTOP = "'light', sans-serif"; // EDITABLE Desktop: Zone name font family
+  const WORLD_CLOCK_NAME_FONT_FAMILY_MOBILE = "'light', sans-serif";  // EDITABLE Mobile: Zone name font family
+  const WORLD_CLOCK_NAME_COLOR_DESKTOP = '#ffffff';          // EDITABLE Desktop: Zone name color
+  const WORLD_CLOCK_NAME_COLOR_MOBILE = '#ffffff';           // EDITABLE Mobile: Zone name color
+  const WORLD_CLOCK_NAME_OPACITY_DESKTOP = 0.85;             // EDITABLE Desktop: Zone name opacity
+  const WORLD_CLOCK_NAME_OPACITY_MOBILE = 0.85;              // EDITABLE Mobile: Zone name opacity
+  const WORLD_CLOCK_NAME_LETTER_SPACING_DESKTOP = '0.04vw';  // EDITABLE Desktop: Zone name letter spacing
+  const WORLD_CLOCK_NAME_LETTER_SPACING_MOBILE = '0.02vw';   // EDITABLE Mobile: Zone name letter spacing
+
+  // Line 2: Actual Time ("time" - enlarged 30% from 1.35vw/1.75vw to 1.75vw/2.3vw)
+  const WORLD_CLOCK_TIME_FONT_SIZE_DESKTOP = '1.75vw';       // EDITABLE Desktop: Actual time font size (+30%)
+  const WORLD_CLOCK_TIME_FONT_SIZE_MOBILE = '2.3vw';         // EDITABLE Mobile: Actual time font size (+30%)
+  const WORLD_CLOCK_TIME_FONT_FAMILY_DESKTOP = "'light', sans-serif"; // EDITABLE Desktop: Time font family
+  const WORLD_CLOCK_TIME_FONT_FAMILY_MOBILE = "'light', sans-serif";  // EDITABLE Mobile: Time font family
   const WORLD_CLOCK_TIME_COLOR_DESKTOP = '#ffffff';          // EDITABLE Desktop: Time text color
   const WORLD_CLOCK_TIME_COLOR_MOBILE = '#ffffff';           // EDITABLE Mobile: Time text color
   const WORLD_CLOCK_TIME_OPACITY_DESKTOP = 0.85;             // EDITABLE Desktop: Time opacity
   const WORLD_CLOCK_TIME_OPACITY_MOBILE = 0.85;              // EDITABLE Mobile: Time opacity
+  const WORLD_CLOCK_TIME_LETTER_SPACING_DESKTOP = '0.04vw';  // EDITABLE Desktop: Time letter spacing
+  const WORLD_CLOCK_TIME_LETTER_SPACING_MOBILE = '0.02vw';   // EDITABLE Mobile: Time letter spacing
+
+  // Legacy fallback references
+  const WORLD_CLOCK_LABEL_FONT_SIZE_DESKTOP = WORLD_CLOCK_NAME_FONT_SIZE_DESKTOP;
+  const WORLD_CLOCK_LABEL_FONT_SIZE_MOBILE = WORLD_CLOCK_NAME_FONT_SIZE_MOBILE;
+  const WORLD_CLOCK_LABEL_LETTER_SPACING_DESKTOP = WORLD_CLOCK_NAME_LETTER_SPACING_DESKTOP;
+  const WORLD_CLOCK_LABEL_LETTER_SPACING_MOBILE = WORLD_CLOCK_NAME_LETTER_SPACING_MOBILE;
+  const WORLD_CLOCK_LABEL_FONT_FAMILY_DESKTOP = WORLD_CLOCK_NAME_FONT_FAMILY_DESKTOP;
+  const WORLD_CLOCK_LABEL_FONT_FAMILY_MOBILE = WORLD_CLOCK_NAME_FONT_FAMILY_MOBILE;
+  const WORLD_CLOCK_LABEL_COLOR_DESKTOP = WORLD_CLOCK_NAME_COLOR_DESKTOP;
+  const WORLD_CLOCK_LABEL_COLOR_MOBILE = WORLD_CLOCK_NAME_COLOR_MOBILE;
+  const WORLD_CLOCK_LABEL_OPACITY_DESKTOP = WORLD_CLOCK_NAME_OPACITY_DESKTOP;
+  const WORLD_CLOCK_LABEL_OPACITY_MOBILE = WORLD_CLOCK_NAME_OPACITY_MOBILE;
 
   function applyWorldClocksConfig() {
     const isMobile = window.innerWidth <= 767;
@@ -7101,29 +7133,46 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--world-clock-label-gap-mobile', WORLD_CLOCK_LABEL_GAP_MOBILE);
     document.documentElement.style.setProperty('--world-clock-label-gap', isMobile ? WORLD_CLOCK_LABEL_GAP_MOBILE : WORLD_CLOCK_LABEL_GAP_DESKTOP);
 
-    document.documentElement.style.setProperty('--world-clock-label-font-size-desktop', WORLD_CLOCK_LABEL_FONT_SIZE_DESKTOP);
-    document.documentElement.style.setProperty('--world-clock-label-font-size-mobile', WORLD_CLOCK_LABEL_FONT_SIZE_MOBILE);
-    document.documentElement.style.setProperty('--world-clock-label-font-size', isMobile ? WORLD_CLOCK_LABEL_FONT_SIZE_MOBILE : WORLD_CLOCK_LABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--world-clock-label-line-gap-desktop', WORLD_CLOCK_LABEL_LINE_GAP_DESKTOP);
+    document.documentElement.style.setProperty('--world-clock-label-line-gap-mobile', WORLD_CLOCK_LABEL_LINE_GAP_MOBILE);
+    document.documentElement.style.setProperty('--world-clock-label-line-gap', isMobile ? WORLD_CLOCK_LABEL_LINE_GAP_MOBILE : WORLD_CLOCK_LABEL_LINE_GAP_DESKTOP);
+
+    const isRowLayout = (isMobile ? WORLD_CLOCK_LABEL_LAYOUT_MOBILE : WORLD_CLOCK_LABEL_LAYOUT_DESKTOP) === 'row';
+    document.documentElement.style.setProperty('--world-clock-spacer-display', isRowLayout ? 'inline-block' : 'none');
 
     document.documentElement.style.setProperty('--world-clock-label-margin-top-desktop', WORLD_CLOCK_LABEL_MARGIN_TOP_DESKTOP);
     document.documentElement.style.setProperty('--world-clock-label-margin-top-mobile', WORLD_CLOCK_LABEL_MARGIN_TOP_MOBILE);
     document.documentElement.style.setProperty('--world-clock-label-margin-top', isMobile ? WORLD_CLOCK_LABEL_MARGIN_TOP_MOBILE : WORLD_CLOCK_LABEL_MARGIN_TOP_DESKTOP);
 
-    document.documentElement.style.setProperty('--world-clock-label-letter-spacing-desktop', WORLD_CLOCK_LABEL_LETTER_SPACING_DESKTOP);
-    document.documentElement.style.setProperty('--world-clock-label-letter-spacing-mobile', WORLD_CLOCK_LABEL_LETTER_SPACING_MOBILE);
-    document.documentElement.style.setProperty('--world-clock-label-letter-spacing', isMobile ? WORLD_CLOCK_LABEL_LETTER_SPACING_MOBILE : WORLD_CLOCK_LABEL_LETTER_SPACING_DESKTOP);
+    // Line 1: Zone Name ("where")
+    document.documentElement.style.setProperty('--world-clock-name-font-size-desktop', WORLD_CLOCK_NAME_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--world-clock-name-font-size-mobile', WORLD_CLOCK_NAME_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--world-clock-name-font-size', isMobile ? WORLD_CLOCK_NAME_FONT_SIZE_MOBILE : WORLD_CLOCK_NAME_FONT_SIZE_DESKTOP);
 
-    document.documentElement.style.setProperty('--world-clock-label-font-family-desktop', WORLD_CLOCK_LABEL_FONT_FAMILY_DESKTOP);
-    document.documentElement.style.setProperty('--world-clock-label-font-family-mobile', WORLD_CLOCK_LABEL_FONT_FAMILY_MOBILE);
-    document.documentElement.style.setProperty('--world-clock-label-font-family', isMobile ? WORLD_CLOCK_LABEL_FONT_FAMILY_MOBILE : WORLD_CLOCK_LABEL_FONT_FAMILY_DESKTOP);
+    document.documentElement.style.setProperty('--world-clock-name-font-family-desktop', WORLD_CLOCK_NAME_FONT_FAMILY_DESKTOP);
+    document.documentElement.style.setProperty('--world-clock-name-font-family-mobile', WORLD_CLOCK_NAME_FONT_FAMILY_MOBILE);
+    document.documentElement.style.setProperty('--world-clock-name-font-family', isMobile ? WORLD_CLOCK_NAME_FONT_FAMILY_MOBILE : WORLD_CLOCK_NAME_FONT_FAMILY_DESKTOP);
 
-    document.documentElement.style.setProperty('--world-clock-label-color-desktop', WORLD_CLOCK_LABEL_COLOR_DESKTOP);
-    document.documentElement.style.setProperty('--world-clock-label-color-mobile', WORLD_CLOCK_LABEL_COLOR_MOBILE);
-    document.documentElement.style.setProperty('--world-clock-label-color', isMobile ? WORLD_CLOCK_LABEL_COLOR_MOBILE : WORLD_CLOCK_LABEL_COLOR_DESKTOP);
+    document.documentElement.style.setProperty('--world-clock-name-color-desktop', WORLD_CLOCK_NAME_COLOR_DESKTOP);
+    document.documentElement.style.setProperty('--world-clock-name-color-mobile', WORLD_CLOCK_NAME_COLOR_MOBILE);
+    document.documentElement.style.setProperty('--world-clock-name-color', isMobile ? WORLD_CLOCK_NAME_COLOR_MOBILE : WORLD_CLOCK_NAME_COLOR_DESKTOP);
 
-    document.documentElement.style.setProperty('--world-clock-label-opacity-desktop', String(WORLD_CLOCK_LABEL_OPACITY_DESKTOP));
-    document.documentElement.style.setProperty('--world-clock-label-opacity-mobile', String(WORLD_CLOCK_LABEL_OPACITY_MOBILE));
-    document.documentElement.style.setProperty('--world-clock-label-opacity', String(isMobile ? WORLD_CLOCK_LABEL_OPACITY_MOBILE : WORLD_CLOCK_LABEL_OPACITY_DESKTOP));
+    document.documentElement.style.setProperty('--world-clock-name-opacity-desktop', String(WORLD_CLOCK_NAME_OPACITY_DESKTOP));
+    document.documentElement.style.setProperty('--world-clock-name-opacity-mobile', String(WORLD_CLOCK_NAME_OPACITY_MOBILE));
+    document.documentElement.style.setProperty('--world-clock-name-opacity', String(isMobile ? WORLD_CLOCK_NAME_OPACITY_MOBILE : WORLD_CLOCK_NAME_OPACITY_DESKTOP));
+
+    document.documentElement.style.setProperty('--world-clock-name-letter-spacing-desktop', WORLD_CLOCK_NAME_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--world-clock-name-letter-spacing-mobile', WORLD_CLOCK_NAME_LETTER_SPACING_MOBILE);
+    document.documentElement.style.setProperty('--world-clock-name-letter-spacing', isMobile ? WORLD_CLOCK_NAME_LETTER_SPACING_MOBILE : WORLD_CLOCK_NAME_LETTER_SPACING_DESKTOP);
+
+    // Line 2: Actual Time ("time")
+    document.documentElement.style.setProperty('--world-clock-time-font-size-desktop', WORLD_CLOCK_TIME_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--world-clock-time-font-size-mobile', WORLD_CLOCK_TIME_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--world-clock-time-font-size', isMobile ? WORLD_CLOCK_TIME_FONT_SIZE_MOBILE : WORLD_CLOCK_TIME_FONT_SIZE_DESKTOP);
+
+    document.documentElement.style.setProperty('--world-clock-time-font-family-desktop', WORLD_CLOCK_TIME_FONT_FAMILY_DESKTOP);
+    document.documentElement.style.setProperty('--world-clock-time-font-family-mobile', WORLD_CLOCK_TIME_FONT_FAMILY_MOBILE);
+    document.documentElement.style.setProperty('--world-clock-time-font-family', isMobile ? WORLD_CLOCK_TIME_FONT_FAMILY_MOBILE : WORLD_CLOCK_TIME_FONT_FAMILY_DESKTOP);
 
     document.documentElement.style.setProperty('--world-clock-time-color-desktop', WORLD_CLOCK_TIME_COLOR_DESKTOP);
     document.documentElement.style.setProperty('--world-clock-time-color-mobile', WORLD_CLOCK_TIME_COLOR_MOBILE);
@@ -7132,6 +7181,17 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--world-clock-time-opacity-desktop', String(WORLD_CLOCK_TIME_OPACITY_DESKTOP));
     document.documentElement.style.setProperty('--world-clock-time-opacity-mobile', String(WORLD_CLOCK_TIME_OPACITY_MOBILE));
     document.documentElement.style.setProperty('--world-clock-time-opacity', String(isMobile ? WORLD_CLOCK_TIME_OPACITY_MOBILE : WORLD_CLOCK_TIME_OPACITY_DESKTOP));
+
+    document.documentElement.style.setProperty('--world-clock-time-letter-spacing-desktop', WORLD_CLOCK_TIME_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--world-clock-time-letter-spacing-mobile', WORLD_CLOCK_TIME_LETTER_SPACING_MOBILE);
+    document.documentElement.style.setProperty('--world-clock-time-letter-spacing', isMobile ? WORLD_CLOCK_TIME_LETTER_SPACING_MOBILE : WORLD_CLOCK_TIME_LETTER_SPACING_DESKTOP);
+
+    // Overall label fallbacks
+    document.documentElement.style.setProperty('--world-clock-label-font-size', isMobile ? WORLD_CLOCK_NAME_FONT_SIZE_MOBILE : WORLD_CLOCK_NAME_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--world-clock-label-font-family', isMobile ? WORLD_CLOCK_NAME_FONT_FAMILY_MOBILE : WORLD_CLOCK_NAME_FONT_FAMILY_DESKTOP);
+    document.documentElement.style.setProperty('--world-clock-label-color', isMobile ? WORLD_CLOCK_NAME_COLOR_MOBILE : WORLD_CLOCK_NAME_COLOR_DESKTOP);
+    document.documentElement.style.setProperty('--world-clock-label-opacity', String(isMobile ? WORLD_CLOCK_NAME_OPACITY_MOBILE : WORLD_CLOCK_NAME_OPACITY_DESKTOP));
+    document.documentElement.style.setProperty('--world-clock-label-letter-spacing', isMobile ? WORLD_CLOCK_NAME_LETTER_SPACING_MOBILE : WORLD_CLOCK_NAME_LETTER_SPACING_DESKTOP);
   }
   applyWorldClocksConfig();
   window.addEventListener('resize', applyWorldClocksConfig);
@@ -7170,7 +7230,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1143';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1149';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -10755,6 +10815,62 @@ Plan ahead for significantly warmer conditions tomorrow!`
     { id: 'uk', name: 'UK', timeZone: 'Europe/London' }
   ];
 
+  function getUserTimezoneZoneId() {
+    if (WORLD_CLOCK_USER_TIMEZONE_OVERRIDE) {
+      return WORLD_CLOCK_USER_TIMEZONE_OVERRIDE;
+    }
+    let userTz = '';
+    try {
+      userTz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+    } catch (e) {
+      userTz = '';
+    }
+
+    // Direct and common regional matches for the 5 zones:
+    if (/Chicago|Menominee|Winnipeg|Rainy_River|Rankin_Inlet|Resolute|Matamoros|Ojinaga|Monterrey|Mexico_City|Central/i.test(userTz)) {
+      return 'central';
+    }
+    if (/New_York|Detroit|Louisville|Monticello|Indianapolis|Vincennes|Winamac|Marengo|Petersburg|Vevay|Toronto|Montreal|Iqaluit|Nassau|Havana|Eastern/i.test(userTz)) {
+      return 'eastern';
+    }
+    if (/Denver|Phoenix|Boise|Edmonton|Cambridge_Bay|Yellowknife|Inuvik|Chihuahua|Hermosillo|Mountain/i.test(userTz)) {
+      return 'mountain';
+    }
+    if (/Los_Angeles|Vancouver|Tijuana|Dawson|Whitehorse|Pacific/i.test(userTz)) {
+      return 'pacific';
+    }
+    if (/London|Belfast|Guernsey|Jersey|Isle_of_Man|Dublin/i.test(userTz)) {
+      return 'uk';
+    }
+
+    // Fallback: match by current local wall-clock hour & minute against zones
+    try {
+      const now = new Date();
+      const userHour = now.getHours();
+      const userMinute = now.getMinutes();
+      for (const zone of WORLD_CLOCK_ZONES) {
+        const parts = new Intl.DateTimeFormat('en-US', { timeZone: zone.timeZone, hour: 'numeric', minute: 'numeric', hour12: false }).formatToParts(now);
+        const zH = parseInt(parts.find(p => p.type === 'hour')?.value, 10) % 24;
+        const zM = parseInt(parts.find(p => p.type === 'minute')?.value, 10);
+        if (zH === userHour && Math.abs(zM - userMinute) <= 1) {
+          return zone.id;
+        }
+      }
+    } catch (e) {}
+
+    // Fallback if weather data has timezone
+    if (window.lastWeatherData && window.lastWeatherData.timezone) {
+      const weatherTz = window.lastWeatherData.timezone;
+      if (/Chicago|Central/i.test(weatherTz)) return 'central';
+      if (/New_York|Detroit|Eastern/i.test(weatherTz)) return 'eastern';
+      if (/Denver|Mountain/i.test(weatherTz)) return 'mountain';
+      if (/Los_Angeles|Pacific/i.test(weatherTz)) return 'pacific';
+      if (/London/i.test(weatherTz)) return 'uk';
+    }
+
+    return null;
+  }
+
   const worldClockFormatters = WORLD_CLOCK_ZONES.map(z => {
     const hourFormatter = new Intl.DateTimeFormat('en-US', { timeZone: z.timeZone, hour: 'numeric', hour12: false });
     const timeFormatter = new Intl.DateTimeFormat('en-US', { timeZone: z.timeZone, hour: 'numeric', minute: '2-digit', hour12: true });
@@ -10900,13 +11016,41 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const secondRotation = (seconds * 6) + (milliseconds * 0.006);
 
     let handsColor = null;
+    let currentTempColor = null;
+    if (window.lastWeatherData && window.lastWeatherData.current && typeof window.lastWeatherData.current.temp === 'number') {
+      currentTempColor = tempToColor(window.lastWeatherData.current.temp);
+    } else {
+      currentTempColor = document.documentElement.style.getPropertyValue('--temp-color') || null;
+    }
+
     if (WORLD_CLOCK_HANDS_COLOR_MODE === 'temp') {
-      if (window.lastWeatherData && window.lastWeatherData.current && typeof window.lastWeatherData.current.temp === 'number') {
-        handsColor = tempToColor(window.lastWeatherData.current.temp);
-      }
+      handsColor = currentTempColor;
     } else if (WORLD_CLOCK_HANDS_COLOR_MODE && WORLD_CLOCK_HANDS_COLOR_MODE !== 'white') {
       handsColor = WORLD_CLOCK_HANDS_COLOR_MODE;
     }
+
+    // Update Dial Tracks: user's timezone gets current temperature color
+    const userZoneId = getUserTimezoneZoneId();
+    const isMobile = window.innerWidth <= 767;
+    const userTrackSetting = isMobile ? WORLD_CLOCK_USER_TIMEZONE_TRACK_COLOR_MOBILE : WORLD_CLOCK_USER_TIMEZONE_TRACK_COLOR_DESKTOP;
+    const resolvedUserTrackColor = (userTrackSetting === 'temp') ? (currentTempColor || 'rgba(255, 255, 255, 0.4)') : userTrackSetting;
+
+    WORLD_CLOCK_ZONES.forEach(zone => {
+      const dial = document.getElementById(`world-clock-dial-${zone.id}`);
+      if (!dial) return;
+      const trackCircle = dial.querySelector('.countdown-track');
+      const isUserZone = (zone.id === userZoneId);
+
+      if (isUserZone) {
+        dial.classList.add('is-user-timezone');
+        dial.style.setProperty('--world-clock-track-color', resolvedUserTrackColor);
+        if (trackCircle) trackCircle.style.stroke = resolvedUserTrackColor;
+      } else {
+        dial.classList.remove('is-user-timezone');
+        dial.style.removeProperty('--world-clock-track-color');
+        if (trackCircle) trackCircle.style.stroke = '';
+      }
+    });
 
     worldClockFormatters.forEach(({ id, formatter, timeFormatter }) => {
       const dial = document.getElementById(`world-clock-dial-${id}`);
@@ -10948,7 +11092,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         centerDot.style.backgroundColor = handsColor;
       }
 
-      // Update dynamic time text under dial (e.g. "Pacific 6:51a")
+      // Update dynamic time text under dial (e.g. Line 2 "6:51a")
       if (WORLD_CLOCK_LABEL_SHOW_TIME) {
         const timeSpan = document.getElementById(`world-clock-time-${id}`);
         if (timeSpan && timeFormatter) {
@@ -11088,7 +11232,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       rightSun = buildSunCircle(
         'sun-image-container-right',
         'sun-image-right',
-        SUN_SIZZLE_FRAMES_SEED[SUN_SIZZLE_FRAMES_SEED.length - 1] || SUN_IMAGE_URL,
+        `${SUN_IMAGE_BASE_URL}600x600.jpg?t=${Date.now()}`,
         'Live Sizzling Solar Flare Activity from GOES-19 SUVI Fe195'
       );
       const rightCol = buildSunColumn('sun-col-right', rightSun, SUN_LABEL_RIGHT_TEXT, 'sun-label-right');
@@ -11224,6 +11368,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
         const curImg = preloadedSizzleImages[sizzleIndex];
         if (curImg && (curImg.complete || curImg.naturalWidth > 0)) {
           rightSun.img.src = curImg.src;
+        } else if (curImg && curImg.src) {
+          // Robust mobile WebKit decoding fallback
+          rightSun.img.src = curImg.src;
         }
 
         const totalFrames = preloadedSizzleImages.length;
@@ -11256,17 +11403,30 @@ Plan ahead for significantly warmer conditions tomorrow!`
       // Auto-fetch freshest live frames from NOAA STAR SUVI Fe195
       async function refreshLiveSizzleFrames() {
         try {
-          const res = await fetch('https://www.star.nesdis.noaa.gov/goes/SUVI_band.php?sat=G19&band=Fe195&length=60');
-          if (!res.ok) return;
+          const res = await fetch(`https://www.star.nesdis.noaa.gov/goes/SUVI_band.php?sat=G19&band=Fe195&length=60&_t=${Date.now()}`, {
+            cache: 'no-store'
+          });
+          if (!res.ok) throw new Error(`SUVI HTTP status ${res.status}`);
           const html = await res.text();
           const matches = [...html.matchAll(/'(https:\/\/cdn\.star\.nesdis\.noaa\.gov\/GOES19\/SUVI\/FD\/Fe195\/[0-9]+_GOES19-SUVI-Fe195-600x600\.jpg)'/g)];
           if (matches && matches.length >= 2) {
             const freshUrls = matches.map(m => m[1]);
             currentSizzleUrls = freshUrls;
             setupSizzleFrames(currentSizzleUrls);
+            return;
           }
         } catch (err) {
-          console.warn('Auto-refresh of SUVI frames skipped (using active frames):', err);
+          console.warn('Auto-refresh of SUVI frames skipped (falling back to live feed):', err);
+        }
+
+        // Live fallback: ensure right sun never stays stuck if PHP scraper is blocked on mobile WebKit/iPhone
+        if (rightSun && rightSun.img) {
+          const liveUrl = `${SUN_IMAGE_BASE_URL}600x600.jpg?t=${Date.now()}`;
+          const fallbackImg = new Image();
+          fallbackImg.onload = () => {
+            if (rightSun && rightSun.img) rightSun.img.src = liveUrl;
+          };
+          fallbackImg.src = liveUrl;
         }
       }
 
@@ -11275,6 +11435,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       // Periodic auto-refresh every SUN_SIZZLE_AUTO_REFRESH_MS (default 3 min)
       setInterval(refreshLiveSizzleFrames, SUN_SIZZLE_AUTO_REFRESH_MS);
+
+      // Periodic live heartbeat: every 60s ensures image is never stale even if animation pauses
+      setInterval(() => {
+        if (!sunSizzleTimeoutId && rightSun && rightSun.img) {
+          rightSun.img.src = `${SUN_IMAGE_BASE_URL}600x600.jpg?t=${Date.now()}`;
+        }
+      }, 60 * 1000);
     }
   }
 
