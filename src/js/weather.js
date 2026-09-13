@@ -6831,6 +6831,15 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SUN_ANIMATION_LOOP_PAUSE_MS = 1200;           // EDITABLE: Pause in ms on the latest frame before repeating loop
   const SUN_ANIMATION_RESOLUTION = '600x600';         // EDITABLE: Resolution ('600x600' or '300x300')
 
+  // Ease-In & Ease-Out Playback Dynamics (JCV)
+  // Eases out of the Live frame pause (slow start accelerating to cruise speed)
+  // and eases into the Live frame stop (decelerating smoothly before the pause)
+  const SUN_ANIMATION_EASE_ENABLED = true;              // EDITABLE: Enable/disable ease-in and ease-out speed ramping
+  const SUN_ANIMATION_EASE_FRAMES_DESKTOP = 4;          // EDITABLE Desktop: Number of frames to ease in and ease out (e.g. 5-7)
+  const SUN_ANIMATION_EASE_FRAMES_MOBILE = 4;           // EDITABLE Mobile: Number of frames to ease in and ease out
+  const SUN_ANIMATION_EASE_MAX_DELAY_MS_DESKTOP = 200;  // EDITABLE Desktop: Delay in ms for slowest ease frame (cruising is ~83ms)
+  const SUN_ANIMATION_EASE_MAX_DELAY_MS_MOBILE = 200;   // EDITABLE Mobile: Delay in ms for slowest ease frame
+
   // Verified 27-day historical frame sequence (55 frames sampled at 12-hour intervals up to today noon, ending with live sun)
   const SUN_ANIMATION_FRAMES = [
     '20262300000468_GOES19-SUVI-Fe195-600x600.jpg',
@@ -6891,26 +6900,51 @@ Plan ahead for significantly warmer conditions tomorrow!`
   ];
 
   // Right Sun ("Sizzling Current Sun") Controls (JCV)
-  // Plays back recent rapid frames back-and-forth (ping-pong: 1..32..1) to show live solar flare activity
+  // Plays back recent rapid frames back-and-forth (ping-pong) to show live solar flare activity
   const SUN_SIZZLE_ENABLED = true;                    // EDITABLE: Enable/disable animation for right sizzling sun
-  const SUN_SIZZLE_FRAME_COUNT = 32;                  // EDITABLE: Number of recent frames to loop (e.g. 32, or user can pick fewer like 8, 16)
-  const SUN_SIZZLE_FPS = 16;                          // EDITABLE: Playback speed in frames per second (e.g. 16 fps for sizzling flare dynamics)
-  const SUN_SIZZLE_PAUSE_END_MS = 150;                // EDITABLE: Pause in ms at ends (frame 1 and frame 32) before reversing direction (0 for instant)
-  const SUN_SIZZLE_PLAYBACK_MODE = 'pingpong';        // EDITABLE: 'pingpong' (1..32..1) or 'forward' (1..32, 1..32)
+  const SUN_SIZZLE_BAND = 'Fe195';                    // EDITABLE: NOAA SUVI band: 'Fe195' (coronal loops/bronze), 'Fe094' (hot solar flares/blue), 'He304' (prominence eruptions/red)
+  const SUN_SIZZLE_FETCH_LENGTH = 120;                // EDITABLE: Historical buffer to pull from NOAA (60 = ~1 hr, 120 = ~2 hrs, 240 = ~4 hrs)
+  const SUN_SIZZLE_FRAME_STEP = 2;                    // EDITABLE: Cadence step (1 = every frame ~1m, 2 = every 2nd frame ~2m, 3 = ~3m apart for more visible sizzle/flares)
+  const SUN_SIZZLE_FRAME_COUNT = 48;                  // EDITABLE: Number of recent frames in loop (e.g. 32, 48, 64)
+  const SUN_SIZZLE_FPS = 14;                          // EDITABLE: Playback speed in frames per second (12–16 FPS allows eye to track flare eruptions without blurring)
+  const SUN_SIZZLE_PAUSE_END_MS = 0;                  // EDITABLE: Pause in ms at ends (frame 1 and live frame) before reversing (0 for instant)
+  const SUN_SIZZLE_PLAYBACK_MODE = 'pingpong';        // EDITABLE: 'pingpong' or 'forward'
   const SUN_SIZZLE_AUTO_REFRESH_MS = 3 * 60 * 1000;   // EDITABLE: Auto-fetch fresh SUVI frames every 3 minutes
 
   // Seed list of latest real-time NOAA SUVI Fe195 frames (50-70s cadence)
   const SUN_SIZZLE_FRAMES_SEED = [
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561433437_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561434537_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561436037_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561436537_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561437437_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561438537_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561440037_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561440537_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561441437_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561442537_GOES19-SUVI-Fe195-600x600.jpg'
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561600039_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561600538_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561601439_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561602538_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561604039_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561604538_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561605439_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561606539_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561608039_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561608539_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561609439_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561610539_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561612039_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561612539_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561613439_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561614539_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561616039_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561616539_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561617439_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561618539_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561620039_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561620539_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561621439_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561622539_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561624039_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561624539_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561625439_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561626539_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561628039_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561628539_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561629439_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561630539_GOES19-SUVI-Fe195-600x600.jpg'
   ];
 
   // Sizing & Layout (Half size per user request)
@@ -7051,9 +7085,19 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--sun-animation-crossfade-duration-mobile', `${SUN_ANIMATION_CROSSFADE_MS_MOBILE}ms`);
     document.documentElement.style.setProperty('--sun-animation-crossfade-duration', `${isMobile ? SUN_ANIMATION_CROSSFADE_MS_MOBILE : SUN_ANIMATION_CROSSFADE_MS_DESKTOP}ms`);
 
+    document.documentElement.style.setProperty('--sun-animation-ease-enabled', SUN_ANIMATION_EASE_ENABLED ? '1' : '0');
+    document.documentElement.style.setProperty('--sun-animation-ease-frames-desktop', String(SUN_ANIMATION_EASE_FRAMES_DESKTOP));
+    document.documentElement.style.setProperty('--sun-animation-ease-frames-mobile', String(SUN_ANIMATION_EASE_FRAMES_MOBILE));
+    document.documentElement.style.setProperty('--sun-animation-ease-frames', String(isMobile ? SUN_ANIMATION_EASE_FRAMES_MOBILE : SUN_ANIMATION_EASE_FRAMES_DESKTOP));
+    document.documentElement.style.setProperty('--sun-animation-ease-max-delay-desktop', `${SUN_ANIMATION_EASE_MAX_DELAY_MS_DESKTOP}ms`);
+    document.documentElement.style.setProperty('--sun-animation-ease-max-delay-mobile', `${SUN_ANIMATION_EASE_MAX_DELAY_MS_MOBILE}ms`);
+    document.documentElement.style.setProperty('--sun-animation-ease-max-delay', `${isMobile ? SUN_ANIMATION_EASE_MAX_DELAY_MS_MOBILE : SUN_ANIMATION_EASE_MAX_DELAY_MS_DESKTOP}ms`);
+
     document.documentElement.style.setProperty('--sun-animation-days', String(SUN_ANIMATION_DAYS));
     document.documentElement.style.setProperty('--sun-sizzle-fps', String(SUN_SIZZLE_FPS));
     document.documentElement.style.setProperty('--sun-sizzle-frame-count', String(SUN_SIZZLE_FRAME_COUNT));
+    document.documentElement.style.setProperty('--sun-sizzle-frame-step', String(SUN_SIZZLE_FRAME_STEP));
+    document.documentElement.style.setProperty('--sun-sizzle-fetch-length', String(SUN_SIZZLE_FETCH_LENGTH));
   }
   applySunImageConfig();
   window.addEventListener('resize', applySunImageConfig);
@@ -7270,7 +7314,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1152';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1157';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -11394,7 +11438,52 @@ Plan ahead for significantly warmer conditions tomorrow!`
       function runLeftAnimationLoop() {
         if (!SUN_ANIMATION_ENABLED || preloadedImages.length <= 1) return;
 
-        const nextImg = preloadedImages[currentFrameIndex];
+        const totalFrames = preloadedImages.length;
+        const frameIdx = currentFrameIndex;
+        const isLastFrame = frameIdx === totalFrames - 1;
+
+        // Calculate dynamic frame delay with smooth ease-in and ease-out curves
+        const isMobile = window.innerWidth <= 767;
+        const fps = isMobile ? SUN_ANIMATION_FPS_MOBILE : SUN_ANIMATION_FPS_DESKTOP;
+        const cruiseDelay = Math.max(20, Math.round(1000 / Math.max(1, fps)));
+
+        let delay = cruiseDelay;
+        if (isLastFrame) {
+          // Full rest pause on live current sun
+          delay = SUN_ANIMATION_LOOP_PAUSE_MS;
+        } else if (SUN_ANIMATION_EASE_ENABLED && totalFrames > 10) {
+          const easeFrames = isMobile ? SUN_ANIMATION_EASE_FRAMES_MOBILE : SUN_ANIMATION_EASE_FRAMES_DESKTOP;
+          const maxDelay = isMobile ? SUN_ANIMATION_EASE_MAX_DELAY_MS_MOBILE : SUN_ANIMATION_EASE_MAX_DELAY_MS_DESKTOP;
+
+          // Ease-In: Gentle accelerating curve out of the Live frame pause
+          let factorIn = 0;
+          if (frameIdx < easeFrames) {
+            const progIn = frameIdx / easeFrames;
+            factorIn = 0.5 * (1 + Math.cos(Math.PI * progIn)); // 1.0 down to 0.0
+          }
+
+          // Ease-Out: Gentle decelerating curve into the Live frame pause
+          let factorOut = 0;
+          const distEnd = (totalFrames - 2) - frameIdx;
+          if (distEnd >= 0 && distEnd < easeFrames) {
+            const progOut = distEnd / easeFrames;
+            factorOut = 0.5 * (1 + Math.cos(Math.PI * progOut)); // 0.0 up to 1.0
+          }
+
+          const factor = Math.max(factorIn, factorOut);
+          delay = Math.round(cruiseDelay + (maxDelay - cruiseDelay) * factor);
+        }
+
+        // Dynamically calibrate cross-fade transition duration to match current frame speed
+        if (SUN_ANIMATION_CROSSFADE_ENABLED && leftSun && leftSun.container) {
+          const baseFade = isMobile ? SUN_ANIMATION_CROSSFADE_MS_MOBILE : SUN_ANIMATION_CROSSFADE_MS_DESKTOP;
+          const dynamicFade = SUN_ANIMATION_EASE_ENABLED && !isLastFrame
+            ? Math.round(Math.min(delay * 0.72, baseFade * 2.5))
+            : baseFade;
+          leftSun.container.style.setProperty('--sun-animation-crossfade-duration', `${dynamicFade}ms`);
+        }
+
+        const nextImg = preloadedImages[frameIdx];
         if (nextImg && (nextImg.complete || nextImg.naturalWidth > 0 || nextImg.src)) {
           if (SUN_ANIMATION_CROSSFADE_ENABLED && leftSun && leftSun.imgB) {
             if (activeLayer === 'a') {
@@ -11419,12 +11508,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           }
         }
 
-        const isLastFrame = currentFrameIndex === preloadedImages.length - 1;
-        currentFrameIndex = (currentFrameIndex + 1) % preloadedImages.length;
-
-        const isMobile = window.innerWidth <= 767;
-        const fps = isMobile ? SUN_ANIMATION_FPS_MOBILE : SUN_ANIMATION_FPS_DESKTOP;
-        const delay = isLastFrame ? SUN_ANIMATION_LOOP_PAUSE_MS : Math.max(20, Math.round(1000 / Math.max(1, fps)));
+        currentFrameIndex = (frameIdx + 1) % totalFrames;
         sunAnimationTimeoutId = setTimeout(runLeftAnimationLoop, delay);
       }
     } else {
@@ -11438,23 +11522,51 @@ Plan ahead for significantly warmer conditions tomorrow!`
       let currentSizzleUrls = [...SUN_SIZZLE_FRAMES_SEED];
       let preloadedSizzleImages = [];
 
-      function setupSizzleFrames(urls) {
-        const frameLimit = Math.max(2, SUN_SIZZLE_FRAME_COUNT);
-        const selectedUrls = urls.slice(-frameLimit).map(u => {
+      function setupSizzleFrames(urls, isInitial = false) {
+        // Deduplicate unique frames and sort in strict ascending chronological order
+        const uniqueUrls = Array.from(new Set(urls)).sort();
+        const step = Math.max(1, Math.round(SUN_SIZZLE_FRAME_STEP || 1));
+        const steppedUrls = step > 1
+          ? uniqueUrls.filter((_, idx) => (uniqueUrls.length - 1 - idx) % step === 0)
+          : uniqueUrls;
+        const frameLimit = Math.max(2, Math.min(steppedUrls.length, SUN_SIZZLE_FRAME_COUNT));
+        const selectedUrls = steppedUrls.slice(-frameLimit).map(u => {
           if (SUN_ANIMATION_RESOLUTION === '300x300') {
             return u.replace('600x600', '300x300');
           }
           return u;
         });
 
-        preloadedSizzleImages = selectedUrls.map(u => {
-          const imgObj = new Image();
-          imgObj.src = u;
-          return imgObj;
-        });
+        if (isInitial || preloadedSizzleImages.length === 0) {
+          preloadedSizzleImages = selectedUrls.map(u => {
+            const imgObj = new Image();
+            imgObj.src = u;
+            return imgObj;
+          });
 
-        if (!sunSizzleTimeoutId && preloadedSizzleImages.length > 1) {
-          startSizzleLoop();
+          if (!sunSizzleTimeoutId && preloadedSizzleImages.length > 1) {
+            startSizzleLoop();
+          }
+        } else {
+          // Seamless hot-swap: Preload new batch in background so running loop never stutters
+          let loaded = 0;
+          const newImages = selectedUrls.map(u => {
+            const imgObj = new Image();
+            imgObj.onload = () => { loaded++; };
+            imgObj.onerror = () => { loaded++; };
+            imgObj.src = u;
+            return imgObj;
+          });
+
+          const swapWhenReady = () => {
+            if (loaded >= Math.min(10, selectedUrls.length)) {
+              preloadedSizzleImages = newImages;
+              sizzleIndex = Math.max(0, Math.min(preloadedSizzleImages.length - 1, sizzleIndex));
+            } else {
+              setTimeout(swapWhenReady, 100);
+            }
+          };
+          swapWhenReady();
         }
       }
 
@@ -11464,28 +11576,36 @@ Plan ahead for significantly warmer conditions tomorrow!`
       function startSizzleLoop() {
         if (!SUN_SIZZLE_ENABLED || preloadedSizzleImages.length <= 1) return;
 
+        const totalFrames = preloadedSizzleImages.length;
+        if (totalFrames <= 1) return;
+
+        // Ensure index is strictly clamped within bounds
+        sizzleIndex = Math.max(0, Math.min(totalFrames - 1, sizzleIndex));
+
         const curImg = preloadedSizzleImages[sizzleIndex];
-        if (curImg && (curImg.complete || curImg.naturalWidth > 0)) {
-          rightSun.img.src = curImg.src;
-        } else if (curImg && curImg.src) {
-          // Robust mobile WebKit decoding fallback
+        if (curImg && (curImg.complete || curImg.naturalWidth > 0 || curImg.src)) {
           rightSun.img.src = curImg.src;
         }
 
-        const totalFrames = preloadedSizzleImages.length;
         let delay = Math.round(1000 / SUN_SIZZLE_FPS);
 
         if (SUN_SIZZLE_PLAYBACK_MODE === 'pingpong') {
-          if (sizzleDirection === 1 && sizzleIndex >= totalFrames - 1) {
-            sizzleDirection = -1;
-            sizzleIndex = totalFrames - 2;
-            if (SUN_SIZZLE_PAUSE_END_MS > 0) delay += SUN_SIZZLE_PAUSE_END_MS;
-          } else if (sizzleDirection === -1 && sizzleIndex <= 0) {
-            sizzleDirection = 1;
-            sizzleIndex = 1;
-            if (SUN_SIZZLE_PAUSE_END_MS > 0) delay += SUN_SIZZLE_PAUSE_END_MS;
+          if (sizzleDirection === 1) {
+            if (sizzleIndex >= totalFrames - 1) {
+              sizzleDirection = -1;
+              sizzleIndex = totalFrames - 2;
+              if (SUN_SIZZLE_PAUSE_END_MS > 0) delay += SUN_SIZZLE_PAUSE_END_MS;
+            } else {
+              sizzleIndex++;
+            }
           } else {
-            sizzleIndex += sizzleDirection;
+            if (sizzleIndex <= 0) {
+              sizzleDirection = 1;
+              sizzleIndex = 1;
+              if (SUN_SIZZLE_PAUSE_END_MS > 0) delay += SUN_SIZZLE_PAUSE_END_MS;
+            } else {
+              sizzleIndex--;
+            }
           }
         } else {
           const isEnd = sizzleIndex >= totalFrames - 1;
@@ -11497,33 +11617,41 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }
 
       // Initialize with seed frames immediately
-      setupSizzleFrames(currentSizzleUrls);
+      setupSizzleFrames(currentSizzleUrls, true);
 
       // Auto-fetch freshest live frames from NOAA STAR SUVI Fe195
       async function refreshLiveSizzleFrames() {
         try {
-          const res = await fetch(`https://www.star.nesdis.noaa.gov/goes/SUVI_band.php?sat=G19&band=Fe195&length=60&_t=${Date.now()}`, {
+          const band = SUN_SIZZLE_BAND || 'Fe195';
+          const length = Math.max(20, Math.min(300, SUN_SIZZLE_FETCH_LENGTH || 120));
+          const res = await fetch(`https://www.star.nesdis.noaa.gov/goes/SUVI_band.php?sat=G19&band=${band}&length=${length}&_t=${Date.now()}`, {
             cache: 'no-store'
           });
           if (!res.ok) throw new Error(`SUVI HTTP status ${res.status}`);
           const html = await res.text();
-          const matches = [...html.matchAll(/'(https:\/\/cdn\.star\.nesdis\.noaa\.gov\/GOES19\/SUVI\/FD\/Fe195\/[0-9]+_GOES19-SUVI-Fe195-600x600\.jpg)'/g)];
+          const regex = new RegExp(`'(https:\\/\\/cdn\\.star\\.nesdis\\.noaa\\.gov\\/GOES19\\/SUVI\\/FD\\/${band}\\/[0-9]+_GOES19-SUVI-${band}-600x600\\.jpg)'`, 'g');
+          const matches = [...html.matchAll(regex)];
           if (matches && matches.length >= 2) {
-            const freshUrls = matches.map(m => m[1]);
-            currentSizzleUrls = freshUrls;
-            setupSizzleFrames(currentSizzleUrls);
-            return;
+            const rawUrls = matches.map(m => m[1]);
+            const uniqueUrls = Array.from(new Set(rawUrls)).sort();
+            if (uniqueUrls.length >= 2) {
+              currentSizzleUrls = uniqueUrls;
+              setupSizzleFrames(currentSizzleUrls, false);
+              return;
+            }
           }
         } catch (err) {
           console.warn('Auto-refresh of SUVI frames skipped (falling back to live feed):', err);
         }
 
-        // Live fallback: ensure right sun never stays stuck if PHP scraper is blocked on mobile WebKit/iPhone
-        if (rightSun && rightSun.img) {
+        // Live fallback: ONLY if no frames loaded or animation is not running
+        if (rightSun && rightSun.img && preloadedSizzleImages.length === 0) {
           const liveUrl = `${SUN_IMAGE_BASE_URL}600x600.jpg?t=${Date.now()}`;
           const fallbackImg = new Image();
           fallbackImg.onload = () => {
-            if (rightSun && rightSun.img) rightSun.img.src = liveUrl;
+            if (rightSun && rightSun.img && preloadedSizzleImages.length === 0) {
+              rightSun.img.src = liveUrl;
+            }
           };
           fallbackImg.src = liveUrl;
         }

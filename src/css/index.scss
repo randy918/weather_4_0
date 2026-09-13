@@ -1494,6 +1494,8 @@ main {
     --sun-label-opacity: var(--sun-label-opacity-desktop, 0.70);
     --sun-label-text-transform: var(--sun-label-text-transform-desktop, capitalize);
     --sun-animation-crossfade-duration: var(--sun-animation-crossfade-duration-desktop, 60ms);
+    --sun-animation-ease-max-delay: var(--sun-animation-ease-max-delay-desktop, 280ms);
+    --sun-animation-ease-frames: var(--sun-animation-ease-frames-desktop, 6);
     --sun-label-offset-x: var(--sun-label-offset-x-desktop, 0vw);
     --sun-label-left-offset-x: var(--sun-label-left-offset-x-desktop, 0vw);
     --sun-label-right-offset-x: var(--sun-label-right-offset-x-desktop, 0vw);
@@ -1597,6 +1599,8 @@ main {
         --sun-label-left-offset-x: var(--sun-label-left-offset-x-mobile, 0vw);
         --sun-label-right-offset-x: var(--sun-label-right-offset-x-mobile, 0vw);
         --sun-animation-crossfade-duration: var(--sun-animation-crossfade-duration-mobile, 60ms);
+        --sun-animation-ease-max-delay: var(--sun-animation-ease-max-delay-mobile, 280ms);
+        --sun-animation-ease-frames: var(--sun-animation-ease-frames-mobile, 6);
 
         --world-clock-size: var(--world-clock-size-mobile, 16.0vw);
         --world-clocks-gap: var(--world-clocks-gap-mobile, 1.8vw);
@@ -1691,6 +1695,8 @@ main {
         --sun-label-left-offset-x: var(--sun-label-left-offset-x-desktop, 0vw);
         --sun-label-right-offset-x: var(--sun-label-right-offset-x-desktop, 0vw);
         --sun-animation-crossfade-duration: var(--sun-animation-crossfade-duration-desktop, 60ms);
+        --sun-animation-ease-max-delay: var(--sun-animation-ease-max-delay-desktop, 280ms);
+        --sun-animation-ease-frames: var(--sun-animation-ease-frames-desktop, 6);
 
         --world-clock-size: var(--world-clock-size-desktop, 13.5vw);
         --world-clocks-gap: var(--world-clocks-gap-desktop, 2.5vw);
