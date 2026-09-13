@@ -1493,6 +1493,7 @@ main {
     --sun-label-color: var(--sun-label-color-desktop, #ffffff);
     --sun-label-opacity: var(--sun-label-opacity-desktop, 0.70);
     --sun-label-text-transform: var(--sun-label-text-transform-desktop, capitalize);
+    --sun-animation-crossfade-duration: var(--sun-animation-crossfade-duration-desktop, 60ms);
     --sun-label-offset-x: var(--sun-label-offset-x-desktop, 0vw);
     --sun-label-left-offset-x: var(--sun-label-left-offset-x-desktop, 0vw);
     --sun-label-right-offset-x: var(--sun-label-right-offset-x-desktop, 0vw);
@@ -1595,6 +1596,7 @@ main {
         --sun-label-offset-x: var(--sun-label-offset-x-mobile, 0vw);
         --sun-label-left-offset-x: var(--sun-label-left-offset-x-mobile, 0vw);
         --sun-label-right-offset-x: var(--sun-label-right-offset-x-mobile, 0vw);
+        --sun-animation-crossfade-duration: var(--sun-animation-crossfade-duration-mobile, 60ms);
 
         --world-clock-size: var(--world-clock-size-mobile, 16.0vw);
         --world-clocks-gap: var(--world-clocks-gap-mobile, 1.8vw);
@@ -1688,6 +1690,7 @@ main {
         --sun-label-offset-x: var(--sun-label-offset-x-desktop, 0vw);
         --sun-label-left-offset-x: var(--sun-label-left-offset-x-desktop, 0vw);
         --sun-label-right-offset-x: var(--sun-label-right-offset-x-desktop, 0vw);
+        --sun-animation-crossfade-duration: var(--sun-animation-crossfade-duration-desktop, 60ms);
 
         --world-clock-size: var(--world-clock-size-desktop, 13.5vw);
         --world-clocks-gap: var(--world-clocks-gap-desktop, 2.5vw);
@@ -2156,7 +2159,9 @@ main {
 }
 
 #sun-image,
-#sun-image-right {
+#sun-image-b,
+#sun-image-right,
+.sun-image {
     width: var(--sun-image-inner-scale, 108%);
     height: var(--sun-image-inner-scale, 108%);
     position: absolute;
@@ -2167,6 +2172,18 @@ main {
     mix-blend-mode: var(--sun-image-blend-mode, lighten);
     display: block;
     opacity: var(--sun-image-opacity, 1);
+}
+
+.sun-image-layer-a {
+    z-index: 1;
+    opacity: 1;
+    transition: opacity var(--sun-animation-crossfade-duration, 60ms) ease-in-out;
+}
+
+.sun-image-layer-b {
+    z-index: 2;
+    opacity: 0;
+    transition: opacity var(--sun-animation-crossfade-duration, 60ms) ease-in-out;
 }
 
 .sun-label {

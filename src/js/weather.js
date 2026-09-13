@@ -6822,38 +6822,71 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // Left Sun: 27-Day Solar Rotation Animation Controls (JCV)
   const SUN_ANIMATION_ENABLED = true;                 // EDITABLE: Enable/disable time-span rotation animation
   const SUN_ANIMATION_DAYS = 27;                      // EDITABLE: Number of data days in time span (27 = full solar synodic rotation)
-  const SUN_ANIMATION_FPS = 6;                        // EDITABLE: Frames per second (playback speed, e.g. 6 = ~4.5s per rotation cycle)
+  const SUN_ANIMATION_FPS = 12;                       // EDITABLE: Default frames per second (e.g. 12 = ~4.5s for 54-frame rotation cycle)
+  const SUN_ANIMATION_FPS_DESKTOP = 12;               // EDITABLE Desktop: Frames per second (playback speed)
+  const SUN_ANIMATION_FPS_MOBILE = 12;                // EDITABLE Mobile: Frames per second (playback speed)
+  const SUN_ANIMATION_CROSSFADE_ENABLED = true;       // EDITABLE: Enable/disable smooth dual-buffer cross-fade between rotation frames
+  const SUN_ANIMATION_CROSSFADE_MS_DESKTOP = 60;      // EDITABLE Desktop: Cross-fade transition duration in milliseconds (e.g. 50-70ms)
+  const SUN_ANIMATION_CROSSFADE_MS_MOBILE = 60;       // EDITABLE Mobile: Cross-fade transition duration in milliseconds (e.g. 50-70ms)
   const SUN_ANIMATION_LOOP_PAUSE_MS = 1200;           // EDITABLE: Pause in ms on the latest frame before repeating loop
   const SUN_ANIMATION_RESOLUTION = '600x600';         // EDITABLE: Resolution ('600x600' or '300x300')
 
-  // Verified 27-day historical frame sequence (1 daily noon snapshot per day across 27 days)
+  // Verified 27-day historical frame sequence (55 frames sampled at 12-hour intervals up to today noon, ending with live sun)
   const SUN_ANIMATION_FRAMES = [
-    '20262281200422_GOES19-SUVI-Fe195-600x600.jpg',
-    '20262291200453_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262300000468_GOES19-SUVI-Fe195-600x600.jpg',
     '20262301200483_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262310000499_GOES19-SUVI-Fe195-600x600.jpg',
     '20262311200514_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262320000529_GOES19-SUVI-Fe195-600x600.jpg',
     '20262321200544_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262330000560_GOES19-SUVI-Fe195-600x600.jpg',
     '20262331200575_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262340000590_GOES19-SUVI-Fe195-600x600.jpg',
     '20262341201005_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262350001020_GOES19-SUVI-Fe195-600x600.jpg',
     '20262351201036_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262360001051_GOES19-SUVI-Fe195-600x600.jpg',
     '20262361201066_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262370001081_GOES19-SUVI-Fe195-600x600.jpg',
     '20262371201096_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262380000011_GOES19-SUVI-Fe195-600x600.jpg',
     '20262381200026_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262390000042_GOES19-SUVI-Fe195-600x600.jpg',
     '20262391200057_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262400000072_GOES19-SUVI-Fe195-600x600.jpg',
     '20262401200087_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262410000102_GOES19-SUVI-Fe195-600x600.jpg',
     '20262411200117_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262420000132_GOES19-SUVI-Fe195-600x600.jpg',
     '20262421200147_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262430000163_GOES19-SUVI-Fe195-600x600.jpg',
     '20262431200178_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262440000193_GOES19-SUVI-Fe195-600x600.jpg',
     '20262441200208_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262450000223_GOES19-SUVI-Fe195-600x600.jpg',
     '20262451200238_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262460000253_GOES19-SUVI-Fe195-600x600.jpg',
     '20262461200268_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262470000283_GOES19-SUVI-Fe195-600x600.jpg',
     '20262471200298_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262480000312_GOES19-SUVI-Fe195-600x600.jpg',
     '20262481200327_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262490000342_GOES19-SUVI-Fe195-600x600.jpg',
     '20262491200357_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262500000372_GOES19-SUVI-Fe195-600x600.jpg',
     '20262501200387_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262510000402_GOES19-SUVI-Fe195-600x600.jpg',
     '20262511200417_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262520000400_GOES19-SUVI-Fe195-600x600.jpg',
     '20262521200415_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262530000430_GOES19-SUVI-Fe195-600x600.jpg',
     '20262531200445_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262540000460_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262541200474_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262550000489_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262551200004_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262560000019_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262561200034_GOES19-SUVI-Fe195-600x600.jpg',
     'latest.jpg'
   ];
 
@@ -7010,7 +7043,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--sun-label-opacity', SUN_LABEL_OPACITY);
     document.documentElement.style.setProperty('--sun-label-text-transform', SUN_LABEL_TEXT_TRANSFORM);
 
-    document.documentElement.style.setProperty('--sun-animation-fps', String(SUN_ANIMATION_FPS));
+    document.documentElement.style.setProperty('--sun-animation-fps-desktop', String(SUN_ANIMATION_FPS_DESKTOP));
+    document.documentElement.style.setProperty('--sun-animation-fps-mobile', String(SUN_ANIMATION_FPS_MOBILE));
+    document.documentElement.style.setProperty('--sun-animation-fps', String(isMobile ? SUN_ANIMATION_FPS_MOBILE : SUN_ANIMATION_FPS_DESKTOP));
+
+    document.documentElement.style.setProperty('--sun-animation-crossfade-duration-desktop', `${SUN_ANIMATION_CROSSFADE_MS_DESKTOP}ms`);
+    document.documentElement.style.setProperty('--sun-animation-crossfade-duration-mobile', `${SUN_ANIMATION_CROSSFADE_MS_MOBILE}ms`);
+    document.documentElement.style.setProperty('--sun-animation-crossfade-duration', `${isMobile ? SUN_ANIMATION_CROSSFADE_MS_MOBILE : SUN_ANIMATION_CROSSFADE_MS_DESKTOP}ms`);
+
     document.documentElement.style.setProperty('--sun-animation-days', String(SUN_ANIMATION_DAYS));
     document.documentElement.style.setProperty('--sun-sizzle-fps', String(SUN_SIZZLE_FPS));
     document.documentElement.style.setProperty('--sun-sizzle-frame-count', String(SUN_SIZZLE_FRAME_COUNT));
@@ -7230,7 +7270,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1149';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1152';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -11121,7 +11161,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (document.getElementById('sun-image-container') || document.getElementById('suns-row-wrapper')) return;
 
     // Helper to build a styled circular sun element
-    function buildSunCircle(containerId, imgId, initialUrl, altText) {
+    function buildSunCircle(containerId, imgId, initialUrl, altText, enableDualBuffer = false) {
       const c = document.createElement('div');
       c.id = containerId;
       c.className = 'sun-image-container';
@@ -11139,7 +11179,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       const im = document.createElement('img');
       im.id = imgId;
-      im.className = 'sun-image';
+      im.className = 'sun-image sun-image-layer-a';
       im.src = initialUrl;
       im.alt = altText;
       im.style.width = 'var(--sun-image-inner-scale, 108%)';
@@ -11151,9 +11191,37 @@ Plan ahead for significantly warmer conditions tomorrow!`
       im.style.objectFit = 'cover';
       im.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
       im.style.display = 'block';
+      im.style.zIndex = '1';
+      im.style.opacity = '1';
+      if (enableDualBuffer) {
+        im.style.transition = 'opacity var(--sun-animation-crossfade-duration, 60ms) ease-in-out';
+      }
 
       c.appendChild(im);
-      return { container: c, img: im };
+
+      let imB = null;
+      if (enableDualBuffer) {
+        imB = document.createElement('img');
+        imB.id = imgId + '-b';
+        imB.className = 'sun-image sun-image-layer-b';
+        imB.src = initialUrl;
+        imB.alt = altText;
+        imB.style.width = 'var(--sun-image-inner-scale, 108%)';
+        imB.style.height = 'var(--sun-image-inner-scale, 108%)';
+        imB.style.position = 'absolute';
+        imB.style.top = 'var(--sun-image-offset-y, -1%)';
+        imB.style.left = '50%';
+        imB.style.transform = 'translateX(-50%)';
+        imB.style.objectFit = 'cover';
+        imB.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
+        imB.style.display = 'block';
+        imB.style.zIndex = '2';
+        imB.style.opacity = '0';
+        imB.style.transition = 'opacity var(--sun-animation-crossfade-duration, 60ms) ease-in-out';
+        c.appendChild(imB);
+      }
+
+      return { container: c, img: im, imgB: imB };
     }
 
     // Helper to build a vertical column containing the circular sun and its centered label
@@ -11201,12 +11269,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
       return col;
     }
 
-    // Left Sun (27-Day Rotation Loop)
+    // Left Sun (27-Day Rotation Loop with Dual-Buffer Smooth Cross-Fade)
     const leftSun = buildSunCircle(
       'sun-image-container',
       'sun-image',
       SUN_IMAGE_URL,
-      'Live Sunspot & Coronal 27-Day Rotation Animation from GOES-19 SUVI Fe195'
+      'Live Sunspot & Coronal 27-Day Rotation Animation from GOES-19 SUVI Fe195',
+      SUN_ANIMATION_CROSSFADE_ENABLED
     );
     const leftCol = buildSunColumn('sun-col-left', leftSun, SUN_LABEL_LEFT_TEXT, 'sun-label-left');
 
@@ -11288,13 +11357,19 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
     // --- Left Sun: 27-Day Repeating Solar Rotation Animation Engine ---
     if (SUN_ANIMATION_ENABLED && Array.isArray(SUN_ANIMATION_FRAMES) && SUN_ANIMATION_FRAMES.length > 0) {
-      const activeFrameNames = SUN_ANIMATION_FRAMES.slice(-Math.max(1, SUN_ANIMATION_DAYS));
+      const framesPerDay = SUN_ANIMATION_FRAMES.length > 27 ? 2 : 1;
+      const targetCount = Math.max(1, Math.min(SUN_ANIMATION_FRAMES.length, Math.round(SUN_ANIMATION_DAYS * framesPerDay + 1)));
+      const activeFrameNames = SUN_ANIMATION_FRAMES.slice(-targetCount);
       const frameUrls = activeFrameNames.map(name => {
         let fn = name;
         if (SUN_ANIMATION_RESOLUTION === '300x300' && fn.includes('600x600')) {
           fn = fn.replace('600x600', '300x300');
         }
-        return fn === 'latest.jpg' ? (SUN_IMAGE_URL + '?t=' + Date.now()) : (SUN_IMAGE_BASE_URL + fn);
+        if (fn === 'latest.jpg') {
+          const resFile = SUN_ANIMATION_RESOLUTION === '300x300' ? '300x300.jpg' : '600x600.jpg';
+          return `${SUN_IMAGE_BASE_URL}${resFile}?t=${Date.now()}`;
+        }
+        return SUN_IMAGE_BASE_URL + fn;
       });
 
       const preloadedImages = [];
@@ -11314,18 +11389,42 @@ Plan ahead for significantly warmer conditions tomorrow!`
       });
 
       let currentFrameIndex = 0;
+      let activeLayer = 'a'; // 'a' or 'b' for dual-buffer smooth cross-dissolve
+
       function runLeftAnimationLoop() {
         if (!SUN_ANIMATION_ENABLED || preloadedImages.length <= 1) return;
 
         const nextImg = preloadedImages[currentFrameIndex];
-        if (nextImg && (nextImg.complete || nextImg.naturalWidth > 0)) {
-          leftSun.img.src = nextImg.src;
+        if (nextImg && (nextImg.complete || nextImg.naturalWidth > 0 || nextImg.src)) {
+          if (SUN_ANIMATION_CROSSFADE_ENABLED && leftSun && leftSun.imgB) {
+            if (activeLayer === 'a') {
+              // Seamlessly cross-fade to Layer B
+              leftSun.imgB.src = nextImg.src;
+              leftSun.imgB.style.zIndex = '2';
+              leftSun.img.style.zIndex = '1';
+              leftSun.imgB.style.opacity = '1';
+              leftSun.img.style.opacity = '0';
+              activeLayer = 'b';
+            } else {
+              // Seamlessly cross-fade to Layer A
+              leftSun.img.src = nextImg.src;
+              leftSun.img.style.zIndex = '2';
+              leftSun.imgB.style.zIndex = '1';
+              leftSun.img.style.opacity = '1';
+              leftSun.imgB.style.opacity = '0';
+              activeLayer = 'a';
+            }
+          } else {
+            leftSun.img.src = nextImg.src;
+          }
         }
 
         const isLastFrame = currentFrameIndex === preloadedImages.length - 1;
         currentFrameIndex = (currentFrameIndex + 1) % preloadedImages.length;
 
-        const delay = isLastFrame ? SUN_ANIMATION_LOOP_PAUSE_MS : Math.round(1000 / SUN_ANIMATION_FPS);
+        const isMobile = window.innerWidth <= 767;
+        const fps = isMobile ? SUN_ANIMATION_FPS_MOBILE : SUN_ANIMATION_FPS_DESKTOP;
+        const delay = isLastFrame ? SUN_ANIMATION_LOOP_PAUSE_MS : Math.max(20, Math.round(1000 / Math.max(1, fps)));
         sunAnimationTimeoutId = setTimeout(runLeftAnimationLoop, delay);
       }
     } else {
