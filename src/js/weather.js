@@ -6814,12 +6814,17 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SUN_IMAGE_BASE_URL = 'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/';
   const SUN_IMAGE_URL = 'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/latest.jpg';
 
-  // Duo Sun Mode (Side-by-Side) Controls (JCV)
-  const SUN_DUO_MODE = true;                          // EDITABLE: true = two suns side-by-side (Left: 27-day, Right: Sizzling); false = single sun
-  const SUN_DUO_GAP_DESKTOP = '3vw';                  // EDITABLE Desktop: Gap between the two side-by-side suns
-  const SUN_DUO_GAP_MOBILE = '2vw';                   // EDITABLE Mobile: Gap between the two side-by-side suns
+  // Duo Celestial Mode (Side-by-Side: Left Sun Live, Right Earth Live) Controls (JCV)
+  const SUN_DUO_MODE = true;                          // EDITABLE: true = two celestial bodies side-by-side (Left: Sun Live, Right: Earth Live); false = single sun
+  const SUN_DUO_GAP_DESKTOP = '3vw';                  // EDITABLE Desktop: Gap between the two side-by-side circles
+  const SUN_DUO_GAP_MOBILE = '2vw';                   // EDITABLE Mobile: Gap between the two side-by-side circles
 
-  // Left Sun: 27-Day Solar Rotation Animation Controls (JCV)
+  // Celestial Interactivity & Refresh Controls (JCV)
+  const CELESTIAL_ROTATION_ON_CLICK = true;           // EDITABLE: Clicking Sun or Earth triggers 1 round of rotation
+  const CELESTIAL_ROTATION_ON_REFRESH = true;         // EDITABLE: 5-minute countdown refresh triggers 1 round of rotation for both
+  const CELESTIAL_ROTATE_ON_INITIAL_LOAD = false;     // EDITABLE: false = static live on page load until clicked or refreshed; true = 1 round on load
+
+  // Left Circle: Sun Live (GOES-19 SUVI Fe195 Å) 27-Day Rotation Controls (JCV)
   const SUN_ANIMATION_ENABLED = true;                 // EDITABLE: Enable/disable time-span rotation animation
   const SUN_ANIMATION_DAYS = 27;                      // EDITABLE: Number of data days in time span (27 = full solar synodic rotation)
   const SUN_ANIMATION_FPS = 12;                       // EDITABLE: Default frames per second (e.g. 12 = ~4.5s for 54-frame rotation cycle)
@@ -6977,11 +6982,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SUN_IMAGE_BLEND_MODE_DESKTOP = 'lighten';     // EDITABLE Desktop: Blend mode on dark background ('lighten', 'screen', etc.)
   const SUN_IMAGE_BLEND_MODE_MOBILE = 'lighten';      // EDITABLE Mobile: Blend mode on dark background
 
-  // --- Sun Labels Config (JCV) ---
-  // Centered labels beneath each sun circle
-  const SUN_LABEL_ENABLED = true;                     // EDITABLE: Enable/disable centered labels under each sun
-  const SUN_LABEL_LEFT_TEXT = '\u00A0\u00A0\u00A0\u00A0\u00A027-Day Rotation';       // EDITABLE: Label under left rotating sun (e.g. '27-DAY ROTATION', '27-DAY CYCLE')
-  const SUN_LABEL_RIGHT_TEXT = '\u00A0\u00A0\u00A0\u00A0\u00A0Live';         // EDITABLE: Label under right sizzling sun (e.g. 'LIVE FLARES', 'LIVE ACTIVITY', 'REAL TIME')
+  // --- Sun & Earth Labels Config (JCV) ---
+  // Centered labels beneath each circle
+  const SUN_LABEL_ENABLED = true;                     // EDITABLE: Enable/disable centered labels under each circle
+  const SUN_LABEL_LEFT_TEXT = 'Sun Live';             // EDITABLE: Label under left circle (Sun Live)
+  const SUN_LABEL_RIGHT_TEXT = 'Earth Live';          // EDITABLE: Label under right circle (Earth Live)
 
   const SUN_LABEL_FONT_SIZE_DESKTOP = '2.0vw';        // EDITABLE Desktop: Font size for sun labels
   const SUN_LABEL_FONT_SIZE_MOBILE = '2.6vw';         // EDITABLE Mobile: Font size for sun labels
@@ -7290,12 +7295,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // --- Earth Image & Living Weather Config (JCV) ---
   // ==========================================
   // Settings for the live Earth image & animation from NOAA GOES-19 satellite (GeoColor ABI Full Disk)
-  const EARTH_IMAGE_WIDTH_DESKTOP = '68vw';         // EDITABLE Desktop: Width of the Earth container
-  const EARTH_IMAGE_WIDTH_MOBILE = '85vw';          // EDITABLE Mobile: Width of the Earth container
-  const EARTH_IMAGE_MARGIN_TOP_DESKTOP = '2vw';     // EDITABLE Desktop: Gap above Earth image
-  const EARTH_IMAGE_MARGIN_TOP_MOBILE = '3vw';      // EDITABLE Mobile: Gap above Earth image
-  const EARTH_IMAGE_MARGIN_BOTTOM_DESKTOP = '4vw';  // EDITABLE Desktop: Gap below Earth image
-  const EARTH_IMAGE_MARGIN_BOTTOM_MOBILE = '5vw';   // EDITABLE Mobile: Gap below Earth image
+  const EARTH_IMAGE_WIDTH_DESKTOP = '34vw';         // EDITABLE Desktop: Width of the Earth container (matches Sun's 34vw)
+  const EARTH_IMAGE_WIDTH_MOBILE = '42vw';          // EDITABLE Mobile: Width of the Earth container (matches Sun's 42vw)
+  const EARTH_IMAGE_MARGIN_TOP_DESKTOP = '0vw';     // EDITABLE Desktop: Handled by duo row wrapper
+  const EARTH_IMAGE_MARGIN_TOP_MOBILE = '0vw';      // EDITABLE Mobile: Handled by duo row wrapper
+  const EARTH_IMAGE_MARGIN_BOTTOM_DESKTOP = '0vw';  // EDITABLE Desktop: Handled by duo row spacer
+  const EARTH_IMAGE_MARGIN_BOTTOM_MOBILE = '0vw';   // EDITABLE Mobile: Handled by duo row spacer
   const EARTH_MASK_RADIUS = '49.5%';                // EDITABLE: Shrink circle slightly to hide edge artifacts (49.5% = 99% size)
   const EARTH_MASK_POSITION_Y = '50.25%';           // EDITABLE: Shift mask down to crop exactly 0.5% more from top
   const EARTH_IMAGE_URL = 'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/678x678.jpg';
@@ -7305,37 +7310,53 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const EARTH_IMAGE_MARGIN_TOP = EARTH_IMAGE_MARGIN_TOP_DESKTOP;
   const EARTH_IMAGE_MARGIN_BOTTOM = EARTH_IMAGE_MARGIN_BOTTOM_DESKTOP;
 
-  // --- Dynamic Earth Animation Engine Controls (JCV) ---
-  const EARTH_ANIMATION_ENABLED = true;             // EDITABLE: Enable/disable animation (true = animated weather loop; false = static image)
-  const EARTH_ANIMATION_MODE = 'daynight';           // EDITABLE SWITCH: 'weather' (Mode A: 2-4h live cloud/storm flow) or 'daynight' (Mode B: 24h day/night & city lights cycle)
-  const EARTH_ANIMATION_RESOLUTION = '678x678';     // EDITABLE: Resolution: '339x339' (lightweight ~128KB, fast & crisp) or '678x678' (~450KB)
+  // --- Dynamic Earth Animation Controls (JCV) ---
+  const EARTH_ANIMATION_ENABLED = true;             // EDITABLE: Enable/disable animation
+  const EARTH_ANIMATION_MODE = 'daynight';          // EDITABLE SWITCH: 'weather' (Mode A: 2-4h live cloud flow) or 'daynight' (Mode B: 24h day/night cycle)
+  const EARTH_ANIMATION_RESOLUTION = '678x678';     // EDITABLE: Resolution: '339x339' (lightweight ~128KB) or '678x678' (~450KB)
 
   // Mode A: "Living Weather" (Recent 2-4 Hours Storm & Cloud Flow)
   const EARTH_WEATHER_FETCH_LENGTH = 24;            // EDITABLE: NOAA buffer (24 = 4 hours of 10-minute satellite captures)
   const EARTH_WEATHER_FRAME_STEP = 1;               // EDITABLE: Cadence step (1 = every 10m frame, 2 = every 20m)
   const EARTH_WEATHER_FRAME_COUNT = 18;             // EDITABLE: Number of frames in loop (18 = 3 hours of cloud motion)
-  const EARTH_WEATHER_FPS = 8;                      // EDITABLE: Playback speed in frames per second (6-10 FPS provides smooth atmospheric drift)
-  const EARTH_WEATHER_LOOP_PAUSE_MS = 1200;         // EDITABLE: Pause in ms on the live newest frame before restarting loop
-  const EARTH_WEATHER_PLAYBACK_MODE = 'forward';    // EDITABLE: 'forward' (clouds flow forward, pause on live) or 'pingpong'
+  const EARTH_WEATHER_FPS = 8;                      // EDITABLE: Playback speed in frames per second
+  const EARTH_WEATHER_LOOP_PAUSE_MS = 1200;         // EDITABLE: Pause in ms on live frame
 
   // Mode B: "Day & Night Cycle" (24 Hours of Sunlight & Night Lights)
   const EARTH_DAYNIGHT_FETCH_LENGTH = 144;          // EDITABLE: NOAA 24-hour buffer (144 frames @ 10m cadence)
-  const EARTH_DAYNIGHT_FRAME_STEP = 4;              // EDITABLE: Cadence step (4 = ~40m intervals; 6 = ~60m intervals)
-  const EARTH_DAYNIGHT_FRAME_COUNT = 36;            // EDITABLE: Number of frames in 24h cycle (36 frames @ 40m = 24h)
-  const EARTH_DAYNIGHT_FPS = 10;                    // EDITABLE: Playback speed in frames per second (8-12 FPS)
-  const EARTH_DAYNIGHT_LOOP_PAUSE_MS = 1200;        // EDITABLE: Pause in ms on the live newest frame before restarting loop
-  const EARTH_DAYNIGHT_PLAYBACK_MODE = 'forward';   // EDITABLE: 'forward' (shadow sweeps across globe) or 'pingpong'
+  const EARTH_DAYNIGHT_FRAME_STEP = 4;              // EDITABLE: Cadence step (4 = ~40m intervals; 36 frames total)
+  const EARTH_DAYNIGHT_FRAME_COUNT = 36;            // EDITABLE: Number of frames in 24h cycle
+  const EARTH_DAYNIGHT_FPS_DESKTOP = 10;            // EDITABLE Desktop: Playback speed in frames per second
+  const EARTH_DAYNIGHT_FPS_MOBILE = 10;             // EDITABLE Mobile: Playback speed in frames per second
+  const EARTH_DAYNIGHT_FPS = EARTH_DAYNIGHT_FPS_DESKTOP;
+  const EARTH_DAYNIGHT_LOOP_PAUSE_MS = 1200;        // EDITABLE: Pause in ms on live frame
 
   // Smooth Cross-Fade Dynamics
   const EARTH_ANIMATION_CROSSFADE_ENABLED = true;   // EDITABLE: Smooth dual-buffer cross-dissolve between frames
-  const EARTH_ANIMATION_CROSSFADE_MS_DESKTOP = 80;  // EDITABLE Desktop: Cross-fade duration in milliseconds (50-100ms)
-  const EARTH_ANIMATION_CROSSFADE_MS_MOBILE = 80;   // EDITABLE Mobile: Cross-fade duration in milliseconds (50-100ms)
+  const EARTH_ANIMATION_CROSSFADE_MS_DESKTOP = 70;  // EDITABLE Desktop: Cross-fade duration in milliseconds
+  const EARTH_ANIMATION_CROSSFADE_MS_MOBILE = 70;   // EDITABLE Mobile: Cross-fade duration in milliseconds
   const EARTH_ANIMATION_CROSSFADE_MS = EARTH_ANIMATION_CROSSFADE_MS_DESKTOP;
-  const EARTH_ANIMATION_AUTO_REFRESH_MS = 10 * 60 * 1000; // EDITABLE: Auto-fetch fresh frames every 10 minutes (matches NOAA capture interval)
+  const EARTH_ANIMATION_AUTO_REFRESH_MS = 10 * 60 * 1000; // EDITABLE: Auto-fetch fresh frames every 10 minutes
+
+  // Seed list of real-time NOAA GOES-19 GeoColor Full Disk frames for instant readiness
+  const EARTH_FRAMES_SEED = [
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262571720_GOES19-ABI-FD-GEOCOLOR-678x678.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262571740_GOES19-ABI-FD-GEOCOLOR-678x678.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262571800_GOES19-ABI-FD-GEOCOLOR-678x678.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262571820_GOES19-ABI-FD-GEOCOLOR-678x678.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262571840_GOES19-ABI-FD-GEOCOLOR-678x678.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262571900_GOES19-ABI-FD-GEOCOLOR-678x678.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262571920_GOES19-ABI-FD-GEOCOLOR-678x678.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262571940_GOES19-ABI-FD-GEOCOLOR-678x678.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262572000_GOES19-ABI-FD-GEOCOLOR-678x678.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262572020_GOES19-ABI-FD-GEOCOLOR-678x678.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262572040_GOES19-ABI-FD-GEOCOLOR-678x678.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262572100_GOES19-ABI-FD-GEOCOLOR-678x678.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/678x678.jpg'
+  ];
 
   // Subpixel Anti-Aliasing & Soft-Meld Blur (JCV)
-  // Melds adjacent pixels, sensor noise, and JPEG blockiness into a smooth photograph without sacrificing coastline/continental definition
-  const EARTH_IMAGE_BLUR_DESKTOP = '0.8px';        // EDITABLE Desktop: Subpixel blur (e.g. 0.5px to 1.2px melds pixels without getting blurry; 0px = raw pixels)
+  const EARTH_IMAGE_BLUR_DESKTOP = '0.8px';        // EDITABLE Desktop: Subpixel blur
   const EARTH_IMAGE_BLUR_MOBILE = '0.5px';         // EDITABLE Mobile: Subpixel blur on mobile
 
   function applyEarthImageConfig() {
@@ -7373,7 +7394,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (container) {
       container.style.width = width;
       container.style.height = width;
-      container.style.marginTop = marginTop;
       container.style.clipPath = `circle(${EARTH_MASK_RADIUS} at 50% ${EARTH_MASK_POSITION_Y})`;
       container.style.WebkitClipPath = `circle(${EARTH_MASK_RADIUS} at 50% ${EARTH_MASK_POSITION_Y})`;
       container.style.filter = blur ? `blur(${blur})` : 'none';
@@ -7381,7 +7401,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
     const spacer = document.getElementById('earth-image-spacer');
     if (spacer) {
-      spacer.style.height = marginBottom;
+      spacer.style.display = 'none';
     }
   }
   applyEarthImageConfig();
@@ -7412,7 +7432,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1169';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1170';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -10800,6 +10820,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
     stopAutoRefresh();
     getLocalWeather();
     triggerClockHandsSpinAnimation();
+    if (CELESTIAL_ROTATION_ON_REFRESH && typeof window.triggerCelestialRotations === 'function') {
+      window.triggerCelestialRotations();
+    }
     startAutoRefresh(currentRefreshMs, autoRefreshAligned);
     
     const targets = document.querySelectorAll('.clockGridItem-0, #analog-clock');
@@ -11295,15 +11318,20 @@ Plan ahead for significantly warmer conditions tomorrow!`
     });
   }
 
-  /* --- Live Sun Image & Solar Animations (NOAA GOES-19 SUVI Fe195 Å) --- */
   let sunAnimationTimeoutId = null;
-  let sunSizzleTimeoutId = null;
+  let earthAnimationTimeoutId = null;
+
+  function triggerCelestialRotations() {
+    if (typeof window.triggerSunRotation === 'function') window.triggerSunRotation();
+    if (typeof window.triggerEarthRotation === 'function') window.triggerEarthRotation();
+  }
+  window.triggerCelestialRotations = triggerCelestialRotations;
 
   function createSunImageIfMissing() {
     if (document.getElementById('sun-image-container') || document.getElementById('suns-row-wrapper')) return;
 
-    // Helper to build a styled circular sun element
-    function buildSunCircle(containerId, imgId, initialUrl, altText, enableDualBuffer = false, isRightSizzle = false) {
+    // Helper to build a styled circular sun element with dual buffer
+    function buildSunCircle(containerId, imgId, initialUrl, altText) {
       const c = document.createElement('div');
       c.id = containerId;
       c.className = 'sun-image-container';
@@ -11324,7 +11352,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       c.style.transform = 'translate3d(0, 0, 0)';
       c.style.webkitMaskImage = '-webkit-radial-gradient(white, black)';
 
-      const durVar = isRightSizzle ? '--sun-sizzle-crossfade-duration, 35ms' : '--sun-animation-crossfade-duration, 60ms';
+      const durVar = '--sun-animation-crossfade-duration, 60ms';
 
       const im = document.createElement('img');
       im.id = imgId;
@@ -11345,42 +11373,110 @@ Plan ahead for significantly warmer conditions tomorrow!`
       im.style.display = 'block';
       im.style.zIndex = '1';
       im.style.opacity = '1';
-      if (enableDualBuffer) {
-        im.style.transition = `opacity var(${durVar}) ease-in-out`;
-      }
+      im.style.transition = `opacity var(${durVar}) ease-in-out`;
+
+      const imB = document.createElement('img');
+      imB.id = imgId + '-b';
+      imB.className = 'sun-image sun-image-layer-b';
+      imB.src = initialUrl;
+      imB.alt = altText + ' Buffer';
+      imB.style.width = 'var(--sun-image-inner-scale, 108%)';
+      imB.style.height = 'var(--sun-image-inner-scale, 108%)';
+      imB.style.position = 'absolute';
+      imB.style.top = 'var(--sun-image-offset-y, -1%)';
+      imB.style.left = '50%';
+      imB.style.transform = 'translate3d(-50%, 0, 0)';
+      imB.style.webkitTransform = 'translate3d(-50%, 0, 0)';
+      imB.style.webkitBackfaceVisibility = 'hidden';
+      imB.style.backfaceVisibility = 'hidden';
+      imB.style.willChange = 'opacity';
+      imB.style.objectFit = 'cover';
+      imB.style.display = 'block';
+      imB.style.zIndex = '2';
+      imB.style.opacity = '0';
+      imB.style.transition = `opacity var(${durVar}) ease-in-out`;
 
       c.appendChild(im);
-
-      let imB = null;
-      if (enableDualBuffer) {
-        imB = document.createElement('img');
-        imB.id = imgId + '-b';
-        imB.className = 'sun-image sun-image-layer-b';
-        imB.src = initialUrl;
-        imB.alt = altText;
-        imB.style.width = 'var(--sun-image-inner-scale, 108%)';
-        imB.style.height = 'var(--sun-image-inner-scale, 108%)';
-        imB.style.position = 'absolute';
-        imB.style.top = 'var(--sun-image-offset-y, -1%)';
-        imB.style.left = '50%';
-        imB.style.transform = 'translate3d(-50%, 0, 0)';
-        imB.style.webkitTransform = 'translate3d(-50%, 0, 0)';
-        imB.style.webkitBackfaceVisibility = 'hidden';
-        imB.style.backfaceVisibility = 'hidden';
-        imB.style.willChange = 'opacity';
-        imB.style.objectFit = 'cover';
-        imB.style.display = 'block';
-        imB.style.zIndex = '2';
-        imB.style.opacity = '0';
-        imB.style.transition = `opacity var(${durVar}) ease-in-out`;
-        c.appendChild(imB);
-      }
+      c.appendChild(imB);
 
       return { container: c, img: im, imgB: imB };
     }
 
-    // Helper to build a vertical column containing the circular sun and its centered label
-    function buildSunColumn(colId, sunCircleObj, labelText, labelId) {
+    // Helper to build a styled circular Earth element with dual buffer
+    function buildEarthCircle(containerId, imgId, initialUrl, altText) {
+      const c = document.createElement('div');
+      c.id = containerId;
+      c.className = 'sun-image-container earth-image-container';
+      c.style.width = 'var(--earth-image-width, var(--sun-image-width, 34vw))';
+      c.style.height = 'var(--earth-image-width, var(--sun-image-width, 34vw))';
+      c.style.borderRadius = '50%';
+      c.style.overflow = 'hidden';
+      c.style.clipPath = 'circle(var(--earth-mask-radius, 49.5%) at 50% var(--earth-mask-position-y, 50.25%))';
+      c.style.WebkitClipPath = 'circle(var(--earth-mask-radius, 49.5%) at 50% var(--earth-mask-position-y, 50.25%))';
+      c.style.position = 'relative';
+      c.style.opacity = '0';
+      c.style.transition = 'opacity 1s ease';
+      c.style.mixBlendMode = 'lighten';
+      c.style.flexShrink = '0';
+      c.style.filter = 'blur(var(--earth-image-blur, 0.8px))';
+      c.style.webkitBackfaceVisibility = 'hidden';
+      c.style.backfaceVisibility = 'hidden';
+      c.style.webkitTransform = 'translate3d(0, 0, 0)';
+      c.style.transform = 'translate3d(0, 0, 0)';
+      c.style.webkitMaskImage = '-webkit-radial-gradient(white, black)';
+
+      const durVar = '--earth-animation-crossfade-duration, 70ms';
+
+      const imA = document.createElement('img');
+      imA.id = imgId;
+      imA.className = 'earth-image earth-layer-a';
+      imA.src = initialUrl;
+      imA.alt = altText;
+      imA.style.width = '115%';
+      imA.style.height = '115%';
+      imA.style.position = 'absolute';
+      imA.style.top = '0';
+      imA.style.left = '50%';
+      imA.style.transform = 'translate3d(-50%, 0, 0)';
+      imA.style.webkitTransform = 'translate3d(-50%, 0, 0)';
+      imA.style.webkitBackfaceVisibility = 'hidden';
+      imA.style.backfaceVisibility = 'hidden';
+      imA.style.willChange = 'opacity';
+      imA.style.objectFit = 'cover';
+      imA.style.display = 'block';
+      imA.style.zIndex = '1';
+      imA.style.opacity = '1';
+      imA.style.transition = `opacity var(${durVar}) ease-in-out`;
+
+      const imB = document.createElement('img');
+      imB.id = imgId + '-b';
+      imB.className = 'earth-image earth-layer-b';
+      imB.src = initialUrl;
+      imB.alt = altText + ' Buffer';
+      imB.style.width = '115%';
+      imB.style.height = '115%';
+      imB.style.position = 'absolute';
+      imB.style.top = '0';
+      imB.style.left = '50%';
+      imB.style.transform = 'translate3d(-50%, 0, 0)';
+      imB.style.webkitTransform = 'translate3d(-50%, 0, 0)';
+      imB.style.webkitBackfaceVisibility = 'hidden';
+      imB.style.backfaceVisibility = 'hidden';
+      imB.style.willChange = 'opacity';
+      imB.style.objectFit = 'cover';
+      imB.style.display = 'block';
+      imB.style.zIndex = '2';
+      imB.style.opacity = '0';
+      imB.style.transition = `opacity var(${durVar}) ease-in-out`;
+
+      c.appendChild(imA);
+      c.appendChild(imB);
+
+      return { container: c, img: imA, imgB: imB };
+    }
+
+    // Helper to build a vertical column containing circle and its centered label
+    function buildCelestialColumn(colId, circleObj, labelText, labelId) {
       const col = document.createElement('div');
       col.id = colId;
       col.className = 'sun-column';
@@ -11392,7 +11488,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       col.style.position = 'relative';
       col.style.flexShrink = '0';
 
-      col.appendChild(sunCircleObj.container);
+      col.appendChild(circleObj.container);
 
       if (SUN_LABEL_ENABLED && labelText) {
         const isLeft = colId === 'sun-col-left';
@@ -11406,7 +11502,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         lbl.style.fontFamily = "var(--sun-label-font-family, 'light', sans-serif)";
         lbl.style.fontSize = 'var(--sun-label-font-size, 2.0vw)';
         lbl.style.letterSpacing = 'var(--sun-label-letter-spacing, 0.08vw)';
-        lbl.style.paddingLeft = 'var(--sun-label-letter-spacing, 0.08vw)'; // Balances trailing letter spacing
+        lbl.style.paddingLeft = 'var(--sun-label-letter-spacing, 0.08vw)';
         lbl.style.color = 'var(--sun-label-color, #ffffff)';
         lbl.style.opacity = 'var(--sun-label-opacity, 0.70)';
         lbl.style.textTransform = 'var(--sun-label-text-transform, capitalize)';
@@ -11423,22 +11519,28 @@ Plan ahead for significantly warmer conditions tomorrow!`
       return col;
     }
 
-    // Left Sun (27-Day Rotation Loop with Dual-Buffer Smooth Cross-Fade)
+    // Left Circle: Sun Live (GOES-19 SUVI Fe195 Å)
     const leftSun = buildSunCircle(
       'sun-image-container',
       'sun-image',
       SUN_IMAGE_URL,
-      'Live Sunspot & Coronal 27-Day Rotation Animation from GOES-19 SUVI Fe195',
-      SUN_ANIMATION_CROSSFADE_ENABLED,
-      false
+      'Live Sunspot & Coronal 27-Day Rotation Animation from GOES-19 SUVI Fe195'
     );
-    const leftCol = buildSunColumn('sun-col-left', leftSun, SUN_LABEL_LEFT_TEXT, 'sun-label-left');
+    const leftCol = buildCelestialColumn('sun-col-left', leftSun, SUN_LABEL_LEFT_TEXT, 'sun-label-left');
+
+    // Right Circle: Earth Live (NOAA GOES-19 GeoColor Full Disk)
+    const rightEarth = buildEarthCircle(
+      'earth-image-container',
+      'earth-image',
+      EARTH_IMAGE_URL,
+      'Live Earth GeoColor Full Disk from NOAA GOES-19 Satellite'
+    );
+    const rightCol = buildCelestialColumn('sun-col-right', rightEarth, SUN_LABEL_RIGHT_TEXT, 'sun-label-right');
+    rightCol.classList.add('earth-column');
 
     let mainWrapper = null;
-    let rightSun = null;
 
     if (SUN_DUO_MODE) {
-      // Duo Mode: Side-by-side row wrapper
       mainWrapper = document.createElement('div');
       mainWrapper.id = 'suns-row-wrapper';
       mainWrapper.className = 'suns-row-wrapper';
@@ -11452,35 +11554,42 @@ Plan ahead for significantly warmer conditions tomorrow!`
       mainWrapper.style.opacity = '0';
       mainWrapper.style.transition = 'opacity 1s ease';
 
-      rightSun = buildSunCircle(
-        'sun-image-container-right',
-        'sun-image-right',
-        `${SUN_IMAGE_BASE_URL}600x600.jpg?t=${Date.now()}`,
-        'Live Sizzling Solar Flare Activity from GOES-19 SUVI Fe195',
-        true, // Dual buffer enabled to eliminate iPad flicker
-        true  // Sizzle mode timing
-      );
-      const rightCol = buildSunColumn('sun-col-right', rightSun, SUN_LABEL_RIGHT_TEXT, 'sun-label-right');
-
       mainWrapper.appendChild(leftCol);
       mainWrapper.appendChild(rightCol);
     } else {
-      // Single Sun Mode
       leftCol.classList.add('single-mode');
       leftCol.style.margin = 'var(--sun-image-margin-top, 2vw) auto 0';
       mainWrapper = leftCol;
     }
 
-    // Dedicated spacer to prevent margin collapse at bottom
+    // Interactivity: On-demand single cycle rotation when clicked or touched
+    if (CELESTIAL_ROTATION_ON_CLICK) {
+      leftCol.style.cursor = 'pointer';
+      leftCol.setAttribute('role', 'button');
+      leftCol.setAttribute('title', 'Click or tap to rotate Sun');
+      leftCol.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (typeof window.triggerSunRotation === 'function') window.triggerSunRotation();
+      });
+
+      rightCol.style.cursor = 'pointer';
+      rightCol.setAttribute('role', 'button');
+      rightCol.setAttribute('title', 'Click or tap to rotate Earth');
+      rightCol.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (typeof window.triggerEarthRotation === 'function') window.triggerEarthRotation();
+      });
+    }
+
+    // Dedicated spacer below the duo row
     const spacer = document.createElement('div');
     spacer.id = 'sun-image-spacer';
     spacer.className = 'sun-image-spacer';
     spacer.style.height = 'var(--sun-image-margin-bottom, 2vw)';
     spacer.style.width = '100%';
 
-    // Position above Earth image (below 24-hour condition images and world clocks)
+    // Position directly below World Clocks (or above Cities Location Switcher / Last Updated)
     const worldClocks = document.getElementById('world-clocks-row-wrapper');
-    const earthContainer = document.getElementById('earth-image-container');
     const locSwitcher = document.getElementById('weather-location-switcher');
     const missingAssets = document.getElementById('weather-missing-assets');
     const lastUpdated = document.getElementById('weather-last-updated');
@@ -11489,9 +11598,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (worldClocks && worldClocks.parentNode) {
       worldClocks.parentNode.insertBefore(mainWrapper, worldClocks.nextSibling);
       worldClocks.parentNode.insertBefore(spacer, mainWrapper.nextSibling);
-    } else if (earthContainer && earthContainer.parentNode) {
-      earthContainer.parentNode.insertBefore(mainWrapper, earthContainer);
-      earthContainer.parentNode.insertBefore(spacer, earthContainer);
     } else if (locSwitcher && locSwitcher.parentNode) {
       locSwitcher.parentNode.insertBefore(mainWrapper, locSwitcher);
       locSwitcher.parentNode.insertBefore(spacer, locSwitcher);
@@ -11510,7 +11616,18 @@ Plan ahead for significantly warmer conditions tomorrow!`
       parent.appendChild(spacer);
     }
 
-    // --- Left Sun: 27-Day Repeating Solar Rotation Animation Engine ---
+    // Clean up any stray standalone Earth container or spacer
+    const oldEarthSpacer = document.getElementById('earth-image-spacer');
+    if (oldEarthSpacer) oldEarthSpacer.remove();
+
+    // =========================================================================
+    // --- Left Sun: 27-Day Solar Rotation Engine (Single Cycle On-Demand) ---
+    // =========================================================================
+    let sunPreloadedImages = [];
+    let isSunRotating = false;
+    let sunFrameIndex = 0;
+    let sunActiveLayer = 'a';
+
     if (SUN_ANIMATION_ENABLED && Array.isArray(SUN_ANIMATION_FRAMES) && SUN_ANIMATION_FRAMES.length > 0) {
       const framesPerDay = SUN_ANIMATION_FRAMES.length > 27 ? 2 : 1;
       const targetCount = Math.max(1, Math.min(SUN_ANIMATION_FRAMES.length, Math.round(SUN_ANIMATION_DAYS * framesPerDay + 1)));
@@ -11527,94 +11644,74 @@ Plan ahead for significantly warmer conditions tomorrow!`
         return SUN_IMAGE_BASE_URL + fn;
       });
 
-      const preloadedImages = [];
-      let loadedCount = 0;
-
-      frameUrls.forEach((url) => {
+      sunPreloadedImages = frameUrls.map((url) => {
         const pImg = new Image();
-        pImg.onload = () => {
-          loadedCount++;
-          if (loadedCount >= Math.min(6, frameUrls.length) && !sunAnimationTimeoutId) {
-            // Prime both layers before starting playback
-            if (preloadedImages.length > 0 && leftSun && leftSun.img) {
-              leftSun.img.src = preloadedImages[0].src;
-              leftSun.img.style.zIndex = '1';
-              leftSun.img.style.opacity = '1';
-              if (leftSun.img.decode) leftSun.img.decode().catch(() => {});
-            }
-            if (preloadedImages.length > 1 && leftSun && leftSun.imgB) {
-              leftSun.imgB.src = preloadedImages[1].src;
-              leftSun.imgB.style.zIndex = '2';
-              leftSun.imgB.style.opacity = '0';
-              if (leftSun.imgB.decode) leftSun.imgB.decode().catch(() => {});
-            }
-            currentFrameIndex = 0;
-            activeLayer = 'a';
-            const isMobile = window.innerWidth <= 767;
-            const initFps = isMobile ? SUN_ANIMATION_FPS_MOBILE : SUN_ANIMATION_FPS_DESKTOP;
-            const initDelay = Math.max(20, Math.round(1000 / Math.max(1, initFps)));
-            sunAnimationTimeoutId = setTimeout(runLeftAnimationLoop, initDelay);
-          }
-        };
-        pImg.onerror = () => { loadedCount++; };
         pImg.src = url;
-        preloadedImages.push(pImg);
+        return pImg;
       });
 
-      let currentFrameIndex = 0;
-      let activeLayer = 'a'; // 'a' or 'b' for dual-buffer smooth cross-dissolve
+      // Default: Static live sun displayed on Layer A
+      if (leftSun && leftSun.img) {
+        leftSun.img.src = SUN_IMAGE_URL;
+        leftSun.img.style.zIndex = '1';
+        leftSun.img.style.opacity = '1';
+      }
+      if (leftSun && leftSun.imgB) {
+        leftSun.imgB.src = SUN_IMAGE_URL;
+        leftSun.imgB.style.zIndex = '2';
+        leftSun.imgB.style.opacity = '0';
+      }
 
-      function runLeftAnimationLoop() {
-        if (!SUN_ANIMATION_ENABLED || preloadedImages.length <= 1) return;
+      function runSunCycleStep() {
+        if (!isSunRotating || sunPreloadedImages.length <= 1) {
+          isSunRotating = false;
+          return;
+        }
 
-        const totalFrames = preloadedImages.length;
-        const frameIdx = currentFrameIndex;
-        const nextIdx = (frameIdx + 1) % totalFrames;
+        const totalFrames = sunPreloadedImages.length;
+        const nextIdx = sunFrameIndex + 1;
 
-        // Ensure next image is downloaded before advancing to prevent network-induced blank flashes
-        const nextImg = preloadedImages[nextIdx];
+        if (nextIdx >= totalFrames) {
+          isSunRotating = false;
+          sunAnimationTimeoutId = null;
+          return;
+        }
+
+        const nextImg = sunPreloadedImages[nextIdx];
         if (!nextImg || (!nextImg.complete && nextImg.naturalWidth === 0)) {
-          sunAnimationTimeoutId = setTimeout(runLeftAnimationLoop, 50);
+          sunAnimationTimeoutId = setTimeout(runSunCycleStep, 40);
           return;
         }
 
         const isLastFrame = nextIdx === totalFrames - 1;
-
-        // Calculate dynamic frame delay with smooth ease-in and ease-out curves
         const isMobile = window.innerWidth <= 767;
         const fps = isMobile ? SUN_ANIMATION_FPS_MOBILE : SUN_ANIMATION_FPS_DESKTOP;
         const cruiseDelay = Math.max(20, Math.round(1000 / Math.max(1, fps)));
 
         let delay = cruiseDelay;
-        if (isLastFrame) {
-          // Full rest pause on live current sun
-          delay = SUN_ANIMATION_LOOP_PAUSE_MS;
-        } else if (SUN_ANIMATION_EASE_ENABLED && totalFrames > 10) {
+        if (SUN_ANIMATION_EASE_ENABLED && totalFrames > 10) {
           const easeFrames = isMobile ? SUN_ANIMATION_EASE_FRAMES_MOBILE : SUN_ANIMATION_EASE_FRAMES_DESKTOP;
           const maxDelay = isMobile ? SUN_ANIMATION_EASE_MAX_DELAY_MS_MOBILE : SUN_ANIMATION_EASE_MAX_DELAY_MS_DESKTOP;
 
-          // Ease-In: Gentle accelerating curve out of the Live frame pause
           let factorIn = 0;
           if (nextIdx < easeFrames) {
             const progIn = nextIdx / easeFrames;
-            factorIn = 0.5 * (1 + Math.cos(Math.PI * progIn)); // 1.0 down to 0.0
+            factorIn = 0.5 * (1 + Math.cos(Math.PI * progIn));
           }
 
-          // Ease-Out: Gentle decelerating curve into the Live frame pause
           let factorOut = 0;
-          const distEnd = (totalFrames - 2) - nextIdx;
+          const distEnd = (totalFrames - 1) - nextIdx;
           if (distEnd >= 0 && distEnd < easeFrames) {
             const progOut = distEnd / easeFrames;
-            factorOut = 0.5 * (1 + Math.cos(Math.PI * progOut)); // 0.0 up to 1.0
+            factorOut = 0.5 * (1 + Math.cos(Math.PI * progOut));
           }
 
           const factor = Math.max(factorIn, factorOut);
           delay = Math.round(cruiseDelay + (maxDelay - cruiseDelay) * factor);
         }
 
-        // Dynamically calibrate cross-fade transition duration to match current frame speed
         const baseFade = isMobile ? SUN_ANIMATION_CROSSFADE_MS_MOBILE : SUN_ANIMATION_CROSSFADE_MS_DESKTOP;
-        const dynamicFade = SUN_ANIMATION_EASE_ENABLED && !isLastFrame
+        const dynamicFade = SUN_ANIMATION_EASE_ENABLED
           ? Math.min(Math.round(delay * 0.65), Math.round(baseFade * 2.0))
           : Math.min(baseFade, Math.round(delay * 0.65));
 
@@ -11624,629 +11721,287 @@ Plan ahead for significantly warmer conditions tomorrow!`
         }
 
         if (SUN_ANIMATION_CROSSFADE_ENABLED && leftSun && leftSun.imgB) {
-          if (activeLayer === 'a') {
-            // Layer B already has nextImg primed and ready! Bring B to top and crossfade
+          if (sunActiveLayer === 'a') {
             leftSun.imgB.style.zIndex = '2';
             leftSun.img.style.zIndex = '1';
             leftSun.imgB.style.opacity = '1';
             leftSun.img.style.opacity = '0';
-            activeLayer = 'b';
-            currentFrameIndex = nextIdx;
+            sunActiveLayer = 'b';
+            sunFrameIndex = nextIdx;
 
-            // Cue up following frame on Layer A ONLY AFTER Layer A has faded completely to opacity 0
-            const cueIdx = (nextIdx + 1) % totalFrames;
-            const cueImg = preloadedImages[cueIdx];
-            if (cueImg && cueImg.src) {
-              setTimeout(() => {
-                if (leftSun && leftSun.img && activeLayer === 'b') {
-                  leftSun.img.src = cueImg.src;
-                  if (leftSun.img.decode) leftSun.img.decode().catch(() => {});
-                }
-              }, dynamicFade + 10);
+            if (!isLastFrame) {
+              const cueIdx = nextIdx + 1;
+              const cueImg = sunPreloadedImages[cueIdx];
+              if (cueImg && cueImg.src) {
+                setTimeout(() => {
+                  if (leftSun && leftSun.img && sunActiveLayer === 'b') {
+                    leftSun.img.src = cueImg.src;
+                    if (leftSun.img.decode) leftSun.img.decode().catch(() => {});
+                  }
+                }, dynamicFade + 10);
+              }
             }
           } else {
-            // Layer A already has nextImg primed and ready! Bring A to top and crossfade
             leftSun.img.style.zIndex = '2';
             leftSun.imgB.style.zIndex = '1';
             leftSun.img.style.opacity = '1';
             leftSun.imgB.style.opacity = '0';
-            activeLayer = 'a';
-            currentFrameIndex = nextIdx;
+            sunActiveLayer = 'a';
+            sunFrameIndex = nextIdx;
 
-            // Cue up following frame on Layer B ONLY AFTER Layer B has faded completely to opacity 0
-            const cueIdx = (nextIdx + 1) % totalFrames;
-            const cueImg = preloadedImages[cueIdx];
-            if (cueImg && cueImg.src) {
-              setTimeout(() => {
-                if (leftSun && leftSun.imgB && activeLayer === 'a') {
-                  leftSun.imgB.src = cueImg.src;
-                  if (leftSun.imgB.decode) leftSun.imgB.decode().catch(() => {});
-                }
-              }, dynamicFade + 10);
+            if (!isLastFrame) {
+              const cueIdx = nextIdx + 1;
+              const cueImg = sunPreloadedImages[cueIdx];
+              if (cueImg && cueImg.src) {
+                setTimeout(() => {
+                  if (leftSun && leftSun.imgB && sunActiveLayer === 'a') {
+                    leftSun.imgB.src = cueImg.src;
+                    if (leftSun.imgB.decode) leftSun.imgB.decode().catch(() => {});
+                  }
+                }, dynamicFade + 10);
+              }
             }
           }
         } else if (leftSun && leftSun.img) {
-          currentFrameIndex = nextIdx;
+          sunFrameIndex = nextIdx;
           if (nextImg && nextImg.src) leftSun.img.src = nextImg.src;
         }
 
-        sunAnimationTimeoutId = setTimeout(runLeftAnimationLoop, delay);
-      }
-    } else {
-      setInterval(() => {
-        leftSun.img.src = SUN_IMAGE_URL + '?t=' + Date.now();
-      }, 5 * 60 * 1000);
-    }
-
-    // --- Right Sun: Sizzling Ping-Pong Animation Engine (1..32..1) ---
-    if (SUN_DUO_MODE && rightSun && SUN_SIZZLE_ENABLED) {
-      let currentSizzleUrls = [...SUN_SIZZLE_FRAMES_SEED];
-      let preloadedSizzleImages = [];
-
-      function setupSizzleFrames(urls, isInitial = false) {
-        // Deduplicate unique frames and sort in strict ascending chronological order
-        const uniqueUrls = Array.from(new Set(urls)).sort();
-        const step = Math.max(1, Math.round(SUN_SIZZLE_FRAME_STEP || 1));
-        const steppedUrls = step > 1
-          ? uniqueUrls.filter((_, idx) => (uniqueUrls.length - 1 - idx) % step === 0)
-          : uniqueUrls;
-        const frameLimit = Math.max(2, Math.min(steppedUrls.length, SUN_SIZZLE_FRAME_COUNT));
-        const selectedUrls = steppedUrls.slice(-frameLimit).map(u => {
-          if (SUN_ANIMATION_RESOLUTION === '300x300') {
-            return u.replace('600x600', '300x300');
-          }
-          return u;
-        });
-
-        if (isInitial || preloadedSizzleImages.length === 0) {
-          preloadedSizzleImages = selectedUrls.map(u => {
-            const imgObj = new Image();
-            imgObj.src = u;
-            return imgObj;
-          });
-
-          // Prime dual buffers up front
-          if (preloadedSizzleImages.length > 0 && rightSun && rightSun.img) {
-            rightSun.img.src = preloadedSizzleImages[0].src;
-            rightSun.img.style.zIndex = '1';
-            rightSun.img.style.opacity = '1';
-            if (rightSun.img.decode) rightSun.img.decode().catch(() => {});
-          }
-          if (preloadedSizzleImages.length > 1 && rightSun && rightSun.imgB) {
-            rightSun.imgB.src = preloadedSizzleImages[1].src;
-            rightSun.imgB.style.zIndex = '2';
-            rightSun.imgB.style.opacity = '0';
-            if (rightSun.imgB.decode) rightSun.imgB.decode().catch(() => {});
-          }
-          sizzleIndex = 0;
-          sizzleDirection = 1;
-          sizzleActiveLayer = 'a';
-
-          if (!sunSizzleTimeoutId && preloadedSizzleImages.length > 1) {
-            const initDelay = Math.round(1000 / SUN_SIZZLE_FPS);
-            sunSizzleTimeoutId = setTimeout(startSizzleLoop, initDelay);
-          }
+        if (isLastFrame) {
+          setTimeout(() => {
+            isSunRotating = false;
+            sunAnimationTimeoutId = null;
+          }, dynamicFade + 50);
         } else {
-          // Seamless hot-swap: Preload new batch in background so running loop never stutters
-          let loaded = 0;
-          const newImages = selectedUrls.map(u => {
-            const imgObj = new Image();
-            imgObj.onload = () => { loaded++; };
-            imgObj.onerror = () => { loaded++; };
-            imgObj.src = u;
-            return imgObj;
-          });
-
-          const swapWhenReady = () => {
-            if (loaded >= Math.min(10, selectedUrls.length)) {
-              preloadedSizzleImages = newImages;
-              sizzleIndex = Math.max(0, Math.min(preloadedSizzleImages.length - 1, sizzleIndex));
-            } else {
-              setTimeout(swapWhenReady, 100);
-            }
-          };
-          swapWhenReady();
+          sunAnimationTimeoutId = setTimeout(runSunCycleStep, delay);
         }
       }
 
-      function getNextSizzleStep(curIdx, curDir, total) {
-        if (total <= 1) return { idx: 0, dir: 1, isEnd: true };
-        if (SUN_SIZZLE_PLAYBACK_MODE === 'pingpong') {
-          let newDir = curDir;
-          let nextIdx = curIdx;
-          let isEnd = false;
-          if (newDir === 1) {
-            if (curIdx >= total - 1) {
-              newDir = -1;
-              nextIdx = total - 2;
-              isEnd = true;
-            } else {
-              nextIdx = curIdx + 1;
-            }
-          } else {
-            if (curIdx <= 0) {
-              newDir = 1;
-              nextIdx = 1;
-              isEnd = true;
-            } else {
-              nextIdx = curIdx - 1;
-            }
-          }
-          return { idx: Math.max(0, Math.min(total - 1, nextIdx)), dir: newDir, isEnd };
-        } else {
-          const isEnd = curIdx >= total - 1;
-          const nextIdx = (curIdx + 1) % total;
-          return { idx: nextIdx, dir: 1, isEnd };
+      function triggerSunRotation() {
+        if (isSunRotating || sunPreloadedImages.length <= 1) return;
+        isSunRotating = true;
+        sunFrameIndex = 0;
+        sunActiveLayer = 'a';
+
+        if (leftSun && leftSun.img) {
+          leftSun.img.style.transitionDuration = '0ms';
+          leftSun.img.src = sunPreloadedImages[0].src;
+          leftSun.img.style.zIndex = '1';
+          leftSun.img.style.opacity = '1';
         }
-      }
-
-      let sizzleIndex = 0;
-      let sizzleDirection = 1; // 1 = forward, -1 = backward
-      let sizzleActiveLayer = 'a'; // 'a' or 'b' for dual-buffer smooth cross-dissolve
-
-      function startSizzleLoop() {
-        if (!SUN_SIZZLE_ENABLED || preloadedSizzleImages.length <= 1) return;
-
-        const totalFrames = preloadedSizzleImages.length;
-        if (totalFrames <= 1) return;
-
-        const step = getNextSizzleStep(sizzleIndex, sizzleDirection, totalFrames);
-        const nextImg = preloadedSizzleImages[step.idx];
-        if (!nextImg || (!nextImg.complete && nextImg.naturalWidth === 0)) {
-          sunSizzleTimeoutId = setTimeout(startSizzleLoop, 40);
-          return;
+        if (leftSun && leftSun.imgB && sunPreloadedImages.length > 1) {
+          leftSun.imgB.style.transitionDuration = '0ms';
+          leftSun.imgB.src = sunPreloadedImages[1].src;
+          leftSun.imgB.style.zIndex = '2';
+          leftSun.imgB.style.opacity = '0';
         }
-
-        let delay = Math.round(1000 / SUN_SIZZLE_FPS);
-        if (step.isEnd && SUN_SIZZLE_PAUSE_END_MS > 0) delay += SUN_SIZZLE_PAUSE_END_MS;
 
         const isMobile = window.innerWidth <= 767;
-        const sizzleFade = isMobile ? SUN_SIZZLE_CROSSFADE_MS_MOBILE : SUN_SIZZLE_CROSSFADE_MS_DESKTOP;
-        const fadeDuration = Math.min(sizzleFade, Math.round(delay * 0.65));
-
-        if (rightSun && rightSun.imgB) {
-          if (rightSun.img) rightSun.img.style.transitionDuration = `${fadeDuration}ms`;
-          if (rightSun.imgB) rightSun.imgB.style.transitionDuration = `${fadeDuration}ms`;
-
-          if (sizzleActiveLayer === 'a') {
-            rightSun.imgB.style.zIndex = '2';
-            rightSun.img.style.zIndex = '1';
-            rightSun.imgB.style.opacity = '1';
-            rightSun.img.style.opacity = '0';
-            sizzleActiveLayer = 'b';
-            sizzleIndex = step.idx;
-            sizzleDirection = step.dir;
-
-            const cueStep = getNextSizzleStep(sizzleIndex, sizzleDirection, totalFrames);
-            const cueImg = preloadedSizzleImages[cueStep.idx];
-            if (cueImg && cueImg.src) {
-              setTimeout(() => {
-                if (rightSun && rightSun.img && sizzleActiveLayer === 'b') {
-                  rightSun.img.src = cueImg.src;
-                  if (rightSun.img.decode) rightSun.img.decode().catch(() => {});
-                }
-              }, fadeDuration + 10);
-            }
-          } else {
-            rightSun.img.style.zIndex = '2';
-            rightSun.imgB.style.zIndex = '1';
-            rightSun.img.style.opacity = '1';
-            rightSun.imgB.style.opacity = '0';
-            sizzleActiveLayer = 'a';
-            sizzleIndex = step.idx;
-            sizzleDirection = step.dir;
-
-            const cueStep = getNextSizzleStep(sizzleIndex, sizzleDirection, totalFrames);
-            const cueImg = preloadedSizzleImages[cueStep.idx];
-            if (cueImg && cueImg.src) {
-              setTimeout(() => {
-                if (rightSun && rightSun.imgB && sizzleActiveLayer === 'a') {
-                  rightSun.imgB.src = cueImg.src;
-                  if (rightSun.imgB.decode) rightSun.imgB.decode().catch(() => {});
-                }
-              }, fadeDuration + 10);
-            }
-          }
-        } else if (rightSun && rightSun.img) {
-          sizzleIndex = step.idx;
-          sizzleDirection = step.dir;
-          if (nextImg && nextImg.src) rightSun.img.src = nextImg.src;
-        }
-
-        sunSizzleTimeoutId = setTimeout(startSizzleLoop, delay);
+        const initFps = isMobile ? SUN_ANIMATION_FPS_MOBILE : SUN_ANIMATION_FPS_DESKTOP;
+        const initDelay = Math.max(20, Math.round(1000 / Math.max(1, initFps)));
+        if (sunAnimationTimeoutId) clearTimeout(sunAnimationTimeoutId);
+        sunAnimationTimeoutId = setTimeout(runSunCycleStep, initDelay);
       }
 
-      // Initialize with seed frames immediately
-      setupSizzleFrames(currentSizzleUrls, true);
-
-      // Auto-fetch freshest live frames from NOAA STAR SUVI Fe195
-      async function refreshLiveSizzleFrames() {
-        try {
-          const band = SUN_SIZZLE_BAND || 'Fe195';
-          const length = Math.max(20, Math.min(300, SUN_SIZZLE_FETCH_LENGTH || 120));
-          const res = await fetch(`https://www.star.nesdis.noaa.gov/goes/SUVI_band.php?sat=G19&band=${band}&length=${length}&_t=${Date.now()}`, {
-            cache: 'no-store'
-          });
-          if (!res.ok) throw new Error(`SUVI HTTP status ${res.status}`);
-          const html = await res.text();
-          const regex = new RegExp(`'(https:\\/\\/cdn\\.star\\.nesdis\\.noaa\\.gov\\/GOES19\\/SUVI\\/FD\\/${band}\\/[0-9]+_GOES19-SUVI-${band}-600x600\\.jpg)'`, 'g');
-          const matches = [...html.matchAll(regex)];
-          if (matches && matches.length >= 2) {
-            const rawUrls = matches.map(m => m[1]);
-            const uniqueUrls = Array.from(new Set(rawUrls)).sort();
-            if (uniqueUrls.length >= 2) {
-              currentSizzleUrls = uniqueUrls;
-              setupSizzleFrames(currentSizzleUrls, false);
-              return;
-            }
-          }
-        } catch (err) {
-          console.warn('Auto-refresh of SUVI frames skipped (falling back to live feed):', err);
-        }
-
-        // Live fallback: ONLY if no frames loaded or animation is not running
-        if (rightSun && rightSun.img && preloadedSizzleImages.length === 0) {
-          const liveUrl = `${SUN_IMAGE_BASE_URL}600x600.jpg?t=${Date.now()}`;
-          const fallbackImg = new Image();
-          fallbackImg.onload = () => {
-            if (rightSun && rightSun.img && preloadedSizzleImages.length === 0) {
-              rightSun.img.src = liveUrl;
-            }
-          };
-          fallbackImg.src = liveUrl;
-        }
-      }
-
-      // Initial fetch after page settle
-      setTimeout(refreshLiveSizzleFrames, 2500);
-
-      // Periodic auto-refresh every SUN_SIZZLE_AUTO_REFRESH_MS (default 3 min)
-      setInterval(refreshLiveSizzleFrames, SUN_SIZZLE_AUTO_REFRESH_MS);
-
-      // Periodic live heartbeat: every 60s ensures image is never stale even if animation pauses
-      setInterval(() => {
-        if (!sunSizzleTimeoutId && rightSun && rightSun.img) {
-          rightSun.img.src = `${SUN_IMAGE_BASE_URL}600x600.jpg?t=${Date.now()}`;
-        }
-      }, 60 * 1000);
-    }
-  }
-
-  /* --- Live Earth Image & Living Weather Animation Engine (NOAA GOES satellite) --- */
-  let earthAnimationTimeoutId = null;
-
-  function createEarthImageIfMissing() {
-    if (document.getElementById('earth-image-container')) return;
-    
-    const isMobile = window.innerWidth <= 767;
-    const width = isMobile ? EARTH_IMAGE_WIDTH_MOBILE : EARTH_IMAGE_WIDTH_DESKTOP;
-    const marginTop = isMobile ? EARTH_IMAGE_MARGIN_TOP_MOBILE : EARTH_IMAGE_MARGIN_TOP_DESKTOP;
-    const marginBottom = isMobile ? EARTH_IMAGE_MARGIN_BOTTOM_MOBILE : EARTH_IMAGE_MARGIN_BOTTOM_DESKTOP;
-    const blur = isMobile ? EARTH_IMAGE_BLUR_MOBILE : EARTH_IMAGE_BLUR_DESKTOP;
-    const crossfadeMs = isMobile ? EARTH_ANIMATION_CROSSFADE_MS_MOBILE : EARTH_ANIMATION_CROSSFADE_MS_DESKTOP;
-
-    const container = document.createElement('div');
-    container.id = 'earth-image-container';
-    container.style.width = width;
-    container.style.height = width;  // Square container
-    container.style.margin = `${marginTop} auto 0`; // Bottom margin handled by dedicated spacer to prevent collapse
-    container.style.borderRadius = '50%';  // Make it circular
-    container.style.overflow = 'hidden';
-    container.style.clipPath = `circle(${EARTH_MASK_RADIUS} at 50% ${EARTH_MASK_POSITION_Y})`; // Strict mask to hide anti-aliasing bleed
-    container.style.WebkitClipPath = `circle(${EARTH_MASK_RADIUS} at 50% ${EARTH_MASK_POSITION_Y})`; // For older iOS/Safari
-    container.style.position = 'relative';
-    container.style.opacity = '0'; // Hide initially to prevent center-screen flashing
-    container.style.transition = 'opacity 1s ease'; // Smooth fade in
-    container.style.mixBlendMode = 'lighten'; // Force container to blend with the page gradient
-    container.style.flexShrink = '0';
-    container.style.webkitBackfaceVisibility = 'hidden';
-    container.style.backfaceVisibility = 'hidden';
-    container.style.webkitTransform = 'translate3d(0, 0, 0)';
-    container.style.transform = 'translate3d(0, 0, 0)';
-    container.style.webkitMaskImage = '-webkit-radial-gradient(white, black)';
-    container.style.filter = blur ? `blur(${blur})` : 'none';
-    
-    // Layer A (Active image layer)
-    const imgA = document.createElement('img');
-    imgA.id = 'earth-image';
-    imgA.className = 'earth-image earth-layer-a';
-    imgA.src = EARTH_IMAGE_URL;
-    imgA.alt = 'Live Earth from GOES Satellite';
-    imgA.style.width = '115%';
-    imgA.style.height = '115%';
-    imgA.style.position = 'absolute';
-    imgA.style.top = '0';
-    imgA.style.left = '50%';
-    imgA.style.transform = 'translate3d(-50%, 0, 0)';
-    imgA.style.webkitTransform = 'translate3d(-50%, 0, 0)';
-    imgA.style.webkitBackfaceVisibility = 'hidden';
-    imgA.style.backfaceVisibility = 'hidden';
-    imgA.style.objectFit = 'cover';
-    imgA.style.display = 'block';
-    imgA.style.zIndex = '1';
-    imgA.style.opacity = '1';
-    imgA.style.willChange = 'opacity';
-    imgA.style.transition = `opacity ${crossfadeMs}ms ease-in-out`;
-
-    // Layer B (Dual-buffer for smooth cross-dissolve)
-    const imgB = document.createElement('img');
-    imgB.id = 'earth-image-b';
-    imgB.className = 'earth-image earth-layer-b';
-    imgB.src = EARTH_IMAGE_URL;
-    imgB.alt = 'Live Earth from GOES Satellite Buffer';
-    imgB.style.width = '115%';
-    imgB.style.height = '115%';
-    imgB.style.position = 'absolute';
-    imgB.style.top = '0';
-    imgB.style.left = '50%';
-    imgB.style.transform = 'translate3d(-50%, 0, 0)';
-    imgB.style.webkitTransform = 'translate3d(-50%, 0, 0)';
-    imgB.style.webkitBackfaceVisibility = 'hidden';
-    imgB.style.backfaceVisibility = 'hidden';
-    imgB.style.objectFit = 'cover';
-    imgB.style.display = 'block';
-    imgB.style.zIndex = '2';
-    imgB.style.opacity = '0';
-    imgB.style.willChange = 'opacity';
-    imgB.style.transition = `opacity ${crossfadeMs}ms ease-in-out`;
-
-    container.appendChild(imgA);
-    container.appendChild(imgB);
-    
-    // Dedicated spacer to prevent margin collapse at the bottom of the page
-    const spacer = document.createElement('div');
-    spacer.id = 'earth-image-spacer';
-    spacer.style.height = marginBottom;
-    spacer.style.width = '100%';
-    
-    // Ensure Earth goes ABOVE the Cities Location Switcher or Last Updated text
-    const locSwitcher = document.getElementById('weather-location-switcher');
-    const missingAssets = document.getElementById('weather-missing-assets');
-    const lastUpdated = document.getElementById('weather-last-updated');
-    const secondGauge = document.querySelector('.second-gauge-container');
-    
-    if (locSwitcher && locSwitcher.parentNode) {
-      locSwitcher.parentNode.insertBefore(container, locSwitcher);
-      locSwitcher.parentNode.insertBefore(spacer, locSwitcher);
-    } else if (missingAssets && missingAssets.parentNode) {
-      missingAssets.parentNode.insertBefore(container, missingAssets);
-      missingAssets.parentNode.insertBefore(spacer, missingAssets);
-    } else if (lastUpdated && lastUpdated.parentNode) {
-      lastUpdated.parentNode.insertBefore(container, lastUpdated);
-      lastUpdated.parentNode.insertBefore(spacer, lastUpdated);
-    } else if (secondGauge && secondGauge.parentNode) {
-      secondGauge.parentNode.insertBefore(container, secondGauge.nextSibling);
-      secondGauge.parentNode.insertBefore(spacer, container.nextSibling);
-    } else {
-      const parent = document.querySelector('main') || document.body;
-      parent.appendChild(container);
-      parent.appendChild(spacer);
+      window.triggerSunRotation = triggerSunRotation;
     }
 
-    if (EARTH_ANIMATION_ENABLED) {
-      initEarthAnimationEngine(imgA, imgB);
-    } else {
-      // Reload static image every 5 minutes to get latest view
-      setInterval(() => {
-        imgA.src = EARTH_IMAGE_URL + '?t=' + Date.now();
-      }, 5 * 60 * 1000);
-    }
-  }
-
-  function initEarthAnimationEngine(imgA, imgB) {
-    let preloadedImages = [];
-    let currentFrameIndex = 0;
-    let activeLayer = 'a'; // 'a' or 'b'
-    let direction = 1; // 1 = forward, -1 = reverse (for pingpong)
+    // =========================================================================
+    // --- Right Earth: GeoColor Rotation Engine (Single Cycle On-Demand) ---
+    // =========================================================================
+    let earthPreloadedImages = [];
+    let isEarthRotating = false;
+    let earthFrameIndex = 0;
+    let earthActiveLayer = 'a';
 
     const isDayNight = EARTH_ANIMATION_MODE === 'daynight';
-    const fetchLength = isDayNight ? EARTH_DAYNIGHT_FETCH_LENGTH : EARTH_WEATHER_FETCH_LENGTH;
-    const frameStep = Math.max(1, Math.round(isDayNight ? EARTH_DAYNIGHT_FRAME_STEP : EARTH_WEATHER_FRAME_STEP));
-    const frameCount = isDayNight ? EARTH_DAYNIGHT_FRAME_COUNT : EARTH_WEATHER_FRAME_COUNT;
-    const fps = isDayNight ? EARTH_DAYNIGHT_FPS : EARTH_WEATHER_FPS;
-    const loopPauseMs = isDayNight ? EARTH_DAYNIGHT_LOOP_PAUSE_MS : EARTH_WEATHER_LOOP_PAUSE_MS;
-    const playbackMode = isDayNight ? EARTH_DAYNIGHT_PLAYBACK_MODE : EARTH_WEATHER_PLAYBACK_MODE;
-    const resSize = EARTH_ANIMATION_RESOLUTION === '339x339' ? '339x339' : '678x678';
+    const earthFetchLength = isDayNight ? EARTH_DAYNIGHT_FETCH_LENGTH : EARTH_WEATHER_FETCH_LENGTH;
+    const earthFrameStep = Math.max(1, Math.round(isDayNight ? EARTH_DAYNIGHT_FRAME_STEP : EARTH_WEATHER_FRAME_STEP));
+    const earthFrameCount = isDayNight ? EARTH_DAYNIGHT_FRAME_COUNT : EARTH_WEATHER_FRAME_COUNT;
+    const earthFps = isDayNight ? EARTH_DAYNIGHT_FPS : EARTH_WEATHER_FPS;
+    const earthResSize = EARTH_ANIMATION_RESOLUTION === '339x339' ? '339x339' : '678x678';
 
-    function setupEarthFrames(rawUrls) {
+    function setupEarthPreload(rawUrls) {
       const uniqueUrls = Array.from(new Set(rawUrls)).sort();
       if (uniqueUrls.length === 0) return;
 
-      // Apply cadence step stepping backwards from newest frame
-      const steppedUrls = frameStep > 1
-        ? uniqueUrls.filter((_, idx) => (uniqueUrls.length - 1 - idx) % frameStep === 0)
+      const steppedUrls = earthFrameStep > 1
+        ? uniqueUrls.filter((_, idx) => (uniqueUrls.length - 1 - idx) % earthFrameStep === 0)
         : uniqueUrls;
 
-      const frameLimit = Math.max(2, Math.min(steppedUrls.length, frameCount));
-      const selectedUrls = steppedUrls.slice(-frameLimit).map(u => {
-        return u.replace('1808x1808', resSize);
+      const frameLimit = Math.max(2, Math.min(steppedUrls.length, earthFrameCount));
+      const selectedUrls = steppedUrls.slice(-frameLimit).map(u => u.replace('1808x1808', earthResSize));
+
+      earthPreloadedImages = selectedUrls.map(url => {
+        const img = new Image();
+        img.src = url;
+        return img;
       });
-
-      if (preloadedImages.length === 0) {
-        let loaded = 0;
-        preloadedImages = selectedUrls.map(url => {
-          const img = new Image();
-          img.onload = () => {
-            loaded++;
-            if (loaded >= Math.min(6, selectedUrls.length) && !earthAnimationTimeoutId) {
-              if (preloadedImages.length > 0 && imgA) {
-                imgA.src = preloadedImages[0].src;
-                imgA.style.zIndex = '1';
-                imgA.style.opacity = '1';
-                if (imgA.decode) imgA.decode().catch(() => {});
-              }
-              if (preloadedImages.length > 1 && imgB) {
-                imgB.src = preloadedImages[1].src;
-                imgB.style.zIndex = '2';
-                imgB.style.opacity = '0';
-                if (imgB.decode) imgB.decode().catch(() => {});
-              }
-              currentFrameIndex = 0;
-              direction = 1;
-              activeLayer = 'a';
-              const initDelay = Math.round(1000 / Math.max(1, fps));
-              earthAnimationTimeoutId = setTimeout(startEarthLoop, initDelay);
-            }
-          };
-          img.onerror = () => { loaded++; };
-          img.src = url;
-          return img;
-        });
-      } else {
-        // Seamless background hot-swap
-        let loaded = 0;
-        const newImages = selectedUrls.map(url => {
-          const img = new Image();
-          img.onload = () => { loaded++; };
-          img.onerror = () => { loaded++; };
-          img.src = url;
-          return img;
-        });
-
-        const swapWhenReady = () => {
-          if (loaded >= Math.min(6, selectedUrls.length)) {
-            preloadedImages = newImages;
-            currentFrameIndex = Math.max(0, Math.min(preloadedImages.length - 1, currentFrameIndex));
-          } else {
-            setTimeout(swapWhenReady, 100);
-          }
-        };
-        swapWhenReady();
-      }
     }
 
-    function getNextEarthStep(curIdx, curDir, total) {
-      if (total <= 1) return { idx: 0, dir: 1, isEnd: true };
-      if (playbackMode === 'pingpong') {
-        let newDir = curDir;
-        let nextIdx = curIdx;
-        let isEnd = false;
-        if (newDir === 1) {
-          if (curIdx >= total - 1) {
-            newDir = -1;
-            nextIdx = total - 2;
-            isEnd = true;
-          } else {
-            nextIdx = curIdx + 1;
-          }
-        } else {
-          if (curIdx <= 0) {
-            newDir = 1;
-            nextIdx = 1;
-            isEnd = true;
-          } else {
-            nextIdx = curIdx - 1;
-          }
-        }
-        return { idx: Math.max(0, Math.min(total - 1, nextIdx)), dir: newDir, isEnd };
-      } else {
-        const isEnd = curIdx >= total - 1;
-        const nextIdx = (curIdx + 1) % total;
-        return { idx: nextIdx, dir: 1, isEnd };
-      }
+    // Seed frames loaded immediately
+    if (Array.isArray(EARTH_FRAMES_SEED) && EARTH_FRAMES_SEED.length > 0) {
+      setupEarthPreload(EARTH_FRAMES_SEED);
     }
 
-    function startEarthLoop() {
-      if (!EARTH_ANIMATION_ENABLED || preloadedImages.length <= 1) return;
+    // Default: Static live Earth displayed on Layer A
+    if (rightEarth && rightEarth.img) {
+      rightEarth.img.src = EARTH_IMAGE_URL;
+      rightEarth.img.style.zIndex = '1';
+      rightEarth.img.style.opacity = '1';
+    }
+    if (rightEarth && rightEarth.imgB) {
+      rightEarth.imgB.src = EARTH_IMAGE_URL;
+      rightEarth.imgB.style.zIndex = '2';
+      rightEarth.imgB.style.opacity = '0';
+    }
 
-      const totalFrames = preloadedImages.length;
-      if (totalFrames <= 1) return;
-
-      const step = getNextEarthStep(currentFrameIndex, direction, totalFrames);
-      const nextImg = preloadedImages[step.idx];
-      if (!nextImg || (!nextImg.complete && nextImg.naturalWidth === 0)) {
-        earthAnimationTimeoutId = setTimeout(startEarthLoop, 60);
+    function runEarthCycleStep() {
+      if (!isEarthRotating || earthPreloadedImages.length <= 1) {
+        isEarthRotating = false;
         return;
       }
 
-      let delay = Math.round(1000 / Math.max(1, fps));
-      if (step.isEnd && loopPauseMs > 0) delay += loopPauseMs;
+      const totalFrames = earthPreloadedImages.length;
+      const nextIdx = earthFrameIndex + 1;
 
+      if (nextIdx >= totalFrames) {
+        isEarthRotating = false;
+        earthAnimationTimeoutId = null;
+        return;
+      }
+
+      const nextImg = earthPreloadedImages[nextIdx];
+      if (!nextImg || (!nextImg.complete && nextImg.naturalWidth === 0)) {
+        earthAnimationTimeoutId = setTimeout(runEarthCycleStep, 40);
+        return;
+      }
+
+      const isLastFrame = nextIdx === totalFrames - 1;
+      const delay = Math.round(1000 / Math.max(1, earthFps));
       const isMobile = window.innerWidth <= 767;
       const crossfadeDuration = isMobile ? EARTH_ANIMATION_CROSSFADE_MS_MOBILE : EARTH_ANIMATION_CROSSFADE_MS_DESKTOP;
       const fadeDuration = Math.min(crossfadeDuration, Math.round(delay * 0.65));
 
-      if (imgA) imgA.style.transitionDuration = `${fadeDuration}ms`;
-      if (imgB) imgB.style.transitionDuration = `${fadeDuration}ms`;
-
-      if (EARTH_ANIMATION_CROSSFADE_ENABLED && imgA && imgB) {
-        if (activeLayer === 'a') {
-          // Layer B already has next frame primed! Bring B to top and crossfade
-          imgB.style.zIndex = '2';
-          imgA.style.zIndex = '1';
-          imgB.style.opacity = '1';
-          imgA.style.opacity = '0';
-          activeLayer = 'b';
-          currentFrameIndex = step.idx;
-          direction = step.dir;
-
-          // Cue up following frame on Layer A ONLY AFTER Layer A has completely faded to opacity 0
-          const cueStep = getNextEarthStep(currentFrameIndex, direction, totalFrames);
-          const cueImg = preloadedImages[cueStep.idx];
-          if (cueImg && cueImg.src) {
-            setTimeout(() => {
-              if (imgA && activeLayer === 'b') {
-                imgA.src = cueImg.src;
-                if (imgA.decode) imgA.decode().catch(() => {});
-              }
-            }, fadeDuration + 10);
-          }
-        } else {
-          // Layer A already has next frame primed! Bring A to top and crossfade
-          imgA.style.zIndex = '2';
-          imgB.style.zIndex = '1';
-          imgA.style.opacity = '1';
-          imgB.style.opacity = '0';
-          activeLayer = 'a';
-          currentFrameIndex = step.idx;
-          direction = step.dir;
-
-          // Cue up following frame on Layer B ONLY AFTER Layer B has completely faded to opacity 0
-          const cueStep = getNextEarthStep(currentFrameIndex, direction, totalFrames);
-          const cueImg = preloadedImages[cueStep.idx];
-          if (cueImg && cueImg.src) {
-            setTimeout(() => {
-              if (imgB && activeLayer === 'a') {
-                imgB.src = cueImg.src;
-                if (imgB.decode) imgB.decode().catch(() => {});
-              }
-            }, fadeDuration + 10);
-          }
-        }
-      } else if (imgA) {
-        currentFrameIndex = step.idx;
-        direction = step.dir;
-        if (nextImg && nextImg.src) imgA.src = nextImg.src;
+      if (rightEarth) {
+        if (rightEarth.img) rightEarth.img.style.transitionDuration = `${fadeDuration}ms`;
+        if (rightEarth.imgB) rightEarth.imgB.style.transitionDuration = `${fadeDuration}ms`;
       }
 
-      earthAnimationTimeoutId = setTimeout(startEarthLoop, delay);
+      if (EARTH_ANIMATION_CROSSFADE_ENABLED && rightEarth && rightEarth.imgB) {
+        if (earthActiveLayer === 'a') {
+          rightEarth.imgB.style.zIndex = '2';
+          rightEarth.img.style.zIndex = '1';
+          rightEarth.imgB.style.opacity = '1';
+          rightEarth.img.style.opacity = '0';
+          earthActiveLayer = 'b';
+          earthFrameIndex = nextIdx;
+
+          if (!isLastFrame) {
+            const cueIdx = nextIdx + 1;
+            const cueImg = earthPreloadedImages[cueIdx];
+            if (cueImg && cueImg.src) {
+              setTimeout(() => {
+                if (rightEarth && rightEarth.img && earthActiveLayer === 'b') {
+                  rightEarth.img.src = cueImg.src;
+                  if (rightEarth.img.decode) rightEarth.img.decode().catch(() => {});
+                }
+              }, fadeDuration + 10);
+            }
+          }
+        } else {
+          rightEarth.img.style.zIndex = '2';
+          rightEarth.imgB.style.zIndex = '1';
+          rightEarth.img.style.opacity = '1';
+          rightEarth.imgB.style.opacity = '0';
+          earthActiveLayer = 'a';
+          earthFrameIndex = nextIdx;
+
+          if (!isLastFrame) {
+            const cueIdx = nextIdx + 1;
+            const cueImg = earthPreloadedImages[cueIdx];
+            if (cueImg && cueImg.src) {
+              setTimeout(() => {
+                if (rightEarth && rightEarth.imgB && earthActiveLayer === 'a') {
+                  rightEarth.imgB.src = cueImg.src;
+                  if (rightEarth.imgB.decode) rightEarth.imgB.decode().catch(() => {});
+                }
+              }, fadeDuration + 10);
+            }
+          }
+        }
+      } else if (rightEarth && rightEarth.img) {
+        earthFrameIndex = nextIdx;
+        if (nextImg && nextImg.src) rightEarth.img.src = nextImg.src;
+      }
+
+      if (isLastFrame) {
+        setTimeout(() => {
+          isEarthRotating = false;
+          earthAnimationTimeoutId = null;
+        }, fadeDuration + 50);
+      } else {
+        earthAnimationTimeoutId = setTimeout(runEarthCycleStep, delay);
+      }
     }
+
+    function triggerEarthRotation() {
+      if (isEarthRotating || earthPreloadedImages.length <= 1) return;
+      isEarthRotating = true;
+      earthFrameIndex = 0;
+      earthActiveLayer = 'a';
+
+      if (rightEarth && rightEarth.img) {
+        rightEarth.img.style.transitionDuration = '0ms';
+        rightEarth.img.src = earthPreloadedImages[0].src;
+        rightEarth.img.style.zIndex = '1';
+        rightEarth.img.style.opacity = '1';
+      }
+      if (rightEarth && rightEarth.imgB && earthPreloadedImages.length > 1) {
+        rightEarth.imgB.style.transitionDuration = '0ms';
+        rightEarth.imgB.src = earthPreloadedImages[1].src;
+        rightEarth.imgB.style.zIndex = '2';
+        rightEarth.imgB.style.opacity = '0';
+      }
+
+      const initDelay = Math.round(1000 / Math.max(1, earthFps));
+      if (earthAnimationTimeoutId) clearTimeout(earthAnimationTimeoutId);
+      earthAnimationTimeoutId = setTimeout(runEarthCycleStep, initDelay);
+    }
+
+    window.triggerEarthRotation = triggerEarthRotation;
 
     async function refreshLiveEarthFrames() {
       try {
-        const url = `https://www.star.nesdis.noaa.gov/goes/fulldisk_band.php?sat=G19&band=GEOCOLOR&length=${fetchLength}&_t=${Date.now()}`;
+        const url = `https://www.star.nesdis.noaa.gov/goes/fulldisk_band.php?sat=G19&band=GEOCOLOR&length=${earthFetchLength}&_t=${Date.now()}`;
         const res = await fetch(url, { cache: 'no-store' });
         if (!res.ok) throw new Error(`NOAA Earth HTTP ${res.status}`);
         const html = await res.text();
         const matches = [...html.matchAll(/'(https:\/\/cdn\.star\.nesdis\.noaa\.gov\/GOES19\/ABI\/FD\/GEOCOLOR\/[0-9]+_GOES19-ABI-FD-GEOCOLOR-1808x1808\.jpg)'/g)];
         if (matches && matches.length >= 2) {
           const rawUrls = matches.map(m => m[1]);
-          setupEarthFrames(rawUrls);
+          setupEarthPreload(rawUrls);
         }
       } catch (err) {
         console.warn('Auto-refresh of Earth satellite frames skipped:', err);
       }
     }
 
-    // Initial fetch after page settle
-    setTimeout(refreshLiveEarthFrames, 1500);
-
-    // Periodic auto-refresh every 10 minutes
+    setTimeout(refreshLiveEarthFrames, 2000);
     setInterval(refreshLiveEarthFrames, EARTH_ANIMATION_AUTO_REFRESH_MS);
+
+    // Initial load trigger (default false: stays static live until clicked or 5-min refresh)
+    if (CELESTIAL_ROTATE_ON_INITIAL_LOAD) {
+      setTimeout(() => {
+        triggerCelestialRotations();
+      }, 1500);
+    }
   }
 
-  // Earth image is now initialized dynamically at the end of getLocalWeather()
-  // createEarthImageIfMissing();
+  function createEarthImageIfMissing() {
+    // Earth is integrated side-by-side with Sun in the duo row
+    createSunImageIfMissing();
+  }
 
   /* --- Animated background helpers (subtle, complementary pair) ---
     - Derives two soft background colors from the temp color (HSL) and sets
@@ -14841,10 +14596,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
         console.info('Aligned timeout fired — running fetch now.');
         getLocalWeather();
         triggerClockHandsSpinAnimation();
+        if (CELESTIAL_ROTATION_ON_REFRESH && typeof window.triggerCelestialRotations === 'function') {
+          window.triggerCelestialRotations();
+        }
         // schedule regular intervals after the aligned first run
         refreshTimerId = setInterval(() => {
           getLocalWeather();
           triggerClockHandsSpinAnimation();
+          if (CELESTIAL_ROTATION_ON_REFRESH && typeof window.triggerCelestialRotations === 'function') {
+            window.triggerCelestialRotations();
+          }
           nextRefreshAt = new Date(Date.now() + currentRefreshMs);
         }, currentRefreshMs);
         nextRefreshAt = new Date(Date.now() + currentRefreshMs);
@@ -14859,10 +14620,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
           if (alignedTimeoutId) { clearTimeout(alignedTimeoutId); alignedTimeoutId = null; }
           getLocalWeather();
           triggerClockHandsSpinAnimation();
+          if (CELESTIAL_ROTATION_ON_REFRESH && typeof window.triggerCelestialRotations === 'function') {
+            window.triggerCelestialRotations();
+          }
           if (!refreshTimerId) {
             refreshTimerId = setInterval(() => {
               getLocalWeather();
               triggerClockHandsSpinAnimation();
+              if (CELESTIAL_ROTATION_ON_REFRESH && typeof window.triggerCelestialRotations === 'function') {
+                window.triggerCelestialRotations();
+              }
               nextRefreshAt = new Date(Date.now() + currentRefreshMs);
             }, currentRefreshMs);
           }
@@ -14878,6 +14645,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
       refreshTimerId = setInterval(() => {
         getLocalWeather();
         triggerClockHandsSpinAnimation();
+        if (CELESTIAL_ROTATION_ON_REFRESH && typeof window.triggerCelestialRotations === 'function') {
+          window.triggerCelestialRotations();
+        }
         nextRefreshAt = new Date(Date.now() + currentRefreshMs);
       }, currentRefreshMs);
       nextRefreshAt = new Date(Date.now() + currentRefreshMs);

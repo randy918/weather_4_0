@@ -2149,7 +2149,7 @@ main {
     }
 }
 
-// Live Sun Image & Sizzling Sun Duo Mode (GOES-19 SUVI Fe195 Å)
+// Live Sun & Earth Duo Row Mode (GOES-19 SUVI Fe195 Å & GeoColor ABI Full Disk)
 #suns-row-wrapper,
 .suns-row-wrapper {
     display: flex;
@@ -2171,6 +2171,19 @@ main {
     width: var(--sun-image-width, 34vw);
     position: relative;
     flex-shrink: 0;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.2s ease, filter 0.2s ease;
+
+    &:hover {
+        filter: brightness(1.06);
+    }
+
+    &:active {
+        transform: scale(0.98);
+    }
 }
 
 .sun-column.single-mode {
@@ -2257,7 +2270,8 @@ main {
     transform: translateX(calc(var(--sun-label-offset-x, 0vw) + var(--sun-label-left-offset-x, 0vw)));
 }
 
-#sun-label-right {
+#sun-label-right,
+#earth-label-right {
     transform: translateX(calc(var(--sun-label-offset-x, 0vw) + var(--sun-label-right-offset-x, 0vw)));
 }
 
@@ -2266,11 +2280,10 @@ main {
     width: 100%;
 }
 
-// Live Earth Image & Living Weather Animation (NOAA GOES-19 GeoColor Full Disk)
+// Live Earth Image in Duo Row Mode (NOAA GOES-19 GeoColor Full Disk)
 #earth-image-container {
-    width: var(--earth-image-width, 68vw);
-    height: var(--earth-image-width, 68vw);
-    margin: var(--earth-image-margin-top, 2vw) auto 0;
+    width: var(--earth-image-width, var(--sun-image-width, 34vw));
+    height: var(--earth-image-width, var(--sun-image-width, 34vw));
     border-radius: 50%;
     overflow: hidden;
     clip-path: circle(var(--earth-mask-radius, 49.5%) at 50% var(--earth-mask-position-y, 50.25%));
@@ -2316,6 +2329,7 @@ main {
 }
 
 #earth-image-spacer {
-    height: var(--earth-image-margin-bottom, 4vw);
-    width: 100%;
+    display: none;
+    height: 0;
+    width: 0;
 }
