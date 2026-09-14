@@ -7305,6 +7305,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const EARTH_MASK_POSITION_Y = '50.25%';           // EDITABLE: Shift mask down to crop exactly 0.5% more from top
   const EARTH_IMAGE_URL = 'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/678x678.jpg';
 
+  // Inner Scale & Centering (Per user request: Earth image at 68.3% to match Sun visual ball)
+  const EARTH_IMAGE_INNER_SCALE_DESKTOP = '68.3%';  // EDITABLE Desktop: Inner scale of Earth image (68.3% matches Sun visual ball)
+  const EARTH_IMAGE_INNER_SCALE_MOBILE = '68.3%';   // EDITABLE Mobile: Inner scale of Earth image (68.3%)
+  const EARTH_IMAGE_OFFSET_Y_DESKTOP = '0%';        // EDITABLE Desktop: Vertical nudge inside circle
+  const EARTH_IMAGE_OFFSET_Y_MOBILE = '0%';         // EDITABLE Mobile: Vertical nudge inside circle
+  const EARTH_IMAGE_OFFSET_X_DESKTOP = '0%';        // EDITABLE Desktop: Horizontal nudge inside circle
+  const EARTH_IMAGE_OFFSET_X_MOBILE = '0%';         // EDITABLE Mobile: Horizontal nudge inside circle
+
   // Compatibility aliases
   const EARTH_IMAGE_WIDTH = EARTH_IMAGE_WIDTH_DESKTOP;
   const EARTH_IMAGE_MARGIN_TOP = EARTH_IMAGE_MARGIN_TOP_DESKTOP;
@@ -7366,6 +7374,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const marginBottom = isMobile ? EARTH_IMAGE_MARGIN_BOTTOM_MOBILE : EARTH_IMAGE_MARGIN_BOTTOM_DESKTOP;
     const blur = isMobile ? EARTH_IMAGE_BLUR_MOBILE : EARTH_IMAGE_BLUR_DESKTOP;
     const crossfadeMs = isMobile ? EARTH_ANIMATION_CROSSFADE_MS_MOBILE : EARTH_ANIMATION_CROSSFADE_MS_DESKTOP;
+    const innerScale = isMobile ? EARTH_IMAGE_INNER_SCALE_MOBILE : EARTH_IMAGE_INNER_SCALE_DESKTOP;
+    const offsetY = isMobile ? EARTH_IMAGE_OFFSET_Y_MOBILE : EARTH_IMAGE_OFFSET_Y_DESKTOP;
+    const offsetX = isMobile ? EARTH_IMAGE_OFFSET_X_MOBILE : EARTH_IMAGE_OFFSET_X_DESKTOP;
 
     document.documentElement.style.setProperty('--earth-image-width-desktop', EARTH_IMAGE_WIDTH_DESKTOP);
     document.documentElement.style.setProperty('--earth-image-width-mobile', EARTH_IMAGE_WIDTH_MOBILE);
@@ -7378,6 +7389,18 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--earth-image-margin-bottom-desktop', EARTH_IMAGE_MARGIN_BOTTOM_DESKTOP);
     document.documentElement.style.setProperty('--earth-image-margin-bottom-mobile', EARTH_IMAGE_MARGIN_BOTTOM_MOBILE);
     document.documentElement.style.setProperty('--earth-image-margin-bottom', marginBottom);
+
+    document.documentElement.style.setProperty('--earth-image-inner-scale-desktop', EARTH_IMAGE_INNER_SCALE_DESKTOP);
+    document.documentElement.style.setProperty('--earth-image-inner-scale-mobile', EARTH_IMAGE_INNER_SCALE_MOBILE);
+    document.documentElement.style.setProperty('--earth-image-inner-scale', innerScale);
+
+    document.documentElement.style.setProperty('--earth-image-offset-y-desktop', EARTH_IMAGE_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--earth-image-offset-y-mobile', EARTH_IMAGE_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--earth-image-offset-y', offsetY);
+
+    document.documentElement.style.setProperty('--earth-image-offset-x-desktop', EARTH_IMAGE_OFFSET_X_DESKTOP);
+    document.documentElement.style.setProperty('--earth-image-offset-x-mobile', EARTH_IMAGE_OFFSET_X_MOBILE);
+    document.documentElement.style.setProperty('--earth-image-offset-x', offsetX);
 
     document.documentElement.style.setProperty('--earth-image-blur-desktop', EARTH_IMAGE_BLUR_DESKTOP);
     document.documentElement.style.setProperty('--earth-image-blur-mobile', EARTH_IMAGE_BLUR_MOBILE);
@@ -7432,7 +7455,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1170';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1172';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -7582,20 +7605,20 @@ Plan ahead for significantly warmer conditions tomorrow!`
       btnContainer.appendChild(btn2);
     }
 
-    // Position/Append formats buttons below location switcher
+    // Position/Append format buttons below location switcher in mainContainer
     const locSwitcher = document.getElementById('weather-location-switcher');
     const versionEl = document.getElementById('weather-version');
     const lastUpdatedEl = document.getElementById('weather-last-updated');
-    const targetParent = document.querySelector('main.content') || document.body;
+    const targetParent = document.querySelector('main.content') || document.querySelector('main') || document.body;
     
-    if (locSwitcher && locSwitcher.parentNode) {
+    if (locSwitcher && locSwitcher.parentNode === targetParent) {
       if (locSwitcher.nextSibling !== btnContainer) {
-        locSwitcher.parentNode.insertBefore(btnContainer, locSwitcher.nextSibling);
+        targetParent.insertBefore(btnContainer, locSwitcher.nextSibling);
       }
-    } else if (versionEl && versionEl.parentNode) {
-      versionEl.parentNode.insertBefore(btnContainer, versionEl);
-    } else if (lastUpdatedEl && lastUpdatedEl.parentNode) {
-      lastUpdatedEl.parentNode.insertBefore(btnContainer, lastUpdatedEl);
+    } else if (versionEl && versionEl.parentNode === targetParent) {
+      targetParent.insertBefore(btnContainer, versionEl);
+    } else if (lastUpdatedEl && lastUpdatedEl.parentNode === targetParent) {
+      targetParent.insertBefore(btnContainer, lastUpdatedEl);
     } else {
       if (btnContainer.parentNode !== targetParent) {
         targetParent.appendChild(btnContainer);
@@ -10369,22 +10392,30 @@ Plan ahead for significantly warmer conditions tomorrow!`
     // Render or update the Location Switcher directly below Earth image / spacer
     updateLocationSwitcherDisplay();
 
-    // Position F/C format buttons directly BELOW location switcher
+    const mainContainer = document.querySelector('main.content') || document.querySelector('main') || document.body;
+
+    // Position F/C format buttons directly BELOW location switcher in mainContainer
     const btnContainer = document.getElementById('temp-format-buttons');
     const locSwitcher = document.getElementById('weather-location-switcher');
-    if (btnContainer && locSwitcher && locSwitcher.parentNode) {
+    if (btnContainer && locSwitcher && locSwitcher.parentNode === mainContainer) {
       if (locSwitcher.nextSibling !== btnContainer) {
-        locSwitcher.parentNode.insertBefore(btnContainer, locSwitcher.nextSibling);
+        mainContainer.insertBefore(btnContainer, locSwitcher.nextSibling);
       }
+    } else if (btnContainer && btnContainer.parentNode !== mainContainer) {
+      mainContainer.appendChild(btnContainer);
     }
 
-    // Render or update the Version indicator directly BELOW format buttons
+    // Render or update the Version indicator directly BELOW format buttons in mainContainer
     updateVersionDisplay();
     const versionEl = document.getElementById('weather-version');
-    if (versionEl && btnContainer && btnContainer.parentNode) {
-      if (btnContainer.nextSibling !== versionEl) {
-        btnContainer.parentNode.insertBefore(versionEl, btnContainer.nextSibling);
+    const versionAnchor = (btnContainer && btnContainer.parentNode === mainContainer) ? btnContainer :
+                          ((locSwitcher && locSwitcher.parentNode === mainContainer) ? locSwitcher : null);
+    if (versionEl && versionAnchor && versionAnchor.parentNode === mainContainer) {
+      if (versionAnchor.nextSibling !== versionEl) {
+        mainContainer.insertBefore(versionEl, versionAnchor.nextSibling);
       }
+    } else if (versionEl && versionEl.parentNode !== mainContainer) {
+      mainContainer.appendChild(versionEl);
     }
 
     if (span) {
@@ -10412,14 +10443,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
       span.style.zIndex = '10';
     }
 
-    // Position #weather-last-updated at the VERY BOTTOM below version / format buttons / location switcher
-    const bottomTarget = versionEl || btnContainer || locSwitcher;
-    if (bottomTarget && bottomTarget.parentNode) {
+    // Position #weather-last-updated at the VERY BOTTOM below version / format buttons / location switcher in mainContainer
+    const bottomTarget = (versionEl && versionEl.parentNode === mainContainer) ? versionEl :
+                         ((btnContainer && btnContainer.parentNode === mainContainer) ? btnContainer :
+                         ((locSwitcher && locSwitcher.parentNode === mainContainer) ? locSwitcher : null));
+    if (bottomTarget && bottomTarget.parentNode === mainContainer) {
       if (bottomTarget.nextSibling !== span) {
-        bottomTarget.parentNode.insertBefore(span, bottomTarget.nextSibling);
+        mainContainer.insertBefore(span, bottomTarget.nextSibling);
       }
-    } else if (!span.parentNode) {
-      container.appendChild(span);
+    } else if (span.parentNode !== mainContainer) {
+      mainContainer.appendChild(span);
     }
   }
 
@@ -10428,7 +10461,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const id = 'weather-location-switcher';
     let container = document.getElementById(id);
     const lastUpdatedEl = document.getElementById('weather-last-updated');
-    const mainContainer = document.querySelector('main') || document.body;
+    const mainContainer = document.querySelector('main.content') || document.querySelector('main') || document.body;
 
     if (!container) {
       container = document.createElement('div');
@@ -10459,19 +10492,34 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--location-active-color', LOCATION_ACTIVE_COLOR);
     document.documentElement.style.setProperty('--location-inactive-color', LOCATION_INACTIVE_COLOR);
 
-    // Ensure container is inserted below Earth image / spacer in the DOM
+    // Ensure container is inserted directly in mainContainer, below the celestial row spacer (#sun-image-spacer) or #suns-row-wrapper
+    const sunSpacer = document.getElementById('sun-image-spacer');
+    const sunsRow = document.getElementById('suns-row-wrapper');
+    const singleSunCol = document.querySelector('.sun-column.single-mode');
     const earthSpacer = document.getElementById('earth-image-spacer');
     const earthContainer = document.getElementById('earth-image-container');
+    const worldClocks = document.getElementById('world-clocks-row-wrapper');
 
-    if (earthSpacer && earthSpacer.parentNode) {
-      if (earthSpacer.nextSibling !== container) {
-        earthSpacer.parentNode.insertBefore(container, earthSpacer.nextSibling);
+    let rowAnchor = null;
+    if (sunSpacer && sunSpacer.parentNode === mainContainer) {
+      rowAnchor = sunSpacer;
+    } else if (sunsRow && sunsRow.parentNode === mainContainer) {
+      rowAnchor = sunsRow;
+    } else if (singleSunCol && singleSunCol.parentNode === mainContainer) {
+      rowAnchor = singleSunCol;
+    } else if (earthSpacer && earthSpacer.parentNode === mainContainer) {
+      rowAnchor = earthSpacer;
+    } else if (earthContainer && earthContainer.parentNode === mainContainer) {
+      rowAnchor = earthContainer;
+    } else if (worldClocks && worldClocks.parentNode === mainContainer) {
+      rowAnchor = worldClocks;
+    }
+
+    if (rowAnchor && rowAnchor.parentNode === mainContainer) {
+      if (rowAnchor.nextSibling !== container) {
+        mainContainer.insertBefore(container, rowAnchor.nextSibling);
       }
-    } else if (earthContainer && earthContainer.parentNode) {
-      if (earthContainer.nextSibling !== container) {
-        earthContainer.parentNode.insertBefore(container, earthContainer.nextSibling);
-      }
-    } else if (!container.parentNode) {
+    } else if (container.parentNode !== mainContainer) {
       mainContainer.appendChild(container);
     }
 
@@ -10599,21 +10647,22 @@ Plan ahead for significantly warmer conditions tomorrow!`
     el.style.color = color;
     el.style.opacity = VERSION_OPACITY;
 
-    // Position correctly in DOM: after #temp-format-buttons (or #weather-location-switcher)
+    // Position correctly in DOM: after #temp-format-buttons (or #weather-location-switcher) in mainContainer
     const btnContainer = document.getElementById('temp-format-buttons');
     const locSwitcher = document.getElementById('weather-location-switcher');
     const lastUpdatedEl = document.getElementById('weather-last-updated');
-    const anchor = btnContainer || locSwitcher;
+    const anchor = (btnContainer && btnContainer.parentNode === mainContainer) ? btnContainer :
+                   ((locSwitcher && locSwitcher.parentNode === mainContainer) ? locSwitcher : null);
 
-    if (anchor && anchor.parentNode) {
+    if (anchor && anchor.parentNode === mainContainer) {
       if (anchor.nextSibling !== el) {
-        anchor.parentNode.insertBefore(el, anchor.nextSibling);
+        mainContainer.insertBefore(el, anchor.nextSibling);
       }
-    } else if (lastUpdatedEl && lastUpdatedEl.parentNode) {
+    } else if (lastUpdatedEl && lastUpdatedEl.parentNode === mainContainer) {
       if (lastUpdatedEl.previousSibling !== el) {
-        lastUpdatedEl.parentNode.insertBefore(el, lastUpdatedEl);
+        mainContainer.insertBefore(el, lastUpdatedEl);
       }
-    } else if (!el.parentNode) {
+    } else if (el.parentNode !== mainContainer) {
       mainContainer.appendChild(el);
     }
   }
@@ -11432,13 +11481,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
       imA.className = 'earth-image earth-layer-a';
       imA.src = initialUrl;
       imA.alt = altText;
-      imA.style.width = '115%';
-      imA.style.height = '115%';
+      imA.style.width = 'var(--earth-image-inner-scale, 68.3%)';
+      imA.style.height = 'var(--earth-image-inner-scale, 68.3%)';
       imA.style.position = 'absolute';
-      imA.style.top = '0';
-      imA.style.left = '50%';
-      imA.style.transform = 'translate3d(-50%, 0, 0)';
-      imA.style.webkitTransform = 'translate3d(-50%, 0, 0)';
+      imA.style.top = 'calc(50% + var(--earth-image-offset-y, 0%))';
+      imA.style.left = 'calc(50% + var(--earth-image-offset-x, 0%))';
+      imA.style.transform = 'translate3d(-50%, -50%, 0)';
+      imA.style.webkitTransform = 'translate3d(-50%, -50%, 0)';
       imA.style.webkitBackfaceVisibility = 'hidden';
       imA.style.backfaceVisibility = 'hidden';
       imA.style.willChange = 'opacity';
@@ -11453,13 +11502,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
       imB.className = 'earth-image earth-layer-b';
       imB.src = initialUrl;
       imB.alt = altText + ' Buffer';
-      imB.style.width = '115%';
-      imB.style.height = '115%';
+      imB.style.width = 'var(--earth-image-inner-scale, 68.3%)';
+      imB.style.height = 'var(--earth-image-inner-scale, 68.3%)';
       imB.style.position = 'absolute';
-      imB.style.top = '0';
-      imB.style.left = '50%';
-      imB.style.transform = 'translate3d(-50%, 0, 0)';
-      imB.style.webkitTransform = 'translate3d(-50%, 0, 0)';
+      imB.style.top = 'calc(50% + var(--earth-image-offset-y, 0%))';
+      imB.style.left = 'calc(50% + var(--earth-image-offset-x, 0%))';
+      imB.style.transform = 'translate3d(-50%, -50%, 0)';
+      imB.style.webkitTransform = 'translate3d(-50%, -50%, 0)';
       imB.style.webkitBackfaceVisibility = 'hidden';
       imB.style.backfaceVisibility = 'hidden';
       imB.style.willChange = 'opacity';
@@ -11484,7 +11533,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       col.style.flexDirection = 'column';
       col.style.alignItems = 'center';
       col.style.justifyContent = 'flex-start';
-      col.style.width = 'var(--sun-image-width, 34vw)';
+      col.style.width = colId === 'sun-col-right' ? 'var(--earth-image-width, var(--sun-image-width, 34vw))' : 'var(--sun-image-width, 34vw)';
       col.style.position = 'relative';
       col.style.flexShrink = '0';
 
@@ -11594,26 +11643,36 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const missingAssets = document.getElementById('weather-missing-assets');
     const lastUpdated = document.getElementById('weather-last-updated');
     const secondGauge = document.querySelector('.second-gauge-container');
+    const mainContainer = document.querySelector('main.content') || document.querySelector('main') || document.body;
 
-    if (worldClocks && worldClocks.parentNode) {
-      worldClocks.parentNode.insertBefore(mainWrapper, worldClocks.nextSibling);
-      worldClocks.parentNode.insertBefore(spacer, mainWrapper.nextSibling);
-    } else if (locSwitcher && locSwitcher.parentNode) {
-      locSwitcher.parentNode.insertBefore(mainWrapper, locSwitcher);
-      locSwitcher.parentNode.insertBefore(spacer, locSwitcher);
-    } else if (missingAssets && missingAssets.parentNode) {
-      missingAssets.parentNode.insertBefore(mainWrapper, missingAssets);
-      missingAssets.parentNode.insertBefore(spacer, missingAssets);
-    } else if (lastUpdated && lastUpdated.parentNode) {
-      lastUpdated.parentNode.insertBefore(mainWrapper, lastUpdated);
-      lastUpdated.parentNode.insertBefore(spacer, lastUpdated);
-    } else if (secondGauge && secondGauge.parentNode) {
-      secondGauge.parentNode.insertBefore(mainWrapper, secondGauge.nextSibling);
-      secondGauge.parentNode.insertBefore(spacer, mainWrapper.nextSibling);
+    if (worldClocks && worldClocks.parentNode === mainContainer) {
+      mainContainer.insertBefore(mainWrapper, worldClocks.nextSibling);
+      mainContainer.insertBefore(spacer, mainWrapper.nextSibling);
+    } else if (locSwitcher && locSwitcher.parentNode === mainContainer) {
+      mainContainer.insertBefore(mainWrapper, locSwitcher);
+      mainContainer.insertBefore(spacer, locSwitcher);
+    } else if (missingAssets && missingAssets.parentNode === mainContainer) {
+      mainContainer.insertBefore(mainWrapper, missingAssets);
+      mainContainer.insertBefore(spacer, missingAssets);
+    } else if (lastUpdated && lastUpdated.parentNode === mainContainer) {
+      mainContainer.insertBefore(mainWrapper, lastUpdated);
+      mainContainer.insertBefore(spacer, lastUpdated);
+    } else if (secondGauge && secondGauge.parentNode === mainContainer) {
+      mainContainer.insertBefore(mainWrapper, secondGauge.nextSibling);
+      mainContainer.insertBefore(spacer, mainWrapper.nextSibling);
     } else {
-      const parent = document.querySelector('main') || document.body;
-      parent.appendChild(mainWrapper);
-      parent.appendChild(spacer);
+      mainContainer.appendChild(mainWrapper);
+      mainContainer.appendChild(spacer);
+    }
+
+    // Ensure cities location switcher, F/C buttons, version #, and last updated are directly in mainContainer below celestial spacer
+    if (locSwitcher) {
+      mainContainer.insertBefore(locSwitcher, spacer.nextSibling);
+      const btnContainer = document.getElementById('temp-format-buttons');
+      if (btnContainer) mainContainer.insertBefore(btnContainer, locSwitcher.nextSibling);
+      const versionEl = document.getElementById('weather-version');
+      if (versionEl) mainContainer.insertBefore(versionEl, (btnContainer || locSwitcher).nextSibling);
+      if (lastUpdated) mainContainer.insertBefore(lastUpdated, (versionEl || btnContainer || locSwitcher).nextSibling);
     }
 
     // Clean up any stray standalone Earth container or spacer

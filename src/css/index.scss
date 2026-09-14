@@ -1502,13 +1502,16 @@ main {
     --sun-label-right-offset-x: var(--sun-label-right-offset-x-desktop, 0vw);
 
     /* Earth Image & Living Weather Config */
-    --earth-image-width: var(--earth-image-width-desktop, 68vw);
-    --earth-image-margin-top: var(--earth-image-margin-top-desktop, 2vw);
-    --earth-image-margin-bottom: var(--earth-image-margin-bottom-desktop, 4vw);
+    --earth-image-width: var(--earth-image-width-desktop, 34vw);
+    --earth-image-inner-scale: var(--earth-image-inner-scale-desktop, 68.3%);
+    --earth-image-offset-y: var(--earth-image-offset-y-desktop, 0%);
+    --earth-image-offset-x: var(--earth-image-offset-x-desktop, 0%);
+    --earth-image-margin-top: var(--earth-image-margin-top-desktop, 0vw);
+    --earth-image-margin-bottom: var(--earth-image-margin-bottom-desktop, 0vw);
     --earth-image-blur: var(--earth-image-blur-desktop, 0.8px);
     --earth-mask-radius: var(--earth-mask-radius-desktop, 49.5%);
     --earth-mask-position-y: var(--earth-mask-position-y-desktop, 50.25%);
-    --earth-animation-crossfade-duration: var(--earth-animation-crossfade-duration-desktop, 80ms);
+    --earth-animation-crossfade-duration: var(--earth-animation-crossfade-duration-desktop, 70ms);
 
     /* World Clocks Row Config */
     --world-clock-size: var(--world-clock-size-desktop, 13.5vw);
@@ -1614,13 +1617,16 @@ main {
         --sun-animation-ease-frames: var(--sun-animation-ease-frames-mobile, 6);
 
         /* Earth Image & Living Weather Config Mobile */
-        --earth-image-width: var(--earth-image-width-mobile, 85vw);
-        --earth-image-margin-top: var(--earth-image-margin-top-mobile, 3vw);
-        --earth-image-margin-bottom: var(--earth-image-margin-bottom-mobile, 5vw);
+        --earth-image-width: var(--earth-image-width-mobile, 42vw);
+        --earth-image-inner-scale: var(--earth-image-inner-scale-mobile, 68.3%);
+        --earth-image-offset-y: var(--earth-image-offset-y-mobile, 0%);
+        --earth-image-offset-x: var(--earth-image-offset-x-mobile, 0%);
+        --earth-image-margin-top: var(--earth-image-margin-top-mobile, 0vw);
+        --earth-image-margin-bottom: var(--earth-image-margin-bottom-mobile, 0vw);
         --earth-image-blur: var(--earth-image-blur-mobile, 0.5px);
         --earth-mask-radius: var(--earth-mask-radius-mobile, 49.5%);
         --earth-mask-position-y: var(--earth-mask-position-y-mobile, 50.25%);
-        --earth-animation-crossfade-duration: var(--earth-animation-crossfade-duration-mobile, 80ms);
+        --earth-animation-crossfade-duration: var(--earth-animation-crossfade-duration-mobile, 70ms);
 
         --world-clock-size: var(--world-clock-size-mobile, 16.0vw);
         --world-clocks-gap: var(--world-clocks-gap-mobile, 1.8vw);
@@ -1720,13 +1726,16 @@ main {
         --sun-animation-ease-frames: var(--sun-animation-ease-frames-desktop, 6);
 
         /* Earth Image & Living Weather Config Desktop */
-        --earth-image-width: var(--earth-image-width-desktop, 68vw);
-        --earth-image-margin-top: var(--earth-image-margin-top-desktop, 2vw);
-        --earth-image-margin-bottom: var(--earth-image-margin-bottom-desktop, 4vw);
+        --earth-image-width: var(--earth-image-width-desktop, 34vw);
+        --earth-image-inner-scale: var(--earth-image-inner-scale-desktop, 68.3%);
+        --earth-image-offset-y: var(--earth-image-offset-y-desktop, 0%);
+        --earth-image-offset-x: var(--earth-image-offset-x-desktop, 0%);
+        --earth-image-margin-top: var(--earth-image-margin-top-desktop, 0vw);
+        --earth-image-margin-bottom: var(--earth-image-margin-bottom-desktop, 0vw);
         --earth-image-blur: var(--earth-image-blur-desktop, 0.8px);
         --earth-mask-radius: var(--earth-mask-radius-desktop, 49.5%);
         --earth-mask-position-y: var(--earth-mask-position-y-desktop, 50.25%);
-        --earth-animation-crossfade-duration: var(--earth-animation-crossfade-duration-desktop, 80ms);
+        --earth-animation-crossfade-duration: var(--earth-animation-crossfade-duration-desktop, 70ms);
 
         --world-clock-size: var(--world-clock-size-desktop, 13.5vw);
         --world-clocks-gap: var(--world-clocks-gap-desktop, 2.5vw);
@@ -2186,6 +2195,10 @@ main {
     }
 }
 
+.sun-column.earth-column {
+    width: var(--earth-image-width, var(--sun-image-width, 34vw));
+}
+
 .sun-column.single-mode {
     margin: var(--sun-image-margin-top, 2vw) auto 0;
 }
@@ -2301,14 +2314,16 @@ main {
     -webkit-mask-image: -webkit-radial-gradient(white, black);
 }
 
+#earth-image,
+#earth-image-b,
 .earth-image {
-    width: 115%;
-    height: 115%;
+    width: var(--earth-image-inner-scale, 68.3%);
+    height: var(--earth-image-inner-scale, 68.3%);
     position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translate3d(-50%, 0, 0);
-    -webkit-transform: translate3d(-50%, 0, 0);
+    top: calc(50% + var(--earth-image-offset-y, 0%));
+    left: calc(50% + var(--earth-image-offset-x, 0%));
+    transform: translate3d(-50%, -50%, 0);
+    -webkit-transform: translate3d(-50%, -50%, 0);
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     object-fit: cover;
