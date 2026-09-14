@@ -1477,8 +1477,9 @@ main {
     --sun-image-width: var(--sun-image-width-desktop, 34vw);
     --sun-image-margin-top: var(--sun-image-margin-top-desktop, 2vw);
     --sun-image-margin-bottom: var(--sun-image-margin-bottom-desktop, 2vw);
-    --sun-image-inner-scale: var(--sun-image-inner-scale-desktop, 108%);
-    --sun-image-offset-y: var(--sun-image-offset-y-desktop, -1%);
+    --sun-image-inner-scale: var(--sun-image-inner-scale-desktop, 36.7vw);
+    --sun-image-offset-y: var(--sun-image-offset-y-desktop, 0vw);
+    --sun-image-offset-x: var(--sun-image-offset-x-desktop, 0vw);
     --sun-mask-radius: var(--sun-mask-radius-desktop, 49.5%);
     --sun-mask-position-y: var(--sun-mask-position-y-desktop, 50%);
     --sun-image-opacity: var(--sun-image-opacity-desktop, 1);
@@ -1503,14 +1504,14 @@ main {
 
     /* Earth Image & Living Weather Config */
     --earth-image-width: var(--earth-image-width-desktop, 34vw);
-    --earth-image-inner-scale: var(--earth-image-inner-scale-desktop, 68.3%);
-    --earth-image-offset-y: var(--earth-image-offset-y-desktop, 0%);
-    --earth-image-offset-x: var(--earth-image-offset-x-desktop, 0%);
+    --earth-image-inner-scale: var(--earth-image-inner-scale-desktop, 23.2vw);
+    --earth-image-offset-y: var(--earth-image-offset-y-desktop, 0vw);
+    --earth-image-offset-x: var(--earth-image-offset-x-desktop, 0vw);
     --earth-image-margin-top: var(--earth-image-margin-top-desktop, 0vw);
     --earth-image-margin-bottom: var(--earth-image-margin-bottom-desktop, 0vw);
     --earth-image-blur: var(--earth-image-blur-desktop, 0.8px);
-    --earth-mask-radius: var(--earth-mask-radius-desktop, 49.5%);
-    --earth-mask-position-y: var(--earth-mask-position-y-desktop, 50.25%);
+    --earth-mask-radius: var(--earth-mask-radius-desktop, 45.2%);
+    --earth-mask-position-y: var(--earth-mask-position-y-desktop, 45.5%);
     --earth-animation-crossfade-duration: var(--earth-animation-crossfade-duration-desktop, 70ms);
 
     /* World Clocks Row Config */
@@ -1596,8 +1597,9 @@ main {
         --sun-image-width: var(--sun-image-width-mobile, 42vw);
         --sun-image-margin-top: var(--sun-image-margin-top-mobile, 3vw);
         --sun-image-margin-bottom: var(--sun-image-margin-bottom-mobile, 3vw);
-        --sun-image-inner-scale: var(--sun-image-inner-scale-mobile, 108%);
-        --sun-image-offset-y: var(--sun-image-offset-y-mobile, -1%);
+        --sun-image-inner-scale: var(--sun-image-inner-scale-mobile, 45.4vw);
+        --sun-image-offset-y: var(--sun-image-offset-y-mobile, 0vw);
+        --sun-image-offset-x: var(--sun-image-offset-x-mobile, 0vw);
         --sun-mask-radius: var(--sun-mask-radius-mobile, 49.5%);
         --sun-mask-position-y: var(--sun-mask-position-y-mobile, 50%);
         --sun-image-opacity: var(--sun-image-opacity-mobile, 1);
@@ -1618,14 +1620,14 @@ main {
 
         /* Earth Image & Living Weather Config Mobile */
         --earth-image-width: var(--earth-image-width-mobile, 42vw);
-        --earth-image-inner-scale: var(--earth-image-inner-scale-mobile, 68.3%);
-        --earth-image-offset-y: var(--earth-image-offset-y-mobile, 0%);
-        --earth-image-offset-x: var(--earth-image-offset-x-mobile, 0%);
+        --earth-image-inner-scale: var(--earth-image-inner-scale-mobile, 28.7vw);
+        --earth-image-offset-y: var(--earth-image-offset-y-mobile, 0vw);
+        --earth-image-offset-x: var(--earth-image-offset-x-mobile, 0vw);
         --earth-image-margin-top: var(--earth-image-margin-top-mobile, 0vw);
         --earth-image-margin-bottom: var(--earth-image-margin-bottom-mobile, 0vw);
         --earth-image-blur: var(--earth-image-blur-mobile, 0.5px);
-        --earth-mask-radius: var(--earth-mask-radius-mobile, 49.5%);
-        --earth-mask-position-y: var(--earth-mask-position-y-mobile, 50.25%);
+        --earth-mask-radius: var(--earth-mask-radius-mobile, 45.2%);
+        --earth-mask-position-y: var(--earth-mask-position-y-mobile, 45.5%);
         --earth-animation-crossfade-duration: var(--earth-animation-crossfade-duration-mobile, 70ms);
 
         --world-clock-size: var(--world-clock-size-mobile, 16.0vw);
@@ -1705,8 +1707,9 @@ main {
         --sun-image-width: var(--sun-image-width-desktop, 34vw);
         --sun-image-margin-top: var(--sun-image-margin-top-desktop, 2vw);
         --sun-image-margin-bottom: var(--sun-image-margin-bottom-desktop, 2vw);
-        --sun-image-inner-scale: var(--sun-image-inner-scale-desktop, 108%);
-        --sun-image-offset-y: var(--sun-image-offset-y-desktop, -1%);
+        --sun-image-inner-scale: var(--sun-image-inner-scale-desktop, 36.7vw);
+        --sun-image-offset-y: var(--sun-image-offset-y-desktop, 0vw);
+        --sun-image-offset-x: var(--sun-image-offset-x-desktop, 0vw);
         --sun-mask-radius: var(--sun-mask-radius-desktop, 49.5%);
         --sun-mask-position-y: var(--sun-mask-position-y-desktop, 50%);
         --sun-image-opacity: var(--sun-image-opacity-desktop, 1);
@@ -1727,14 +1730,14 @@ main {
 
         /* Earth Image & Living Weather Config Desktop */
         --earth-image-width: var(--earth-image-width-desktop, 34vw);
-        --earth-image-inner-scale: var(--earth-image-inner-scale-desktop, 68.3%);
-        --earth-image-offset-y: var(--earth-image-offset-y-desktop, 0%);
-        --earth-image-offset-x: var(--earth-image-offset-x-desktop, 0%);
+        --earth-image-inner-scale: var(--earth-image-inner-scale-desktop, 23.2vw);
+        --earth-image-offset-y: var(--earth-image-offset-y-desktop, 0vw);
+        --earth-image-offset-x: var(--earth-image-offset-x-desktop, 0vw);
         --earth-image-margin-top: var(--earth-image-margin-top-desktop, 0vw);
         --earth-image-margin-bottom: var(--earth-image-margin-bottom-desktop, 0vw);
         --earth-image-blur: var(--earth-image-blur-desktop, 0.8px);
-        --earth-mask-radius: var(--earth-mask-radius-desktop, 49.5%);
-        --earth-mask-position-y: var(--earth-mask-position-y-desktop, 50.25%);
+        --earth-mask-radius: var(--earth-mask-radius-desktop, 45.2%);
+        --earth-mask-position-y: var(--earth-mask-position-y-desktop, 45.5%);
         --earth-animation-crossfade-duration: var(--earth-animation-crossfade-duration-desktop, 70ms);
 
         --world-clock-size: var(--world-clock-size-desktop, 13.5vw);
@@ -2184,19 +2187,17 @@ main {
     user-select: none;
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
-    transition: transform 0.2s ease, filter 0.2s ease;
+    mix-blend-mode: var(--sun-image-blend-mode, lighten);
+    background-color: transparent;
 
-    &:hover {
-        filter: brightness(1.06);
-    }
-
-    &:active {
-        transform: scale(0.98);
+    &:hover .sun-label {
+        opacity: 0.95;
     }
 }
 
 .sun-column.earth-column {
     width: var(--earth-image-width, var(--sun-image-width, 34vw));
+    margin-top: var(--earth-image-margin-top, 0vw);
 }
 
 .sun-column.single-mode {
@@ -2215,6 +2216,7 @@ main {
     opacity: 0;
     transition: opacity 1s ease;
     mix-blend-mode: var(--sun-image-blend-mode, lighten);
+    background-color: transparent;
     flex-shrink: 0;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
@@ -2228,17 +2230,18 @@ main {
 #sun-image-right,
 #sun-image-right-b,
 .sun-image {
-    width: var(--sun-image-inner-scale, 108%);
-    height: var(--sun-image-inner-scale, 108%);
+    width: var(--sun-image-inner-scale, 36.7vw);
+    height: var(--sun-image-inner-scale, 36.7vw);
     position: absolute;
-    top: var(--sun-image-offset-y, -1%);
-    left: 50%;
-    transform: translate3d(-50%, 0, 0);
-    -webkit-transform: translate3d(-50%, 0, 0);
+    top: calc(50% + var(--sun-image-offset-y, 0vw));
+    left: calc(50% + var(--sun-image-offset-x, 0vw));
+    transform: translate3d(-50%, -50%, 0);
+    -webkit-transform: translate3d(-50%, -50%, 0);
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     object-fit: cover;
     display: block;
+    mix-blend-mode: var(--sun-image-blend-mode, lighten);
     opacity: var(--sun-image-opacity, 1);
     will-change: opacity;
 }
@@ -2298,36 +2301,36 @@ main {
     width: var(--earth-image-width, var(--sun-image-width, 34vw));
     height: var(--earth-image-width, var(--sun-image-width, 34vw));
     border-radius: 50%;
-    overflow: hidden;
-    clip-path: circle(var(--earth-mask-radius, 49.5%) at 50% var(--earth-mask-position-y, 50.25%));
-    -webkit-clip-path: circle(var(--earth-mask-radius, 49.5%) at 50% var(--earth-mask-position-y, 50.25%));
     position: relative;
     opacity: 0;
     transition: opacity 1s ease;
     mix-blend-mode: lighten;
+    background-color: transparent;
     flex-shrink: 0;
-    filter: blur(var(--earth-image-blur, 0.8px));
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
-    -webkit-mask-image: -webkit-radial-gradient(white, black);
 }
 
 #earth-image,
 #earth-image-b,
 .earth-image {
-    width: var(--earth-image-inner-scale, 68.3%);
-    height: var(--earth-image-inner-scale, 68.3%);
+    width: var(--earth-image-inner-scale, 23.2vw);
+    height: var(--earth-image-inner-scale, 23.2vw);
     position: absolute;
-    top: calc(50% + var(--earth-image-offset-y, 0%));
-    left: calc(50% + var(--earth-image-offset-x, 0%));
-    transform: translate3d(-50%, -50%, 0);
-    -webkit-transform: translate3d(-50%, -50%, 0);
+    top: calc(50% + var(--earth-image-offset-y, 0vw));
+    left: calc(50% + var(--earth-image-offset-x, 0vw));
+    transform: translate3d(-50%, -45.5%, 0);
+    -webkit-transform: translate3d(-50%, -45.5%, 0);
+    clip-path: circle(var(--earth-mask-radius, 45.2%) at 50% var(--earth-mask-position-y, 45.5%));
+    -webkit-clip-path: circle(var(--earth-mask-radius, 45.2%) at 50% var(--earth-mask-position-y, 45.5%));
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     object-fit: cover;
     display: block;
+    mix-blend-mode: lighten;
+    filter: blur(var(--earth-image-blur, 0.8px));
     will-change: opacity;
 }
 

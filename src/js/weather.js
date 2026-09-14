@@ -6964,11 +6964,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SUN_IMAGE_MARGIN_BOTTOM_DESKTOP = '2vw';      // EDITABLE Desktop: Gap below sun image
   const SUN_IMAGE_MARGIN_BOTTOM_MOBILE = '0vw';       // EDITABLE Mobile: Gap below sun image
 
-  const SUN_IMAGE_INNER_SCALE_DESKTOP = '108%';       // EDITABLE Desktop: Inner scale to crop bottom timestamp & NOAA logo
-  const SUN_IMAGE_INNER_SCALE_MOBILE = '108%';        // EDITABLE Mobile: Inner scale to crop bottom timestamp & NOAA logo
+  // --- Sun Sizing & Position Controls (JCV) ---
+  // Granular controls to size and nudge Sun independently of Earth (all in vw)
+  const SUN_IMAGE_INNER_SCALE_DESKTOP = '36.7vw';     // EDITABLE Desktop: Sun inner image size in vw (e.g. '36.7vw', '34vw')
+  const SUN_IMAGE_INNER_SCALE_MOBILE = '45.4vw';      // EDITABLE Mobile: Sun inner image size in vw (e.g. '45.4vw', '42vw')
 
-  const SUN_IMAGE_OFFSET_Y_DESKTOP = '-1%';           // EDITABLE Desktop: Vertical nudge inside circle
-  const SUN_IMAGE_OFFSET_Y_MOBILE = '-1%';            // EDITABLE Mobile: Vertical nudge inside circle
+  const SUN_IMAGE_OFFSET_Y_DESKTOP = '0vw';           // EDITABLE Desktop: Vertical position in vw (positive = DOWN, negative = UP; e.g. '0vw', '-0.5vw', '1vw')
+  const SUN_IMAGE_OFFSET_Y_MOBILE = '0vw';            // EDITABLE Mobile: Vertical position in vw (positive = DOWN, negative = UP)
+
+  const SUN_IMAGE_OFFSET_X_DESKTOP = '0vw';           // EDITABLE Desktop: Horizontal position in vw (positive = RIGHT, negative = LEFT; e.g. '0vw', '0.5vw', '-1vw')
+  const SUN_IMAGE_OFFSET_X_MOBILE = '0vw';            // EDITABLE Mobile: Horizontal position in vw (positive = RIGHT, negative = LEFT)
 
   const SUN_MASK_RADIUS_DESKTOP = '49.5%';            // EDITABLE Desktop: Circular mask radius
   const SUN_MASK_RADIUS_MOBILE = '49.5%';             // EDITABLE Mobile: Circular mask radius
@@ -7034,6 +7039,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--sun-image-offset-y-desktop', SUN_IMAGE_OFFSET_Y_DESKTOP);
     document.documentElement.style.setProperty('--sun-image-offset-y-mobile', SUN_IMAGE_OFFSET_Y_MOBILE);
     document.documentElement.style.setProperty('--sun-image-offset-y', isMobile ? SUN_IMAGE_OFFSET_Y_MOBILE : SUN_IMAGE_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-image-offset-x-desktop', SUN_IMAGE_OFFSET_X_DESKTOP);
+    document.documentElement.style.setProperty('--sun-image-offset-x-mobile', SUN_IMAGE_OFFSET_X_MOBILE);
+    document.documentElement.style.setProperty('--sun-image-offset-x', isMobile ? SUN_IMAGE_OFFSET_X_MOBILE : SUN_IMAGE_OFFSET_X_DESKTOP);
 
     document.documentElement.style.setProperty('--sun-mask-radius-desktop', SUN_MASK_RADIUS_DESKTOP);
     document.documentElement.style.setProperty('--sun-mask-radius-mobile', SUN_MASK_RADIUS_MOBILE);
@@ -7298,20 +7307,27 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const EARTH_IMAGE_WIDTH_DESKTOP = '34vw';         // EDITABLE Desktop: Width of the Earth container (matches Sun's 34vw)
   const EARTH_IMAGE_WIDTH_MOBILE = '42vw';          // EDITABLE Mobile: Width of the Earth container (matches Sun's 42vw)
   const EARTH_IMAGE_MARGIN_TOP_DESKTOP = '0vw';     // EDITABLE Desktop: Handled by duo row wrapper
-  const EARTH_IMAGE_MARGIN_TOP_MOBILE = '0vw';      // EDITABLE Mobile: Handled by duo row wrapper
+  const EARTH_IMAGE_MARGIN_TOP_MOBILE = '8vw';      // EDITABLE Mobile: Handled by duo row wrapper
   const EARTH_IMAGE_MARGIN_BOTTOM_DESKTOP = '0vw';  // EDITABLE Desktop: Handled by duo row spacer
   const EARTH_IMAGE_MARGIN_BOTTOM_MOBILE = '0vw';   // EDITABLE Mobile: Handled by duo row spacer
-  const EARTH_MASK_RADIUS = '49.5%';                // EDITABLE: Shrink circle slightly to hide edge artifacts (49.5% = 99% size)
-  const EARTH_MASK_POSITION_Y = '50.25%';           // EDITABLE: Shift mask down to crop exactly 0.5% more from top
+  const EARTH_MASK_RADIUS_DESKTOP = '45.2%';        // EDITABLE Desktop: Circle radius clipping Earth globe, completely excluding the bottom NOAA white platform
+  const EARTH_MASK_RADIUS_MOBILE = '45.2%';         // EDITABLE Mobile: Circle radius clipping Earth globe
+  const EARTH_MASK_POSITION_Y_DESKTOP = '45.5%';    // EDITABLE Desktop: Center of the Earth globe in the NOAA frame (45.5%)
+  const EARTH_MASK_POSITION_Y_MOBILE = '45.5%';     // EDITABLE Mobile: Center of the Earth globe in the NOAA frame (45.5%)
+  const EARTH_MASK_RADIUS = EARTH_MASK_RADIUS_DESKTOP;
+  const EARTH_MASK_POSITION_Y = EARTH_MASK_POSITION_Y_DESKTOP;
   const EARTH_IMAGE_URL = 'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/678x678.jpg';
 
-  // Inner Scale & Centering (Per user request: Earth image at 68.3% to match Sun visual ball)
-  const EARTH_IMAGE_INNER_SCALE_DESKTOP = '68.3%';  // EDITABLE Desktop: Inner scale of Earth image (68.3% matches Sun visual ball)
-  const EARTH_IMAGE_INNER_SCALE_MOBILE = '68.3%';   // EDITABLE Mobile: Inner scale of Earth image (68.3%)
-  const EARTH_IMAGE_OFFSET_Y_DESKTOP = '0%';        // EDITABLE Desktop: Vertical nudge inside circle
-  const EARTH_IMAGE_OFFSET_Y_MOBILE = '0%';         // EDITABLE Mobile: Vertical nudge inside circle
-  const EARTH_IMAGE_OFFSET_X_DESKTOP = '0%';        // EDITABLE Desktop: Horizontal nudge inside circle
-  const EARTH_IMAGE_OFFSET_X_MOBILE = '0%';         // EDITABLE Mobile: Horizontal nudge inside circle
+  // --- Earth Sizing & Position Controls (JCV) ---
+  // Granular controls to size and nudge Earth independently of Sun (all in vw)
+  const EARTH_IMAGE_INNER_SCALE_DESKTOP = '26vw';   // EDITABLE Desktop: Earth inner image size in vw (e.g. '23.2vw', '24vw')
+  const EARTH_IMAGE_INNER_SCALE_MOBILE = '32vw';    // EDITABLE Mobile: Earth inner image size in vw (e.g. '28.7vw', '30vw')
+
+  const EARTH_IMAGE_OFFSET_Y_DESKTOP = '0vw';         // EDITABLE Desktop: Vertical position in vw (positive = DOWN, negative = UP; e.g. '0vw', '-0.5vw', '1vw')
+  const EARTH_IMAGE_OFFSET_Y_MOBILE = '0vw';          // EDITABLE Mobile: Vertical position in vw (positive = DOWN, negative = UP)
+
+  const EARTH_IMAGE_OFFSET_X_DESKTOP = '0vw';         // EDITABLE Desktop: Horizontal position in vw (positive = RIGHT, negative = LEFT; e.g. '0vw', '0.5vw', '-1vw')
+  const EARTH_IMAGE_OFFSET_X_MOBILE = '0vw';          // EDITABLE Mobile: Horizontal position in vw (positive = RIGHT, negative = LEFT)
 
   // Compatibility aliases
   const EARTH_IMAGE_WIDTH = EARTH_IMAGE_WIDTH_DESKTOP;
@@ -7410,16 +7426,23 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--earth-animation-crossfade-duration-mobile', `${EARTH_ANIMATION_CROSSFADE_MS_MOBILE}ms`);
     document.documentElement.style.setProperty('--earth-animation-crossfade-duration', `${crossfadeMs}ms`);
 
-    document.documentElement.style.setProperty('--earth-mask-radius', EARTH_MASK_RADIUS);
-    document.documentElement.style.setProperty('--earth-mask-position-y', EARTH_MASK_POSITION_Y);
+    const maskRadius = isMobile ? EARTH_MASK_RADIUS_MOBILE : EARTH_MASK_RADIUS_DESKTOP;
+    const maskPosY = isMobile ? EARTH_MASK_POSITION_Y_MOBILE : EARTH_MASK_POSITION_Y_DESKTOP;
+
+    document.documentElement.style.setProperty('--earth-mask-radius-desktop', EARTH_MASK_RADIUS_DESKTOP);
+    document.documentElement.style.setProperty('--earth-mask-radius-mobile', EARTH_MASK_RADIUS_MOBILE);
+    document.documentElement.style.setProperty('--earth-mask-radius', maskRadius);
+
+    document.documentElement.style.setProperty('--earth-mask-position-y-desktop', EARTH_MASK_POSITION_Y_DESKTOP);
+    document.documentElement.style.setProperty('--earth-mask-position-y-mobile', EARTH_MASK_POSITION_Y_MOBILE);
+    document.documentElement.style.setProperty('--earth-mask-position-y', maskPosY);
 
     const container = document.getElementById('earth-image-container');
     if (container) {
       container.style.width = width;
       container.style.height = width;
-      container.style.clipPath = `circle(${EARTH_MASK_RADIUS} at 50% ${EARTH_MASK_POSITION_Y})`;
-      container.style.WebkitClipPath = `circle(${EARTH_MASK_RADIUS} at 50% ${EARTH_MASK_POSITION_Y})`;
-      container.style.filter = blur ? `blur(${blur})` : 'none';
+      container.style.backgroundColor = 'transparent';
+      container.style.mixBlendMode = 'lighten';
     }
 
     const spacer = document.getElementById('earth-image-spacer');
@@ -7455,7 +7478,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1172';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1177';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -11394,6 +11417,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       c.style.opacity = '0';
       c.style.transition = 'opacity 1s ease';
       c.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
+      c.style.backgroundColor = 'transparent';
       c.style.flexShrink = '0';
       c.style.webkitBackfaceVisibility = 'hidden';
       c.style.backfaceVisibility = 'hidden';
@@ -11408,18 +11432,19 @@ Plan ahead for significantly warmer conditions tomorrow!`
       im.className = 'sun-image sun-image-layer-a';
       im.src = initialUrl;
       im.alt = altText;
-      im.style.width = 'var(--sun-image-inner-scale, 108%)';
-      im.style.height = 'var(--sun-image-inner-scale, 108%)';
+      im.style.width = 'var(--sun-image-inner-scale, 36.7vw)';
+      im.style.height = 'var(--sun-image-inner-scale, 36.7vw)';
       im.style.position = 'absolute';
-      im.style.top = 'var(--sun-image-offset-y, -1%)';
-      im.style.left = '50%';
-      im.style.transform = 'translate3d(-50%, 0, 0)';
-      im.style.webkitTransform = 'translate3d(-50%, 0, 0)';
+      im.style.top = 'calc(50% + var(--sun-image-offset-y, 0vw))';
+      im.style.left = 'calc(50% + var(--sun-image-offset-x, 0vw))';
+      im.style.transform = 'translate3d(-50%, -50%, 0)';
+      im.style.webkitTransform = 'translate3d(-50%, -50%, 0)';
       im.style.webkitBackfaceVisibility = 'hidden';
       im.style.backfaceVisibility = 'hidden';
       im.style.willChange = 'opacity';
       im.style.objectFit = 'cover';
       im.style.display = 'block';
+      im.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
       im.style.zIndex = '1';
       im.style.opacity = '1';
       im.style.transition = `opacity var(${durVar}) ease-in-out`;
@@ -11429,18 +11454,19 @@ Plan ahead for significantly warmer conditions tomorrow!`
       imB.className = 'sun-image sun-image-layer-b';
       imB.src = initialUrl;
       imB.alt = altText + ' Buffer';
-      imB.style.width = 'var(--sun-image-inner-scale, 108%)';
-      imB.style.height = 'var(--sun-image-inner-scale, 108%)';
+      imB.style.width = 'var(--sun-image-inner-scale, 36.7vw)';
+      imB.style.height = 'var(--sun-image-inner-scale, 36.7vw)';
       imB.style.position = 'absolute';
-      imB.style.top = 'var(--sun-image-offset-y, -1%)';
-      imB.style.left = '50%';
-      imB.style.transform = 'translate3d(-50%, 0, 0)';
-      imB.style.webkitTransform = 'translate3d(-50%, 0, 0)';
+      imB.style.top = 'calc(50% + var(--sun-image-offset-y, 0vw))';
+      imB.style.left = 'calc(50% + var(--sun-image-offset-x, 0vw))';
+      imB.style.transform = 'translate3d(-50%, -50%, 0)';
+      imB.style.webkitTransform = 'translate3d(-50%, -50%, 0)';
       imB.style.webkitBackfaceVisibility = 'hidden';
       imB.style.backfaceVisibility = 'hidden';
       imB.style.willChange = 'opacity';
       imB.style.objectFit = 'cover';
       imB.style.display = 'block';
+      imB.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
       imB.style.zIndex = '2';
       imB.style.opacity = '0';
       imB.style.transition = `opacity var(${durVar}) ease-in-out`;
@@ -11459,20 +11485,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
       c.style.width = 'var(--earth-image-width, var(--sun-image-width, 34vw))';
       c.style.height = 'var(--earth-image-width, var(--sun-image-width, 34vw))';
       c.style.borderRadius = '50%';
-      c.style.overflow = 'hidden';
-      c.style.clipPath = 'circle(var(--earth-mask-radius, 49.5%) at 50% var(--earth-mask-position-y, 50.25%))';
-      c.style.WebkitClipPath = 'circle(var(--earth-mask-radius, 49.5%) at 50% var(--earth-mask-position-y, 50.25%))';
       c.style.position = 'relative';
       c.style.opacity = '0';
       c.style.transition = 'opacity 1s ease';
       c.style.mixBlendMode = 'lighten';
+      c.style.backgroundColor = 'transparent';
       c.style.flexShrink = '0';
-      c.style.filter = 'blur(var(--earth-image-blur, 0.8px))';
       c.style.webkitBackfaceVisibility = 'hidden';
       c.style.backfaceVisibility = 'hidden';
       c.style.webkitTransform = 'translate3d(0, 0, 0)';
       c.style.transform = 'translate3d(0, 0, 0)';
-      c.style.webkitMaskImage = '-webkit-radial-gradient(white, black)';
 
       const durVar = '--earth-animation-crossfade-duration, 70ms';
 
@@ -11481,18 +11503,22 @@ Plan ahead for significantly warmer conditions tomorrow!`
       imA.className = 'earth-image earth-layer-a';
       imA.src = initialUrl;
       imA.alt = altText;
-      imA.style.width = 'var(--earth-image-inner-scale, 68.3%)';
-      imA.style.height = 'var(--earth-image-inner-scale, 68.3%)';
+      imA.style.width = 'var(--earth-image-inner-scale, 23.2vw)';
+      imA.style.height = 'var(--earth-image-inner-scale, 23.2vw)';
       imA.style.position = 'absolute';
-      imA.style.top = 'calc(50% + var(--earth-image-offset-y, 0%))';
-      imA.style.left = 'calc(50% + var(--earth-image-offset-x, 0%))';
-      imA.style.transform = 'translate3d(-50%, -50%, 0)';
-      imA.style.webkitTransform = 'translate3d(-50%, -50%, 0)';
+      imA.style.top = 'calc(50% + var(--earth-image-offset-y, 0vw))';
+      imA.style.left = 'calc(50% + var(--earth-image-offset-x, 0vw))';
+      imA.style.transform = 'translate3d(-50%, -45.5%, 0)';
+      imA.style.webkitTransform = 'translate3d(-50%, -45.5%, 0)';
+      imA.style.clipPath = 'circle(var(--earth-mask-radius, 45.2%) at 50% var(--earth-mask-position-y, 45.5%))';
+      imA.style.WebkitClipPath = 'circle(var(--earth-mask-radius, 45.2%) at 50% var(--earth-mask-position-y, 45.5%))';
       imA.style.webkitBackfaceVisibility = 'hidden';
       imA.style.backfaceVisibility = 'hidden';
       imA.style.willChange = 'opacity';
       imA.style.objectFit = 'cover';
       imA.style.display = 'block';
+      imA.style.mixBlendMode = 'lighten';
+      imA.style.filter = 'blur(var(--earth-image-blur, 0.8px))';
       imA.style.zIndex = '1';
       imA.style.opacity = '1';
       imA.style.transition = `opacity var(${durVar}) ease-in-out`;
@@ -11502,18 +11528,22 @@ Plan ahead for significantly warmer conditions tomorrow!`
       imB.className = 'earth-image earth-layer-b';
       imB.src = initialUrl;
       imB.alt = altText + ' Buffer';
-      imB.style.width = 'var(--earth-image-inner-scale, 68.3%)';
-      imB.style.height = 'var(--earth-image-inner-scale, 68.3%)';
+      imB.style.width = 'var(--earth-image-inner-scale, 23.2vw)';
+      imB.style.height = 'var(--earth-image-inner-scale, 23.2vw)';
       imB.style.position = 'absolute';
-      imB.style.top = 'calc(50% + var(--earth-image-offset-y, 0%))';
-      imB.style.left = 'calc(50% + var(--earth-image-offset-x, 0%))';
-      imB.style.transform = 'translate3d(-50%, -50%, 0)';
-      imB.style.webkitTransform = 'translate3d(-50%, -50%, 0)';
+      imB.style.top = 'calc(50% + var(--earth-image-offset-y, 0vw))';
+      imB.style.left = 'calc(50% + var(--earth-image-offset-x, 0vw))';
+      imB.style.transform = 'translate3d(-50%, -45.5%, 0)';
+      imB.style.webkitTransform = 'translate3d(-50%, -45.5%, 0)';
+      imB.style.clipPath = 'circle(var(--earth-mask-radius, 45.2%) at 50% var(--earth-mask-position-y, 45.5%))';
+      imB.style.WebkitClipPath = 'circle(var(--earth-mask-radius, 45.2%) at 50% var(--earth-mask-position-y, 45.5%))';
       imB.style.webkitBackfaceVisibility = 'hidden';
       imB.style.backfaceVisibility = 'hidden';
       imB.style.willChange = 'opacity';
       imB.style.objectFit = 'cover';
       imB.style.display = 'block';
+      imB.style.mixBlendMode = 'lighten';
+      imB.style.filter = 'blur(var(--earth-image-blur, 0.8px))';
       imB.style.zIndex = '2';
       imB.style.opacity = '0';
       imB.style.transition = `opacity var(${durVar}) ease-in-out`;
@@ -11536,6 +11566,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
       col.style.width = colId === 'sun-col-right' ? 'var(--earth-image-width, var(--sun-image-width, 34vw))' : 'var(--sun-image-width, 34vw)';
       col.style.position = 'relative';
       col.style.flexShrink = '0';
+      col.style.backgroundColor = 'transparent';
+      col.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
 
       col.appendChild(circleObj.container);
 
@@ -11600,6 +11632,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
       mainWrapper.style.width = '100%';
       mainWrapper.style.gap = 'var(--sun-duo-gap, 3vw)';
       mainWrapper.style.margin = 'var(--sun-image-margin-top, 2vw) auto 0';
+      mainWrapper.style.backgroundColor = 'transparent';
+      mainWrapper.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
       mainWrapper.style.opacity = '0';
       mainWrapper.style.transition = 'opacity 1s ease';
 
