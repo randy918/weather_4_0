@@ -7412,7 +7412,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1165';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1168';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -11534,19 +11534,26 @@ Plan ahead for significantly warmer conditions tomorrow!`
         const pImg = new Image();
         pImg.onload = () => {
           loadedCount++;
-          if (loadedCount >= Math.min(3, frameUrls.length) && !sunAnimationTimeoutId) {
+          if (loadedCount >= Math.min(6, frameUrls.length) && !sunAnimationTimeoutId) {
             // Prime both layers before starting playback
             if (preloadedImages.length > 0 && leftSun && leftSun.img) {
               leftSun.img.src = preloadedImages[0].src;
+              leftSun.img.style.zIndex = '1';
+              leftSun.img.style.opacity = '1';
               if (leftSun.img.decode) leftSun.img.decode().catch(() => {});
             }
             if (preloadedImages.length > 1 && leftSun && leftSun.imgB) {
               leftSun.imgB.src = preloadedImages[1].src;
+              leftSun.imgB.style.zIndex = '2';
+              leftSun.imgB.style.opacity = '0';
               if (leftSun.imgB.decode) leftSun.imgB.decode().catch(() => {});
             }
-            currentFrameIndex = 1;
+            currentFrameIndex = 0;
             activeLayer = 'a';
-            runLeftAnimationLoop();
+            const isMobile = window.innerWidth <= 767;
+            const initFps = isMobile ? SUN_ANIMATION_FPS_MOBILE : SUN_ANIMATION_FPS_DESKTOP;
+            const initDelay = Math.max(20, Math.round(1000 / Math.max(1, initFps)));
+            sunAnimationTimeoutId = setTimeout(runLeftAnimationLoop, initDelay);
           }
         };
         pImg.onerror = () => { loadedCount++; };
@@ -11562,7 +11569,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
         const totalFrames = preloadedImages.length;
         const frameIdx = currentFrameIndex;
-        const isLastFrame = frameIdx === totalFrames - 1;
+        const nextIdx = (frameIdx + 1) % totalFrames;
+
+        // Ensure next image is downloaded before advancing to prevent network-induced blank flashes
+        const nextImg = preloadedImages[nextIdx];
+        if (!nextImg || (!nextImg.complete && nextImg.naturalWidth === 0)) {
+          sunAnimationTimeoutId = setTimeout(runLeftAnimationLoop, 50);
+          return;
+        }
+
+        const isLastFrame = nextIdx === totalFrames - 1;
 
         // Calculate dynamic frame delay with smooth ease-in and ease-out curves
         const isMobile = window.innerWidth <= 767;
@@ -11579,14 +11595,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
           // Ease-In: Gentle accelerating curve out of the Live frame pause
           let factorIn = 0;
-          if (frameIdx < easeFrames) {
-            const progIn = frameIdx / easeFrames;
+          if (nextIdx < easeFrames) {
+            const progIn = nextIdx / easeFrames;
             factorIn = 0.5 * (1 + Math.cos(Math.PI * progIn)); // 1.0 down to 0.0
           }
 
           // Ease-Out: Gentle decelerating curve into the Live frame pause
           let factorOut = 0;
-          const distEnd = (totalFrames - 2) - frameIdx;
+          const distEnd = (totalFrames - 2) - nextIdx;
           if (distEnd >= 0 && distEnd < easeFrames) {
             const progOut = distEnd / easeFrames;
             factorOut = 0.5 * (1 + Math.cos(Math.PI * progOut)); // 0.0 up to 1.0
@@ -11597,51 +11613,63 @@ Plan ahead for significantly warmer conditions tomorrow!`
         }
 
         // Dynamically calibrate cross-fade transition duration to match current frame speed
-        if (SUN_ANIMATION_CROSSFADE_ENABLED && leftSun) {
-          const baseFade = isMobile ? SUN_ANIMATION_CROSSFADE_MS_MOBILE : SUN_ANIMATION_CROSSFADE_MS_DESKTOP;
-          const dynamicFade = SUN_ANIMATION_EASE_ENABLED && !isLastFrame
-            ? Math.round(Math.min(delay * 0.72, baseFade * 2.5))
-            : baseFade;
+        const baseFade = isMobile ? SUN_ANIMATION_CROSSFADE_MS_MOBILE : SUN_ANIMATION_CROSSFADE_MS_DESKTOP;
+        const dynamicFade = SUN_ANIMATION_EASE_ENABLED && !isLastFrame
+          ? Math.min(Math.round(delay * 0.65), Math.round(baseFade * 2.0))
+          : Math.min(baseFade, Math.round(delay * 0.65));
+
+        if (leftSun) {
           if (leftSun.img) leftSun.img.style.transitionDuration = `${dynamicFade}ms`;
           if (leftSun.imgB) leftSun.imgB.style.transitionDuration = `${dynamicFade}ms`;
         }
 
-        const nextIdx = (frameIdx + 1) % totalFrames;
-
         if (SUN_ANIMATION_CROSSFADE_ENABLED && leftSun && leftSun.imgB) {
           if (activeLayer === 'a') {
-            // Layer B already has frameUrls[frameIdx] primed and decoded!
-            // Fade in Layer B, fade out Layer A
+            // Layer B already has nextImg primed and ready! Bring B to top and crossfade
+            leftSun.imgB.style.zIndex = '2';
+            leftSun.img.style.zIndex = '1';
             leftSun.imgB.style.opacity = '1';
             leftSun.img.style.opacity = '0';
             activeLayer = 'b';
+            currentFrameIndex = nextIdx;
 
-            // Cue up following frame on Layer A while it is hidden
-            const nextImg = preloadedImages[nextIdx];
-            if (nextImg && nextImg.src) {
-              leftSun.img.src = nextImg.src;
-              if (leftSun.img.decode) leftSun.img.decode().catch(() => {});
+            // Cue up following frame on Layer A ONLY AFTER Layer A has faded completely to opacity 0
+            const cueIdx = (nextIdx + 1) % totalFrames;
+            const cueImg = preloadedImages[cueIdx];
+            if (cueImg && cueImg.src) {
+              setTimeout(() => {
+                if (leftSun && leftSun.img && activeLayer === 'b') {
+                  leftSun.img.src = cueImg.src;
+                  if (leftSun.img.decode) leftSun.img.decode().catch(() => {});
+                }
+              }, dynamicFade + 10);
             }
           } else {
-            // Layer A already has frameUrls[frameIdx] primed and decoded!
-            // Fade in Layer A, fade out Layer B
+            // Layer A already has nextImg primed and ready! Bring A to top and crossfade
+            leftSun.img.style.zIndex = '2';
+            leftSun.imgB.style.zIndex = '1';
             leftSun.img.style.opacity = '1';
             leftSun.imgB.style.opacity = '0';
             activeLayer = 'a';
+            currentFrameIndex = nextIdx;
 
-            // Cue up following frame on Layer B while it is hidden
-            const nextImg = preloadedImages[nextIdx];
-            if (nextImg && nextImg.src) {
-              leftSun.imgB.src = nextImg.src;
-              if (leftSun.imgB.decode) leftSun.imgB.decode().catch(() => {});
+            // Cue up following frame on Layer B ONLY AFTER Layer B has faded completely to opacity 0
+            const cueIdx = (nextIdx + 1) % totalFrames;
+            const cueImg = preloadedImages[cueIdx];
+            if (cueImg && cueImg.src) {
+              setTimeout(() => {
+                if (leftSun && leftSun.imgB && activeLayer === 'a') {
+                  leftSun.imgB.src = cueImg.src;
+                  if (leftSun.imgB.decode) leftSun.imgB.decode().catch(() => {});
+                }
+              }, dynamicFade + 10);
             }
           }
         } else if (leftSun && leftSun.img) {
-          const curImg = preloadedImages[frameIdx];
-          if (curImg && curImg.src) leftSun.img.src = curImg.src;
+          currentFrameIndex = nextIdx;
+          if (nextImg && nextImg.src) leftSun.img.src = nextImg.src;
         }
 
-        currentFrameIndex = nextIdx;
         sunAnimationTimeoutId = setTimeout(runLeftAnimationLoop, delay);
       }
     } else {
@@ -11680,17 +11708,23 @@ Plan ahead for significantly warmer conditions tomorrow!`
           // Prime dual buffers up front
           if (preloadedSizzleImages.length > 0 && rightSun && rightSun.img) {
             rightSun.img.src = preloadedSizzleImages[0].src;
+            rightSun.img.style.zIndex = '1';
+            rightSun.img.style.opacity = '1';
             if (rightSun.img.decode) rightSun.img.decode().catch(() => {});
           }
           if (preloadedSizzleImages.length > 1 && rightSun && rightSun.imgB) {
             rightSun.imgB.src = preloadedSizzleImages[1].src;
+            rightSun.imgB.style.zIndex = '2';
+            rightSun.imgB.style.opacity = '0';
             if (rightSun.imgB.decode) rightSun.imgB.decode().catch(() => {});
           }
-          sizzleIndex = 1;
+          sizzleIndex = 0;
+          sizzleDirection = 1;
           sizzleActiveLayer = 'a';
 
           if (!sunSizzleTimeoutId && preloadedSizzleImages.length > 1) {
-            startSizzleLoop();
+            const initDelay = Math.round(1000 / SUN_SIZZLE_FPS);
+            sunSizzleTimeoutId = setTimeout(startSizzleLoop, initDelay);
           }
         } else {
           // Seamless hot-swap: Preload new batch in background so running loop never stutters
@@ -11715,6 +11749,37 @@ Plan ahead for significantly warmer conditions tomorrow!`
         }
       }
 
+      function getNextSizzleStep(curIdx, curDir, total) {
+        if (total <= 1) return { idx: 0, dir: 1, isEnd: true };
+        if (SUN_SIZZLE_PLAYBACK_MODE === 'pingpong') {
+          let newDir = curDir;
+          let nextIdx = curIdx;
+          let isEnd = false;
+          if (newDir === 1) {
+            if (curIdx >= total - 1) {
+              newDir = -1;
+              nextIdx = total - 2;
+              isEnd = true;
+            } else {
+              nextIdx = curIdx + 1;
+            }
+          } else {
+            if (curIdx <= 0) {
+              newDir = 1;
+              nextIdx = 1;
+              isEnd = true;
+            } else {
+              nextIdx = curIdx - 1;
+            }
+          }
+          return { idx: Math.max(0, Math.min(total - 1, nextIdx)), dir: newDir, isEnd };
+        } else {
+          const isEnd = curIdx >= total - 1;
+          const nextIdx = (curIdx + 1) % total;
+          return { idx: nextIdx, dir: 1, isEnd };
+        }
+      }
+
       let sizzleIndex = 0;
       let sizzleDirection = 1; // 1 = forward, -1 = backward
       let sizzleActiveLayer = 'a'; // 'a' or 'b' for dual-buffer smooth cross-dissolve
@@ -11725,71 +11790,69 @@ Plan ahead for significantly warmer conditions tomorrow!`
         const totalFrames = preloadedSizzleImages.length;
         if (totalFrames <= 1) return;
 
-        // Ensure index is strictly clamped within bounds
-        sizzleIndex = Math.max(0, Math.min(totalFrames - 1, sizzleIndex));
-        const frameIdx = sizzleIndex;
-
-        let nextIndex = frameIdx;
-        let delay = Math.round(1000 / SUN_SIZZLE_FPS);
-
-        if (SUN_SIZZLE_PLAYBACK_MODE === 'pingpong') {
-          if (sizzleDirection === 1) {
-            if (frameIdx >= totalFrames - 1) {
-              sizzleDirection = -1;
-              nextIndex = totalFrames - 2;
-              if (SUN_SIZZLE_PAUSE_END_MS > 0) delay += SUN_SIZZLE_PAUSE_END_MS;
-            } else {
-              nextIndex = frameIdx + 1;
-            }
-          } else {
-            if (frameIdx <= 0) {
-              sizzleDirection = 1;
-              nextIndex = 1;
-              if (SUN_SIZZLE_PAUSE_END_MS > 0) delay += SUN_SIZZLE_PAUSE_END_MS;
-            } else {
-              nextIndex = frameIdx - 1;
-            }
-          }
-        } else {
-          const isEnd = frameIdx >= totalFrames - 1;
-          nextIndex = (frameIdx + 1) % totalFrames;
-          if (isEnd && SUN_SIZZLE_PAUSE_END_MS > 0) delay += SUN_SIZZLE_PAUSE_END_MS;
+        const step = getNextSizzleStep(sizzleIndex, sizzleDirection, totalFrames);
+        const nextImg = preloadedSizzleImages[step.idx];
+        if (!nextImg || (!nextImg.complete && nextImg.naturalWidth === 0)) {
+          sunSizzleTimeoutId = setTimeout(startSizzleLoop, 40);
+          return;
         }
 
-        nextIndex = Math.max(0, Math.min(totalFrames - 1, nextIndex));
+        let delay = Math.round(1000 / SUN_SIZZLE_FPS);
+        if (step.isEnd && SUN_SIZZLE_PAUSE_END_MS > 0) delay += SUN_SIZZLE_PAUSE_END_MS;
+
+        const isMobile = window.innerWidth <= 767;
+        const sizzleFade = isMobile ? SUN_SIZZLE_CROSSFADE_MS_MOBILE : SUN_SIZZLE_CROSSFADE_MS_DESKTOP;
+        const fadeDuration = Math.min(sizzleFade, Math.round(delay * 0.65));
 
         if (rightSun && rightSun.imgB) {
+          if (rightSun.img) rightSun.img.style.transitionDuration = `${fadeDuration}ms`;
+          if (rightSun.imgB) rightSun.imgB.style.transitionDuration = `${fadeDuration}ms`;
+
           if (sizzleActiveLayer === 'a') {
-            // Layer B was already primed with frameIdx! Fade in B, fade out A
+            rightSun.imgB.style.zIndex = '2';
+            rightSun.img.style.zIndex = '1';
             rightSun.imgB.style.opacity = '1';
             rightSun.img.style.opacity = '0';
             sizzleActiveLayer = 'b';
+            sizzleIndex = step.idx;
+            sizzleDirection = step.dir;
 
-            // Cue nextIndex on Layer A while it is hidden
-            const nextImg = preloadedSizzleImages[nextIndex];
-            if (nextImg && nextImg.src) {
-              rightSun.img.src = nextImg.src;
-              if (rightSun.img.decode) rightSun.img.decode().catch(() => {});
+            const cueStep = getNextSizzleStep(sizzleIndex, sizzleDirection, totalFrames);
+            const cueImg = preloadedSizzleImages[cueStep.idx];
+            if (cueImg && cueImg.src) {
+              setTimeout(() => {
+                if (rightSun && rightSun.img && sizzleActiveLayer === 'b') {
+                  rightSun.img.src = cueImg.src;
+                  if (rightSun.img.decode) rightSun.img.decode().catch(() => {});
+                }
+              }, fadeDuration + 10);
             }
           } else {
-            // Layer A was already primed with frameIdx! Fade in A, fade out B
+            rightSun.img.style.zIndex = '2';
+            rightSun.imgB.style.zIndex = '1';
             rightSun.img.style.opacity = '1';
             rightSun.imgB.style.opacity = '0';
             sizzleActiveLayer = 'a';
+            sizzleIndex = step.idx;
+            sizzleDirection = step.dir;
 
-            // Cue nextIndex on Layer B while it is hidden
-            const nextImg = preloadedSizzleImages[nextIndex];
-            if (nextImg && nextImg.src) {
-              rightSun.imgB.src = nextImg.src;
-              if (rightSun.imgB.decode) rightSun.imgB.decode().catch(() => {});
+            const cueStep = getNextSizzleStep(sizzleIndex, sizzleDirection, totalFrames);
+            const cueImg = preloadedSizzleImages[cueStep.idx];
+            if (cueImg && cueImg.src) {
+              setTimeout(() => {
+                if (rightSun && rightSun.imgB && sizzleActiveLayer === 'a') {
+                  rightSun.imgB.src = cueImg.src;
+                  if (rightSun.imgB.decode) rightSun.imgB.decode().catch(() => {});
+                }
+              }, fadeDuration + 10);
             }
           }
         } else if (rightSun && rightSun.img) {
-          const curImg = preloadedSizzleImages[frameIdx];
-          if (curImg && curImg.src) rightSun.img.src = curImg.src;
+          sizzleIndex = step.idx;
+          sizzleDirection = step.dir;
+          if (nextImg && nextImg.src) rightSun.img.src = nextImg.src;
         }
 
-        sizzleIndex = nextIndex;
         sunSizzleTimeoutId = setTimeout(startSizzleLoop, delay);
       }
 
@@ -12005,18 +12068,24 @@ Plan ahead for significantly warmer conditions tomorrow!`
           const img = new Image();
           img.onload = () => {
             loaded++;
-            if (loaded >= Math.min(3, selectedUrls.length) && !earthAnimationTimeoutId) {
+            if (loaded >= Math.min(6, selectedUrls.length) && !earthAnimationTimeoutId) {
               if (preloadedImages.length > 0 && imgA) {
                 imgA.src = preloadedImages[0].src;
+                imgA.style.zIndex = '1';
+                imgA.style.opacity = '1';
                 if (imgA.decode) imgA.decode().catch(() => {});
               }
               if (preloadedImages.length > 1 && imgB) {
                 imgB.src = preloadedImages[1].src;
+                imgB.style.zIndex = '2';
+                imgB.style.opacity = '0';
                 if (imgB.decode) imgB.decode().catch(() => {});
               }
-              currentFrameIndex = 1;
+              currentFrameIndex = 0;
+              direction = 1;
               activeLayer = 'a';
-              startEarthLoop();
+              const initDelay = Math.round(1000 / Math.max(1, fps));
+              earthAnimationTimeoutId = setTimeout(startEarthLoop, initDelay);
             }
           };
           img.onerror = () => { loaded++; };
@@ -12046,76 +12115,110 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }
     }
 
+    function getNextEarthStep(curIdx, curDir, total) {
+      if (total <= 1) return { idx: 0, dir: 1, isEnd: true };
+      if (playbackMode === 'pingpong') {
+        let newDir = curDir;
+        let nextIdx = curIdx;
+        let isEnd = false;
+        if (newDir === 1) {
+          if (curIdx >= total - 1) {
+            newDir = -1;
+            nextIdx = total - 2;
+            isEnd = true;
+          } else {
+            nextIdx = curIdx + 1;
+          }
+        } else {
+          if (curIdx <= 0) {
+            newDir = 1;
+            nextIdx = 1;
+            isEnd = true;
+          } else {
+            nextIdx = curIdx - 1;
+          }
+        }
+        return { idx: Math.max(0, Math.min(total - 1, nextIdx)), dir: newDir, isEnd };
+      } else {
+        const isEnd = curIdx >= total - 1;
+        const nextIdx = (curIdx + 1) % total;
+        return { idx: nextIdx, dir: 1, isEnd };
+      }
+    }
+
     function startEarthLoop() {
       if (!EARTH_ANIMATION_ENABLED || preloadedImages.length <= 1) return;
 
       const totalFrames = preloadedImages.length;
       if (totalFrames <= 1) return;
 
-      currentFrameIndex = Math.max(0, Math.min(totalFrames - 1, currentFrameIndex));
-      const frameIdx = currentFrameIndex;
-
-      let nextIndex = frameIdx;
-      let delay = Math.round(1000 / Math.max(1, fps));
-
-      if (playbackMode === 'pingpong') {
-        if (direction === 1) {
-          if (frameIdx >= totalFrames - 1) {
-            direction = -1;
-            nextIndex = totalFrames - 2;
-            if (loopPauseMs > 0) delay += loopPauseMs;
-          } else {
-            nextIndex = frameIdx + 1;
-          }
-        } else {
-          if (frameIdx <= 0) {
-            direction = 1;
-            nextIndex = 1;
-            if (loopPauseMs > 0) delay += loopPauseMs;
-          } else {
-            nextIndex = frameIdx - 1;
-          }
-        }
-      } else {
-        const isEnd = frameIdx >= totalFrames - 1;
-        nextIndex = (frameIdx + 1) % totalFrames;
-        if (isEnd && loopPauseMs > 0) delay += loopPauseMs;
+      const step = getNextEarthStep(currentFrameIndex, direction, totalFrames);
+      const nextImg = preloadedImages[step.idx];
+      if (!nextImg || (!nextImg.complete && nextImg.naturalWidth === 0)) {
+        earthAnimationTimeoutId = setTimeout(startEarthLoop, 60);
+        return;
       }
 
-      nextIndex = Math.max(0, Math.min(totalFrames - 1, nextIndex));
+      let delay = Math.round(1000 / Math.max(1, fps));
+      if (step.isEnd && loopPauseMs > 0) delay += loopPauseMs;
+
+      const isMobile = window.innerWidth <= 767;
+      const crossfadeDuration = isMobile ? EARTH_ANIMATION_CROSSFADE_MS_MOBILE : EARTH_ANIMATION_CROSSFADE_MS_DESKTOP;
+      const fadeDuration = Math.min(crossfadeDuration, Math.round(delay * 0.65));
+
+      if (imgA) imgA.style.transitionDuration = `${fadeDuration}ms`;
+      if (imgB) imgB.style.transitionDuration = `${fadeDuration}ms`;
 
       if (EARTH_ANIMATION_CROSSFADE_ENABLED && imgA && imgB) {
         if (activeLayer === 'a') {
-          // Layer B was already primed with frameIdx! Fade in B, fade out A
+          // Layer B already has next frame primed! Bring B to top and crossfade
+          imgB.style.zIndex = '2';
+          imgA.style.zIndex = '1';
           imgB.style.opacity = '1';
           imgA.style.opacity = '0';
           activeLayer = 'b';
+          currentFrameIndex = step.idx;
+          direction = step.dir;
 
-          // Cue nextIndex on Layer A while it is hidden
-          const nextImg = preloadedImages[nextIndex];
-          if (nextImg && nextImg.src) {
-            imgA.src = nextImg.src;
-            if (imgA.decode) imgA.decode().catch(() => {});
+          // Cue up following frame on Layer A ONLY AFTER Layer A has completely faded to opacity 0
+          const cueStep = getNextEarthStep(currentFrameIndex, direction, totalFrames);
+          const cueImg = preloadedImages[cueStep.idx];
+          if (cueImg && cueImg.src) {
+            setTimeout(() => {
+              if (imgA && activeLayer === 'b') {
+                imgA.src = cueImg.src;
+                if (imgA.decode) imgA.decode().catch(() => {});
+              }
+            }, fadeDuration + 10);
           }
         } else {
-          // Layer A was already primed with frameIdx! Fade in A, fade out B
+          // Layer A already has next frame primed! Bring A to top and crossfade
+          imgA.style.zIndex = '2';
+          imgB.style.zIndex = '1';
           imgA.style.opacity = '1';
           imgB.style.opacity = '0';
           activeLayer = 'a';
+          currentFrameIndex = step.idx;
+          direction = step.dir;
 
-          // Cue nextIndex on Layer B while it is hidden
-          const nextImg = preloadedImages[nextIndex];
-          if (nextImg && nextImg.src) {
-            imgB.src = nextImg.src;
-            if (imgB.decode) imgB.decode().catch(() => {});
+          // Cue up following frame on Layer B ONLY AFTER Layer B has completely faded to opacity 0
+          const cueStep = getNextEarthStep(currentFrameIndex, direction, totalFrames);
+          const cueImg = preloadedImages[cueStep.idx];
+          if (cueImg && cueImg.src) {
+            setTimeout(() => {
+              if (imgB && activeLayer === 'a') {
+                imgB.src = cueImg.src;
+                if (imgB.decode) imgB.decode().catch(() => {});
+              }
+            }, fadeDuration + 10);
           }
         }
       } else if (imgA) {
-        const curImg = preloadedImages[frameIdx];
-        if (curImg && curImg.src) imgA.src = curImg.src;
+        currentFrameIndex = step.idx;
+        direction = step.dir;
+        if (nextImg && nextImg.src) imgA.src = nextImg.src;
       }
 
-      currentFrameIndex = nextIndex;
       earthAnimationTimeoutId = setTimeout(startEarthLoop, delay);
     }
 
