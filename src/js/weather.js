@@ -587,6 +587,8 @@ import weatherConditions from '../data/weather-conditions.json';
   // --- Weather Image Config (Upper Right/Left Circle Cells) ---
   // EDITABLE: Size, margins, and offsets for the left and right weather circle cells.
   // These variables are injected as CSS variables, allowing easy tweaks here or via CSS.
+  const WEATHER_CIRCLES_NIGHT_IMAGE_FORCE_CLEAR = true; // EDITABLE: Always use clear night image ('dark-desc-clear-sky.jpg') for all nighttime conditions (does not change with cloud cover)
+  const WEATHER_CIRCLES_NIGHT_IMAGE = 'img/dark-desc-clear-sky.jpg'; // EDITABLE: Nighttime background image path for weather circles
   const CIRCLE_CELL_SIZE_DESKTOP = '24vw';       // EDITABLE Desktop: Diameter of the circles (resizes them)
   const CIRCLE_CELL_SIZE_MOBILE = 'var(--dynamic-item-size-4)'; // EDITABLE Mobile: Diameter of the circles (matches 4-column dial size)
   const CIRCLE_CELL_TOP_DESKTOP = '8vw';         // EDITABLE Desktop: Space above the circles (top spacing)
@@ -668,6 +670,133 @@ import weatherConditions from '../data/weather-conditions.json';
   // Positive values move the text to the RIGHT, negative values move it to the LEFT (e.g., '.5vw' or '-.5vw').
   const MIDDLE_TEXT_X_OFFSET = '.5vw';
   document.documentElement.style.setProperty('--middle-text-x-offset', MIDDLE_TEXT_X_OFFSET);
+
+  // ==========================================================================
+  // ==========================================================================
+  // --- Floating Sticky Back-to-Top Button (JCV Config & Implementation) ---
+  // ==========================================================================
+  const SCROLL_TOP_BUTTON_ENABLED = true;                    // EDITABLE: Master toggle to enable/disable back-to-top button
+
+  // EDITABLE: "APPEARS WHEN" scroll distance (in px) before button appears
+  const SCROLL_TOP_APPEARS_WHEN_DESKTOP = 350;               // EDITABLE Desktop: Pixels scrolled down before button appears
+  const SCROLL_TOP_APPEARS_WHEN_MOBILE  = 600;               // EDITABLE Mobile: Pixels scrolled down before button appears (default 600px so it does not appear immediately on mobile)
+  // Compatibility aliases
+  const SCROLL_TOP_APPEARS_WHEN_PX_DESKTOP = SCROLL_TOP_APPEARS_WHEN_DESKTOP;
+  const SCROLL_TOP_APPEARS_WHEN_PX_MOBILE  = SCROLL_TOP_APPEARS_WHEN_MOBILE;
+  const SCROLL_TOP_THRESHOLD_PX_DESKTOP    = SCROLL_TOP_APPEARS_WHEN_DESKTOP;
+  const SCROLL_TOP_THRESHOLD_PX_MOBILE     = SCROLL_TOP_APPEARS_WHEN_MOBILE;
+
+  // EDITABLE: Distance from viewport bottom (Lowered down closer to the bottom edge)
+  const SCROLL_TOP_BOTTOM_DESKTOP = '2.0vw';                 // EDITABLE Desktop: Distance from viewport bottom (lowered down)
+  const SCROLL_TOP_BOTTOM_MOBILE  = '2.5vw';                 // EDITABLE Mobile: Distance from viewport bottom (lowered down from 5.0vw)
+  const SCROLL_TOP_RIGHT_DESKTOP  = '2.5vw';                 // EDITABLE Desktop: Distance from viewport right edge
+  const SCROLL_TOP_RIGHT_MOBILE   = '5.0vw';                 // EDITABLE Mobile: Distance from viewport right edge
+
+  // EDITABLE: Dimensions & Strokes (from movie app)
+  const SCROLL_TOP_SIZE_DESKTOP         = '3.2vw';           // EDITABLE Desktop: Button diameter
+  const SCROLL_TOP_SIZE_MOBILE          = '11.0vw';          // EDITABLE Mobile: Button diameter
+  const SCROLL_TOP_ICON_SIZE_DESKTOP    = '1.3vw';           // EDITABLE Desktop: Up arrow icon font-size
+  const SCROLL_TOP_ICON_SIZE_MOBILE     = '4.5vw';           // EDITABLE Mobile: Up arrow icon font-size
+  const SCROLL_TOP_BORDER_WIDTH_DESKTOP = '0.35vw';          // EDITABLE Desktop: Ring border thickness
+  const SCROLL_TOP_BORDER_WIDTH_MOBILE  = '1.1vw';           // EDITABLE Mobile: Ring border thickness
+  const SCROLL_TOP_ARROW_STROKE_DESKTOP = '0.04vw';          // EDITABLE Desktop: Arrow stroke thickness
+  const SCROLL_TOP_ARROW_STROKE_MOBILE  = '0.12vw';          // EDITABLE Mobile: Arrow stroke thickness
+
+  // EDITABLE: Colors (The Red from movie app)
+  const SCROLL_TOP_COLOR              = 'red';               // EDITABLE: "The red" arrow color (matches movie app)
+  const SCROLL_TOP_STROKE_COLOR       = 'red';               // EDITABLE: "The red" ring border color (matches movie app)
+  const SCROLL_TOP_HOVER_COLOR        = '#ff3333';           // EDITABLE: Hover arrow color (matches movie app)
+  const SCROLL_TOP_HOVER_STROKE_COLOR = '#ff3333';           // EDITABLE: Hover ring border color (matches movie app)
+
+  const SCROLL_TOP_BG            = 'rgba(0, 0, 0, 0.45)';    // EDITABLE: Button background color
+  const SCROLL_TOP_HOVER_BG      = 'rgba(0, 0, 0, 0.75)';    // EDITABLE: Button background color on hover
+  const SCROLL_TOP_OPACITY       = '0.9';                    // EDITABLE: Normal resting opacity when visible
+  const SCROLL_TOP_HOVER_OPACITY = '1.0';                    // EDITABLE: Hover opacity
+  const SCROLL_TOP_HOVER_SCALE   = '1.08';                   // EDITABLE: Hover scale
+  const SCROLL_TOP_Z_INDEX       = '9000';                   // EDITABLE: z-index layer
+
+  function applyScrollTopButtonConfig() {
+    const isMobile = window.innerWidth <= 767;
+    document.documentElement.style.setProperty('--scroll-top-bottom-desktop', SCROLL_TOP_BOTTOM_DESKTOP);
+    document.documentElement.style.setProperty('--scroll-top-bottom-mobile', SCROLL_TOP_BOTTOM_MOBILE);
+    document.documentElement.style.setProperty('--scroll-top-bottom', isMobile ? SCROLL_TOP_BOTTOM_MOBILE : SCROLL_TOP_BOTTOM_DESKTOP);
+
+    document.documentElement.style.setProperty('--scroll-top-right-desktop', SCROLL_TOP_RIGHT_DESKTOP);
+    document.documentElement.style.setProperty('--scroll-top-right-mobile', SCROLL_TOP_RIGHT_MOBILE);
+    document.documentElement.style.setProperty('--scroll-top-right', isMobile ? SCROLL_TOP_RIGHT_MOBILE : SCROLL_TOP_RIGHT_DESKTOP);
+
+    document.documentElement.style.setProperty('--scroll-top-size-desktop', SCROLL_TOP_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--scroll-top-size-mobile', SCROLL_TOP_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--scroll-top-size', isMobile ? SCROLL_TOP_SIZE_MOBILE : SCROLL_TOP_SIZE_DESKTOP);
+
+    document.documentElement.style.setProperty('--scroll-top-icon-size-desktop', SCROLL_TOP_ICON_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--scroll-top-icon-size-mobile', SCROLL_TOP_ICON_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--scroll-top-icon-size', isMobile ? SCROLL_TOP_ICON_SIZE_MOBILE : SCROLL_TOP_ICON_SIZE_DESKTOP);
+
+    document.documentElement.style.setProperty('--scroll-top-border-width-desktop', SCROLL_TOP_BORDER_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--scroll-top-border-width-mobile', SCROLL_TOP_BORDER_WIDTH_MOBILE);
+    document.documentElement.style.setProperty('--scroll-top-btn-border-width', isMobile ? SCROLL_TOP_BORDER_WIDTH_MOBILE : SCROLL_TOP_BORDER_WIDTH_DESKTOP);
+
+    document.documentElement.style.setProperty('--scroll-top-arrow-stroke-desktop', SCROLL_TOP_ARROW_STROKE_DESKTOP);
+    document.documentElement.style.setProperty('--scroll-top-arrow-stroke-mobile', SCROLL_TOP_ARROW_STROKE_MOBILE);
+    document.documentElement.style.setProperty('--scroll-top-arrow-stroke-width', isMobile ? SCROLL_TOP_ARROW_STROKE_MOBILE : SCROLL_TOP_ARROW_STROKE_DESKTOP);
+
+    document.documentElement.style.setProperty('--scroll-top-color', SCROLL_TOP_COLOR);
+    document.documentElement.style.setProperty('--scroll-top-stroke-color', SCROLL_TOP_STROKE_COLOR);
+    document.documentElement.style.setProperty('--scroll-top-hover-color', SCROLL_TOP_HOVER_COLOR);
+    document.documentElement.style.setProperty('--scroll-top-hover-stroke-color', SCROLL_TOP_HOVER_STROKE_COLOR);
+
+    document.documentElement.style.setProperty('--scroll-top-bg', SCROLL_TOP_BG);
+    document.documentElement.style.setProperty('--scroll-top-hover-bg', SCROLL_TOP_HOVER_BG);
+    document.documentElement.style.setProperty('--scroll-top-opacity', SCROLL_TOP_OPACITY);
+    document.documentElement.style.setProperty('--scroll-top-hover-opacity', SCROLL_TOP_HOVER_OPACITY);
+    document.documentElement.style.setProperty('--scroll-top-hover-scale', SCROLL_TOP_HOVER_SCALE);
+    document.documentElement.style.setProperty('--scroll-top-z-index', SCROLL_TOP_Z_INDEX);
+  }
+
+  function initScrollToTopButton() {
+    if (!SCROLL_TOP_BUTTON_ENABLED) return;
+    if (document.getElementById('scroll-to-top-btn')) return;
+
+    applyScrollTopButtonConfig();
+
+    const btn = document.createElement('button');
+    btn.id = 'scroll-to-top-btn';
+    btn.className = 'scroll-to-top-btn';
+    btn.setAttribute('type', 'button');
+    btn.setAttribute('aria-label', 'Back to top');
+    btn.innerHTML = `<i class="fa-solid fa-arrow-up" aria-hidden="true"></i>`;
+
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+
+    document.body.appendChild(btn);
+
+    const updateVisibility = () => {
+      const isMobile = window.innerWidth <= 767;
+      const threshold = isMobile ? SCROLL_TOP_APPEARS_WHEN_MOBILE : SCROLL_TOP_APPEARS_WHEN_DESKTOP;
+      const currentScroll = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+      if (currentScroll > threshold) {
+        btn.classList.add('is-visible');
+      } else {
+        btn.classList.remove('is-visible');
+      }
+    };
+
+    window.addEventListener('scroll', updateVisibility, { passive: true });
+    window.addEventListener('resize', () => {
+      applyScrollTopButtonConfig();
+      updateVisibility();
+    }, { passive: true });
+
+    updateVisibility();
+  }
+  applyScrollTopButtonConfig();
 
   // EDITABLE: Vertical position of the barometric/humidity/wind trend arrow (scaled to dial size)
   const BAROMETRIC_TREND_TOP_POS = "calc(var(--item-current-size) * -0.28 + 0.25vw)";
@@ -990,8 +1119,8 @@ import weatherConditions from '../data/weather-conditions.json';
   const STARFIELD_STAR_MAX_SIZE_MOBILE = 1.2;       // EDITABLE Mobile: Maximum star radius in px
 
   // 8. Out-of-Focus Stars (Atmospheric Blur Ratio & Max Blur Radius)
-  const STARFIELD_OUT_OF_FOCUS_RATIO_DESKTOP = 0.30; // EDITABLE Desktop: Ratio of stars that are out-of-focus (0.30 = 30%)
-  const STARFIELD_OUT_OF_FOCUS_RATIO_MOBILE = 0.30;  // EDITABLE Mobile: Ratio of stars that are out-of-focus
+  const STARFIELD_OUT_OF_FOCUS_RATIO_DESKTOP = 0.00; // EDITABLE Desktop: Ratio of stars that are out-of-focus (0.30 = 30%)
+  const STARFIELD_OUT_OF_FOCUS_RATIO_MOBILE = 0.00;  // EDITABLE Mobile: Ratio of stars that are out-of-focus
   const STARFIELD_OUT_OF_FOCUS_BLUR_DESKTOP = 1.0;  // EDITABLE Desktop: Blur radius for out-of-focus stars in px
   const STARFIELD_OUT_OF_FOCUS_BLUR_MOBILE = 1.0;   // EDITABLE Mobile: Blur radius for out-of-focus stars in px
 
@@ -3474,7 +3603,7 @@ import weatherConditions from '../data/weather-conditions.json';
         height: var(--circle-cell-size, ${WEATHER_IMAGE_HEIGHT});
         margin-bottom: var(--circle-cell-margin-bottom, 0vw);
         background-color: #000;
-        background-image: url('img/desc-overcast-clouds.jpg');
+        background-image: url('${WEATHER_CIRCLES_NIGHT_IMAGE}');
         background-size: auto 100%;
         background-repeat: repeat-x;
         background-position: center;
@@ -3514,7 +3643,7 @@ import weatherConditions from '../data/weather-conditions.json';
         height: var(--circle-cell-size, ${WEATHER_IMAGE_HEIGHT});
         margin-bottom: var(--circle-cell-margin-bottom, 0vw);
         background-color: #000;
-        background-image: url('img/desc-overcast-clouds.jpg');
+        background-image: url('${WEATHER_CIRCLES_NIGHT_IMAGE}');
         background-size: auto 100%;
         background-repeat: repeat-x;
         background-position: center;
@@ -4119,6 +4248,7 @@ import weatherConditions from '../data/weather-conditions.json';
     initRainCanvas();
     initSnowCanvas();
     initStarfield();
+    if (typeof initScrollToTopButton === 'function') initScrollToTopButton();
     // Initialize fragile elements with starting position
     const moon = document.getElementById('moon-phase-img');
     const descImg = document.getElementById('weather-desc-image');
@@ -4147,6 +4277,7 @@ import weatherConditions from '../data/weather-conditions.json';
       initRainCanvas();
       initSnowCanvas();
       initStarfield();
+      if (typeof initScrollToTopButton === 'function') initScrollToTopButton();
       // Initialize fragile elements with starting position
       const moon = document.getElementById('moon-phase-img');
       const descImg = document.getElementById('weather-desc-image');
@@ -6181,7 +6312,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         updateSimpleMonthColors();
 
         const dayImgPath = 'img/' + baseFileName;
-        const nightImgPath = 'img/dark-' + baseFileName;
+        const nightImgPath = WEATHER_CIRCLES_NIGHT_IMAGE_FORCE_CLEAR ? WEATHER_CIRCLES_NIGHT_IMAGE : ('img/dark-' + baseFileName);
         const fallbackPath = 'img/desc-rem.jpg';
         const primaryImgPath = isNight ? nightImgPath : dayImgPath;
 
@@ -6399,10 +6530,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
             };
             imgPreload.onerror = () => {
               if (isNight) {
+                const nightFallback = WEATHER_CIRCLES_NIGHT_IMAGE_FORCE_CLEAR ? WEATHER_CIRCLES_NIGHT_IMAGE : dayImgPath;
                 const dayPreload = new Image();
-                dayPreload.onload = () => { descImageEl.style.backgroundImage = `url('${dayImgPath}')`; };
+                dayPreload.onload = () => { descImageEl.style.backgroundImage = `url('${nightFallback}')`; };
                 dayPreload.onerror = () => { descImageEl.style.backgroundImage = `url('${fallbackPath}')`; };
-                dayPreload.src = dayImgPath;
+                dayPreload.src = nightFallback;
               } else {
                 descImageEl.style.backgroundImage = `url('${fallbackPath}')`;
               }
@@ -6581,10 +6713,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
             };
             imgPreload.onerror = () => {
               if (isNight) {
+                const nightFallback = WEATHER_CIRCLES_NIGHT_IMAGE_FORCE_CLEAR ? WEATHER_CIRCLES_NIGHT_IMAGE : dayImgPath;
                 const dayPreload = new Image();
-                dayPreload.onload = () => { descImageLeftEl.style.backgroundImage = `url('${dayImgPath}')`; };
+                dayPreload.onload = () => { descImageLeftEl.style.backgroundImage = `url('${nightFallback}')`; };
                 dayPreload.onerror = () => { descImageLeftEl.style.backgroundImage = `url('${fallbackPath}')`; };
-                dayPreload.src = dayImgPath;
+                dayPreload.src = nightFallback;
               } else {
                 descImageLeftEl.style.backgroundImage = `url('${fallbackPath}')`;
               }
@@ -7493,7 +7626,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1181';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1185';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -7775,13 +7908,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
     
     return { active, inactive };
   }
-
-
-
-
-
-
-
 
   // Create and insert the 8-cell clock grid container dynamically
   function updateClockGridRow(data) {
@@ -10861,7 +10987,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
     let activeFileName = currentBaseFileName;
     if (currentIsNight) {
-      activeFileName = 'dark-' + currentBaseFileName;
+      activeFileName = WEATHER_CIRCLES_NIGHT_IMAGE_FORCE_CLEAR ? 'dark-desc-clear-sky.jpg' : ('dark-' + currentBaseFileName);
     }
 
     let lum = IMAGE_LUMINANCE_MAP[activeFileName];
@@ -10871,7 +10997,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
     if (lum === undefined) {
       // If not in map or cache, attempt dynamic analysis and check day fallback in the meantime
-      const imgPath = currentIsNight ? `img/dark-${currentBaseFileName}` : `img/${currentBaseFileName}`;
+      const imgPath = currentIsNight ? (WEATHER_CIRCLES_NIGHT_IMAGE_FORCE_CLEAR ? WEATHER_CIRCLES_NIGHT_IMAGE : `img/dark-${currentBaseFileName}`) : `img/${currentBaseFileName}`;
       analyzeImageLuminance(imgPath, activeFileName);
       lum = IMAGE_LUMINANCE_MAP[currentBaseFileName];
     }
@@ -15525,6 +15651,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   initWeatherWithGeolocation();
   initRadarInteractions();
   initBarChartInteractions();
+  if (typeof initScrollToTopButton === 'function') initScrollToTopButton();
   // Add this at the very end of your file
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") {
@@ -15554,6 +15681,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const isMobile = window.innerWidth <= 767;
     if (typeof applyWorldClocksConfig === 'function') applyWorldClocksConfig();
     if (typeof updateWorldClockHands === 'function') updateWorldClockHands();
+    if (typeof applyScrollTopButtonConfig === 'function') applyScrollTopButtonConfig();
     document.documentElement.style.setProperty('--circle-cell-top', isMobile ? CIRCLE_CELL_TOP_MOBILE : CIRCLE_CELL_TOP_DESKTOP);
     document.documentElement.style.setProperty('--fragile-y-offset', isMobile ? FRAGILE_ELEMENTS_Y_OFFSET_MOBILE : FRAGILE_ELEMENTS_Y_OFFSET_DESKTOP);
     document.documentElement.style.setProperty('--day0-lines-opacity', isMobile ? DAY0_LINES_OPACITY_MOBILE : DAY0_LINES_OPACITY_DESKTOP);
