@@ -6904,54 +6904,60 @@ Plan ahead for significantly warmer conditions tomorrow!`
     'latest.jpg'
   ];
 
-  // Right Sun ("Sizzling Current Sun") Controls (JCV)
-  // Plays back recent rapid frames back-and-forth (ping-pong) to show live solar flare activity
-  const SUN_SIZZLE_ENABLED = true;                    // EDITABLE: Enable/disable animation for right sizzling sun
+  // Left Sun ("Sizzling Live Sun") Controls (JCV)
+  // Plays back recent stepped frames back-and-forth (ping-pong) to show live solar flare activity & winking white dots
+  const SUN_SIZZLE_ENABLED = true;                    // EDITABLE: Enable/disable animation for left sizzling sun
   const SUN_SIZZLE_BAND = 'Fe195';                    // EDITABLE: NOAA SUVI band: 'Fe195' (coronal loops/bronze), 'Fe094' (hot solar flares/blue), 'He304' (prominence eruptions/red)
   const SUN_SIZZLE_FETCH_LENGTH = 240;                // EDITABLE: Historical buffer to pull from NOAA (60 = ~1 hr, 120 = ~2 hrs, 240 = ~4 hrs)
-  const SUN_SIZZLE_FRAME_STEP = 3;                    // EDITABLE: Cadence step (1 = every frame ~1m, 2 = every 2nd frame ~2m, 3 = ~3m apart for more visible sizzle/flares)
-  const SUN_SIZZLE_FRAME_COUNT = 60;                  // EDITABLE: Number of recent frames in loop (e.g. 32, 48, 64)
-  const SUN_SIZZLE_FPS = 14;                          // EDITABLE: Playback speed in frames per second (12–16 FPS allows eye to track flare eruptions without blurring)
-  const SUN_SIZZLE_PAUSE_END_MS = 0;                  // EDITABLE: Pause in ms at ends (frame 1 and live frame) before reversing (0 for instant)
-  const SUN_SIZZLE_PLAYBACK_MODE = 'pingpong';        // EDITABLE: 'pingpong' or 'forward'
-  const SUN_SIZZLE_CROSSFADE_MS_DESKTOP = 35;         // EDITABLE Desktop: Cross-fade transition in ms between rapid sizzle frames (eliminates iPad/Safari flicker)
-  const SUN_SIZZLE_CROSSFADE_MS_MOBILE = 35;          // EDITABLE Mobile: Cross-fade transition in ms between rapid sizzle frames
+  const SUN_SIZZLE_FRAME_STEP = 3;                    // EDITABLE: Cadence step (~3-4m apart so solar flares visibly boil and wink with white dots)
+  const SUN_SIZZLE_FRAME_COUNT = 36;                  // EDITABLE: Number of recent stepped frames in loop (e.g. 24, 36, 48)
+  const SUN_SIZZLE_FPS_DESKTOP = 10;                  // EDITABLE Desktop: Sizzle playback speed in FPS (8-12 FPS allows eye to clearly track flare eruptions & winking dots)
+  const SUN_SIZZLE_FPS_MOBILE = 10;                   // EDITABLE Mobile: Sizzle playback speed in FPS
+  const SUN_SIZZLE_FPS = 10;                          // EDITABLE: Fallback / default FPS
+  const SUN_SIZZLE_PAUSE_END_MS = 150;                // EDITABLE: Pause in ms at turnaround ends (live frame and oldest frame) before reversing (0 for instant)
+  const SUN_SIZZLE_PLAYBACK_MODE = 'pingpong';        // EDITABLE: 'pingpong' (1..36..1) or 'forward' (1..36, 1..36)
+  const SUN_SIZZLE_CROSSFADE_MS_DESKTOP = 35;         // EDITABLE Desktop: Cross-fade transition in ms between sizzle frames (eliminates flicker)
+  const SUN_SIZZLE_CROSSFADE_MS_MOBILE = 35;          // EDITABLE Mobile: Cross-fade transition in ms between sizzle frames
   const SUN_SIZZLE_AUTO_REFRESH_MS = 3 * 60 * 1000;   // EDITABLE: Auto-fetch fresh SUVI frames every 3 minutes
 
-  // Seed list of latest real-time NOAA SUVI Fe195 frames (50-70s cadence)
+  // Seed list of latest stepped real-time NOAA SUVI Fe195 frames (~4m cadence spanning ~2.5 hrs for vivid flare sizzling)
   const SUN_SIZZLE_FRAMES_SEED = [
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561600039_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561600538_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561601439_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561602538_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561604039_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561604538_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561605439_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561606539_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561608039_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561608539_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561609439_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561610539_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561612039_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561612539_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561613439_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561614539_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561616039_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561616539_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561617439_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561618539_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561620039_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561620539_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561621439_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561622539_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561624039_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561624539_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561625439_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561626539_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561628039_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561628539_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561629439_GOES19-SUVI-Fe195-600x600.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262561630539_GOES19-SUVI-Fe195-600x600.jpg'
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572148075_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572152075_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572156075_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572200575_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572204576_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572208576_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572212576_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572216576_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572220576_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572224576_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572228576_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572232576_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572236576_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572240576_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572244576_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572248576_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572252577_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572256577_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572301477_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572305477_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572309477_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572313477_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572317477_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572321477_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572325477_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572329477_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572333477_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572337477_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572341477_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572345477_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572349478_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572353478_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262572357478_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262580002578_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262580006578_GOES19-SUVI-Fe195-600x600.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262580010578_GOES19-SUVI-Fe195-600x600.jpg'
   ];
 
   // Sizing & Layout (Half size per user request)
@@ -6989,9 +6995,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   // --- Sun & Earth Labels Config (JCV) ---
   // Centered labels beneath each circle
+  // Default is 'Live' for both; changes to '27-Day Rotation' / '24-Hour Rotation' ONLY during animation
   const SUN_LABEL_ENABLED = true;                     // EDITABLE: Enable/disable centered labels under each circle
-  const SUN_LABEL_LEFT_TEXT = 'Sun Live';             // EDITABLE: Label under left circle (Sun Live)
-  const SUN_LABEL_RIGHT_TEXT = 'Earth Live';          // EDITABLE: Label under right circle (Earth Live)
+  const SUN_LABEL_LEFT_DEFAULT_TEXT = 'Live';         // EDITABLE: Default label under left circle (when not rotating)
+  const SUN_LABEL_RIGHT_DEFAULT_TEXT = 'Live';        // EDITABLE: Default label under right circle (when not rotating)
+  const SUN_LABEL_LEFT_ROTATING_TEXT = '27-Day Rotation'; // EDITABLE: Label under left circle during rotation animation
+  const SUN_LABEL_RIGHT_ROTATING_TEXT = '24-Hour Rotation';// EDITABLE: Label under right circle during rotation animation
+
+  // Compatibility aliases
+  const SUN_LABEL_LEFT_TEXT = SUN_LABEL_LEFT_DEFAULT_TEXT;
+  const SUN_LABEL_RIGHT_TEXT = SUN_LABEL_RIGHT_DEFAULT_TEXT;
 
   const SUN_LABEL_FONT_SIZE_DESKTOP = '2.0vw';        // EDITABLE Desktop: Font size for sun labels
   const SUN_LABEL_FONT_SIZE_MOBILE = '2.6vw';         // EDITABLE Mobile: Font size for sun labels
@@ -7005,7 +7018,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   const SUN_LABEL_COLOR = '#ffffff';                  // EDITABLE: Text color
   const SUN_LABEL_OPACITY = '0.70';                   // EDITABLE: Opacity (0.0 to 1.0)
-  const SUN_LABEL_TEXT_TRANSFORM = 'capitalize';       // EDITABLE: 'uppercase', 'capitalize', 'none'
+  const SUN_LABEL_TEXT_TRANSFORM = 'none';            // EDITABLE: 'uppercase', 'capitalize', 'none'
 
   // Horizontal Nudge / Alignment Offsets (JCV)
   // Positive nudges label to the right, negative nudges label to the left
@@ -7114,7 +7127,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--sun-animation-ease-max-delay', `${isMobile ? SUN_ANIMATION_EASE_MAX_DELAY_MS_MOBILE : SUN_ANIMATION_EASE_MAX_DELAY_MS_DESKTOP}ms`);
 
     document.documentElement.style.setProperty('--sun-animation-days', String(SUN_ANIMATION_DAYS));
-    document.documentElement.style.setProperty('--sun-sizzle-fps', String(SUN_SIZZLE_FPS));
+    document.documentElement.style.setProperty('--sun-sizzle-fps-desktop', String(SUN_SIZZLE_FPS_DESKTOP));
+    document.documentElement.style.setProperty('--sun-sizzle-fps-mobile', String(SUN_SIZZLE_FPS_MOBILE));
+    document.documentElement.style.setProperty('--sun-sizzle-fps', String(isMobile ? SUN_SIZZLE_FPS_MOBILE : SUN_SIZZLE_FPS_DESKTOP));
     document.documentElement.style.setProperty('--sun-sizzle-frame-count', String(SUN_SIZZLE_FRAME_COUNT));
     document.documentElement.style.setProperty('--sun-sizzle-frame-step', String(SUN_SIZZLE_FRAME_STEP));
     document.documentElement.style.setProperty('--sun-sizzle-fetch-length', String(SUN_SIZZLE_FETCH_LENGTH));
@@ -7307,7 +7322,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const EARTH_IMAGE_WIDTH_DESKTOP = '34vw';         // EDITABLE Desktop: Width of the Earth container (matches Sun's 34vw)
   const EARTH_IMAGE_WIDTH_MOBILE = '42vw';          // EDITABLE Mobile: Width of the Earth container (matches Sun's 42vw)
   const EARTH_IMAGE_MARGIN_TOP_DESKTOP = '0vw';     // EDITABLE Desktop: Handled by duo row wrapper
-  const EARTH_IMAGE_MARGIN_TOP_MOBILE = '8vw';      // EDITABLE Mobile: Handled by duo row wrapper
+  const EARTH_IMAGE_MARGIN_TOP_MOBILE = '0vw';      // EDITABLE Mobile: Handled by duo row wrapper
   const EARTH_IMAGE_MARGIN_BOTTOM_DESKTOP = '0vw';  // EDITABLE Desktop: Handled by duo row spacer
   const EARTH_IMAGE_MARGIN_BOTTOM_MOBILE = '0vw';   // EDITABLE Mobile: Handled by duo row spacer
   const EARTH_MASK_RADIUS_DESKTOP = '45.2%';        // EDITABLE Desktop: Circle radius clipping Earth globe, completely excluding the bottom NOAA white platform
@@ -7478,7 +7493,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1177';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1181';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -11586,7 +11601,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         lbl.style.paddingLeft = 'var(--sun-label-letter-spacing, 0.08vw)';
         lbl.style.color = 'var(--sun-label-color, #ffffff)';
         lbl.style.opacity = 'var(--sun-label-opacity, 0.70)';
-        lbl.style.textTransform = 'var(--sun-label-text-transform, capitalize)';
+        lbl.style.textTransform = 'var(--sun-label-text-transform, none)';
         lbl.style.marginTop = 'var(--sun-label-margin-top, 0.8vw)';
         lbl.style.textAlign = 'center';
         lbl.style.whiteSpace = 'nowrap';
@@ -11743,14 +11758,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
         return pImg;
       });
 
-      // Default: Static live sun displayed on Layer A
+      // Default: Live sizzling sun displayed on Layer A
       if (leftSun && leftSun.img) {
-        leftSun.img.src = SUN_IMAGE_URL;
+        leftSun.img.src = SUN_SIZZLE_FRAMES_SEED[SUN_SIZZLE_FRAMES_SEED.length - 1] || SUN_IMAGE_URL;
         leftSun.img.style.zIndex = '1';
         leftSun.img.style.opacity = '1';
       }
       if (leftSun && leftSun.imgB) {
-        leftSun.imgB.src = SUN_IMAGE_URL;
+        leftSun.imgB.src = SUN_SIZZLE_FRAMES_SEED[SUN_SIZZLE_FRAMES_SEED.length - 1] || SUN_IMAGE_URL;
         leftSun.imgB.style.zIndex = '2';
         leftSun.imgB.style.opacity = '0';
       }
@@ -11758,6 +11773,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
       function runSunCycleStep() {
         if (!isSunRotating || sunPreloadedImages.length <= 1) {
           isSunRotating = false;
+          const sunLabel = document.getElementById('sun-label-left');
+          if (sunLabel) sunLabel.textContent = SUN_LABEL_LEFT_DEFAULT_TEXT;
           return;
         }
 
@@ -11767,6 +11784,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
         if (nextIdx >= totalFrames) {
           isSunRotating = false;
           sunAnimationTimeoutId = null;
+          const sunLabel = document.getElementById('sun-label-left');
+          if (sunLabel) sunLabel.textContent = SUN_LABEL_LEFT_DEFAULT_TEXT;
+          if (SUN_SIZZLE_ENABLED && typeof startSunSizzleLoop === 'function') {
+            startSunSizzleLoop();
+          }
           return;
         }
 
@@ -11864,6 +11886,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
           setTimeout(() => {
             isSunRotating = false;
             sunAnimationTimeoutId = null;
+            const sunLabel = document.getElementById('sun-label-left');
+            if (sunLabel) sunLabel.textContent = SUN_LABEL_LEFT_DEFAULT_TEXT;
+            if (SUN_SIZZLE_ENABLED && typeof startSunSizzleLoop === 'function') {
+              startSunSizzleLoop();
+            }
           }, dynamicFade + 50);
         } else {
           sunAnimationTimeoutId = setTimeout(runSunCycleStep, delay);
@@ -11872,9 +11899,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       function triggerSunRotation() {
         if (isSunRotating || sunPreloadedImages.length <= 1) return;
+        if (sunSizzleTimeoutId) {
+          clearTimeout(sunSizzleTimeoutId);
+          sunSizzleTimeoutId = null;
+        }
         isSunRotating = true;
         sunFrameIndex = 0;
         sunActiveLayer = 'a';
+
+        const sunLabel = document.getElementById('sun-label-left');
+        if (sunLabel) sunLabel.textContent = SUN_LABEL_LEFT_ROTATING_TEXT;
 
         if (leftSun && leftSun.img) {
           leftSun.img.style.transitionDuration = '0ms';
@@ -11897,6 +11931,239 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }
 
       window.triggerSunRotation = triggerSunRotation;
+
+      // =========================================================================
+      // --- Left Sun: Sizzle Engine (Live Condition: Boiling Flare Activity) ---
+      // =========================================================================
+      let sunSizzleTimeoutId = null;
+      let preloadedSizzleImages = [];
+      let sizzleIndex = 0;
+      let sizzleDirection = 1; // 1 = forward, -1 = backward
+      let sizzleActiveLayer = 'a'; // 'a' or 'b' for dual-buffer smooth cross-dissolve
+      let currentSizzleUrls = [...SUN_SIZZLE_FRAMES_SEED];
+
+      function getNextSizzleStep(curIdx, curDir, total) {
+        if (total <= 1) return { idx: 0, dir: 1, isEnd: true };
+        if (SUN_SIZZLE_PLAYBACK_MODE === 'pingpong') {
+          let newDir = curDir;
+          let nextIdx = curIdx;
+          let isEnd = false;
+          if (newDir === 1) {
+            if (curIdx >= total - 1) {
+              newDir = -1;
+              nextIdx = total - 2;
+              isEnd = true;
+            } else {
+              nextIdx = curIdx + 1;
+            }
+          } else {
+            if (curIdx <= 0) {
+              newDir = 1;
+              nextIdx = 1;
+              isEnd = true;
+            } else {
+              nextIdx = curIdx - 1;
+            }
+          }
+          return { idx: Math.max(0, Math.min(total - 1, nextIdx)), dir: newDir, isEnd };
+        } else {
+          const isEnd = curIdx >= total - 1;
+          const nextIdx = (curIdx + 1) % total;
+          return { idx: nextIdx, dir: 1, isEnd };
+        }
+      }
+
+      function runSunSizzleStep() {
+        if (!SUN_SIZZLE_ENABLED || isSunRotating || preloadedSizzleImages.length <= 1) return;
+
+        const totalFrames = preloadedSizzleImages.length;
+        if (totalFrames <= 1) return;
+
+        const step = getNextSizzleStep(sizzleIndex, sizzleDirection, totalFrames);
+        const nextImg = preloadedSizzleImages[step.idx];
+        if (!nextImg || (!nextImg.complete && nextImg.naturalWidth === 0)) {
+          sunSizzleTimeoutId = setTimeout(runSunSizzleStep, 40);
+          return;
+        }
+
+        const isMobile = window.innerWidth <= 767;
+        const fps = isMobile ? SUN_SIZZLE_FPS_MOBILE : SUN_SIZZLE_FPS_DESKTOP;
+        let delay = Math.max(30, Math.round(1000 / Math.max(1, fps)));
+        if (step.isEnd && SUN_SIZZLE_PAUSE_END_MS > 0) delay += SUN_SIZZLE_PAUSE_END_MS;
+
+        const sizzleFade = isMobile ? SUN_SIZZLE_CROSSFADE_MS_MOBILE : SUN_SIZZLE_CROSSFADE_MS_DESKTOP;
+        const fadeDuration = Math.min(sizzleFade, Math.round(delay * 0.65));
+
+        if (leftSun && leftSun.imgB) {
+          if (leftSun.img) leftSun.img.style.transitionDuration = `${fadeDuration}ms`;
+          if (leftSun.imgB) leftSun.imgB.style.transitionDuration = `${fadeDuration}ms`;
+
+          if (sizzleActiveLayer === 'a') {
+            leftSun.imgB.src = nextImg.src;
+            leftSun.imgB.style.zIndex = '2';
+            leftSun.img.style.zIndex = '1';
+            leftSun.imgB.style.opacity = '1';
+            leftSun.img.style.opacity = '0';
+            sizzleActiveLayer = 'b';
+            sizzleIndex = step.idx;
+            sizzleDirection = step.dir;
+
+            const cueStep = getNextSizzleStep(sizzleIndex, sizzleDirection, totalFrames);
+            const cueImg = preloadedSizzleImages[cueStep.idx];
+            if (cueImg && cueImg.src) {
+              setTimeout(() => {
+                if (leftSun && leftSun.img && sizzleActiveLayer === 'b') {
+                  leftSun.img.src = cueImg.src;
+                  if (leftSun.img.decode) leftSun.img.decode().catch(() => {});
+                }
+              }, fadeDuration + 10);
+            }
+          } else {
+            leftSun.img.src = nextImg.src;
+            leftSun.img.style.zIndex = '2';
+            leftSun.imgB.style.zIndex = '1';
+            leftSun.img.style.opacity = '1';
+            leftSun.imgB.style.opacity = '0';
+            sizzleActiveLayer = 'a';
+            sizzleIndex = step.idx;
+            sizzleDirection = step.dir;
+
+            const cueStep = getNextSizzleStep(sizzleIndex, sizzleDirection, totalFrames);
+            const cueImg = preloadedSizzleImages[cueStep.idx];
+            if (cueImg && cueImg.src) {
+              setTimeout(() => {
+                if (leftSun && leftSun.imgB && sizzleActiveLayer === 'a') {
+                  leftSun.imgB.src = cueImg.src;
+                  if (leftSun.imgB.decode) leftSun.imgB.decode().catch(() => {});
+                }
+              }, fadeDuration + 10);
+            }
+          }
+        } else if (leftSun && leftSun.img) {
+          sizzleIndex = step.idx;
+          sizzleDirection = step.dir;
+          if (nextImg && nextImg.src) leftSun.img.src = nextImg.src;
+        }
+
+        sunSizzleTimeoutId = setTimeout(runSunSizzleStep, delay);
+      }
+
+      function startSunSizzleLoop() {
+        if (!SUN_SIZZLE_ENABLED || isSunRotating || preloadedSizzleImages.length <= 1) return;
+        if (sunSizzleTimeoutId) clearTimeout(sunSizzleTimeoutId);
+        sizzleActiveLayer = 'a';
+        if (leftSun && leftSun.img && preloadedSizzleImages[sizzleIndex]) {
+          leftSun.img.style.transitionDuration = '0ms';
+          leftSun.img.src = preloadedSizzleImages[sizzleIndex].src;
+          leftSun.img.style.zIndex = '1';
+          leftSun.img.style.opacity = '1';
+        }
+        if (leftSun && leftSun.imgB) {
+          leftSun.imgB.style.transitionDuration = '0ms';
+          leftSun.imgB.style.zIndex = '2';
+          leftSun.imgB.style.opacity = '0';
+        }
+        const isMobile = window.innerWidth <= 767;
+        const fps = isMobile ? SUN_SIZZLE_FPS_MOBILE : SUN_SIZZLE_FPS_DESKTOP;
+        const initDelay = Math.max(30, Math.round(1000 / Math.max(1, fps)));
+        sunSizzleTimeoutId = setTimeout(runSunSizzleStep, initDelay);
+      }
+
+      function setupSizzleFrames(urls, isInitial = false) {
+        const uniqueUrls = Array.from(new Set(urls)).sort();
+        if (uniqueUrls.length === 0) return;
+
+        const steppedUrls = SUN_SIZZLE_FRAME_STEP > 1
+          ? uniqueUrls.filter((_, idx) => (uniqueUrls.length - 1 - idx) % SUN_SIZZLE_FRAME_STEP === 0)
+          : uniqueUrls;
+
+        const frameLimit = Math.max(2, Math.min(steppedUrls.length, SUN_SIZZLE_FRAME_COUNT));
+        const selectedUrls = steppedUrls.slice(-frameLimit).map(u => {
+          if (SUN_ANIMATION_RESOLUTION === '300x300') {
+            return u.replace('600x600', '300x300');
+          }
+          return u;
+        });
+
+        if (isInitial || preloadedSizzleImages.length === 0) {
+          preloadedSizzleImages = selectedUrls.map(u => {
+            const imgObj = new Image();
+            imgObj.src = u;
+            return imgObj;
+          });
+          sizzleIndex = 0;
+          sizzleDirection = 1;
+          sizzleActiveLayer = 'a';
+
+          if (leftSun && leftSun.img && preloadedSizzleImages[0]) {
+            leftSun.img.src = preloadedSizzleImages[0].src;
+            leftSun.img.style.zIndex = '1';
+            leftSun.img.style.opacity = '1';
+          }
+          if (leftSun && leftSun.imgB && preloadedSizzleImages.length > 1) {
+            leftSun.imgB.src = preloadedSizzleImages[1].src;
+            leftSun.imgB.style.zIndex = '2';
+            leftSun.imgB.style.opacity = '0';
+          }
+
+          if (!sunSizzleTimeoutId && !isSunRotating && preloadedSizzleImages.length > 1) {
+            const isMobile = window.innerWidth <= 767;
+            const fps = isMobile ? SUN_SIZZLE_FPS_MOBILE : SUN_SIZZLE_FPS_DESKTOP;
+            const initDelay = Math.max(30, Math.round(1000 / Math.max(1, fps)));
+            sunSizzleTimeoutId = setTimeout(runSunSizzleStep, initDelay);
+          }
+        } else {
+          // Seamless hot-swap: Preload new batch in background so running loop never stutters
+          let loaded = 0;
+          const newImages = selectedUrls.map(u => {
+            const imgObj = new Image();
+            imgObj.onload = () => { loaded++; };
+            imgObj.onerror = () => { loaded++; };
+            imgObj.src = u;
+            return imgObj;
+          });
+
+          const swapWhenReady = () => {
+            if (loaded >= Math.min(8, selectedUrls.length)) {
+              preloadedSizzleImages = newImages;
+              sizzleIndex = Math.max(0, Math.min(preloadedSizzleImages.length - 1, sizzleIndex));
+            } else {
+              setTimeout(swapWhenReady, 100);
+            }
+          };
+          swapWhenReady();
+        }
+      }
+
+      if (SUN_SIZZLE_ENABLED && Array.isArray(currentSizzleUrls) && currentSizzleUrls.length > 0) {
+        setupSizzleFrames(currentSizzleUrls, true);
+      }
+
+      // Auto-fetch freshest live frames from NOAA STAR SUVI Fe195
+      async function refreshLiveSizzleFrames() {
+        try {
+          const band = SUN_SIZZLE_BAND || 'Fe195';
+          const length = Math.max(60, Math.min(300, SUN_SIZZLE_FETCH_LENGTH || 240));
+          const res = await fetch(`https://www.star.nesdis.noaa.gov/goes/SUVI_band.php?sat=G19&band=${band}&length=${length}&_t=${Date.now()}`, {
+            cache: 'no-store'
+          });
+          if (!res.ok) throw new Error(`SUVI HTTP status ${res.status}`);
+          const html = await res.text();
+          const regex = new RegExp(`src=['"](https:\\/\\/cdn\\.star\\.nesdis\\.noaa\\.gov\\/GOES19\\/SUVI\\/FD\\/${band}\\/[0-9]+_GOES19-SUVI-${band}-600x600\\.jpg)['"]`, 'g');
+          const matches = [...html.matchAll(regex)];
+          if (matches && matches.length >= 2) {
+            const rawUrls = matches.map(m => m[1]);
+            currentSizzleUrls = rawUrls;
+            setupSizzleFrames(currentSizzleUrls, false);
+            return;
+          }
+        } catch (err) {
+          console.warn('Auto-refresh of SUVI frames skipped (using active frames):', err);
+        }
+      }
+
+      setTimeout(refreshLiveSizzleFrames, 2500);
+      setInterval(refreshLiveSizzleFrames, SUN_SIZZLE_AUTO_REFRESH_MS);
     }
 
     // =========================================================================
@@ -11952,6 +12219,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
     function runEarthCycleStep() {
       if (!isEarthRotating || earthPreloadedImages.length <= 1) {
         isEarthRotating = false;
+        const earthLabel = document.getElementById('sun-label-right');
+        if (earthLabel) earthLabel.textContent = SUN_LABEL_RIGHT_DEFAULT_TEXT;
         return;
       }
 
@@ -11961,6 +12230,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
       if (nextIdx >= totalFrames) {
         isEarthRotating = false;
         earthAnimationTimeoutId = null;
+        const earthLabel = document.getElementById('sun-label-right');
+        if (earthLabel) earthLabel.textContent = SUN_LABEL_RIGHT_DEFAULT_TEXT;
         return;
       }
 
@@ -12032,6 +12303,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
         setTimeout(() => {
           isEarthRotating = false;
           earthAnimationTimeoutId = null;
+          const earthLabel = document.getElementById('sun-label-right');
+          if (earthLabel) earthLabel.textContent = SUN_LABEL_RIGHT_DEFAULT_TEXT;
         }, fadeDuration + 50);
       } else {
         earthAnimationTimeoutId = setTimeout(runEarthCycleStep, delay);
@@ -12043,6 +12316,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
       isEarthRotating = true;
       earthFrameIndex = 0;
       earthActiveLayer = 'a';
+
+      const earthLabel = document.getElementById('sun-label-right');
+      if (earthLabel) earthLabel.textContent = SUN_LABEL_RIGHT_ROTATING_TEXT;
 
       if (rightEarth && rightEarth.img) {
         rightEarth.img.style.transitionDuration = '0ms';

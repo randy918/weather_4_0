@@ -1493,7 +1493,7 @@ main {
     --sun-label-font-family: var(--sun-label-font-family-desktop, "'light', sans-serif");
     --sun-label-color: var(--sun-label-color-desktop, #ffffff);
     --sun-label-opacity: var(--sun-label-opacity-desktop, 0.70);
-    --sun-label-text-transform: var(--sun-label-text-transform-desktop, capitalize);
+    --sun-label-text-transform: var(--sun-label-text-transform-desktop, none);
     --sun-animation-crossfade-duration: var(--sun-animation-crossfade-duration-desktop, 60ms);
     --sun-sizzle-crossfade-duration: var(--sun-sizzle-crossfade-duration-desktop, 35ms);
     --sun-animation-ease-max-delay: var(--sun-animation-ease-max-delay-desktop, 280ms);
@@ -2273,7 +2273,7 @@ main {
     padding-left: var(--sun-label-letter-spacing, 0.08vw);
     color: var(--sun-label-color, #ffffff);
     opacity: var(--sun-label-opacity, 0.70);
-    text-transform: var(--sun-label-text-transform, capitalize);
+    text-transform: var(--sun-label-text-transform, none);
     margin-top: var(--sun-label-margin-top, 0.8vw);
     text-align: center;
     white-space: nowrap;
