@@ -685,15 +685,23 @@ main {
     display: grid;
     grid-template-columns: repeat(24, minmax(0, 1fr));
     gap: 0.25vw;
-    margin-top: 0.5vw;
+    margin-top: var(--hourly-label-space-above-desktop, 0.5vw);
+
+    @media (max-width: 767px) {
+        margin-top: var(--hourly-label-space-above-mobile, var(--hourly-label-space-above-desktop, 0.5vw));
+    }
 }
 
 .hourly-label {
     text-align: center;
     color: white;
-    font-size: 0.25vw; // Base size (can be overridden by JS inline style)
+    font-size: var(--hourly-label-font-size-desktop, 1.5vw);
     line-height: 1;
     white-space: nowrap;
+
+    @media (max-width: 767px) {
+        font-size: var(--hourly-label-font-size-mobile, var(--hourly-label-font-size-desktop, 1.5vw));
+    }
 
     .time-hour {
         font-family: 'bold', sans-serif;

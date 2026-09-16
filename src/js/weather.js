@@ -2262,9 +2262,18 @@ import weatherConditions from '../data/weather-conditions.json';
   const MIN_TEMP_BAR_HEIGHT_VW = 6.5; // The height for the lowest temp of the week
   const DAY_LETTER_FONT_SIZE = 'inherit'; // EDITABLE: Size of the day letters (S, M, T...) under the bars. Try '4.5vw'!
 
-  // EDITABLE: Hourly forecast time labels
-  const HOURLY_LABEL_FONT_SIZE = '1.5vw'; // 40% of previous 0.64vw size
-  const HOURLY_LABEL_COLOR = '#ffffff'; // Enforce pure white
+  // EDITABLE: Hourly forecast time labels (JCV)
+  const HOURLY_LABEL_FONT_SIZE_DESKTOP = '1.5vw';   // EDITABLE Desktop: Time label font size
+  const HOURLY_LABEL_FONT_SIZE_MOBILE = '1.5vw';    // EDITABLE Mobile: Time label font size
+  const HOURLY_LABEL_FONT_SIZE = HOURLY_LABEL_FONT_SIZE_DESKTOP; // Fallback alias
+  const HOURLY_LABEL_SPACE_ABOVE_DESKTOP = '0.5vw'; // EDITABLE Desktop: Space between sky images and labels
+  const HOURLY_LABEL_SPACE_ABOVE_MOBILE = '0.5vw';  // EDITABLE Mobile: Space between sky images and labels
+  const HOURLY_LABEL_COLOR = '#ffffff';             // Enforce pure white
+
+  document.documentElement.style.setProperty('--hourly-label-font-size-desktop', HOURLY_LABEL_FONT_SIZE_DESKTOP);
+  document.documentElement.style.setProperty('--hourly-label-font-size-mobile', HOURLY_LABEL_FONT_SIZE_MOBILE);
+  document.documentElement.style.setProperty('--hourly-label-space-above-desktop', HOURLY_LABEL_SPACE_ABOVE_DESKTOP);
+  document.documentElement.style.setProperty('--hourly-label-space-above-mobile', HOURLY_LABEL_SPACE_ABOVE_MOBILE);
 
   // EDITABLE: Hourly forecast section margins
   const HOURLY_MARGIN_TOP = '4vw';    // Gap above the entire 24-hour forecast row (after the daily rows)
@@ -7626,7 +7635,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1185';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1187';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -13289,7 +13298,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
       // 3. Label
       const label = document.createElement('div');
       label.className = 'hourly-label';
-      label.style.setProperty('font-size', HOURLY_LABEL_FONT_SIZE, 'important');
       
       const isNightLabel = hour.weather && hour.weather[0] && hour.weather[0].icon.includes('n');
       const labelColor = isNightLabel ? 'hsl(195, 90%, 45%)' : HOURLY_LABEL_COLOR;
