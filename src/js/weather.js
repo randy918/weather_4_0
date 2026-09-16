@@ -7635,7 +7635,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1187';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1188';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -13308,7 +13308,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const ampm = hr >= 12 ? 'p' : 'a';
       hr = hr % 12 || 12;
       
-      label.innerHTML = `<span class="time-hour" style="font-family: 'bold', sans-serif; font-size: inherit !important; color: inherit !important;">${hr}</span><span class="time-ampm" style="font-family: 'light', sans-serif; font-size: inherit !important; color: inherit !important;">${ampm}</span>`;
+      label.innerHTML = `<span class="time-hour" style="font-family: 'bold', sans-serif; font-size: inherit !important; color: inherit !important;">${hr}</span><span class="time-ampm" style="font-family: 'medium', sans-serif; font-size: inherit !important; color: inherit !important;">${ampm}</span>`;
       labelsContainer.appendChild(label);
       
       // 4. Rain Cell
