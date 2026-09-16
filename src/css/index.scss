@@ -707,7 +707,6 @@ main {
         font-family: 'bold', sans-serif;
         color: white; // Force white to prevent inheriting brown
         font-size: 1em; // Enforce scaling exactly with parent
-        padding-left: 0.3vw; // Visual centering adjustment for the am/pm text
     }
 
     .time-ampm {

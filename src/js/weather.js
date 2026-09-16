@@ -2263,8 +2263,8 @@ import weatherConditions from '../data/weather-conditions.json';
   const DAY_LETTER_FONT_SIZE = 'inherit'; // EDITABLE: Size of the day letters (S, M, T...) under the bars. Try '4.5vw'!
 
   // EDITABLE: Hourly forecast time labels (JCV)
-  const HOURLY_LABEL_FONT_SIZE_DESKTOP = '1.5vw';   // EDITABLE Desktop: Time label font size
-  const HOURLY_LABEL_FONT_SIZE_MOBILE = '1.5vw';    // EDITABLE Mobile: Time label font size
+  const HOURLY_LABEL_FONT_SIZE_DESKTOP = '2.25vw';   // EDITABLE Desktop: Time label font size
+  const HOURLY_LABEL_FONT_SIZE_MOBILE = '2.75vw';    // EDITABLE Mobile: Time label font size
   const HOURLY_LABEL_FONT_SIZE = HOURLY_LABEL_FONT_SIZE_DESKTOP; // Fallback alias
   const HOURLY_LABEL_SPACE_ABOVE_DESKTOP = '0.5vw'; // EDITABLE Desktop: Space between sky images and labels
   const HOURLY_LABEL_SPACE_ABOVE_MOBILE = '0.5vw';  // EDITABLE Mobile: Space between sky images and labels
@@ -7635,7 +7635,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1188';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1190';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -13305,10 +13305,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
       
       const dateObj = new Date(hour.dt * 1000);
       let hr = dateObj.getHours();
-      const ampm = hr >= 12 ? 'p' : 'a';
       hr = hr % 12 || 12;
       
-      label.innerHTML = `<span class="time-hour" style="font-family: 'bold', sans-serif; font-size: inherit !important; color: inherit !important;">${hr}</span><span class="time-ampm" style="font-family: 'medium', sans-serif; font-size: inherit !important; color: inherit !important;">${ampm}</span>`;
+      label.innerHTML = `<span class="time-hour" style="font-family: 'bold', sans-serif; font-size: inherit !important; color: inherit !important;">${hr}</span>`;
       labelsContainer.appendChild(label);
       
       // 4. Rain Cell
