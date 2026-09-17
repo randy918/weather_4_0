@@ -7204,7 +7204,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // Editable fixed gap between Earth (#3) and UK dial (#4).
   // Dial #4 (UK) is fixed at the right 95% edge. When Earth is resized, Dial #4 does NOT move,
   // and this gap stays fixed (Earth grows/shrinks towards the Sun into the derived middle space).
-  const GAP_EARTH_TO_UK_DESKTOP = '0vw';                       // EDITABLE Desktop: Spacing between Earth and UK dial (e.g. '0vw', '-2vw', '2.5vw')
+  const GAP_EARTH_TO_UK_DESKTOP = '3.6vw';                       // EDITABLE Desktop: Spacing between Earth and UK dial (e.g. '0vw', '-2vw', '2.5vw')
   const GAP_EARTH_TO_UK_MOBILE = '0vw';                        // EDITABLE Mobile: Spacing between Earth and UK dial
   const EARTH_GAP_RIGHT_DESKTOP = GAP_EARTH_TO_UK_DESKTOP;     // Compatibility alias for Earth-to-UK gap
   const EARTH_GAP_RIGHT_MOBILE = GAP_EARTH_TO_UK_MOBILE;       // Compatibility alias
@@ -8057,7 +8057,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1197';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1198';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version

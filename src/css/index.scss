@@ -1650,6 +1650,17 @@ main {
         --earth-mask-position-y: var(--earth-mask-position-y-mobile, 45.5%);
         --earth-animation-crossfade-duration: var(--earth-animation-crossfade-duration-mobile, 70ms);
 
+        /* Celestial Row 4-Object Gaps & Lateral Offsets Mobile */
+        --celestial-row-edge-gap-left: var(--celestial-row-edge-gap-left-mobile, 0vw);
+        --celestial-row-edge-gap-right: var(--celestial-row-edge-gap-right-mobile, 0vw);
+        --gap-pacific-to-sun: var(--gap-pacific-to-sun-mobile, 0vw);
+        --sun-gap-left: var(--sun-gap-left-mobile, 0vw);
+        --gap-sun-to-earth: var(--gap-sun-to-earth-mobile, auto);
+        --earth-gap-left: var(--earth-gap-left-mobile, 0vw);
+        --gap-earth-to-uk: var(--gap-earth-to-uk-mobile, var(--earth-gap-right-mobile, 0vw));
+        --earth-gap-right: var(--earth-gap-right-mobile, 0vw);
+        --celestial-dial-right-gap-left: var(--celestial-dial-right-gap-left-mobile, 0vw);
+
         --world-clocks-width: var(--world-clocks-width-mobile, 90vw);
         --world-clocks-gap: var(--world-clocks-gap-mobile, 1.875vw);
         --world-clock-size: var(--world-clock-size-mobile, calc((var(--world-clocks-width, 90vw) - (4 * var(--world-clocks-gap, 1.875vw))) / 5));
@@ -1768,6 +1779,17 @@ main {
         --earth-mask-radius: var(--earth-mask-radius-desktop, 45.2%);
         --earth-mask-position-y: var(--earth-mask-position-y-desktop, 45.5%);
         --earth-animation-crossfade-duration: var(--earth-animation-crossfade-duration-desktop, 70ms);
+
+        /* Celestial Row 4-Object Gaps & Lateral Offsets Desktop */
+        --celestial-row-edge-gap-left: var(--celestial-row-edge-gap-left-desktop, 0vw);
+        --celestial-row-edge-gap-right: var(--celestial-row-edge-gap-right-desktop, 0vw);
+        --gap-pacific-to-sun: var(--gap-pacific-to-sun-desktop, 0vw);
+        --sun-gap-left: var(--sun-gap-left-desktop, 0vw);
+        --gap-sun-to-earth: var(--gap-sun-to-earth-desktop, auto);
+        --earth-gap-left: var(--earth-gap-left-desktop, 0vw);
+        --gap-earth-to-uk: var(--gap-earth-to-uk-desktop, var(--earth-gap-right-desktop, 0vw));
+        --earth-gap-right: var(--earth-gap-right-desktop, 0vw);
+        --celestial-dial-right-gap-left: var(--celestial-dial-right-gap-left-desktop, 0vw);
 
         --world-clock-size: var(--world-clock-size-desktop, 13.5vw);
         --world-clocks-gap: var(--world-clocks-gap-desktop, 2.5vw);
