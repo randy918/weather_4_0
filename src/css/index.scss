@@ -2191,18 +2191,60 @@ main {
     }
 }
 
-// Live Sun & Earth Duo Row Mode (GOES-19 SUVI Fe195 Å & GeoColor ABI Full Disk)
+// Live Sun & Earth Duo Row Mode with Flanking Clocks (Pacific, Sun, Earth, UK)
 #suns-row-wrapper,
 .suns-row-wrapper {
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: flex-start;
-    width: 100%;
-    gap: var(--sun-duo-gap, 3vw);
-    margin: var(--sun-image-margin-top, 2vw) auto 0;
+    width: var(--world-clocks-width, 95vw);
+    max-width: var(--world-clocks-width, 95vw);
+    gap: var(--world-clocks-gap, 2vw);
+    margin: var(--sun-image-margin-top, 0vw) auto 0;
     opacity: 0;
     transition: opacity 1s ease;
+    user-select: none;
+    flex-wrap: nowrap;
+    box-sizing: border-box;
+}
+
+.celestial-duo-subwrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    width: var(--celestial-duo-width, calc((3 * var(--world-clock-size)) + (2 * var(--world-clocks-gap))));
+    max-width: var(--celestial-duo-width, calc((3 * var(--world-clock-size)) + (2 * var(--world-clocks-gap))));
+    gap: var(--sun-duo-gap, 2.5vw);
+    flex-shrink: 0;
+    background-color: transparent;
+    mix-blend-mode: var(--sun-image-blend-mode, lighten);
+    box-sizing: border-box;
+}
+
+.celestial-clock-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: var(--celestial-dial-size, var(--world-clock-size, 13.5vw));
+    flex-shrink: 0;
+    position: relative;
+    box-sizing: border-box;
+
+    .world-clock-dial {
+        width: var(--celestial-dial-size, var(--world-clock-size, 13.5vw));
+        height: var(--celestial-dial-size, var(--world-clock-size, 13.5vw));
+        margin-top: var(--celestial-dial-margin-top, 0vw);
+        transform: translate(var(--celestial-dial-offset-x, 0vw), 0);
+        transition: margin-top 0.3s ease;
+    }
+
+    .world-clock-label {
+        margin-top: var(--celestial-dial-label-margin-top, var(--world-clock-label-margin-top, 0.8vw));
+        transform: translate(0, var(--celestial-dial-label-offset-y, 0vw));
+    }
 }
 
 .sun-column {
@@ -2210,7 +2252,7 @@ main {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    width: var(--sun-image-width, 34vw);
+    width: var(--celestial-base-circle-size, var(--sun-image-width, 34vw));
     position: relative;
     flex-shrink: 0;
     cursor: pointer;
@@ -2226,7 +2268,7 @@ main {
 }
 
 .sun-column.earth-column {
-    width: var(--earth-image-width, var(--sun-image-width, 34vw));
+    width: var(--celestial-base-circle-size, var(--earth-image-width, 34vw));
     margin-top: var(--earth-image-margin-top, 0vw);
 }
 
@@ -2236,8 +2278,8 @@ main {
 
 #sun-image-container,
 #sun-image-container-right {
-    width: var(--sun-image-width, 34vw);
-    height: var(--sun-image-width, 34vw);
+    width: var(--sun-image-width, var(--celestial-base-circle-size, 34vw));
+    height: var(--sun-image-width, var(--celestial-base-circle-size, 34vw));
     border-radius: 50%;
     overflow: hidden;
     clip-path: circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%));
@@ -2328,8 +2370,8 @@ main {
 
 // Live Earth Image in Duo Row Mode (NOAA GOES-19 GeoColor Full Disk)
 #earth-image-container {
-    width: var(--earth-image-width, var(--sun-image-width, 34vw));
-    height: var(--earth-image-width, var(--sun-image-width, 34vw));
+    width: var(--earth-image-width, var(--celestial-base-circle-size, var(--sun-image-width, 34vw)));
+    height: var(--earth-image-width, var(--celestial-base-circle-size, var(--sun-image-width, 34vw)));
     border-radius: 50%;
     position: relative;
     opacity: 0;

@@ -6956,10 +6956,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SUN_IMAGE_BASE_URL = 'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/';
   const SUN_IMAGE_URL = 'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/latest.jpg';
 
-  // Duo Celestial Mode (Side-by-Side: Left Sun Live, Right Earth Live) Controls (JCV)
-  const SUN_DUO_MODE = true;                          // EDITABLE: true = two celestial bodies side-by-side (Left: Sun Live, Right: Earth Live); false = single sun
-  const SUN_DUO_GAP_DESKTOP = '3vw';                  // EDITABLE Desktop: Gap between the two side-by-side circles
-  const SUN_DUO_GAP_MOBILE = '2vw';                   // EDITABLE Mobile: Gap between the two side-by-side circles
+  // Duo Celestial Mode (Side-by-Side: Pacific Dial, Big Sun, Big Earth, UK Dial) Controls (JCV)
+  const SUN_DUO_MODE = true;                          // EDITABLE: true = celestial row active; false = single sun
+  const CELESTIAL_DUO_WIDTH_DESKTOP = 'auto';         // EDITABLE Desktop: 'auto' (exact span of dials 2-4: 3*dial + 2*gap) or custom string (e.g. '56.2vw')
+  const CELESTIAL_DUO_WIDTH_MOBILE = 'auto';          // EDITABLE Mobile: 'auto' (exact span of dials 2-4) or custom string (e.g. '53.25vw')
+  const SUN_DUO_GAP_DESKTOP = '2.5vw';                // EDITABLE Desktop: Gap between Sun and Earth inside duo
+  const SUN_DUO_GAP_MOBILE = '2vw';                   // EDITABLE Mobile: Gap between Sun and Earth inside duo
 
   // Celestial Interactivity & Refresh Controls (JCV)
   const CELESTIAL_ROTATION_ON_CLICK = true;           // EDITABLE: Clicking Sun or Earth triggers 1 round of rotation
@@ -7102,9 +7104,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
     'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262580010578_GOES19-SUVI-Fe195-600x600.jpg'
   ];
 
-  // Sizing & Layout (Half size per user request)
-  const SUN_IMAGE_WIDTH_DESKTOP = '34vw';             // EDITABLE Desktop: Width & height (half Earth's 68vw)
-  const SUN_IMAGE_WIDTH_MOBILE = '42vw';              // EDITABLE Mobile: Width & height (half Earth's 85vw)
+  // Sizing & Layout for Sun & Earth circles
+  // 'auto' automatically resolves to (--celestial-duo-width - --sun-duo-gap) / 2
+  const SUN_IMAGE_WIDTH_DESKTOP = 'auto';             // EDITABLE Desktop: 'auto' (perfect half of duo width) or custom string (e.g. '26.85vw')
+  const SUN_IMAGE_WIDTH_MOBILE = 'auto';              // EDITABLE Mobile: 'auto' or custom string (e.g. '25.6vw')
 
   const SUN_IMAGE_MARGIN_TOP_DESKTOP = '0vw';         // EDITABLE Desktop: Gap above sun image
   const SUN_IMAGE_MARGIN_TOP_MOBILE = '1vw';          // EDITABLE Mobile: Gap above sun image
@@ -7112,10 +7115,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SUN_IMAGE_MARGIN_BOTTOM_DESKTOP = '2vw';      // EDITABLE Desktop: Gap below sun image
   const SUN_IMAGE_MARGIN_BOTTOM_MOBILE = '0vw';       // EDITABLE Mobile: Gap below sun image
 
-  // --- Sun Sizing & Position Controls (JCV) ---
-  // Granular controls to size and nudge Sun independently of Earth (all in vw)
-  const SUN_IMAGE_INNER_SCALE_DESKTOP = '36.7vw';     // EDITABLE Desktop: Sun inner image size in vw (e.g. '36.7vw', '34vw')
-  const SUN_IMAGE_INNER_SCALE_MOBILE = '45.4vw';      // EDITABLE Mobile: Sun inner image size in vw (e.g. '45.4vw', '42vw')
+  // --- Sun Sizing & Corona Controls (JCV) ---
+  // Fine-tune Sun visual diameter relative to base circle to counter false bigness of corona
+  const SUN_CORONA_SCALE_DESKTOP = 0.96;              // EDITABLE Desktop: Fine-tune Sun visual diameter (e.g. 0.90 to 1.05; < 1.0 reduces corona bigness)
+  const SUN_CORONA_SCALE_MOBILE = 0.96;               // EDITABLE Mobile: Fine-tune Sun visual diameter
+  const SUN_IMAGE_INNER_SCALE_DESKTOP = 'auto';       // EDITABLE Desktop: 'auto' (scales with Sun width * SUN_CORONA_SCALE) or custom vw string
+  const SUN_IMAGE_INNER_SCALE_MOBILE = 'auto';        // EDITABLE Mobile: 'auto' or custom vw string
 
   const SUN_IMAGE_OFFSET_Y_DESKTOP = '0vw';           // EDITABLE Desktop: Vertical position in vw (positive = DOWN, negative = UP; e.g. '0vw', '-0.5vw', '1vw')
   const SUN_IMAGE_OFFSET_Y_MOBILE = '0vw';            // EDITABLE Mobile: Vertical position in vw (positive = DOWN, negative = UP)
@@ -7134,6 +7139,35 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   const SUN_IMAGE_BLEND_MODE_DESKTOP = 'lighten';     // EDITABLE Desktop: Blend mode on dark background ('lighten', 'screen', etc.)
   const SUN_IMAGE_BLEND_MODE_MOBILE = 'lighten';      // EDITABLE Mobile: Blend mode on dark background
+
+  // --- Flanking Duplicate Timezone Dials Config (JCV) ---
+  // Duplicates the 1st (Pacific) and 5th (UK) dials down to the Sun/Earth row: [Pacific, Big Sun, Big Earth, UK]
+  const CELESTIAL_DIALS_ENABLED = true;                         // EDITABLE: Enable/disable flanking dials in celestial row
+  const CELESTIAL_DIAL_LEFT_NAME_DESKTOP = 'Pacific';           // EDITABLE Desktop: Left dial label name (user can change content in future)
+  const CELESTIAL_DIAL_LEFT_NAME_MOBILE = 'Pacific';            // EDITABLE Mobile: Left dial label name
+  const CELESTIAL_DIAL_LEFT_TIMEZONE = 'America/Los_Angeles';   // EDITABLE: Left dial IANA timezone string
+  const CELESTIAL_DIAL_LEFT_SHOW_TIME = true;                   // EDITABLE: Show dynamic time under left dial
+  const CELESTIAL_DIAL_RIGHT_NAME_DESKTOP = 'UK';               // EDITABLE Desktop: Right dial label name (user can change content in future)
+  const CELESTIAL_DIAL_RIGHT_NAME_MOBILE = 'UK';                // EDITABLE Mobile: Right dial label name
+  const CELESTIAL_DIAL_RIGHT_TIMEZONE = 'Europe/London';        // EDITABLE: Right dial IANA timezone string
+  const CELESTIAL_DIAL_RIGHT_SHOW_TIME = true;                  // EDITABLE: Show dynamic time under right dial
+
+  // Flanking Dials Lateral & Vertical Centering Controls (JCV)
+  // 'center' aligns the dial circle's horizontal midline with the Sun & Earth equator
+  const CELESTIAL_DIAL_VERTICAL_ALIGN_DESKTOP = 'center';       // EDITABLE Desktop: 'center' (equator aligned with Sun/Earth) or 'top'
+  const CELESTIAL_DIAL_VERTICAL_ALIGN_MOBILE = 'center';        // EDITABLE Mobile: 'center' or 'top'
+  const CELESTIAL_DIAL_OFFSET_Y_DESKTOP = '0vw';                // EDITABLE Desktop: Fine vertical nudge for dial circle (positive = DOWN, negative = UP)
+  const CELESTIAL_DIAL_OFFSET_Y_MOBILE = '0vw';                 // EDITABLE Mobile: Fine vertical nudge for dial circle
+  const CELESTIAL_DIAL_OFFSET_X_DESKTOP = '0vw';                // EDITABLE Desktop: Fine horizontal nudge for dial circle (positive = RIGHT, negative = LEFT)
+  const CELESTIAL_DIAL_OFFSET_X_MOBILE = '0vw';                 // EDITABLE Mobile: Fine horizontal nudge for dial circle
+  const CELESTIAL_DIAL_SIZE_DESKTOP = 'auto';                   // EDITABLE Desktop: 'auto' (matches upper timezone dial size var(--world-clock-size)) or custom vw
+  const CELESTIAL_DIAL_SIZE_MOBILE = 'auto';                    // EDITABLE Mobile: 'auto' or custom vw
+
+  // Flanking Dial Label Spacing & Nudge Controls (JCV)
+  const CELESTIAL_DIAL_LABEL_MARGIN_TOP_DESKTOP = 'calc(var(--world-clock-size) * 0.06)'; // EDITABLE Desktop: Gap above dial label
+  const CELESTIAL_DIAL_LABEL_MARGIN_TOP_MOBILE = 'calc(var(--world-clock-size) * 0.062)'; // EDITABLE Mobile: Gap above dial label
+  const CELESTIAL_DIAL_LABEL_OFFSET_Y_DESKTOP = '0vw';          // EDITABLE Desktop: Vertical nudge for dial label
+  const CELESTIAL_DIAL_LABEL_OFFSET_Y_MOBILE = '0vw';           // EDITABLE Mobile: Vertical nudge for dial label
 
   // --- Sun & Earth Labels Config (JCV) ---
   // Centered labels beneath each circle
@@ -7173,111 +7207,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SUN_LABEL_RIGHT_OFFSET_X_DESKTOP = '0vw';  // EDITABLE Desktop: Right label specific horizontal nudge
   const SUN_LABEL_RIGHT_OFFSET_X_MOBILE = '0vw';   // EDITABLE Mobile: Right label specific horizontal nudge
 
-  function applySunImageConfig() {
-    const isMobile = window.innerWidth <= 767;
-    document.documentElement.style.setProperty('--sun-image-width-desktop', SUN_IMAGE_WIDTH_DESKTOP);
-    document.documentElement.style.setProperty('--sun-image-width-mobile', SUN_IMAGE_WIDTH_MOBILE);
-    document.documentElement.style.setProperty('--sun-image-width', isMobile ? SUN_IMAGE_WIDTH_MOBILE : SUN_IMAGE_WIDTH_DESKTOP);
 
-    document.documentElement.style.setProperty('--sun-image-margin-top-desktop', SUN_IMAGE_MARGIN_TOP_DESKTOP);
-    document.documentElement.style.setProperty('--sun-image-margin-top-mobile', SUN_IMAGE_MARGIN_TOP_MOBILE);
-    document.documentElement.style.setProperty('--sun-image-margin-top', isMobile ? SUN_IMAGE_MARGIN_TOP_MOBILE : SUN_IMAGE_MARGIN_TOP_DESKTOP);
-
-    document.documentElement.style.setProperty('--sun-image-margin-bottom-desktop', SUN_IMAGE_MARGIN_BOTTOM_DESKTOP);
-    document.documentElement.style.setProperty('--sun-image-margin-bottom-mobile', SUN_IMAGE_MARGIN_BOTTOM_MOBILE);
-    document.documentElement.style.setProperty('--sun-image-margin-bottom', isMobile ? SUN_IMAGE_MARGIN_BOTTOM_MOBILE : SUN_IMAGE_MARGIN_BOTTOM_DESKTOP);
-
-    document.documentElement.style.setProperty('--sun-image-inner-scale-desktop', SUN_IMAGE_INNER_SCALE_DESKTOP);
-    document.documentElement.style.setProperty('--sun-image-inner-scale-mobile', SUN_IMAGE_INNER_SCALE_MOBILE);
-    document.documentElement.style.setProperty('--sun-image-inner-scale', isMobile ? SUN_IMAGE_INNER_SCALE_MOBILE : SUN_IMAGE_INNER_SCALE_DESKTOP);
-
-    document.documentElement.style.setProperty('--sun-image-offset-y-desktop', SUN_IMAGE_OFFSET_Y_DESKTOP);
-    document.documentElement.style.setProperty('--sun-image-offset-y-mobile', SUN_IMAGE_OFFSET_Y_MOBILE);
-    document.documentElement.style.setProperty('--sun-image-offset-y', isMobile ? SUN_IMAGE_OFFSET_Y_MOBILE : SUN_IMAGE_OFFSET_Y_DESKTOP);
-
-    document.documentElement.style.setProperty('--sun-image-offset-x-desktop', SUN_IMAGE_OFFSET_X_DESKTOP);
-    document.documentElement.style.setProperty('--sun-image-offset-x-mobile', SUN_IMAGE_OFFSET_X_MOBILE);
-    document.documentElement.style.setProperty('--sun-image-offset-x', isMobile ? SUN_IMAGE_OFFSET_X_MOBILE : SUN_IMAGE_OFFSET_X_DESKTOP);
-
-    document.documentElement.style.setProperty('--sun-mask-radius-desktop', SUN_MASK_RADIUS_DESKTOP);
-    document.documentElement.style.setProperty('--sun-mask-radius-mobile', SUN_MASK_RADIUS_MOBILE);
-    document.documentElement.style.setProperty('--sun-mask-radius', isMobile ? SUN_MASK_RADIUS_MOBILE : SUN_MASK_RADIUS_DESKTOP);
-
-    document.documentElement.style.setProperty('--sun-mask-position-y-desktop', SUN_MASK_POSITION_Y_DESKTOP);
-    document.documentElement.style.setProperty('--sun-mask-position-y-mobile', SUN_MASK_POSITION_Y_MOBILE);
-    document.documentElement.style.setProperty('--sun-mask-position-y', isMobile ? SUN_MASK_POSITION_Y_MOBILE : SUN_MASK_POSITION_Y_DESKTOP);
-
-    document.documentElement.style.setProperty('--sun-image-opacity-desktop', String(SUN_IMAGE_OPACITY_DESKTOP));
-    document.documentElement.style.setProperty('--sun-image-opacity-mobile', String(SUN_IMAGE_OPACITY_MOBILE));
-    document.documentElement.style.setProperty('--sun-image-opacity', String(isMobile ? SUN_IMAGE_OPACITY_MOBILE : SUN_IMAGE_OPACITY_DESKTOP));
-
-    document.documentElement.style.setProperty('--sun-image-blend-mode-desktop', SUN_IMAGE_BLEND_MODE_DESKTOP);
-    document.documentElement.style.setProperty('--sun-image-blend-mode-mobile', SUN_IMAGE_BLEND_MODE_MOBILE);
-    document.documentElement.style.setProperty('--sun-image-blend-mode', isMobile ? SUN_IMAGE_BLEND_MODE_MOBILE : SUN_IMAGE_BLEND_MODE_DESKTOP);
-
-    document.documentElement.style.setProperty('--sun-duo-gap-desktop', SUN_DUO_GAP_DESKTOP);
-    document.documentElement.style.setProperty('--sun-duo-gap-mobile', SUN_DUO_GAP_MOBILE);
-    document.documentElement.style.setProperty('--sun-duo-gap', isMobile ? SUN_DUO_GAP_MOBILE : SUN_DUO_GAP_DESKTOP);
-
-    document.documentElement.style.setProperty('--sun-label-font-size-desktop', SUN_LABEL_FONT_SIZE_DESKTOP);
-    document.documentElement.style.setProperty('--sun-label-font-size-mobile', SUN_LABEL_FONT_SIZE_MOBILE);
-    document.documentElement.style.setProperty('--sun-label-font-size', isMobile ? SUN_LABEL_FONT_SIZE_MOBILE : SUN_LABEL_FONT_SIZE_DESKTOP);
-
-    document.documentElement.style.setProperty('--sun-label-margin-top-desktop', SUN_LABEL_MARGIN_TOP_DESKTOP);
-    document.documentElement.style.setProperty('--sun-label-margin-top-mobile', SUN_LABEL_MARGIN_TOP_MOBILE);
-    document.documentElement.style.setProperty('--sun-label-margin-top', isMobile ? SUN_LABEL_MARGIN_TOP_MOBILE : SUN_LABEL_MARGIN_TOP_DESKTOP);
-
-    document.documentElement.style.setProperty('--sun-label-letter-spacing-desktop', SUN_LABEL_LETTER_SPACING_DESKTOP);
-    document.documentElement.style.setProperty('--sun-label-letter-spacing-mobile', SUN_LABEL_LETTER_SPACING_MOBILE);
-    document.documentElement.style.setProperty('--sun-label-letter-spacing', isMobile ? SUN_LABEL_LETTER_SPACING_MOBILE : SUN_LABEL_LETTER_SPACING_DESKTOP);
-
-    document.documentElement.style.setProperty('--sun-label-offset-x-desktop', SUN_LABEL_OFFSET_X_DESKTOP);
-    document.documentElement.style.setProperty('--sun-label-offset-x-mobile', SUN_LABEL_OFFSET_X_MOBILE);
-    document.documentElement.style.setProperty('--sun-label-offset-x', isMobile ? SUN_LABEL_OFFSET_X_MOBILE : SUN_LABEL_OFFSET_X_DESKTOP);
-
-    document.documentElement.style.setProperty('--sun-label-left-offset-x-desktop', SUN_LABEL_LEFT_OFFSET_X_DESKTOP);
-    document.documentElement.style.setProperty('--sun-label-left-offset-x-mobile', SUN_LABEL_LEFT_OFFSET_X_MOBILE);
-    document.documentElement.style.setProperty('--sun-label-left-offset-x', isMobile ? SUN_LABEL_LEFT_OFFSET_X_MOBILE : SUN_LABEL_LEFT_OFFSET_X_DESKTOP);
-
-    document.documentElement.style.setProperty('--sun-label-right-offset-x-desktop', SUN_LABEL_RIGHT_OFFSET_X_DESKTOP);
-    document.documentElement.style.setProperty('--sun-label-right-offset-x-mobile', SUN_LABEL_RIGHT_OFFSET_X_MOBILE);
-    document.documentElement.style.setProperty('--sun-label-right-offset-x', isMobile ? SUN_LABEL_RIGHT_OFFSET_X_MOBILE : SUN_LABEL_RIGHT_OFFSET_X_DESKTOP);
-
-    document.documentElement.style.setProperty('--sun-label-font-family', SUN_LABEL_FONT_FAMILY);
-    document.documentElement.style.setProperty('--sun-label-color', SUN_LABEL_COLOR);
-    document.documentElement.style.setProperty('--sun-label-opacity', SUN_LABEL_OPACITY);
-    document.documentElement.style.setProperty('--sun-label-text-transform', SUN_LABEL_TEXT_TRANSFORM);
-
-    document.documentElement.style.setProperty('--sun-animation-fps-desktop', String(SUN_ANIMATION_FPS_DESKTOP));
-    document.documentElement.style.setProperty('--sun-animation-fps-mobile', String(SUN_ANIMATION_FPS_MOBILE));
-    document.documentElement.style.setProperty('--sun-animation-fps', String(isMobile ? SUN_ANIMATION_FPS_MOBILE : SUN_ANIMATION_FPS_DESKTOP));
-
-    document.documentElement.style.setProperty('--sun-animation-crossfade-duration-desktop', `${SUN_ANIMATION_CROSSFADE_MS_DESKTOP}ms`);
-    document.documentElement.style.setProperty('--sun-animation-crossfade-duration-mobile', `${SUN_ANIMATION_CROSSFADE_MS_MOBILE}ms`);
-    document.documentElement.style.setProperty('--sun-animation-crossfade-duration', `${isMobile ? SUN_ANIMATION_CROSSFADE_MS_MOBILE : SUN_ANIMATION_CROSSFADE_MS_DESKTOP}ms`);
-
-    document.documentElement.style.setProperty('--sun-sizzle-crossfade-duration-desktop', `${SUN_SIZZLE_CROSSFADE_MS_DESKTOP}ms`);
-    document.documentElement.style.setProperty('--sun-sizzle-crossfade-duration-mobile', `${SUN_SIZZLE_CROSSFADE_MS_MOBILE}ms`);
-    document.documentElement.style.setProperty('--sun-sizzle-crossfade-duration', `${isMobile ? SUN_SIZZLE_CROSSFADE_MS_MOBILE : SUN_SIZZLE_CROSSFADE_MS_DESKTOP}ms`);
-
-    document.documentElement.style.setProperty('--sun-animation-ease-enabled', SUN_ANIMATION_EASE_ENABLED ? '1' : '0');
-    document.documentElement.style.setProperty('--sun-animation-ease-frames-desktop', String(SUN_ANIMATION_EASE_FRAMES_DESKTOP));
-    document.documentElement.style.setProperty('--sun-animation-ease-frames-mobile', String(SUN_ANIMATION_EASE_FRAMES_MOBILE));
-    document.documentElement.style.setProperty('--sun-animation-ease-frames', String(isMobile ? SUN_ANIMATION_EASE_FRAMES_MOBILE : SUN_ANIMATION_EASE_FRAMES_DESKTOP));
-    document.documentElement.style.setProperty('--sun-animation-ease-max-delay-desktop', `${SUN_ANIMATION_EASE_MAX_DELAY_MS_DESKTOP}ms`);
-    document.documentElement.style.setProperty('--sun-animation-ease-max-delay-mobile', `${SUN_ANIMATION_EASE_MAX_DELAY_MS_MOBILE}ms`);
-    document.documentElement.style.setProperty('--sun-animation-ease-max-delay', `${isMobile ? SUN_ANIMATION_EASE_MAX_DELAY_MS_MOBILE : SUN_ANIMATION_EASE_MAX_DELAY_MS_DESKTOP}ms`);
-
-    document.documentElement.style.setProperty('--sun-animation-days', String(SUN_ANIMATION_DAYS));
-    document.documentElement.style.setProperty('--sun-sizzle-fps-desktop', String(SUN_SIZZLE_FPS_DESKTOP));
-    document.documentElement.style.setProperty('--sun-sizzle-fps-mobile', String(SUN_SIZZLE_FPS_MOBILE));
-    document.documentElement.style.setProperty('--sun-sizzle-fps', String(isMobile ? SUN_SIZZLE_FPS_MOBILE : SUN_SIZZLE_FPS_DESKTOP));
-    document.documentElement.style.setProperty('--sun-sizzle-frame-count', String(SUN_SIZZLE_FRAME_COUNT));
-    document.documentElement.style.setProperty('--sun-sizzle-frame-step', String(SUN_SIZZLE_FRAME_STEP));
-    document.documentElement.style.setProperty('--sun-sizzle-fetch-length', String(SUN_SIZZLE_FETCH_LENGTH));
-  }
-  applySunImageConfig();
-  window.addEventListener('resize', applySunImageConfig);
 
   // ==========================================
   // --- EDITABLE: World Clocks Row Config (JCV) ---
@@ -7287,9 +7217,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // --- Primary Row Geometry Controls (JCV) ---
   // The dials automatically become bigger or smaller as a group on their own from these two settings:
   // Dial Diameter = (Row Width - (4 * Gap)) / 5
-  const WORLD_CLOCKS_WIDTH_DESKTOP = '90vw';                 // EDITABLE Desktop: Row container width centered across viewport
+  const WORLD_CLOCKS_WIDTH_DESKTOP = '95vw';                 // EDITABLE Desktop: Row container width centered across viewport
   const WORLD_CLOCKS_WIDTH_MOBILE = '90vw';                  // EDITABLE Mobile: Row container width centered across viewport
-  const WORLD_CLOCKS_GAP_DESKTOP = '2.9vw';                  // EDITABLE Desktop: Spacing between each clock column
+  const WORLD_CLOCKS_GAP_DESKTOP = '2vw';                  // EDITABLE Desktop: Spacing between each clock column
   const WORLD_CLOCKS_GAP_MOBILE = '1.875vw';                 // EDITABLE Mobile: Spacing between each clock column
 
   // Optional manual dial size override ('auto' computes dynamic diameter from Row Width & Gap)
@@ -7479,16 +7409,20 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--world-clock-label-color', isMobile ? WORLD_CLOCK_NAME_COLOR_MOBILE : WORLD_CLOCK_NAME_COLOR_DESKTOP);
     document.documentElement.style.setProperty('--world-clock-label-opacity', String(isMobile ? WORLD_CLOCK_NAME_OPACITY_MOBILE : WORLD_CLOCK_NAME_OPACITY_DESKTOP));
     document.documentElement.style.setProperty('--world-clock-label-letter-spacing', isMobile ? WORLD_CLOCK_NAME_LETTER_SPACING_MOBILE : WORLD_CLOCK_NAME_LETTER_SPACING_DESKTOP);
+
+    // Keep celestial row duo width and base circle sizing locked to timezone dials above
+    if (typeof applySunImageConfig === 'function') {
+      applySunImageConfig();
+    }
   }
-  applyWorldClocksConfig();
-  window.addEventListener('resize', applyWorldClocksConfig);
+
 
   // ==========================================
   // --- Earth Image & Living Weather Config (JCV) ---
   // ==========================================
   // Settings for the live Earth image & animation from NOAA GOES-19 satellite (GeoColor ABI Full Disk)
-  const EARTH_IMAGE_WIDTH_DESKTOP = '34vw';         // EDITABLE Desktop: Width of the Earth container (matches Sun's 34vw)
-  const EARTH_IMAGE_WIDTH_MOBILE = '42vw';          // EDITABLE Mobile: Width of the Earth container (matches Sun's 42vw)
+  const EARTH_IMAGE_WIDTH_DESKTOP = 'auto';         // EDITABLE Desktop: Width of the Earth container ('auto' matches base circle size)
+  const EARTH_IMAGE_WIDTH_MOBILE = 'auto';          // EDITABLE Mobile: Width of the Earth container ('auto' matches base circle size)
   const EARTH_IMAGE_MARGIN_TOP_DESKTOP = '0vw';     // EDITABLE Desktop: Handled by duo row wrapper
   const EARTH_IMAGE_MARGIN_TOP_MOBILE = '0vw';      // EDITABLE Mobile: Handled by duo row wrapper
   const EARTH_IMAGE_MARGIN_BOTTOM_DESKTOP = '0vw';  // EDITABLE Desktop: Handled by duo row spacer
@@ -7503,8 +7437,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   // --- Earth Sizing & Position Controls (JCV) ---
   // Granular controls to size and nudge Earth independently of Sun (all in vw)
-  const EARTH_IMAGE_INNER_SCALE_DESKTOP = '26vw';   // EDITABLE Desktop: Earth inner image size in vw (e.g. '23.2vw', '24vw')
-  const EARTH_IMAGE_INNER_SCALE_MOBILE = '32vw';    // EDITABLE Mobile: Earth inner image size in vw (e.g. '28.7vw', '30vw')
+  const EARTH_GLOBE_SCALE_DESKTOP = 1.08;           // EDITABLE Desktop: Fine-tune Earth globe visual diameter (e.g. 1.0 to 1.15 to balance against Sun)
+  const EARTH_GLOBE_SCALE_MOBILE = 1.08;            // EDITABLE Mobile: Fine-tune Earth globe visual diameter
+  const EARTH_IMAGE_INNER_SCALE_DESKTOP = 'auto';   // EDITABLE Desktop: Earth inner image size in vw ('auto' scales with Earth width * EARTH_GLOBE_SCALE)
+  const EARTH_IMAGE_INNER_SCALE_MOBILE = 'auto';    // EDITABLE Mobile: Earth inner image size in vw ('auto' scales with Earth width * EARTH_GLOBE_SCALE)
 
   const EARTH_IMAGE_OFFSET_Y_DESKTOP = '0vw';         // EDITABLE Desktop: Vertical position in vw (positive = DOWN, negative = UP; e.g. '0vw', '-0.5vw', '1vw')
   const EARTH_IMAGE_OFFSET_Y_MOBILE = '0vw';          // EDITABLE Mobile: Vertical position in vw (positive = DOWN, negative = UP)
@@ -7568,17 +7504,28 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   function applyEarthImageConfig() {
     const isMobile = window.innerWidth <= 767;
-    const width = isMobile ? EARTH_IMAGE_WIDTH_MOBILE : EARTH_IMAGE_WIDTH_DESKTOP;
+    const isAutoWidthDesktop = !EARTH_IMAGE_WIDTH_DESKTOP || EARTH_IMAGE_WIDTH_DESKTOP === 'auto';
+    const isAutoWidthMobile = !EARTH_IMAGE_WIDTH_MOBILE || EARTH_IMAGE_WIDTH_MOBILE === 'auto';
+    const width = (isMobile ? isAutoWidthMobile : isAutoWidthDesktop)
+      ? 'var(--celestial-base-circle-size)'
+      : (isMobile ? EARTH_IMAGE_WIDTH_MOBILE : EARTH_IMAGE_WIDTH_DESKTOP);
+
     const marginTop = isMobile ? EARTH_IMAGE_MARGIN_TOP_MOBILE : EARTH_IMAGE_MARGIN_TOP_DESKTOP;
     const marginBottom = isMobile ? EARTH_IMAGE_MARGIN_BOTTOM_MOBILE : EARTH_IMAGE_MARGIN_BOTTOM_DESKTOP;
     const blur = isMobile ? EARTH_IMAGE_BLUR_MOBILE : EARTH_IMAGE_BLUR_DESKTOP;
     const crossfadeMs = isMobile ? EARTH_ANIMATION_CROSSFADE_MS_MOBILE : EARTH_ANIMATION_CROSSFADE_MS_DESKTOP;
-    const innerScale = isMobile ? EARTH_IMAGE_INNER_SCALE_MOBILE : EARTH_IMAGE_INNER_SCALE_DESKTOP;
+
+    const isAutoInnerDesktop = !EARTH_IMAGE_INNER_SCALE_DESKTOP || EARTH_IMAGE_INNER_SCALE_DESKTOP === 'auto';
+    const isAutoInnerMobile = !EARTH_IMAGE_INNER_SCALE_MOBILE || EARTH_IMAGE_INNER_SCALE_MOBILE === 'auto';
+    const innerScale = (isMobile ? isAutoInnerMobile : isAutoInnerDesktop)
+      ? 'calc(var(--earth-image-width, var(--celestial-base-circle-size)) * var(--earth-globe-scale, 1.08))'
+      : (isMobile ? EARTH_IMAGE_INNER_SCALE_MOBILE : EARTH_IMAGE_INNER_SCALE_DESKTOP);
+
     const offsetY = isMobile ? EARTH_IMAGE_OFFSET_Y_MOBILE : EARTH_IMAGE_OFFSET_Y_DESKTOP;
     const offsetX = isMobile ? EARTH_IMAGE_OFFSET_X_MOBILE : EARTH_IMAGE_OFFSET_X_DESKTOP;
 
-    document.documentElement.style.setProperty('--earth-image-width-desktop', EARTH_IMAGE_WIDTH_DESKTOP);
-    document.documentElement.style.setProperty('--earth-image-width-mobile', EARTH_IMAGE_WIDTH_MOBILE);
+    document.documentElement.style.setProperty('--earth-image-width-desktop', isAutoWidthDesktop ? 'var(--celestial-base-circle-size-desktop)' : EARTH_IMAGE_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--earth-image-width-mobile', isAutoWidthMobile ? 'var(--celestial-base-circle-size-mobile)' : EARTH_IMAGE_WIDTH_MOBILE);
     document.documentElement.style.setProperty('--earth-image-width', width);
 
     document.documentElement.style.setProperty('--earth-image-margin-top-desktop', EARTH_IMAGE_MARGIN_TOP_DESKTOP);
@@ -7589,8 +7536,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--earth-image-margin-bottom-mobile', EARTH_IMAGE_MARGIN_BOTTOM_MOBILE);
     document.documentElement.style.setProperty('--earth-image-margin-bottom', marginBottom);
 
-    document.documentElement.style.setProperty('--earth-image-inner-scale-desktop', EARTH_IMAGE_INNER_SCALE_DESKTOP);
-    document.documentElement.style.setProperty('--earth-image-inner-scale-mobile', EARTH_IMAGE_INNER_SCALE_MOBILE);
+    document.documentElement.style.setProperty('--earth-image-inner-scale-desktop', isAutoInnerDesktop ? 'calc(var(--earth-image-width-desktop, var(--celestial-base-circle-size-desktop)) * var(--earth-globe-scale-desktop, 1.08))' : EARTH_IMAGE_INNER_SCALE_DESKTOP);
+    document.documentElement.style.setProperty('--earth-image-inner-scale-mobile', isAutoInnerMobile ? 'calc(var(--earth-image-width-mobile, var(--celestial-base-circle-size-mobile)) * var(--earth-globe-scale-mobile, 1.08))' : EARTH_IMAGE_INNER_SCALE_MOBILE);
     document.documentElement.style.setProperty('--earth-image-inner-scale', innerScale);
 
     document.documentElement.style.setProperty('--earth-image-offset-y-desktop', EARTH_IMAGE_OFFSET_Y_DESKTOP);
@@ -7633,8 +7580,267 @@ Plan ahead for significantly warmer conditions tomorrow!`
       spacer.style.display = 'none';
     }
   }
+  function applySunImageConfig() {
+    const isMobile = window.innerWidth <= 767;
+
+    // Duo Width: Default 'auto' calculates the exact span of dials 2 to 4 above: 3*dial + 2*gap
+    const isDuoWidthAutoDesktop = !CELESTIAL_DUO_WIDTH_DESKTOP || CELESTIAL_DUO_WIDTH_DESKTOP === 'auto';
+    const isDuoWidthAutoMobile = !CELESTIAL_DUO_WIDTH_MOBILE || CELESTIAL_DUO_WIDTH_MOBILE === 'auto';
+    const duoWidthDesktop = isDuoWidthAutoDesktop
+      ? 'calc((3 * var(--world-clock-size-desktop, 17.4vw)) + (2 * var(--world-clocks-gap-desktop, 2vw)))'
+      : CELESTIAL_DUO_WIDTH_DESKTOP;
+    const duoWidthMobile = isDuoWidthAutoMobile
+      ? 'calc((3 * var(--world-clock-size-mobile, 16.5vw)) + (2 * var(--world-clocks-gap-mobile, 1.875vw)))'
+      : CELESTIAL_DUO_WIDTH_MOBILE;
+    const duoWidthActive = (isMobile ? isDuoWidthAutoMobile : isDuoWidthAutoDesktop)
+      ? 'calc((3 * var(--world-clock-size)) + (2 * var(--world-clocks-gap)))'
+      : (isMobile ? CELESTIAL_DUO_WIDTH_MOBILE : CELESTIAL_DUO_WIDTH_DESKTOP);
+
+    document.documentElement.style.setProperty('--celestial-duo-width-desktop', duoWidthDesktop);
+    document.documentElement.style.setProperty('--celestial-duo-width-mobile', duoWidthMobile);
+    document.documentElement.style.setProperty('--celestial-duo-width', duoWidthActive);
+
+    // Gap between Sun and Earth inside the duo
+    document.documentElement.style.setProperty('--sun-duo-gap-desktop', SUN_DUO_GAP_DESKTOP);
+    document.documentElement.style.setProperty('--sun-duo-gap-mobile', SUN_DUO_GAP_MOBILE);
+    document.documentElement.style.setProperty('--sun-duo-gap', isMobile ? SUN_DUO_GAP_MOBILE : SUN_DUO_GAP_DESKTOP);
+
+    // Base circle size for Sun and Earth: (Duo Width - Gap) / 2
+    const baseCircleDesktop = 'calc((var(--celestial-duo-width-desktop) - var(--sun-duo-gap-desktop)) / 2)';
+    const baseCircleMobile = 'calc((var(--celestial-duo-width-mobile) - var(--sun-duo-gap-mobile)) / 2)';
+    const baseCircleActive = 'calc((var(--celestial-duo-width) - var(--sun-duo-gap)) / 2)';
+    document.documentElement.style.setProperty('--celestial-base-circle-size-desktop', baseCircleDesktop);
+    document.documentElement.style.setProperty('--celestial-base-circle-size-mobile', baseCircleMobile);
+    document.documentElement.style.setProperty('--celestial-base-circle-size', baseCircleActive);
+
+    // Sun circle width (auto applies SUN_CORONA_SCALE to base circle size)
+    const isSunWidthAutoDesktop = !SUN_IMAGE_WIDTH_DESKTOP || SUN_IMAGE_WIDTH_DESKTOP === 'auto';
+    const isSunWidthAutoMobile = !SUN_IMAGE_WIDTH_MOBILE || SUN_IMAGE_WIDTH_MOBILE === 'auto';
+    const sunWidthDesktop = isSunWidthAutoDesktop
+      ? 'calc(var(--celestial-base-circle-size-desktop) * var(--sun-corona-scale-desktop, 0.96))'
+      : SUN_IMAGE_WIDTH_DESKTOP;
+    const sunWidthMobile = isSunWidthAutoMobile
+      ? 'calc(var(--celestial-base-circle-size-mobile) * var(--sun-corona-scale-mobile, 0.96))'
+      : SUN_IMAGE_WIDTH_MOBILE;
+    const sunWidthActive = (isMobile ? isSunWidthAutoMobile : isSunWidthAutoDesktop)
+      ? 'calc(var(--celestial-base-circle-size) * var(--sun-corona-scale, 0.96))'
+      : (isMobile ? SUN_IMAGE_WIDTH_MOBILE : SUN_IMAGE_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--sun-image-width-desktop', sunWidthDesktop);
+    document.documentElement.style.setProperty('--sun-image-width-mobile', sunWidthMobile);
+    document.documentElement.style.setProperty('--sun-image-width', sunWidthActive);
+
+    // Earth circle width (auto applies EARTH_GLOBE_SCALE to base circle size)
+    const isEarthWidthAutoDesktop = !EARTH_IMAGE_WIDTH_DESKTOP || EARTH_IMAGE_WIDTH_DESKTOP === 'auto';
+    const isEarthWidthAutoMobile = !EARTH_IMAGE_WIDTH_MOBILE || EARTH_IMAGE_WIDTH_MOBILE === 'auto';
+    const earthWidthDesktop = isEarthWidthAutoDesktop
+      ? 'calc(var(--celestial-base-circle-size-desktop) * var(--earth-globe-scale-desktop, 1.04))'
+      : EARTH_IMAGE_WIDTH_DESKTOP;
+    const earthWidthMobile = isEarthWidthAutoMobile
+      ? 'calc(var(--celestial-base-circle-size-mobile) * var(--earth-globe-scale-mobile, 1.04))'
+      : EARTH_IMAGE_WIDTH_MOBILE;
+    const earthWidthActive = (isMobile ? isEarthWidthAutoMobile : isEarthWidthAutoDesktop)
+      ? 'calc(var(--celestial-base-circle-size) * var(--earth-globe-scale, 1.04))'
+      : (isMobile ? EARTH_IMAGE_WIDTH_MOBILE : EARTH_IMAGE_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--earth-image-width-desktop', earthWidthDesktop);
+    document.documentElement.style.setProperty('--earth-image-width-mobile', earthWidthMobile);
+    document.documentElement.style.setProperty('--earth-image-width', earthWidthActive);
+
+    // Sun Corona Scale & Inner Scale
+    document.documentElement.style.setProperty('--sun-corona-scale-desktop', String(SUN_CORONA_SCALE_DESKTOP));
+    document.documentElement.style.setProperty('--sun-corona-scale-mobile', String(SUN_CORONA_SCALE_MOBILE));
+    document.documentElement.style.setProperty('--sun-corona-scale', String(isMobile ? SUN_CORONA_SCALE_MOBILE : SUN_CORONA_SCALE_DESKTOP));
+
+    const isSunInnerAutoDesktop = !SUN_IMAGE_INNER_SCALE_DESKTOP || SUN_IMAGE_INNER_SCALE_DESKTOP === 'auto';
+    const isSunInnerAutoMobile = !SUN_IMAGE_INNER_SCALE_MOBILE || SUN_IMAGE_INNER_SCALE_MOBILE === 'auto';
+    const sunInnerDesktop = isSunInnerAutoDesktop
+      ? 'calc(var(--sun-image-width-desktop, var(--celestial-base-circle-size-desktop)) * 1.08)'
+      : SUN_IMAGE_INNER_SCALE_DESKTOP;
+    const sunInnerMobile = isSunInnerAutoMobile
+      ? 'calc(var(--sun-image-width-mobile, var(--celestial-base-circle-size-mobile)) * 1.08)'
+      : SUN_IMAGE_INNER_SCALE_MOBILE;
+    const sunInnerActive = (isMobile ? isSunInnerAutoMobile : isSunInnerAutoDesktop)
+      ? 'calc(var(--sun-image-width, var(--celestial-base-circle-size)) * 1.08)'
+      : (isMobile ? SUN_IMAGE_INNER_SCALE_MOBILE : SUN_IMAGE_INNER_SCALE_DESKTOP);
+    document.documentElement.style.setProperty('--sun-image-inner-scale-desktop', sunInnerDesktop);
+    document.documentElement.style.setProperty('--sun-image-inner-scale-mobile', sunInnerMobile);
+    document.documentElement.style.setProperty('--sun-image-inner-scale', sunInnerActive);
+
+    // Earth Globe Scale & Inner Scale
+    document.documentElement.style.setProperty('--earth-globe-scale-desktop', String(EARTH_GLOBE_SCALE_DESKTOP));
+    document.documentElement.style.setProperty('--earth-globe-scale-mobile', String(EARTH_GLOBE_SCALE_MOBILE));
+    document.documentElement.style.setProperty('--earth-globe-scale', String(isMobile ? EARTH_GLOBE_SCALE_MOBILE : EARTH_GLOBE_SCALE_DESKTOP));
+
+    const isEarthInnerAutoDesktop = !EARTH_IMAGE_INNER_SCALE_DESKTOP || EARTH_IMAGE_INNER_SCALE_DESKTOP === 'auto';
+    const isEarthInnerAutoMobile = !EARTH_IMAGE_INNER_SCALE_MOBILE || EARTH_IMAGE_INNER_SCALE_MOBILE === 'auto';
+    const earthInnerDesktop = isEarthInnerAutoDesktop
+      ? 'var(--earth-image-width-desktop, var(--celestial-base-circle-size-desktop))'
+      : EARTH_IMAGE_INNER_SCALE_DESKTOP;
+    const earthInnerMobile = isEarthInnerAutoMobile
+      ? 'var(--earth-image-width-mobile, var(--celestial-base-circle-size-mobile))'
+      : EARTH_IMAGE_INNER_SCALE_MOBILE;
+    const earthInnerActive = (isMobile ? isEarthInnerAutoMobile : isEarthInnerAutoDesktop)
+      ? 'var(--earth-image-width, var(--celestial-base-circle-size))'
+      : (isMobile ? EARTH_IMAGE_INNER_SCALE_MOBILE : EARTH_IMAGE_INNER_SCALE_DESKTOP);
+    document.documentElement.style.setProperty('--earth-image-inner-scale-desktop', earthInnerDesktop);
+    document.documentElement.style.setProperty('--earth-image-inner-scale-mobile', earthInnerMobile);
+    document.documentElement.style.setProperty('--earth-image-inner-scale', earthInnerActive);
+
+    // Flanking Dials: Size & Centering
+    const isDialSizeAutoDesktop = !CELESTIAL_DIAL_SIZE_DESKTOP || CELESTIAL_DIAL_SIZE_DESKTOP === 'auto';
+    const isDialSizeAutoMobile = !CELESTIAL_DIAL_SIZE_MOBILE || CELESTIAL_DIAL_SIZE_MOBILE === 'auto';
+    const dialSizeDesktop = isDialSizeAutoDesktop ? 'var(--world-clock-size-desktop)' : CELESTIAL_DIAL_SIZE_DESKTOP;
+    const dialSizeMobile = isDialSizeAutoMobile ? 'var(--world-clock-size-mobile)' : CELESTIAL_DIAL_SIZE_MOBILE;
+    const dialSizeActive = (isMobile ? isDialSizeAutoMobile : isDialSizeAutoDesktop) ? 'var(--world-clock-size)' : (isMobile ? CELESTIAL_DIAL_SIZE_MOBILE : CELESTIAL_DIAL_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--celestial-dial-size-desktop', dialSizeDesktop);
+    document.documentElement.style.setProperty('--celestial-dial-size-mobile', dialSizeMobile);
+    document.documentElement.style.setProperty('--celestial-dial-size', dialSizeActive);
+
+    const isCenterDesktop = CELESTIAL_DIAL_VERTICAL_ALIGN_DESKTOP === 'center';
+    const isCenterMobile = CELESTIAL_DIAL_VERTICAL_ALIGN_MOBILE === 'center';
+    const dialMarginTopDesktop = isCenterDesktop
+      ? 'calc((var(--celestial-base-circle-size-desktop) - var(--celestial-dial-size-desktop, var(--world-clock-size-desktop))) / 2 + var(--celestial-dial-offset-y-desktop, 0vw))'
+      : 'var(--celestial-dial-offset-y-desktop, 0vw)';
+    const dialMarginTopMobile = isCenterMobile
+      ? 'calc((var(--celestial-base-circle-size-mobile) - var(--celestial-dial-size-mobile, var(--world-clock-size-mobile))) / 2 + var(--celestial-dial-offset-y-mobile, 0vw))'
+      : 'var(--celestial-dial-offset-y-mobile, 0vw)';
+    const dialMarginTopActive = (isMobile ? isCenterMobile : isCenterDesktop)
+      ? 'calc((var(--celestial-base-circle-size) - var(--celestial-dial-size, var(--world-clock-size))) / 2 + var(--celestial-dial-offset-y, 0vw))'
+      : 'var(--celestial-dial-offset-y, 0vw)';
+
+    document.documentElement.style.setProperty('--celestial-dial-offset-y-desktop', CELESTIAL_DIAL_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--celestial-dial-offset-y-mobile', CELESTIAL_DIAL_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--celestial-dial-offset-y', isMobile ? CELESTIAL_DIAL_OFFSET_Y_MOBILE : CELESTIAL_DIAL_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--celestial-dial-offset-x-desktop', CELESTIAL_DIAL_OFFSET_X_DESKTOP);
+    document.documentElement.style.setProperty('--celestial-dial-offset-x-mobile', CELESTIAL_DIAL_OFFSET_X_MOBILE);
+    document.documentElement.style.setProperty('--celestial-dial-offset-x', isMobile ? CELESTIAL_DIAL_OFFSET_X_MOBILE : CELESTIAL_DIAL_OFFSET_X_DESKTOP);
+
+    document.documentElement.style.setProperty('--celestial-dial-margin-top-desktop', dialMarginTopDesktop);
+    document.documentElement.style.setProperty('--celestial-dial-margin-top-mobile', dialMarginTopMobile);
+    document.documentElement.style.setProperty('--celestial-dial-margin-top', dialMarginTopActive);
+
+    // Flanking Dials: Label Margin & Offsets
+    document.documentElement.style.setProperty('--celestial-dial-label-margin-top-desktop', CELESTIAL_DIAL_LABEL_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--celestial-dial-label-margin-top-mobile', CELESTIAL_DIAL_LABEL_MARGIN_TOP_MOBILE);
+    document.documentElement.style.setProperty('--celestial-dial-label-margin-top', isMobile ? CELESTIAL_DIAL_LABEL_MARGIN_TOP_MOBILE : CELESTIAL_DIAL_LABEL_MARGIN_TOP_DESKTOP);
+
+    document.documentElement.style.setProperty('--celestial-dial-label-offset-y-desktop', CELESTIAL_DIAL_LABEL_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--celestial-dial-label-offset-y-mobile', CELESTIAL_DIAL_LABEL_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--celestial-dial-label-offset-y', isMobile ? CELESTIAL_DIAL_LABEL_OFFSET_Y_MOBILE : CELESTIAL_DIAL_LABEL_OFFSET_Y_DESKTOP);
+
+    // Flanking dial names in DOM if elements exist
+    if (CELESTIAL_DIALS_ENABLED) {
+      const leftNameEl = document.querySelector('#celestial-clock-left .world-clock-name');
+      if (leftNameEl) {
+        leftNameEl.textContent = isMobile ? CELESTIAL_DIAL_LEFT_NAME_MOBILE : CELESTIAL_DIAL_LEFT_NAME_DESKTOP;
+      }
+      const rightNameEl = document.querySelector('#celestial-clock-right .world-clock-name');
+      if (rightNameEl) {
+        rightNameEl.textContent = isMobile ? CELESTIAL_DIAL_RIGHT_NAME_MOBILE : CELESTIAL_DIAL_RIGHT_NAME_DESKTOP;
+      }
+    }
+
+    // Common margins & settings
+    document.documentElement.style.setProperty('--sun-image-margin-top-desktop', SUN_IMAGE_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--sun-image-margin-top-mobile', SUN_IMAGE_MARGIN_TOP_MOBILE);
+    document.documentElement.style.setProperty('--sun-image-margin-top', isMobile ? SUN_IMAGE_MARGIN_TOP_MOBILE : SUN_IMAGE_MARGIN_TOP_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-image-margin-bottom-desktop', SUN_IMAGE_MARGIN_BOTTOM_DESKTOP);
+    document.documentElement.style.setProperty('--sun-image-margin-bottom-mobile', SUN_IMAGE_MARGIN_BOTTOM_MOBILE);
+    document.documentElement.style.setProperty('--sun-image-margin-bottom', isMobile ? SUN_IMAGE_MARGIN_BOTTOM_MOBILE : SUN_IMAGE_MARGIN_BOTTOM_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-image-offset-y-desktop', SUN_IMAGE_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--sun-image-offset-y-mobile', SUN_IMAGE_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--sun-image-offset-y', isMobile ? SUN_IMAGE_OFFSET_Y_MOBILE : SUN_IMAGE_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-image-offset-x-desktop', SUN_IMAGE_OFFSET_X_DESKTOP);
+    document.documentElement.style.setProperty('--sun-image-offset-x-mobile', SUN_IMAGE_OFFSET_X_MOBILE);
+    document.documentElement.style.setProperty('--sun-image-offset-x', isMobile ? SUN_IMAGE_OFFSET_X_MOBILE : SUN_IMAGE_OFFSET_X_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-mask-radius-desktop', SUN_MASK_RADIUS_DESKTOP);
+    document.documentElement.style.setProperty('--sun-mask-radius-mobile', SUN_MASK_RADIUS_MOBILE);
+    document.documentElement.style.setProperty('--sun-mask-radius', isMobile ? SUN_MASK_RADIUS_MOBILE : SUN_MASK_RADIUS_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-mask-position-y-desktop', SUN_MASK_POSITION_Y_DESKTOP);
+    document.documentElement.style.setProperty('--sun-mask-position-y-mobile', SUN_MASK_POSITION_Y_MOBILE);
+    document.documentElement.style.setProperty('--sun-mask-position-y', isMobile ? SUN_MASK_POSITION_Y_MOBILE : SUN_MASK_POSITION_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-image-opacity-desktop', String(SUN_IMAGE_OPACITY_DESKTOP));
+    document.documentElement.style.setProperty('--sun-image-opacity-mobile', String(SUN_IMAGE_OPACITY_MOBILE));
+    document.documentElement.style.setProperty('--sun-image-opacity', String(isMobile ? SUN_IMAGE_OPACITY_MOBILE : SUN_IMAGE_OPACITY_DESKTOP));
+
+    document.documentElement.style.setProperty('--sun-image-blend-mode-desktop', SUN_IMAGE_BLEND_MODE_DESKTOP);
+    document.documentElement.style.setProperty('--sun-image-blend-mode-mobile', SUN_IMAGE_BLEND_MODE_MOBILE);
+    document.documentElement.style.setProperty('--sun-image-blend-mode', isMobile ? SUN_IMAGE_BLEND_MODE_MOBILE : SUN_IMAGE_BLEND_MODE_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-label-font-size-desktop', SUN_LABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--sun-label-font-size-mobile', SUN_LABEL_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--sun-label-font-size', isMobile ? SUN_LABEL_FONT_SIZE_MOBILE : SUN_LABEL_FONT_SIZE_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-label-margin-top-desktop', SUN_LABEL_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--sun-label-margin-top-mobile', SUN_LABEL_MARGIN_TOP_MOBILE);
+    document.documentElement.style.setProperty('--sun-label-margin-top', isMobile ? SUN_LABEL_MARGIN_TOP_MOBILE : SUN_LABEL_MARGIN_TOP_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-label-letter-spacing-desktop', SUN_LABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--sun-label-letter-spacing-mobile', SUN_LABEL_LETTER_SPACING_MOBILE);
+    document.documentElement.style.setProperty('--sun-label-letter-spacing', isMobile ? SUN_LABEL_LETTER_SPACING_MOBILE : SUN_LABEL_LETTER_SPACING_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-label-offset-x-desktop', SUN_LABEL_OFFSET_X_DESKTOP);
+    document.documentElement.style.setProperty('--sun-label-offset-x-mobile', SUN_LABEL_OFFSET_X_MOBILE);
+    document.documentElement.style.setProperty('--sun-label-offset-x', isMobile ? SUN_LABEL_OFFSET_X_MOBILE : SUN_LABEL_OFFSET_X_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-label-left-offset-x-desktop', SUN_LABEL_LEFT_OFFSET_X_DESKTOP);
+    document.documentElement.style.setProperty('--sun-label-left-offset-x-mobile', SUN_LABEL_LEFT_OFFSET_X_MOBILE);
+    document.documentElement.style.setProperty('--sun-label-left-offset-x', isMobile ? SUN_LABEL_LEFT_OFFSET_X_MOBILE : SUN_LABEL_LEFT_OFFSET_X_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-label-right-offset-x-desktop', SUN_LABEL_RIGHT_OFFSET_X_DESKTOP);
+    document.documentElement.style.setProperty('--sun-label-right-offset-x-mobile', SUN_LABEL_RIGHT_OFFSET_X_MOBILE);
+    document.documentElement.style.setProperty('--sun-label-right-offset-x', isMobile ? SUN_LABEL_RIGHT_OFFSET_X_MOBILE : SUN_LABEL_RIGHT_OFFSET_X_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-label-font-family', SUN_LABEL_FONT_FAMILY);
+    document.documentElement.style.setProperty('--sun-label-color', SUN_LABEL_COLOR);
+    document.documentElement.style.setProperty('--sun-label-opacity', SUN_LABEL_OPACITY);
+    document.documentElement.style.setProperty('--sun-label-text-transform', SUN_LABEL_TEXT_TRANSFORM);
+
+    document.documentElement.style.setProperty('--sun-animation-fps-desktop', String(SUN_ANIMATION_FPS_DESKTOP));
+    document.documentElement.style.setProperty('--sun-animation-fps-mobile', String(SUN_ANIMATION_FPS_MOBILE));
+    document.documentElement.style.setProperty('--sun-animation-fps', String(isMobile ? SUN_ANIMATION_FPS_MOBILE : SUN_ANIMATION_FPS_DESKTOP));
+
+    document.documentElement.style.setProperty('--sun-animation-crossfade-duration-desktop', `${SUN_ANIMATION_CROSSFADE_MS_DESKTOP}ms`);
+    document.documentElement.style.setProperty('--sun-animation-crossfade-duration-mobile', `${SUN_ANIMATION_CROSSFADE_MS_MOBILE}ms`);
+    document.documentElement.style.setProperty('--sun-animation-crossfade-duration', `${isMobile ? SUN_ANIMATION_CROSSFADE_MS_MOBILE : SUN_ANIMATION_CROSSFADE_MS_DESKTOP}ms`);
+
+    document.documentElement.style.setProperty('--sun-sizzle-crossfade-duration-desktop', `${SUN_SIZZLE_CROSSFADE_MS_DESKTOP}ms`);
+    document.documentElement.style.setProperty('--sun-sizzle-crossfade-duration-mobile', `${SUN_SIZZLE_CROSSFADE_MS_MOBILE}ms`);
+    document.documentElement.style.setProperty('--sun-sizzle-crossfade-duration', `${isMobile ? SUN_SIZZLE_CROSSFADE_MS_MOBILE : SUN_SIZZLE_CROSSFADE_MS_DESKTOP}ms`);
+
+    document.documentElement.style.setProperty('--sun-animation-ease-enabled', SUN_ANIMATION_EASE_ENABLED ? '1' : '0');
+    document.documentElement.style.setProperty('--sun-animation-ease-frames-desktop', String(SUN_ANIMATION_EASE_FRAMES_DESKTOP));
+    document.documentElement.style.setProperty('--sun-animation-ease-frames-mobile', String(SUN_ANIMATION_EASE_FRAMES_MOBILE));
+    document.documentElement.style.setProperty('--sun-animation-ease-frames', String(isMobile ? SUN_ANIMATION_EASE_FRAMES_MOBILE : SUN_ANIMATION_EASE_FRAMES_DESKTOP));
+    document.documentElement.style.setProperty('--sun-animation-ease-max-delay-desktop', `${SUN_ANIMATION_EASE_MAX_DELAY_MS_DESKTOP}ms`);
+    document.documentElement.style.setProperty('--sun-animation-ease-max-delay-mobile', `${SUN_ANIMATION_EASE_MAX_DELAY_MS_MOBILE}ms`);
+    document.documentElement.style.setProperty('--sun-animation-ease-max-delay', `${isMobile ? SUN_ANIMATION_EASE_MAX_DELAY_MS_MOBILE : SUN_ANIMATION_EASE_MAX_DELAY_MS_DESKTOP}ms`);
+
+    document.documentElement.style.setProperty('--sun-animation-days', String(SUN_ANIMATION_DAYS));
+    document.documentElement.style.setProperty('--sun-sizzle-fps-desktop', String(SUN_SIZZLE_FPS_DESKTOP));
+    document.documentElement.style.setProperty('--sun-sizzle-fps-mobile', String(SUN_SIZZLE_FPS_MOBILE));
+    document.documentElement.style.setProperty('--sun-sizzle-fps', String(isMobile ? SUN_SIZZLE_FPS_MOBILE : SUN_SIZZLE_FPS_DESKTOP));
+    document.documentElement.style.setProperty('--sun-sizzle-frame-count', String(SUN_SIZZLE_FRAME_COUNT));
+    document.documentElement.style.setProperty('--sun-sizzle-frame-step', String(SUN_SIZZLE_FRAME_STEP));
+    document.documentElement.style.setProperty('--sun-sizzle-fetch-length', String(SUN_SIZZLE_FETCH_LENGTH));
+  }
+
+  // Initialize World Clocks, Earth Image, and Celestial Duo configurations in proper dependency order
+  applyWorldClocksConfig();
   applyEarthImageConfig();
-  window.addEventListener('resize', applyEarthImageConfig);
+  applySunImageConfig();
+
+  window.addEventListener('resize', () => {
+    applyWorldClocksConfig();
+    applyEarthImageConfig();
+    applySunImageConfig();
+  });
 
   // --- EDITABLE: Location Switcher Config (Positioned above Weather Last Updated) ---
   const LOCATION_SWITCHER_CONFIG = [
@@ -11337,6 +11543,94 @@ Plan ahead for significantly warmer conditions tomorrow!`
     };
   });
 
+  const celestialClockFormatters = [
+    {
+      id: 'celestial-left',
+      dialId: 'world-clock-dial-celestial-left',
+      timeId: 'world-clock-time-celestial-left',
+      getTimeZone: () => CELESTIAL_DIAL_LEFT_TIMEZONE,
+      matchZoneId: 'pacific'
+    },
+    {
+      id: 'celestial-right',
+      dialId: 'world-clock-dial-celestial-right',
+      timeId: 'world-clock-time-celestial-right',
+      getTimeZone: () => CELESTIAL_DIAL_RIGHT_TIMEZONE,
+      matchZoneId: 'uk'
+    }
+  ];
+
+  function buildWorldClockColumn(zoneConfig) {
+    const {
+      id,
+      colId,
+      dialId,
+      labelId,
+      timeId,
+      name,
+      timeZone,
+      showTime = WORLD_CLOCK_LABEL_SHOW_TIME,
+      isCelestial = false
+    } = zoneConfig;
+
+    const col = document.createElement('div');
+    col.className = isCelestial
+      ? `world-clock-column celestial-clock-column celestial-clock-column-${id}`
+      : `world-clock-column world-clock-column-${id}`;
+    col.id = colId || (isCelestial ? `celestial-clock-${id}` : `world-clock-${id}`);
+
+    // Dial container based on the clock dial (subtle outer track circle, but no 5-min countdown ring)
+    const dial = document.createElement('div');
+    dial.className = isCelestial ? 'world-clock-dial celestial-clock-dial' : 'world-clock-dial';
+    dial.id = dialId || `world-clock-dial-${id}`;
+    dial.setAttribute('data-timezone', timeZone);
+    dial.setAttribute('title', `${name} Time`);
+    dial.style.cursor = 'pointer';
+    dial.addEventListener('click', handleTimeDialReset);
+
+    dial.innerHTML = `
+      <svg class="clock-timer-svg" viewBox="0 0 100 100">
+        <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+      </svg>
+      <div class="clock-face">
+        <div class="clock-hour-hand"></div>
+        <div class="clock-minute-hand"></div>
+        <div class="clock-second-hand"></div>
+        <div class="clock-center-dot"></div>
+      </div>
+    `;
+
+    col.appendChild(dial);
+
+    if (WORLD_CLOCK_LABEL_ENABLED) {
+      const label = document.createElement('div');
+      label.className = isCelestial ? 'world-clock-label celestial-clock-label' : 'world-clock-label';
+      label.id = labelId || `world-clock-label-${id}`;
+
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'world-clock-name';
+      nameSpan.textContent = name;
+      label.appendChild(nameSpan);
+
+      if (showTime) {
+        const spacerSpan = document.createElement('span');
+        spacerSpan.className = 'world-clock-spacer';
+        spacerSpan.innerHTML = '&nbsp;'.repeat(WORLD_CLOCK_LABEL_SPACES || 2);
+        label.appendChild(spacerSpan);
+
+        const timeSpan = document.createElement('span');
+        timeSpan.className = 'world-clock-time';
+        timeSpan.id = timeId || `world-clock-time-${id}`;
+        timeSpan.textContent = '';
+        label.appendChild(timeSpan);
+      }
+
+      col.appendChild(label);
+    }
+
+    return col;
+  }
+
   function createWorldClocksIfMissing() {
     if (!WORLD_CLOCKS_ENABLED) {
       const existing = document.getElementById('world-clocks-row-wrapper');
@@ -11366,59 +11660,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
     wrapper.className = 'world-clocks-row-wrapper';
 
     WORLD_CLOCK_ZONES.forEach(zone => {
-      const col = document.createElement('div');
-      col.className = `world-clock-column world-clock-column-${zone.id}`;
-      col.id = `world-clock-${zone.id}`;
-
-      // Dial container based on the clock dial (subtle outer track circle, but no 5-min countdown ring)
-      const dial = document.createElement('div');
-      dial.className = 'world-clock-dial';
-      dial.id = `world-clock-dial-${zone.id}`;
-      dial.setAttribute('data-timezone', zone.timeZone);
-      dial.setAttribute('title', `${zone.name} Time`);
-      dial.style.cursor = 'pointer';
-      dial.addEventListener('click', handleTimeDialReset);
-
-      dial.innerHTML = `
-        <svg class="clock-timer-svg" viewBox="0 0 100 100">
-          <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
-        </svg>
-        <div class="clock-face">
-          <div class="clock-hour-hand"></div>
-          <div class="clock-minute-hand"></div>
-          <div class="clock-second-hand"></div>
-          <div class="clock-center-dot"></div>
-        </div>
-      `;
-
-      col.appendChild(dial);
-
-      if (WORLD_CLOCK_LABEL_ENABLED) {
-        const label = document.createElement('div');
-        label.className = 'world-clock-label';
-        label.id = `world-clock-label-${zone.id}`;
-
-        const nameSpan = document.createElement('span');
-        nameSpan.className = 'world-clock-name';
-        nameSpan.textContent = zone.name;
-        label.appendChild(nameSpan);
-
-        if (WORLD_CLOCK_LABEL_SHOW_TIME) {
-          const spacerSpan = document.createElement('span');
-          spacerSpan.className = 'world-clock-spacer';
-          spacerSpan.innerHTML = '&nbsp;'.repeat(WORLD_CLOCK_LABEL_SPACES || 2);
-          label.appendChild(spacerSpan);
-
-          const timeSpan = document.createElement('span');
-          timeSpan.className = 'world-clock-time';
-          timeSpan.id = `world-clock-time-${zone.id}`;
-          timeSpan.textContent = '';
-          label.appendChild(timeSpan);
-        }
-
-        col.appendChild(label);
-      }
-
+      const col = buildWorldClockColumn({
+        id: zone.id,
+        name: zone.name,
+        timeZone: zone.timeZone,
+        showTime: WORLD_CLOCK_LABEL_SHOW_TIME,
+        isCelestial: false
+      });
       wrapper.appendChild(col);
     });
 
@@ -11458,7 +11706,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   function updateWorldClockHands() {
     const wrapper = document.getElementById('world-clocks-row-wrapper');
-    if (!wrapper) return;
+    const hasCelestialRow = !!document.getElementById('suns-row-wrapper');
+    if (!wrapper && !hasCelestialRow) return;
 
     const now = new Date();
     const minutes = now.getMinutes();
@@ -11564,6 +11813,91 @@ Plan ahead for significantly warmer conditions tomorrow!`
         }
       }
     });
+
+    // Update Flanking Celestial Row Dials (Pacific & UK duplicates)
+    if (CELESTIAL_DIALS_ENABLED) {
+      celestialClockFormatters.forEach(({ dialId, timeId, getTimeZone, matchZoneId }) => {
+        const dial = document.getElementById(dialId);
+        if (!dial) return;
+
+        const tz = getTimeZone();
+        const isUserZone = (matchZoneId === userZoneId);
+
+        const trackCircle = dial.querySelector('.countdown-track');
+        if (isUserZone) {
+          dial.classList.add('is-user-timezone');
+          dial.style.setProperty('--world-clock-track-color', resolvedUserTrackColor);
+          if (trackCircle) trackCircle.style.stroke = resolvedUserTrackColor;
+        } else {
+          dial.classList.remove('is-user-timezone');
+          dial.style.removeProperty('--world-clock-track-color');
+          if (trackCircle) trackCircle.style.stroke = '';
+        }
+
+        let rawH = 0;
+        try {
+          const parts = new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', hour12: false }).formatToParts(now);
+          rawH = parseInt(parts.find(p => p.type === 'hour')?.value, 10);
+        } catch (e) {
+          rawH = now.getHours();
+        }
+        const hours = isNaN(rawH) ? 0 : rawH % 12;
+        const hourRotation = (hours * 30) + (minutes * 0.5);
+
+        dial.style.setProperty('--hour-rotation', `${hourRotation}deg`);
+        dial.style.setProperty('--minute-rotation', `${minuteRotation}deg`);
+        dial.style.setProperty('--second-rotation', `${secondRotation}deg`);
+
+        if (handsColor) {
+          dial.style.setProperty('--world-clock-hands-color', handsColor);
+        }
+
+        const hourHand = dial.querySelector('.clock-hour-hand');
+        const minuteHand = dial.querySelector('.clock-minute-hand');
+        const secondHand = dial.querySelector('.clock-second-hand');
+        const centerDot = dial.querySelector('.clock-center-dot');
+
+        if (hourHand) {
+          if (!isClockSpinning) {
+            hourHand.style.transform = `translateX(-50%) rotate(${hourRotation}deg)`;
+          }
+          if (handsColor) hourHand.style.backgroundColor = handsColor;
+        }
+        if (minuteHand) {
+          if (!isClockSpinning) {
+            minuteHand.style.transform = `translateX(-50%) rotate(${minuteRotation}deg)`;
+          }
+          if (handsColor) minuteHand.style.backgroundColor = handsColor;
+        }
+        if (secondHand) {
+          secondHand.style.transform = `translateX(-50%) rotate(${secondRotation}deg)`;
+        }
+        if (centerDot && handsColor) {
+          centerDot.style.backgroundColor = handsColor;
+        }
+
+        if (WORLD_CLOCK_LABEL_SHOW_TIME) {
+          const timeSpan = document.getElementById(timeId);
+          if (timeSpan) {
+            try {
+              const timeFormatter = new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', minute: '2-digit', hour12: true });
+              const parts = timeFormatter.formatToParts(now);
+              let h = '', m = '', dayPeriod = 'a';
+              for (const p of parts) {
+                if (p.type === 'hour') h = p.value;
+                else if (p.type === 'minute') m = p.value;
+                else if (p.type === 'dayPeriod') dayPeriod = p.value.toLowerCase();
+              }
+              const ampm = dayPeriod.startsWith('p') ? 'p' : 'a';
+              const formattedTime = `${h}:${m}${ampm}`;
+              if (timeSpan.textContent !== formattedTime) {
+                timeSpan.textContent = formattedTime;
+              }
+            } catch (e) {}
+          }
+        }
+      });
+    }
   }
 
   let sunAnimationTimeoutId = null;
@@ -11576,7 +11910,17 @@ Plan ahead for significantly warmer conditions tomorrow!`
   window.triggerCelestialRotations = triggerCelestialRotations;
 
   function createSunImageIfMissing() {
-    if (document.getElementById('sun-image-container') || document.getElementById('suns-row-wrapper')) return;
+    const existingSunsRow = document.getElementById('suns-row-wrapper');
+    if (existingSunsRow) {
+      if (CELESTIAL_DIALS_ENABLED && !document.getElementById('celestial-duo-subwrapper')) {
+        existingSunsRow.remove();
+        const existingSpacer = document.getElementById('sun-image-spacer');
+        if (existingSpacer) existingSpacer.remove();
+      } else {
+        return;
+      }
+    }
+    if (document.getElementById('sun-image-container')) return;
 
     // Helper to build a styled circular sun element with dual buffer
     function buildSunCircle(containerId, imgId, initialUrl, altText) {
@@ -11805,16 +12149,65 @@ Plan ahead for significantly warmer conditions tomorrow!`
       mainWrapper.style.flexDirection = 'row';
       mainWrapper.style.justifyContent = 'center';
       mainWrapper.style.alignItems = 'flex-start';
-      mainWrapper.style.width = '100%';
-      mainWrapper.style.gap = 'var(--sun-duo-gap, 3vw)';
-      mainWrapper.style.margin = 'var(--sun-image-margin-top, 2vw) auto 0';
+      mainWrapper.style.width = 'var(--world-clocks-width, 95vw)';
+      mainWrapper.style.gap = 'var(--world-clocks-gap, 2vw)';
+      mainWrapper.style.margin = 'var(--sun-image-margin-top, 0vw) auto 0';
       mainWrapper.style.backgroundColor = 'transparent';
       mainWrapper.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
       mainWrapper.style.opacity = '0';
       mainWrapper.style.transition = 'opacity 1s ease';
 
-      mainWrapper.appendChild(leftCol);
-      mainWrapper.appendChild(rightCol);
+      // 1. Duplicate 1st timezone dial (Pacific) on the left
+      if (CELESTIAL_DIALS_ENABLED) {
+        const isMobile = window.innerWidth <= 767;
+        const leftDial = buildWorldClockColumn({
+          id: 'left',
+          colId: 'celestial-clock-left',
+          dialId: 'world-clock-dial-celestial-left',
+          labelId: 'world-clock-label-celestial-left',
+          timeId: 'world-clock-time-celestial-left',
+          name: isMobile ? CELESTIAL_DIAL_LEFT_NAME_MOBILE : CELESTIAL_DIAL_LEFT_NAME_DESKTOP,
+          timeZone: CELESTIAL_DIAL_LEFT_TIMEZONE,
+          showTime: CELESTIAL_DIAL_LEFT_SHOW_TIME,
+          isCelestial: true
+        });
+        mainWrapper.appendChild(leftDial);
+      }
+
+      // 2. Duo subwrapper for Sun and Earth (spanning exact width of dials 2 to 4 above)
+      const duoWrapper = document.createElement('div');
+      duoWrapper.id = 'celestial-duo-subwrapper';
+      duoWrapper.className = 'celestial-duo-subwrapper';
+      duoWrapper.style.display = 'flex';
+      duoWrapper.style.flexDirection = 'row';
+      duoWrapper.style.justifyContent = 'center';
+      duoWrapper.style.alignItems = 'flex-start';
+      duoWrapper.style.width = 'var(--celestial-duo-width, calc((3 * var(--world-clock-size)) + (2 * var(--world-clocks-gap))))';
+      duoWrapper.style.gap = 'var(--sun-duo-gap, 2.5vw)';
+      duoWrapper.style.flexShrink = '0';
+      duoWrapper.style.backgroundColor = 'transparent';
+      duoWrapper.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
+
+      duoWrapper.appendChild(leftCol);
+      duoWrapper.appendChild(rightCol);
+      mainWrapper.appendChild(duoWrapper);
+
+      // 3. Duplicate 5th timezone dial (UK) on the right
+      if (CELESTIAL_DIALS_ENABLED) {
+        const isMobile = window.innerWidth <= 767;
+        const rightDial = buildWorldClockColumn({
+          id: 'right',
+          colId: 'celestial-clock-right',
+          dialId: 'world-clock-dial-celestial-right',
+          labelId: 'world-clock-label-celestial-right',
+          timeId: 'world-clock-time-celestial-right',
+          name: isMobile ? CELESTIAL_DIAL_RIGHT_NAME_MOBILE : CELESTIAL_DIAL_RIGHT_NAME_DESKTOP,
+          timeZone: CELESTIAL_DIAL_RIGHT_TIMEZONE,
+          showTime: CELESTIAL_DIAL_RIGHT_SHOW_TIME,
+          isCelestial: true
+        });
+        mainWrapper.appendChild(rightDial);
+      }
     } else {
       leftCol.classList.add('single-mode');
       leftCol.style.margin = 'var(--sun-image-margin-top, 2vw) auto 0';
@@ -11888,6 +12281,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
     // Clean up any stray standalone Earth container or spacer
     const oldEarthSpacer = document.getElementById('earth-image-spacer');
     if (oldEarthSpacer) oldEarthSpacer.remove();
+
+    // Immediately synchronize world clocks and celestial flanking dials
+    updateWorldClockHands();
 
     // =========================================================================
     // --- Left Sun: 27-Day Solar Rotation Engine (Single Cycle On-Demand) ---
@@ -15278,6 +15674,34 @@ Plan ahead for significantly warmer conditions tomorrow!`
         const dial = document.getElementById(`world-clock-dial-${id}`);
         if (!dial) return;
         const rawH = parseInt(formatter.format(now), 10);
+        const zHours = isNaN(rawH) ? 0 : rawH % 12;
+        const zHourRot = (zHours * 30) + (minutes * 0.5);
+        const hHand = dial.querySelector('.clock-hour-hand');
+        const mHand = dial.querySelector('.clock-minute-hand');
+        if (hHand) {
+          hHand.style.setProperty('--current-rotation', zHourRot + 'deg');
+          hHand.classList.add('spin-clockwise-anim');
+        }
+        if (mHand) {
+          mHand.style.setProperty('--current-rotation', minuteRotation + 'deg');
+          mHand.classList.add('spin-counter-clockwise-anim');
+        }
+      });
+    }
+
+    // Flanking celestial clock hands spin from their respective timezone hour rotations
+    if (typeof celestialClockFormatters !== 'undefined' && typeof CELESTIAL_DIALS_ENABLED !== 'undefined' && CELESTIAL_DIALS_ENABLED) {
+      celestialClockFormatters.forEach(({ dialId, getTimeZone }) => {
+        const dial = document.getElementById(dialId);
+        if (!dial) return;
+        const tz = getTimeZone();
+        let rawH = 0;
+        try {
+          const parts = new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', hour12: false }).formatToParts(now);
+          rawH = parseInt(parts.find(p => p.type === 'hour')?.value, 10);
+        } catch (e) {
+          rawH = now.getHours();
+        }
         const zHours = isNaN(rawH) ? 0 : rawH % 12;
         const zHourRot = (zHours * 30) + (minutes * 0.5);
         const hHand = dial.querySelector('.clock-hour-hand');
