@@ -7190,7 +7190,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const CELESTIAL_DIAL_LEFT_GAP_RIGHT_MOBILE = GAP_PACIFIC_TO_SUN_MOBILE;   // Compatibility alias
 
   // Object 2: Sun (150% size) <--> Object 3: Earth (Derived Middle Space)
-  const SUN_GAP_LEFT_DESKTOP = '-11.25vw';                     // EDITABLE Desktop: Additional gap to the left of Sun (perfected by user)
+  const SUN_GAP_LEFT_DESKTOP = '-3.6vw';                     // EDITABLE Desktop: Additional gap to the left of Sun (perfected by user)
   const SUN_GAP_LEFT_MOBILE = '0vw';                          // EDITABLE Mobile: Additional gap to the left of Sun
   // The gap between Sun and Earth is NOT explicitly defined; it is derived automatically
   // from the remaining space in the 95vw row between the left pair (Pacific/Sun) and right pair (Earth/UK).
