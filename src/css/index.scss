@@ -1522,36 +1522,37 @@ main {
     --earth-animation-crossfade-duration: var(--earth-animation-crossfade-duration-desktop, 70ms);
 
     /* World Clocks Row Config */
-    --world-clock-size: var(--world-clock-size-desktop, 13.5vw);
-    --world-clocks-gap: var(--world-clocks-gap-desktop, 2.5vw);
-    --world-clocks-margin-top: var(--world-clocks-margin-top-desktop, 2.5vw);
-    --world-clocks-margin-bottom: var(--world-clocks-margin-bottom-desktop, 1.0vw);
+    --world-clocks-width: var(--world-clocks-width-desktop, 90vw);
+    --world-clock-size: var(--world-clock-size-desktop, 15.68vw);
+    --world-clocks-gap: var(--world-clocks-gap-desktop, 2.9vw);
+    --world-clocks-margin-top: var(--world-clocks-margin-top-desktop, -5vw);
+    --world-clocks-margin-bottom: var(--world-clocks-margin-bottom-desktop, -1vw);
     --world-clock-track-color: var(--world-clock-track-color-desktop, rgba(255, 255, 255, 0.2));
     --world-clock-track-width: var(--world-clock-track-width-desktop, 4);
     --world-clock-user-track-color: var(--world-clock-user-track-color-desktop, var(--temp-color, var(--world-clock-track-color)));
     --world-clock-label-layout: var(--world-clock-label-layout-desktop, column);
     --world-clock-label-gap: var(--world-clock-label-gap-desktop, 0vw);
-    --world-clock-label-line-gap: var(--world-clock-label-line-gap-desktop, 0.2vw);
-    --world-clock-label-margin-top: var(--world-clock-label-margin-top-desktop, 0.8vw);
-    --world-clock-label-font-size: var(--world-clock-label-font-size-desktop, 1.75vw);
-    --world-clock-label-letter-spacing: var(--world-clock-label-letter-spacing-desktop, 0.04vw);
+    --world-clock-label-line-gap: var(--world-clock-label-line-gap-desktop, 0.23vw);
+    --world-clock-label-margin-top: var(--world-clock-label-margin-top-desktop, 0.93vw);
+    --world-clock-label-font-size: var(--world-clock-label-font-size-desktop, 2.03vw);
+    --world-clock-label-letter-spacing: var(--world-clock-label-letter-spacing-desktop, 0.046vw);
     --world-clock-label-font-family: var(--world-clock-label-font-family-desktop, "'light', sans-serif");
     --world-clock-label-color: var(--world-clock-label-color-desktop, #ffffff);
     --world-clock-label-opacity: var(--world-clock-label-opacity-desktop, 0.85);
 
     /* Line 1: Zone Name (Where) */
-    --world-clock-name-font-size: var(--world-clock-name-font-size-desktop, 1.75vw);
+    --world-clock-name-font-size: var(--world-clock-name-font-size-desktop, 2.03vw);
     --world-clock-name-font-family: var(--world-clock-name-font-family-desktop, "'light', sans-serif");
     --world-clock-name-color: var(--world-clock-name-color-desktop, #ffffff);
     --world-clock-name-opacity: var(--world-clock-name-opacity-desktop, 0.85);
-    --world-clock-name-letter-spacing: var(--world-clock-name-letter-spacing-desktop, 0.04vw);
+    --world-clock-name-letter-spacing: var(--world-clock-name-letter-spacing-desktop, 0.046vw);
 
     /* Line 2: Actual Time */
-    --world-clock-time-font-size: var(--world-clock-time-font-size-desktop, 1.75vw);
+    --world-clock-time-font-size: var(--world-clock-time-font-size-desktop, 2.03vw);
     --world-clock-time-font-family: var(--world-clock-time-font-family-desktop, "'light', sans-serif");
     --world-clock-time-color: var(--world-clock-time-color-desktop, #ffffff);
     --world-clock-time-opacity: var(--world-clock-time-opacity-desktop, 0.85);
-    --world-clock-time-letter-spacing: var(--world-clock-time-letter-spacing-desktop, 0.04vw);
+    --world-clock-time-letter-spacing: var(--world-clock-time-letter-spacing-desktop, 0.046vw);
 
     /* Floating Sticky Back-to-Top Button (Desktop) */
     --scroll-top-bottom: var(--scroll-top-bottom-desktop, 2.0vw);
@@ -1649,32 +1650,33 @@ main {
         --earth-mask-position-y: var(--earth-mask-position-y-mobile, 45.5%);
         --earth-animation-crossfade-duration: var(--earth-animation-crossfade-duration-mobile, 70ms);
 
-        --world-clock-size: var(--world-clock-size-mobile, 16.0vw);
-        --world-clocks-gap: var(--world-clocks-gap-mobile, 1.8vw);
-        --world-clocks-margin-top: var(--world-clocks-margin-top-mobile, 3.0vw);
-        --world-clocks-margin-bottom: var(--world-clocks-margin-bottom-mobile, 1.5vw);
+        --world-clocks-width: var(--world-clocks-width-mobile, 90vw);
+        --world-clock-size: var(--world-clock-size-mobile, 16.5vw);
+        --world-clocks-gap: var(--world-clocks-gap-mobile, 1.875vw);
+        --world-clocks-margin-top: var(--world-clocks-margin-top-mobile, -5.0vw);
+        --world-clocks-margin-bottom: var(--world-clocks-margin-bottom-mobile, -4vw);
         --world-clock-track-color: var(--world-clock-track-color-mobile, rgba(255, 255, 255, 0.2));
         --world-clock-track-width: var(--world-clock-track-width-mobile, 4);
         --world-clock-user-track-color: var(--world-clock-user-track-color-mobile, var(--temp-color, var(--world-clock-track-color)));
         --world-clock-label-layout: var(--world-clock-label-layout-mobile, column);
         --world-clock-label-gap: var(--world-clock-label-gap-mobile, 0vw);
-        --world-clock-label-line-gap: var(--world-clock-label-line-gap-mobile, 0.3vw);
-        --world-clock-label-margin-top: var(--world-clock-label-margin-top-mobile, 1.0vw);
-        --world-clock-label-font-size: var(--world-clock-label-font-size-mobile, 2.3vw);
+        --world-clock-label-line-gap: var(--world-clock-label-line-gap-mobile, 0.31vw);
+        --world-clock-label-margin-top: var(--world-clock-label-margin-top-mobile, 1.03vw);
+        --world-clock-label-font-size: var(--world-clock-label-font-size-mobile, 2.38vw);
         --world-clock-label-letter-spacing: var(--world-clock-label-letter-spacing-mobile, 0.02vw);
         --world-clock-label-font-family: var(--world-clock-label-font-family-mobile, "'light', sans-serif");
         --world-clock-label-color: var(--world-clock-label-color-mobile, #ffffff);
         --world-clock-label-opacity: var(--world-clock-label-opacity-mobile, 0.85);
 
         /* Line 1: Zone Name (Where) Mobile */
-        --world-clock-name-font-size: var(--world-clock-name-font-size-mobile, 2.3vw);
+        --world-clock-name-font-size: var(--world-clock-name-font-size-mobile, 2.38vw);
         --world-clock-name-font-family: var(--world-clock-name-font-family-mobile, "'light', sans-serif");
         --world-clock-name-color: var(--world-clock-name-color-mobile, #ffffff);
         --world-clock-name-opacity: var(--world-clock-name-opacity-mobile, 0.85);
         --world-clock-name-letter-spacing: var(--world-clock-name-letter-spacing-mobile, 0.02vw);
 
         /* Line 2: Actual Time Mobile */
-        --world-clock-time-font-size: var(--world-clock-time-font-size-mobile, 2.3vw);
+        --world-clock-time-font-size: var(--world-clock-time-font-size-mobile, 2.38vw);
         --world-clock-time-font-family: var(--world-clock-time-font-family-mobile, "'light', sans-serif");
         --world-clock-time-color: var(--world-clock-time-color-mobile, #ffffff);
         --world-clock-time-opacity: var(--world-clock-time-opacity-mobile, 0.85);
@@ -2022,8 +2024,9 @@ main {
     flex-direction: row;
     justify-content: center;
     align-items: flex-start;
-    width: 100%;
-    gap: var(--world-clocks-gap, 2.5vw);
+    width: var(--world-clocks-width, 90vw);
+    max-width: var(--world-clocks-width, 90vw);
+    gap: var(--world-clocks-gap, 2.9vw);
     margin: var(--world-clocks-margin-top, 2.5vw) auto var(--world-clocks-margin-bottom, 1.0vw);
     opacity: 0;
     transition: opacity 1s ease;
