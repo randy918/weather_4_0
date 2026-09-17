@@ -2200,13 +2200,32 @@ main {
     align-items: flex-start;
     width: var(--world-clocks-width, 95vw);
     max-width: var(--world-clocks-width, 95vw);
-    gap: var(--world-clocks-gap, 2vw);
-    margin: var(--sun-image-margin-top, 0vw) auto 0;
+    gap: 0; // Gaps are controlled individually via left & right JCV margins on all 4 objects
+    margin: var(--celestial-row-margin-top, var(--sun-image-margin-top, 0vw)) auto 0;
     opacity: 0;
-    transition: opacity 1s ease;
+    transition: opacity 1s ease, margin 0.3s ease;
     user-select: none;
     flex-wrap: nowrap;
     box-sizing: border-box;
+}
+
+// 4-Object Gaps & Offsets (JCV)
+#celestial-clock-left {
+    margin-right: var(--gap-pacific-to-sun, var(--celestial-dial-left-gap-right, 2vw));
+}
+
+#sun-col-left {
+    margin-left: var(--sun-gap-left, 0vw);
+    margin-right: var(--gap-sun-to-earth, var(--sun-gap-right, 2vw));
+}
+
+#sun-col-right {
+    margin-left: var(--earth-gap-left, 0vw);
+    margin-right: var(--gap-earth-to-uk, var(--earth-gap-right, 2vw));
+}
+
+#celestial-clock-right {
+    margin-left: var(--celestial-dial-right-gap-left, 0vw);
 }
 
 .celestial-duo-subwrapper {
@@ -2214,9 +2233,8 @@ main {
     flex-direction: row;
     justify-content: center;
     align-items: flex-start;
-    width: var(--celestial-duo-width, calc((3 * var(--world-clock-size)) + (2 * var(--world-clocks-gap))));
-    max-width: var(--celestial-duo-width, calc((3 * var(--world-clock-size)) + (2 * var(--world-clocks-gap))));
-    gap: var(--sun-duo-gap, 2.5vw);
+    width: auto;
+    gap: var(--sun-duo-gap, 2vw);
     flex-shrink: 0;
     background-color: transparent;
     mix-blend-mode: var(--sun-image-blend-mode, lighten);
@@ -2241,9 +2259,9 @@ main {
         transition: margin-top 0.3s ease;
     }
 
-    .world-clock-label {
-        margin-top: var(--celestial-dial-label-margin-top, var(--world-clock-label-margin-top, 0.8vw));
-        transform: translate(0, var(--celestial-dial-label-offset-y, 0vw));
+    .world-clock-label-container {
+        margin-top: var(--celestial-dial-label-margin-top, calc(var(--world-clock-size) * 0.06));
+        transform: translateY(var(--celestial-dial-label-offset-y, 0vw));
     }
 }
 
@@ -2252,7 +2270,7 @@ main {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    width: var(--celestial-base-circle-size, var(--sun-image-width, 34vw));
+    width: var(--sun-image-width, 34vw);
     position: relative;
     flex-shrink: 0;
     cursor: pointer;
@@ -2268,25 +2286,26 @@ main {
 }
 
 .sun-column.earth-column {
-    width: var(--celestial-base-circle-size, var(--earth-image-width, 34vw));
-    margin-top: var(--earth-image-margin-top, 0vw);
+    width: var(--earth-image-width, 24vw);
+    margin-top: 0vw;
 }
 
 .sun-column.single-mode {
-    margin: var(--sun-image-margin-top, 2vw) auto 0;
+    margin: var(--celestial-row-margin-top, var(--sun-image-margin-top, 2vw)) auto 0;
 }
 
 #sun-image-container,
 #sun-image-container-right {
     width: var(--sun-image-width, var(--celestial-base-circle-size, 34vw));
     height: var(--sun-image-width, var(--celestial-base-circle-size, 34vw));
+    margin-top: var(--sun-image-container-margin-top, 0vw);
     border-radius: 50%;
     overflow: hidden;
     clip-path: circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%));
     -webkit-clip-path: circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%));
     position: relative;
     opacity: 0;
-    transition: opacity 1s ease;
+    transition: opacity 1s ease, margin-top 0.3s ease;
     mix-blend-mode: var(--sun-image-blend-mode, lighten);
     background-color: transparent;
     flex-shrink: 0;
@@ -2298,10 +2317,7 @@ main {
 }
 
 #sun-image,
-#sun-image-b,
-#sun-image-right,
-#sun-image-right-b,
-.sun-image {
+#sun-image-b {
     width: var(--sun-image-inner-scale, 36.7vw);
     height: var(--sun-image-inner-scale, 36.7vw);
     position: absolute;
@@ -2314,7 +2330,6 @@ main {
     object-fit: cover;
     display: block;
     mix-blend-mode: var(--sun-image-blend-mode, lighten);
-    opacity: var(--sun-image-opacity, 1);
     will-change: opacity;
 }
 
@@ -2346,25 +2361,27 @@ main {
     color: var(--sun-label-color, #ffffff);
     opacity: var(--sun-label-opacity, 0.70);
     text-transform: var(--sun-label-text-transform, none);
-    margin-top: var(--sun-label-margin-top, 0.8vw);
     text-align: center;
     white-space: nowrap;
     user-select: none;
     line-height: 1.2;
     box-sizing: border-box;
+    transition: opacity 0.3s ease;
 }
 
 #sun-label-left {
+    margin-top: var(--sun-label-margin-top, 0.8vw);
     transform: translateX(calc(var(--sun-label-offset-x, 0vw) + var(--sun-label-left-offset-x, 0vw)));
 }
 
 #sun-label-right,
 #earth-label-right {
+    margin-top: var(--earth-label-margin-top, var(--sun-label-margin-top, 0.8vw));
     transform: translateX(calc(var(--sun-label-offset-x, 0vw) + var(--sun-label-right-offset-x, 0vw)));
 }
 
 #sun-image-spacer {
-    height: var(--sun-image-margin-bottom, 2vw);
+    height: var(--celestial-row-margin-bottom, var(--sun-image-margin-bottom, 2vw));
     width: 100%;
 }
 
@@ -2372,10 +2389,11 @@ main {
 #earth-image-container {
     width: var(--earth-image-width, var(--celestial-base-circle-size, var(--sun-image-width, 34vw)));
     height: var(--earth-image-width, var(--celestial-base-circle-size, var(--sun-image-width, 34vw)));
+    margin-top: var(--earth-image-container-margin-top, 0vw);
     border-radius: 50%;
     position: relative;
     opacity: 0;
-    transition: opacity 1s ease;
+    transition: opacity 1s ease, margin-top 0.3s ease;
     mix-blend-mode: lighten;
     background-color: transparent;
     flex-shrink: 0;
