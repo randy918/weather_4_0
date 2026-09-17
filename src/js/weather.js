@@ -7101,10 +7101,15 @@ Plan ahead for significantly warmer conditions tomorrow!`
     'https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/Fe195/20262580010578_GOES19-SUVI-Fe195-600x600.jpg'
   ];
 
-  // Sizing & Layout for Sun & Earth circles
-  // 'auto' automatically sizes Sun (150%) and Earth (100%) from remaining row space, or enter custom vw strings (e.g. '28vw' and '20vw')
-  const SUN_IMAGE_WIDTH_DESKTOP = 'auto';             // EDITABLE Desktop: 'auto' (150% scaled base circle) or custom vw string (e.g. '28vw')
-  const SUN_IMAGE_WIDTH_MOBILE = 'auto';              // EDITABLE Mobile: 'auto' or custom vw string (e.g. '25.6vw')
+  // =========================================================================
+  // --- Sun & Earth Sizing Config (JCV) ---
+  // Direct vw unit configuration (e.g. '32vw', '20vw', or plain numbers like 32, 20)
+  // =========================================================================
+  const SUN_IMAGE_WIDTH_DESKTOP = 'auto';             // EDITABLE Desktop: 'auto' (scales via SUN_SIZE_SCALE_DESKTOP below, e.g. 1.85) or direct vw (e.g. '32vw')
+  const SUN_IMAGE_WIDTH_MOBILE = 'auto';              // EDITABLE Mobile: 'auto' (scales via SUN_SIZE_SCALE_MOBILE below) or direct vw
+
+  const EARTH_IMAGE_WIDTH_DESKTOP = 'auto';           // EDITABLE Desktop: 'auto' (scales via EARTH_SIZE_SCALE_DESKTOP below, e.g. 0.92 = 16vw) or direct vw
+  const EARTH_IMAGE_WIDTH_MOBILE = 'auto';            // EDITABLE Mobile: 'auto' (scales via EARTH_SIZE_SCALE_MOBILE below) or direct vw
 
   // =========================================================================
   // --- Space Above & Below Celestial Row (JCV) ---
@@ -7121,60 +7126,90 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SUN_IMAGE_MARGIN_BOTTOM_DESKTOP = CELESTIAL_ROW_MARGIN_BOTTOM_DESKTOP;
   const SUN_IMAGE_MARGIN_BOTTOM_MOBILE = CELESTIAL_ROW_MARGIN_BOTTOM_MOBILE;
 
-  // --- Sun Sizing & Scale Controls (JCV) ---
-  // Sun is 150% size by default relative to base celestial diameter; vertically centered with other 3 circles
-  const SUN_SIZE_SCALE_DESKTOP = 1.50;                // EDITABLE Desktop: Sun circle size scale (1.50 = 150% size)
-  const SUN_SIZE_SCALE_MOBILE = 1.50;                 // EDITABLE Mobile: Sun circle size scale (1.50 = 150% size)
-  const SUN_CORONA_SCALE_DESKTOP = SUN_SIZE_SCALE_DESKTOP; // Compatibility alias
-  const SUN_CORONA_SCALE_MOBILE = SUN_SIZE_SCALE_MOBILE;   // Compatibility alias
-  const SUN_IMAGE_INNER_SCALE_DESKTOP = 'auto';       // EDITABLE Desktop: 'auto' (scales with Sun width * 1.08) or custom vw string
+  // =========================================================================
+  // --- Sun Sizing & Position Controls (JCV) ---
+  // =========================================================================
+  const SUN_IMAGE_INNER_SCALE_DESKTOP = 'auto';       // EDITABLE Desktop: 'auto' (scales with Sun width * 1.08 to crop watermark) or custom vw string (e.g. '34.5vw')
   const SUN_IMAGE_INNER_SCALE_MOBILE = 'auto';        // EDITABLE Mobile: 'auto' or custom vw string
-
   const SUN_IMAGE_OFFSET_Y_DESKTOP = '0vw';           // EDITABLE Desktop: Vertical position in vw (positive = DOWN, negative = UP; e.g. '0vw', '-0.5vw', '1vw')
   const SUN_IMAGE_OFFSET_Y_MOBILE = '0vw';            // EDITABLE Mobile: Vertical position in vw (positive = DOWN, negative = UP)
-
   const SUN_IMAGE_OFFSET_X_DESKTOP = '0vw';           // EDITABLE Desktop: Horizontal position in vw (positive = RIGHT, negative = LEFT; e.g. '0vw', '0.5vw', '-1vw')
   const SUN_IMAGE_OFFSET_X_MOBILE = '0vw';            // EDITABLE Mobile: Horizontal position in vw (positive = RIGHT, negative = LEFT)
 
   const SUN_MASK_RADIUS_DESKTOP = '49.5%';            // EDITABLE Desktop: Circular mask radius
   const SUN_MASK_RADIUS_MOBILE = '49.5%';             // EDITABLE Mobile: Circular mask radius
-
   const SUN_MASK_POSITION_Y_DESKTOP = '50%';          // EDITABLE Desktop: Mask center Y position
   const SUN_MASK_POSITION_Y_MOBILE = '50%';           // EDITABLE Mobile: Mask center Y position
-
   const SUN_IMAGE_OPACITY_DESKTOP = 1.0;              // EDITABLE Desktop: Overall opacity (0.0 to 1.0)
   const SUN_IMAGE_OPACITY_MOBILE = 1.0;               // EDITABLE Mobile: Overall opacity (0.0 to 1.0)
-
   const SUN_IMAGE_BLEND_MODE_DESKTOP = 'lighten';     // EDITABLE Desktop: Blend mode on dark background ('lighten', 'screen', etc.)
   const SUN_IMAGE_BLEND_MODE_MOBILE = 'lighten';      // EDITABLE Mobile: Blend mode on dark background
 
   // =========================================================================
-  // --- Celestial Row: 4-Object Gaps (Left & Right) Config (JCV) ---
+  // --- Earth Sizing & Position Controls (JCV) ---
+  // =========================================================================
+  const EARTH_IMAGE_INNER_SCALE_DESKTOP = 'auto';     // EDITABLE Desktop: 'auto' (matches Earth width) or custom vw string (e.g. '16vw')
+  const EARTH_IMAGE_INNER_SCALE_MOBILE = 'auto';      // EDITABLE Mobile: 'auto' or custom vw string
+  const EARTH_IMAGE_OFFSET_Y_DESKTOP = '0vw';         // EDITABLE Desktop: Vertical position in vw (positive = DOWN, negative = UP; e.g. '0vw', '-0.5vw', '1vw')
+  const EARTH_IMAGE_OFFSET_Y_MOBILE = '0vw';          // EDITABLE Mobile: Vertical position in vw (positive = DOWN, negative = UP)
+  const EARTH_IMAGE_OFFSET_X_DESKTOP = '0vw';         // EDITABLE Desktop: Horizontal position in vw (positive = RIGHT, negative = LEFT; e.g. '0vw', '0.5vw', '-1vw')
+  const EARTH_IMAGE_OFFSET_X_MOBILE = '0vw';          // EDITABLE Mobile: Horizontal position in vw (positive = RIGHT, negative = LEFT)
+
+  // =========================================================================
+  // --- Sun & Earth Sizing Scale Controls (JCV) ---
+  // Direct scale multipliers relative to the timezone clock dial size (var(--world-clock-size)):
+  // e.g. 1.0 = exactly matches clock size (17.4vw); 1.85 = 185% size (~32vw); 1.2 = 120% size (~21vw)
+  // =========================================================================
+  const SUN_SIZE_SCALE_DESKTOP = 1.85;                // EDITABLE Desktop: Sun diameter multiplier (1.85 = ~32vw, 1.2 = ~21vw, 2.0 = ~35vw)
+  const SUN_SIZE_SCALE_MOBILE = 1.60;                 // EDITABLE Mobile: Sun diameter multiplier
+  const SUN_CORONA_SCALE_DESKTOP = SUN_SIZE_SCALE_DESKTOP;
+  const SUN_CORONA_SCALE_MOBILE = SUN_SIZE_SCALE_MOBILE;
+  const EARTH_SIZE_SCALE_DESKTOP = 0.92;              // EDITABLE Desktop: Earth diameter multiplier (0.92 = ~16vw, 1.0 = ~17.4vw)
+  const EARTH_SIZE_SCALE_MOBILE = 1.15;               // EDITABLE Mobile: Earth diameter multiplier
+  const EARTH_GLOBE_SCALE_DESKTOP = EARTH_SIZE_SCALE_DESKTOP;
+  const EARTH_GLOBE_SCALE_MOBILE = EARTH_SIZE_SCALE_MOBILE;
+
+  // =========================================================================
+  // --- Celestial Row: 4-Object Gaps & Lateral Edge Anchors (JCV) ---
   // Row sequence: [ Object 1: Pacific ] <--> [ Object 2: Sun (150%) ] <--> [ Object 3: Earth ] <--> [ Object 4: UK ]
-  // Exterior sides next to the window are governed by row width (WORLD_CLOCKS_WIDTH)
+  // Dials #1 and #4 are anchored to the 95vw boundaries directly under Timezone Clocks #1 & #5.
+  // Gaps between dials adjust spacing WITHOUT moving dials #1 and #4 laterally.
   // =========================================================================
 
+  // Exterior Edge Controls (establishes the 95% vw alignment directly under clocks #1 & #5)
+  // By default 0vw so Dial #1 is flush with the left of 95vw, and Dial #4 is flush with the right of 95vw.
+  const CELESTIAL_ROW_EDGE_GAP_LEFT_DESKTOP = '0vw';          // EDITABLE Desktop: Edge offset for #1 (Pacific) from 95% left boundary
+  const CELESTIAL_ROW_EDGE_GAP_LEFT_MOBILE = '0vw';           // EDITABLE Mobile: Edge offset for #1 (Pacific) from 95% left boundary
+  const CELESTIAL_ROW_EDGE_GAP_RIGHT_DESKTOP = '0vw';         // EDITABLE Desktop: Edge offset for #4 (UK) from 95% right boundary
+  const CELESTIAL_ROW_EDGE_GAP_RIGHT_MOBILE = '0vw';          // EDITABLE Mobile: Edge offset for #4 (UK) from 95% right boundary
+
   // Object 1: Left Dial (Pacific) <--> Object 2: Sun
-  const GAP_PACIFIC_TO_SUN_DESKTOP = '2vw';                    // EDITABLE Desktop: Gap between 'Pacific' dial and the Sun
-  const GAP_PACIFIC_TO_SUN_MOBILE = '1.875vw';                 // EDITABLE Mobile: Gap between 'Pacific' dial and the Sun
+  const GAP_PACIFIC_TO_SUN_DESKTOP = '0vw';                   // EDITABLE Desktop: Spacing between 'Pacific' dial and the Sun (0vw = evenly distributed)
+  const GAP_PACIFIC_TO_SUN_MOBILE = '0vw';                    // EDITABLE Mobile: Spacing between 'Pacific' dial and the Sun
   const CELESTIAL_DIAL_LEFT_GAP_RIGHT_DESKTOP = GAP_PACIFIC_TO_SUN_DESKTOP; // Compatibility alias
   const CELESTIAL_DIAL_LEFT_GAP_RIGHT_MOBILE = GAP_PACIFIC_TO_SUN_MOBILE;   // Compatibility alias
 
-  // Object 2: Sun (150% size) <--> Object 3: Earth
-  const SUN_GAP_LEFT_DESKTOP = '0vw';                          // EDITABLE Desktop: Additional gap to the left of Sun
-  const SUN_GAP_LEFT_MOBILE = '0vw';                           // EDITABLE Mobile: Additional gap to the left of Sun
-  const GAP_SUN_TO_EARTH_DESKTOP = '2vw';                      // EDITABLE Desktop: Gap between Sun and Earth
-  const GAP_SUN_TO_EARTH_MOBILE = '1.875vw';                   // EDITABLE Mobile: Gap between Sun and Earth
+  // Object 2: Sun (150% size) <--> Object 3: Earth (Derived Middle Space)
+  const SUN_GAP_LEFT_DESKTOP = '-11.25vw';                     // EDITABLE Desktop: Additional gap to the left of Sun (perfected by user)
+  const SUN_GAP_LEFT_MOBILE = '0vw';                          // EDITABLE Mobile: Additional gap to the left of Sun
+  // The gap between Sun and Earth is NOT explicitly defined; it is derived automatically
+  // from the remaining space in the 95vw row between the left pair (Pacific/Sun) and right pair (Earth/UK).
+  // Resizing Sun expands rightward into this space; resizing Earth expands leftward into this space.
+  const GAP_SUN_TO_EARTH_DESKTOP = 'auto';                     // DERIVED: Remaining space between Sun & Earth (automatic)
+  const GAP_SUN_TO_EARTH_MOBILE = 'auto';                      // DERIVED: Remaining space between Sun & Earth (automatic)
   const SUN_GAP_RIGHT_DESKTOP = GAP_SUN_TO_EARTH_DESKTOP;      // Compatibility alias
   const SUN_GAP_RIGHT_MOBILE = GAP_SUN_TO_EARTH_MOBILE;        // Compatibility alias
 
   // Object 3: Earth <--> Object 4: Right Dial (UK)
+  // Editable fixed gap between Earth (#3) and UK dial (#4).
+  // Dial #4 (UK) is fixed at the right 95% edge. When Earth is resized, Dial #4 does NOT move,
+  // and this gap stays fixed (Earth grows/shrinks towards the Sun into the derived middle space).
+  const GAP_EARTH_TO_UK_DESKTOP = '0vw';                       // EDITABLE Desktop: Spacing between Earth and UK dial (e.g. '0vw', '-2vw', '2.5vw')
+  const GAP_EARTH_TO_UK_MOBILE = '0vw';                        // EDITABLE Mobile: Spacing between Earth and UK dial
+  const EARTH_GAP_RIGHT_DESKTOP = GAP_EARTH_TO_UK_DESKTOP;     // Compatibility alias for Earth-to-UK gap
+  const EARTH_GAP_RIGHT_MOBILE = GAP_EARTH_TO_UK_MOBILE;       // Compatibility alias
   const EARTH_GAP_LEFT_DESKTOP = '0vw';                        // EDITABLE Desktop: Additional gap to the left of Earth
   const EARTH_GAP_LEFT_MOBILE = '0vw';                         // EDITABLE Mobile: Additional gap to the left of Earth
-  const GAP_EARTH_TO_UK_DESKTOP = '2vw';                       // EDITABLE Desktop: Gap between Earth and UK dial
-  const GAP_EARTH_TO_UK_MOBILE = '1.875vw';                    // EDITABLE Mobile: Gap between Earth and UK dial
-  const EARTH_GAP_RIGHT_DESKTOP = GAP_EARTH_TO_UK_DESKTOP;     // Compatibility alias
-  const EARTH_GAP_RIGHT_MOBILE = GAP_EARTH_TO_UK_MOBILE;       // Compatibility alias
 
   // Object 4: Right Dial (UK)
   const CELESTIAL_DIAL_RIGHT_GAP_LEFT_DESKTOP = '0vw';         // EDITABLE Desktop: Gap to the left of Right Dial
@@ -7469,9 +7504,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- Earth Image & Living Weather Config (JCV) ---
   // ==========================================
-  // Settings for the live Earth image & animation from NOAA GOES-19 satellite (GeoColor ABI Full Disk)
-  const EARTH_IMAGE_WIDTH_DESKTOP = 'auto';         // EDITABLE Desktop: Width of the Earth container ('auto' matches base circle size)
-  const EARTH_IMAGE_WIDTH_MOBILE = 'auto';          // EDITABLE Mobile: Width of the Earth container ('auto' matches base circle size)
+  // Note: EARTH_IMAGE_WIDTH_DESKTOP & EARTH_IMAGE_WIDTH_MOBILE are configured above under Celestial Row config
   const EARTH_IMAGE_MARGIN_TOP_DESKTOP = '0vw';     // EDITABLE Desktop: Handled by duo row wrapper
   const EARTH_IMAGE_MARGIN_TOP_MOBILE = '0vw';      // EDITABLE Mobile: Handled by duo row wrapper
   const EARTH_IMAGE_MARGIN_BOTTOM_DESKTOP = '0vw';  // EDITABLE Desktop: Handled by duo row spacer
@@ -7484,18 +7517,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const EARTH_MASK_POSITION_Y = EARTH_MASK_POSITION_Y_DESKTOP;
   const EARTH_IMAGE_URL = 'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/678x678.jpg';
 
-  // --- Earth Sizing & Position Controls (JCV) ---
-  // Granular controls to size and nudge Earth independently of Sun (all in vw)
-  const EARTH_GLOBE_SCALE_DESKTOP = 1.0;            // EDITABLE Desktop: Earth globe scale (1.0 = standard base diameter; Sun is 1.50 = 150%)
-  const EARTH_GLOBE_SCALE_MOBILE = 1.0;             // EDITABLE Mobile: Earth globe scale
-  const EARTH_IMAGE_INNER_SCALE_DESKTOP = 'auto';   // EDITABLE Desktop: Earth inner image size in vw ('auto' scales with Earth width * EARTH_GLOBE_SCALE)
-  const EARTH_IMAGE_INNER_SCALE_MOBILE = 'auto';    // EDITABLE Mobile: Earth inner image size in vw ('auto' scales with Earth width * EARTH_GLOBE_SCALE)
-
-  const EARTH_IMAGE_OFFSET_Y_DESKTOP = '0vw';         // EDITABLE Desktop: Vertical position in vw (positive = DOWN, negative = UP; e.g. '0vw', '-0.5vw', '1vw')
-  const EARTH_IMAGE_OFFSET_Y_MOBILE = '0vw';          // EDITABLE Mobile: Vertical position in vw (positive = DOWN, negative = UP)
-
-  const EARTH_IMAGE_OFFSET_X_DESKTOP = '0vw';         // EDITABLE Desktop: Horizontal position in vw (positive = RIGHT, negative = LEFT; e.g. '0vw', '0.5vw', '-1vw')
-  const EARTH_IMAGE_OFFSET_X_MOBILE = '0vw';          // EDITABLE Mobile: Horizontal position in vw (positive = RIGHT, negative = LEFT)
+  // Note: EARTH_IMAGE_INNER_SCALE, EARTH_IMAGE_OFFSET_Y, and EARTH_IMAGE_OFFSET_X
+  // are all configured above under the Celestial Row Config section (JCV)
 
   // Compatibility aliases
   const EARTH_IMAGE_WIDTH = EARTH_IMAGE_WIDTH_DESKTOP;
@@ -7551,16 +7574,29 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const EARTH_IMAGE_BLUR_DESKTOP = '0.8px';        // EDITABLE Desktop: Subpixel blur
   const EARTH_IMAGE_BLUR_MOBILE = '0.5px';         // EDITABLE Mobile: Subpixel blur on mobile
 
+  function isAutoCelestialDimension(val) {
+    if (!val) return true;
+    const s = String(val).trim().toLowerCase();
+    return s === 'auto' || s.startsWith('aut');
+  }
+
+  function formatCelestialDimension(val) {
+    if (val === undefined || val === null) return 'auto';
+    const s = String(val).trim();
+    if (/^-?\d+(\.\d+)?$/.test(s)) return `${s}vw`;
+    return s;
+  }
+
   function applyEarthImageConfig() {
     const isMobile = window.innerWidth <= 767;
-    const isAutoWidthDesktop = !EARTH_IMAGE_WIDTH_DESKTOP || EARTH_IMAGE_WIDTH_DESKTOP === 'auto';
-    const isAutoWidthMobile = !EARTH_IMAGE_WIDTH_MOBILE || EARTH_IMAGE_WIDTH_MOBILE === 'auto';
+    const isAutoWidthDesktop = isAutoCelestialDimension(EARTH_IMAGE_WIDTH_DESKTOP);
+    const isAutoWidthMobile = isAutoCelestialDimension(EARTH_IMAGE_WIDTH_MOBILE);
     const earthWidthDesktop = isAutoWidthDesktop
-      ? 'calc(var(--celestial-base-circle-size-desktop) * var(--earth-globe-scale-desktop, 1.0))'
-      : EARTH_IMAGE_WIDTH_DESKTOP;
+      ? `calc(var(--celestial-base-circle-size-desktop) * var(--earth-globe-scale-desktop, ${EARTH_GLOBE_SCALE_DESKTOP}))`
+      : formatCelestialDimension(EARTH_IMAGE_WIDTH_DESKTOP);
     const earthWidthMobile = isAutoWidthMobile
-      ? 'calc(var(--celestial-base-circle-size-mobile) * var(--earth-globe-scale-mobile, 1.0))'
-      : EARTH_IMAGE_WIDTH_MOBILE;
+      ? `calc(var(--celestial-base-circle-size-mobile) * var(--earth-globe-scale-mobile, ${EARTH_GLOBE_SCALE_MOBILE}))`
+      : formatCelestialDimension(EARTH_IMAGE_WIDTH_MOBILE);
     const earthWidthActive = isMobile ? earthWidthMobile : earthWidthDesktop;
 
     const marginTop = isMobile ? EARTH_IMAGE_MARGIN_TOP_MOBILE : EARTH_IMAGE_MARGIN_TOP_DESKTOP;
@@ -7568,11 +7604,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const blur = isMobile ? EARTH_IMAGE_BLUR_MOBILE : EARTH_IMAGE_BLUR_DESKTOP;
     const crossfadeMs = isMobile ? EARTH_ANIMATION_CROSSFADE_MS_MOBILE : EARTH_ANIMATION_CROSSFADE_MS_DESKTOP;
 
-    const isAutoInnerDesktop = !EARTH_IMAGE_INNER_SCALE_DESKTOP || EARTH_IMAGE_INNER_SCALE_DESKTOP === 'auto';
-    const isAutoInnerMobile = !EARTH_IMAGE_INNER_SCALE_MOBILE || EARTH_IMAGE_INNER_SCALE_MOBILE === 'auto';
+    const isAutoInnerDesktop = isAutoCelestialDimension(EARTH_IMAGE_INNER_SCALE_DESKTOP);
+    const isAutoInnerMobile = isAutoCelestialDimension(EARTH_IMAGE_INNER_SCALE_MOBILE);
+    const innerScaleDesktop = isAutoInnerDesktop ? 'var(--earth-image-width-desktop)' : formatCelestialDimension(EARTH_IMAGE_INNER_SCALE_DESKTOP);
+    const innerScaleMobile = isAutoInnerMobile ? 'var(--earth-image-width-mobile)' : formatCelestialDimension(EARTH_IMAGE_INNER_SCALE_MOBILE);
     const innerScale = (isMobile ? isAutoInnerMobile : isAutoInnerDesktop)
       ? 'var(--earth-image-width)'
-      : (isMobile ? EARTH_IMAGE_INNER_SCALE_MOBILE : EARTH_IMAGE_INNER_SCALE_DESKTOP);
+      : (isMobile ? innerScaleMobile : innerScaleDesktop);
 
     const offsetY = isMobile ? EARTH_IMAGE_OFFSET_Y_MOBILE : EARTH_IMAGE_OFFSET_Y_DESKTOP;
     const offsetX = isMobile ? EARTH_IMAGE_OFFSET_X_MOBILE : EARTH_IMAGE_OFFSET_X_DESKTOP;
@@ -7589,8 +7627,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--earth-image-margin-bottom-mobile', EARTH_IMAGE_MARGIN_BOTTOM_MOBILE);
     document.documentElement.style.setProperty('--earth-image-margin-bottom', marginBottom);
 
-    document.documentElement.style.setProperty('--earth-image-inner-scale-desktop', isAutoInnerDesktop ? 'var(--earth-image-width-desktop)' : EARTH_IMAGE_INNER_SCALE_DESKTOP);
-    document.documentElement.style.setProperty('--earth-image-inner-scale-mobile', isAutoInnerMobile ? 'var(--earth-image-width-mobile)' : EARTH_IMAGE_INNER_SCALE_MOBILE);
+    document.documentElement.style.setProperty('--earth-image-inner-scale-desktop', innerScaleDesktop);
+    document.documentElement.style.setProperty('--earth-image-inner-scale-mobile', innerScaleMobile);
     document.documentElement.style.setProperty('--earth-image-inner-scale', innerScale);
 
     document.documentElement.style.setProperty('--earth-image-offset-y-desktop', EARTH_IMAGE_OFFSET_Y_DESKTOP);
@@ -7646,6 +7684,15 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--celestial-row-margin-bottom-mobile', CELESTIAL_ROW_MARGIN_BOTTOM_MOBILE);
     document.documentElement.style.setProperty('--celestial-row-margin-bottom', isMobile ? CELESTIAL_ROW_MARGIN_BOTTOM_MOBILE : CELESTIAL_ROW_MARGIN_BOTTOM_DESKTOP);
 
+    // Edge gaps establishing the 95% alignment directly under timezone clocks #1 & #5 (JCV)
+    document.documentElement.style.setProperty('--celestial-row-edge-gap-left-desktop', CELESTIAL_ROW_EDGE_GAP_LEFT_DESKTOP);
+    document.documentElement.style.setProperty('--celestial-row-edge-gap-left-mobile', CELESTIAL_ROW_EDGE_GAP_LEFT_MOBILE);
+    document.documentElement.style.setProperty('--celestial-row-edge-gap-left', isMobile ? CELESTIAL_ROW_EDGE_GAP_LEFT_MOBILE : CELESTIAL_ROW_EDGE_GAP_LEFT_DESKTOP);
+
+    document.documentElement.style.setProperty('--celestial-row-edge-gap-right-desktop', CELESTIAL_ROW_EDGE_GAP_RIGHT_DESKTOP);
+    document.documentElement.style.setProperty('--celestial-row-edge-gap-right-mobile', CELESTIAL_ROW_EDGE_GAP_RIGHT_MOBILE);
+    document.documentElement.style.setProperty('--celestial-row-edge-gap-right', isMobile ? CELESTIAL_ROW_EDGE_GAP_RIGHT_MOBILE : CELESTIAL_ROW_EDGE_GAP_RIGHT_DESKTOP);
+
     // Gaps between all 4 objects across the row (JCV)
     document.documentElement.style.setProperty('--gap-pacific-to-sun-desktop', GAP_PACIFIC_TO_SUN_DESKTOP);
     document.documentElement.style.setProperty('--gap-pacific-to-sun-mobile', GAP_PACIFIC_TO_SUN_MOBILE);
@@ -7669,12 +7716,19 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--earth-gap-left-mobile', EARTH_GAP_LEFT_MOBILE);
     document.documentElement.style.setProperty('--earth-gap-left', isMobile ? EARTH_GAP_LEFT_MOBILE : EARTH_GAP_LEFT_DESKTOP);
 
-    document.documentElement.style.setProperty('--gap-earth-to-uk-desktop', GAP_EARTH_TO_UK_DESKTOP);
-    document.documentElement.style.setProperty('--gap-earth-to-uk-mobile', GAP_EARTH_TO_UK_MOBILE);
-    document.documentElement.style.setProperty('--gap-earth-to-uk', isMobile ? GAP_EARTH_TO_UK_MOBILE : GAP_EARTH_TO_UK_DESKTOP);
-    document.documentElement.style.setProperty('--earth-gap-right-desktop', EARTH_GAP_RIGHT_DESKTOP);
-    document.documentElement.style.setProperty('--earth-gap-right-mobile', EARTH_GAP_RIGHT_MOBILE);
-    document.documentElement.style.setProperty('--earth-gap-right', isMobile ? EARTH_GAP_RIGHT_MOBILE : EARTH_GAP_RIGHT_DESKTOP);
+    const earthToUkDesktop = (GAP_EARTH_TO_UK_DESKTOP !== '0vw' && EARTH_GAP_RIGHT_DESKTOP !== '0vw' && GAP_EARTH_TO_UK_DESKTOP !== EARTH_GAP_RIGHT_DESKTOP)
+      ? `calc(${GAP_EARTH_TO_UK_DESKTOP} + ${EARTH_GAP_RIGHT_DESKTOP})`
+      : (GAP_EARTH_TO_UK_DESKTOP !== '0vw' ? GAP_EARTH_TO_UK_DESKTOP : EARTH_GAP_RIGHT_DESKTOP);
+    const earthToUkMobile = (GAP_EARTH_TO_UK_MOBILE !== '0vw' && EARTH_GAP_RIGHT_MOBILE !== '0vw' && GAP_EARTH_TO_UK_MOBILE !== EARTH_GAP_RIGHT_MOBILE)
+      ? `calc(${GAP_EARTH_TO_UK_MOBILE} + ${EARTH_GAP_RIGHT_MOBILE})`
+      : (GAP_EARTH_TO_UK_MOBILE !== '0vw' ? GAP_EARTH_TO_UK_MOBILE : EARTH_GAP_RIGHT_MOBILE);
+
+    document.documentElement.style.setProperty('--gap-earth-to-uk-desktop', earthToUkDesktop);
+    document.documentElement.style.setProperty('--gap-earth-to-uk-mobile', earthToUkMobile);
+    document.documentElement.style.setProperty('--gap-earth-to-uk', isMobile ? earthToUkMobile : earthToUkDesktop);
+    document.documentElement.style.setProperty('--earth-gap-right-desktop', earthToUkDesktop);
+    document.documentElement.style.setProperty('--earth-gap-right-mobile', earthToUkMobile);
+    document.documentElement.style.setProperty('--earth-gap-right', isMobile ? earthToUkMobile : earthToUkDesktop);
 
     document.documentElement.style.setProperty('--celestial-dial-right-gap-left-desktop', CELESTIAL_DIAL_RIGHT_GAP_LEFT_DESKTOP);
     document.documentElement.style.setProperty('--celestial-dial-right-gap-left-mobile', CELESTIAL_DIAL_RIGHT_GAP_LEFT_MOBILE);
@@ -7691,87 +7745,90 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--sun-size-scale', String(isMobile ? SUN_SIZE_SCALE_MOBILE : SUN_SIZE_SCALE_DESKTOP));
     document.documentElement.style.setProperty('--sun-corona-scale', String(isMobile ? SUN_SIZE_SCALE_MOBILE : SUN_SIZE_SCALE_DESKTOP));
 
+    document.documentElement.style.setProperty('--earth-size-scale-desktop', String(EARTH_SIZE_SCALE_DESKTOP));
+    document.documentElement.style.setProperty('--earth-size-scale-mobile', String(EARTH_SIZE_SCALE_MOBILE));
+    document.documentElement.style.setProperty('--earth-size-scale', String(isMobile ? EARTH_SIZE_SCALE_MOBILE : EARTH_SIZE_SCALE_DESKTOP));
     document.documentElement.style.setProperty('--earth-globe-scale-desktop', String(EARTH_GLOBE_SCALE_DESKTOP));
     document.documentElement.style.setProperty('--earth-globe-scale-mobile', String(EARTH_GLOBE_SCALE_MOBILE));
     document.documentElement.style.setProperty('--earth-globe-scale', String(isMobile ? EARTH_GLOBE_SCALE_MOBILE : EARTH_GLOBE_SCALE_DESKTOP));
 
     // Base circle diameter calculated from remaining space in row:
     // W_rem = Row_Width - (2 * Dial_Size) - Total_Gaps
-    // Since Sun = scale * Base and Earth = 1.0 * Base, W_rem = (1 + scale) * Base
-    const totalGapsDesktop = 'calc(var(--celestial-dial-left-gap-right-desktop, 2vw) + var(--sun-gap-left-desktop, 0vw) + var(--sun-gap-right-desktop, 2vw) + var(--earth-gap-left-desktop, 0vw) + var(--earth-gap-right-desktop, 2vw) + var(--celestial-dial-right-gap-left-desktop, 0vw))';
-    const totalGapsMobile = 'calc(var(--celestial-dial-left-gap-right-mobile, 1.875vw) + var(--sun-gap-left-mobile, 0vw) + var(--sun-gap-right-mobile, 1.875vw) + var(--earth-gap-left-mobile, 0vw) + var(--earth-gap-right-mobile, 1.875vw) + var(--celestial-dial-right-gap-left-mobile, 0vw))';
+    // Since Sun = sunScale * Base and Earth = earthScale * Base, W_rem = (sunScale + earthScale) * Base
+    const totalGapsDesktop = 'calc(var(--celestial-row-edge-gap-left-desktop, 0vw) + var(--celestial-dial-left-gap-right-desktop, 0vw) + var(--sun-gap-left-desktop, 0vw) + var(--earth-gap-left-desktop, 0vw) + var(--earth-gap-right-desktop, 0vw) + var(--celestial-dial-right-gap-left-desktop, 0vw) + var(--celestial-row-edge-gap-right-desktop, 0vw))';
+    const totalGapsMobile = 'calc(var(--celestial-row-edge-gap-left-mobile, 0vw) + var(--celestial-dial-left-gap-right-mobile, 0vw) + var(--sun-gap-left-mobile, 0vw) + var(--earth-gap-left-mobile, 0vw) + var(--earth-gap-right-mobile, 0vw) + var(--celestial-dial-right-gap-left-mobile, 0vw) + var(--celestial-row-edge-gap-right-mobile, 0vw))';
 
-    const baseCircleDesktop = `calc((var(--world-clocks-width-desktop, 95vw) - (2 * var(--world-clock-size-desktop, 17.4vw)) - (${totalGapsDesktop})) / (1 + ${SUN_SIZE_SCALE_DESKTOP}))`;
-    const baseCircleMobile = `calc((var(--world-clocks-width-mobile, 95vw) - (2 * var(--world-clock-size-mobile, 17.5vw)) - (${totalGapsMobile})) / (1 + ${SUN_SIZE_SCALE_MOBILE}))`;
+    const baseCircleDesktop = `calc((var(--world-clocks-width-desktop, 95vw) - (2 * var(--world-clock-size-desktop, 17.4vw)) - (${totalGapsDesktop})) / (${SUN_SIZE_SCALE_DESKTOP} + ${EARTH_SIZE_SCALE_DESKTOP}))`;
+    const baseCircleMobile = `calc((var(--world-clocks-width-mobile, 95vw) - (2 * var(--world-clock-size-mobile, 17.5vw)) - (${totalGapsMobile})) / (${SUN_SIZE_SCALE_MOBILE} + ${EARTH_SIZE_SCALE_MOBILE}))`;
     const baseCircleActive = isMobile ? baseCircleMobile : baseCircleDesktop;
 
     document.documentElement.style.setProperty('--celestial-base-circle-size-desktop', baseCircleDesktop);
     document.documentElement.style.setProperty('--celestial-base-circle-size-mobile', baseCircleMobile);
     document.documentElement.style.setProperty('--celestial-base-circle-size', baseCircleActive);
 
-    // Sun circle width (150% size by default via SUN_SIZE_SCALE or custom vw string)
-    const isSunWidthAutoDesktop = !SUN_IMAGE_WIDTH_DESKTOP || SUN_IMAGE_WIDTH_DESKTOP === 'auto';
-    const isSunWidthAutoMobile = !SUN_IMAGE_WIDTH_MOBILE || SUN_IMAGE_WIDTH_MOBILE === 'auto';
+    // Sun circle width (scaled relative to world clock size via SUN_SIZE_SCALE or custom vw string)
+    const isSunWidthAutoDesktop = isAutoCelestialDimension(SUN_IMAGE_WIDTH_DESKTOP);
+    const isSunWidthAutoMobile = isAutoCelestialDimension(SUN_IMAGE_WIDTH_MOBILE);
     const sunWidthDesktop = isSunWidthAutoDesktop
-      ? `calc(var(--celestial-base-circle-size-desktop) * var(--sun-size-scale-desktop, ${SUN_SIZE_SCALE_DESKTOP}))`
-      : SUN_IMAGE_WIDTH_DESKTOP;
+      ? `calc(var(--world-clock-size-desktop, 17.4vw) * var(--sun-size-scale-desktop, ${SUN_SIZE_SCALE_DESKTOP}))`
+      : formatCelestialDimension(SUN_IMAGE_WIDTH_DESKTOP);
     const sunWidthMobile = isSunWidthAutoMobile
-      ? `calc(var(--celestial-base-circle-size-mobile) * var(--sun-size-scale-mobile, ${SUN_SIZE_SCALE_MOBILE}))`
-      : SUN_IMAGE_WIDTH_MOBILE;
+      ? `calc(var(--world-clock-size-mobile, 17.5vw) * var(--sun-size-scale-mobile, ${SUN_SIZE_SCALE_MOBILE}))`
+      : formatCelestialDimension(SUN_IMAGE_WIDTH_MOBILE);
     const sunWidthActive = (isMobile ? isSunWidthAutoMobile : isSunWidthAutoDesktop)
-      ? `calc(var(--celestial-base-circle-size) * var(--sun-size-scale, ${isMobile ? SUN_SIZE_SCALE_MOBILE : SUN_SIZE_SCALE_DESKTOP}))`
-      : (isMobile ? SUN_IMAGE_WIDTH_MOBILE : SUN_IMAGE_WIDTH_DESKTOP);
+      ? `calc(var(--world-clock-size, 17.4vw) * var(--sun-size-scale, ${isMobile ? SUN_SIZE_SCALE_MOBILE : SUN_SIZE_SCALE_DESKTOP}))`
+      : (isMobile ? formatCelestialDimension(SUN_IMAGE_WIDTH_MOBILE) : formatCelestialDimension(SUN_IMAGE_WIDTH_DESKTOP));
 
     document.documentElement.style.setProperty('--sun-image-width-desktop', sunWidthDesktop);
     document.documentElement.style.setProperty('--sun-image-width-mobile', sunWidthMobile);
     document.documentElement.style.setProperty('--sun-image-width', sunWidthActive);
 
-    // Earth circle width (100% size by default via EARTH_GLOBE_SCALE or custom vw string)
-    const isEarthWidthAutoDesktop = !EARTH_IMAGE_WIDTH_DESKTOP || EARTH_IMAGE_WIDTH_DESKTOP === 'auto';
-    const isEarthWidthAutoMobile = !EARTH_IMAGE_WIDTH_MOBILE || EARTH_IMAGE_WIDTH_MOBILE === 'auto';
+    // Earth circle width (scaled relative to world clock size via EARTH_GLOBE_SCALE or custom vw string)
+    const isEarthWidthAutoDesktop = isAutoCelestialDimension(EARTH_IMAGE_WIDTH_DESKTOP);
+    const isEarthWidthAutoMobile = isAutoCelestialDimension(EARTH_IMAGE_WIDTH_MOBILE);
     const earthWidthDesktop = isEarthWidthAutoDesktop
-      ? `calc(var(--celestial-base-circle-size-desktop) * var(--earth-globe-scale-desktop, ${EARTH_GLOBE_SCALE_DESKTOP}))`
-      : EARTH_IMAGE_WIDTH_DESKTOP;
+      ? `calc(var(--world-clock-size-desktop, 17.4vw) * var(--earth-globe-scale-desktop, ${EARTH_GLOBE_SCALE_DESKTOP}))`
+      : formatCelestialDimension(EARTH_IMAGE_WIDTH_DESKTOP);
     const earthWidthMobile = isEarthWidthAutoMobile
-      ? `calc(var(--celestial-base-circle-size-mobile) * var(--earth-globe-scale-mobile, ${EARTH_GLOBE_SCALE_MOBILE}))`
-      : EARTH_IMAGE_WIDTH_MOBILE;
+      ? `calc(var(--world-clock-size-mobile, 17.5vw) * var(--earth-globe-scale-mobile, ${EARTH_GLOBE_SCALE_MOBILE}))`
+      : formatCelestialDimension(EARTH_IMAGE_WIDTH_MOBILE);
     const earthWidthActive = (isMobile ? isEarthWidthAutoMobile : isEarthWidthAutoDesktop)
-      ? `calc(var(--celestial-base-circle-size) * var(--earth-globe-scale, ${isMobile ? EARTH_GLOBE_SCALE_MOBILE : EARTH_GLOBE_SCALE_DESKTOP}))`
-      : (isMobile ? EARTH_IMAGE_WIDTH_MOBILE : EARTH_IMAGE_WIDTH_DESKTOP);
+      ? `calc(var(--world-clock-size, 17.4vw) * var(--earth-globe-scale, ${isMobile ? EARTH_GLOBE_SCALE_MOBILE : EARTH_GLOBE_SCALE_DESKTOP}))`
+      : (isMobile ? formatCelestialDimension(EARTH_IMAGE_WIDTH_MOBILE) : formatCelestialDimension(EARTH_IMAGE_WIDTH_DESKTOP));
 
     document.documentElement.style.setProperty('--earth-image-width-desktop', earthWidthDesktop);
     document.documentElement.style.setProperty('--earth-image-width-mobile', earthWidthMobile);
     document.documentElement.style.setProperty('--earth-image-width', earthWidthActive);
 
     // Sun Inner Scale (1.08 of Sun width pushes watermark outside circle)
-    const isSunInnerAutoDesktop = !SUN_IMAGE_INNER_SCALE_DESKTOP || SUN_IMAGE_INNER_SCALE_DESKTOP === 'auto';
-    const isSunInnerAutoMobile = !SUN_IMAGE_INNER_SCALE_MOBILE || SUN_IMAGE_INNER_SCALE_MOBILE === 'auto';
+    const isSunInnerAutoDesktop = isAutoCelestialDimension(SUN_IMAGE_INNER_SCALE_DESKTOP);
+    const isSunInnerAutoMobile = isAutoCelestialDimension(SUN_IMAGE_INNER_SCALE_MOBILE);
     const sunInnerDesktop = isSunInnerAutoDesktop
       ? 'calc(var(--sun-image-width-desktop) * 1.08)'
-      : SUN_IMAGE_INNER_SCALE_DESKTOP;
+      : formatCelestialDimension(SUN_IMAGE_INNER_SCALE_DESKTOP);
     const sunInnerMobile = isSunInnerAutoMobile
       ? 'calc(var(--sun-image-width-mobile) * 1.08)'
-      : SUN_IMAGE_INNER_SCALE_MOBILE;
+      : formatCelestialDimension(SUN_IMAGE_INNER_SCALE_MOBILE);
     const sunInnerActive = (isMobile ? isSunInnerAutoMobile : isSunInnerAutoDesktop)
       ? 'calc(var(--sun-image-width) * 1.08)'
-      : (isMobile ? SUN_IMAGE_INNER_SCALE_MOBILE : SUN_IMAGE_INNER_SCALE_DESKTOP);
+      : (isMobile ? sunInnerMobile : sunInnerDesktop);
 
     document.documentElement.style.setProperty('--sun-image-inner-scale-desktop', sunInnerDesktop);
     document.documentElement.style.setProperty('--sun-image-inner-scale-mobile', sunInnerMobile);
     document.documentElement.style.setProperty('--sun-image-inner-scale', sunInnerActive);
 
     // Earth Inner Scale
-    const isEarthInnerAutoDesktop = !EARTH_IMAGE_INNER_SCALE_DESKTOP || EARTH_IMAGE_INNER_SCALE_DESKTOP === 'auto';
-    const isEarthInnerAutoMobile = !EARTH_IMAGE_INNER_SCALE_MOBILE || EARTH_IMAGE_INNER_SCALE_MOBILE === 'auto';
+    const isEarthInnerAutoDesktop = isAutoCelestialDimension(EARTH_IMAGE_INNER_SCALE_DESKTOP);
+    const isEarthInnerAutoMobile = isAutoCelestialDimension(EARTH_IMAGE_INNER_SCALE_MOBILE);
     const earthInnerDesktop = isEarthInnerAutoDesktop
       ? 'var(--earth-image-width-desktop)'
-      : EARTH_IMAGE_INNER_SCALE_DESKTOP;
+      : formatCelestialDimension(EARTH_IMAGE_INNER_SCALE_DESKTOP);
     const earthInnerMobile = isEarthInnerAutoMobile
       ? 'var(--earth-image-width-mobile)'
-      : EARTH_IMAGE_INNER_SCALE_MOBILE;
+      : formatCelestialDimension(EARTH_IMAGE_INNER_SCALE_MOBILE);
     const earthInnerActive = (isMobile ? isEarthInnerAutoMobile : isEarthInnerAutoDesktop)
       ? 'var(--earth-image-width)'
-      : (isMobile ? EARTH_IMAGE_INNER_SCALE_MOBILE : EARTH_IMAGE_INNER_SCALE_DESKTOP);
+      : (isMobile ? earthInnerMobile : earthInnerDesktop);
 
     document.documentElement.style.setProperty('--earth-image-inner-scale-desktop', earthInnerDesktop);
     document.documentElement.style.setProperty('--earth-image-inner-scale-mobile', earthInnerMobile);
@@ -12284,7 +12341,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       mainWrapper.className = 'suns-row-wrapper';
       mainWrapper.style.display = 'flex';
       mainWrapper.style.flexDirection = 'row';
-      mainWrapper.style.justifyContent = 'center';
+      mainWrapper.style.justifyContent = 'flex-start';
       mainWrapper.style.alignItems = 'flex-start';
       mainWrapper.style.width = 'var(--world-clocks-width, 95vw)';
       mainWrapper.style.gap = '0'; // Controlled individually via left and right gap margins on all 4 objects

@@ -2196,7 +2196,7 @@ main {
 .suns-row-wrapper {
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: flex-start;
     width: var(--world-clocks-width, 95vw);
     max-width: var(--world-clocks-width, 95vw);
@@ -2209,23 +2209,29 @@ main {
     box-sizing: border-box;
 }
 
-// 4-Object Gaps & Offsets (JCV)
+// 4-Object Gaps & Lateral Edge Offsets (JCV)
 #celestial-clock-left {
-    margin-right: var(--gap-pacific-to-sun, var(--celestial-dial-left-gap-right, 2vw));
+    margin-left: var(--celestial-row-edge-gap-left, 0vw);
+    margin-right: var(--gap-pacific-to-sun, var(--celestial-dial-left-gap-right, 0vw));
+    flex-shrink: 0;
 }
 
 #sun-col-left {
     margin-left: var(--sun-gap-left, 0vw);
-    margin-right: var(--gap-sun-to-earth, var(--sun-gap-right, 2vw));
+    margin-right: var(--gap-sun-to-earth, auto);
+    flex-shrink: 0;
 }
 
 #sun-col-right {
     margin-left: var(--earth-gap-left, 0vw);
-    margin-right: var(--gap-earth-to-uk, var(--earth-gap-right, 2vw));
+    margin-right: var(--gap-earth-to-uk, var(--earth-gap-right, 0vw));
+    flex-shrink: 0;
 }
 
 #celestial-clock-right {
     margin-left: var(--celestial-dial-right-gap-left, 0vw);
+    margin-right: var(--celestial-row-edge-gap-right, 0vw);
+    flex-shrink: 0;
 }
 
 .celestial-duo-subwrapper {
