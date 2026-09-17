@@ -7280,16 +7280,22 @@ Plan ahead for significantly warmer conditions tomorrow!`
   window.addEventListener('resize', applySunImageConfig);
 
   // ==========================================
-  // ==========================================
   // --- EDITABLE: World Clocks Row Config (JCV) ---
   // ==========================================
   const WORLD_CLOCKS_ENABLED = true;                         // EDITABLE: Enable/disable 5-clock world time row (Pacific, Mountain, Central, Eastern, UK)
-  const WORLD_CLOCKS_WIDTH_DESKTOP = '90vw';                 // EDITABLE Desktop: Row container width centered across 90vw
-  const WORLD_CLOCKS_WIDTH_MOBILE = '90vw';                  // EDITABLE Mobile: Row container width centered across 90vw
-  const WORLD_CLOCK_SIZE_DESKTOP = '15.68vw';                // EDITABLE Desktop: Dial diameter for each clock (scaled proportionally across 90vw)
-  const WORLD_CLOCK_SIZE_MOBILE = '16.5vw';                  // EDITABLE Mobile: Dial diameter for each clock (scaled proportionally across 90vw)
-  const WORLD_CLOCKS_GAP_DESKTOP = '2.9vw';                  // EDITABLE Desktop: Spacing between each clock column (scaled proportionally across 90vw)
-  const WORLD_CLOCKS_GAP_MOBILE = '1.875vw';                 // EDITABLE Mobile: Spacing between each clock column (scaled proportionally across 90vw)
+
+  // --- Primary Row Geometry Controls (JCV) ---
+  // The dials automatically become bigger or smaller as a group on their own from these two settings:
+  // Dial Diameter = (Row Width - (4 * Gap)) / 5
+  const WORLD_CLOCKS_WIDTH_DESKTOP = '90vw';                 // EDITABLE Desktop: Row container width centered across viewport
+  const WORLD_CLOCKS_WIDTH_MOBILE = '90vw';                  // EDITABLE Mobile: Row container width centered across viewport
+  const WORLD_CLOCKS_GAP_DESKTOP = '2.9vw';                  // EDITABLE Desktop: Spacing between each clock column
+  const WORLD_CLOCKS_GAP_MOBILE = '1.875vw';                 // EDITABLE Mobile: Spacing between each clock column
+
+  // Optional manual dial size override ('auto' computes dynamic diameter from Row Width & Gap)
+  const WORLD_CLOCK_SIZE_DESKTOP = 'auto';                   // EDITABLE Desktop: 'auto' (dials scale on their own from width & gap) or custom string (e.g. '15.68vw')
+  const WORLD_CLOCK_SIZE_MOBILE = 'auto';                    // EDITABLE Mobile: 'auto' (dials scale on their own from width & gap) or custom string (e.g. '16.5vw')
+
   const WORLD_CLOCKS_MARGIN_TOP_DESKTOP = '-5vw';           // EDITABLE Desktop: Margin above the clocks row
   const WORLD_CLOCKS_MARGIN_TOP_MOBILE = '-5.0vw';            // EDITABLE Mobile: Margin above the clocks row
   const WORLD_CLOCKS_MARGIN_BOTTOM_DESKTOP = '-1vw';        // EDITABLE Desktop: Margin below the clocks row
@@ -7322,33 +7328,33 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const WORLD_CLOCK_LABEL_SPACES = 2;                        // EDITABLE: Number of typographic spaces if used in single row
   const WORLD_CLOCK_LABEL_GAP_DESKTOP = '0vw';               // EDITABLE Desktop: Extra spacing when in row layout
   const WORLD_CLOCK_LABEL_GAP_MOBILE = '0vw';                // EDITABLE Mobile: Extra spacing when in row layout
-  const WORLD_CLOCK_LABEL_LINE_GAP_DESKTOP = '0.23vw';       // EDITABLE Desktop: Vertical space between zone name and actual time (scaled proportionally across 90vw)
-  const WORLD_CLOCK_LABEL_LINE_GAP_MOBILE = '0.31vw';        // EDITABLE Mobile: Vertical space between zone name and actual time (scaled proportionally across 90vw)
-  const WORLD_CLOCK_LABEL_MARGIN_TOP_DESKTOP = '0.93vw';      // EDITABLE Desktop: Margin above label (scaled proportionally across 90vw)
-  const WORLD_CLOCK_LABEL_MARGIN_TOP_MOBILE = '1.03vw';       // EDITABLE Mobile: Margin above label (scaled proportionally across 90vw)
+  const WORLD_CLOCK_LABEL_LINE_GAP_DESKTOP = 'calc(var(--world-clock-size) * 0.015)'; // EDITABLE Desktop: Vertical space between zone name and actual time (scales with dial)
+  const WORLD_CLOCK_LABEL_LINE_GAP_MOBILE = 'calc(var(--world-clock-size) * 0.019)';  // EDITABLE Mobile: Vertical space between zone name and actual time (scales with dial)
+  const WORLD_CLOCK_LABEL_MARGIN_TOP_DESKTOP = 'calc(var(--world-clock-size) * 0.06)'; // EDITABLE Desktop: Margin above label (scales with dial)
+  const WORLD_CLOCK_LABEL_MARGIN_TOP_MOBILE = 'calc(var(--world-clock-size) * 0.062)'; // EDITABLE Mobile: Margin above label (scales with dial)
 
-  // Line 1: Zone Name ("where" - scaled proportionally across 90vw)
-  const WORLD_CLOCK_NAME_FONT_SIZE_DESKTOP = '2.03vw';       // EDITABLE Desktop: Zone name (where) font size (scaled proportionally across 90vw)
-  const WORLD_CLOCK_NAME_FONT_SIZE_MOBILE = '2.38vw';        // EDITABLE Mobile: Zone name (where) font size (scaled proportionally across 90vw)
+  // Line 1: Zone Name ("where" - scales proportionally with dials)
+  const WORLD_CLOCK_NAME_FONT_SIZE_DESKTOP = 'calc(var(--world-clock-size) * 0.13)';  // EDITABLE Desktop: Zone name (where) font size
+  const WORLD_CLOCK_NAME_FONT_SIZE_MOBILE = 'calc(var(--world-clock-size) * 0.144)';  // EDITABLE Mobile: Zone name (where) font size
   const WORLD_CLOCK_NAME_FONT_FAMILY_DESKTOP = "'light', sans-serif"; // EDITABLE Desktop: Zone name font family
   const WORLD_CLOCK_NAME_FONT_FAMILY_MOBILE = "'light', sans-serif";  // EDITABLE Mobile: Zone name font family
   const WORLD_CLOCK_NAME_COLOR_DESKTOP = '#ffffff';          // EDITABLE Desktop: Zone name color
   const WORLD_CLOCK_NAME_COLOR_MOBILE = '#ffffff';           // EDITABLE Mobile: Zone name color
   const WORLD_CLOCK_NAME_OPACITY_DESKTOP = 0.85;             // EDITABLE Desktop: Zone name opacity
   const WORLD_CLOCK_NAME_OPACITY_MOBILE = 0.85;              // EDITABLE Mobile: Zone name opacity
-  const WORLD_CLOCK_NAME_LETTER_SPACING_DESKTOP = '0.046vw'; // EDITABLE Desktop: Zone name letter spacing (scaled proportionally across 90vw)
+  const WORLD_CLOCK_NAME_LETTER_SPACING_DESKTOP = '0.046vw'; // EDITABLE Desktop: Zone name letter spacing
   const WORLD_CLOCK_NAME_LETTER_SPACING_MOBILE = '0.02vw';   // EDITABLE Mobile: Zone name letter spacing
 
-  // Line 2: Actual Time ("time" - scaled proportionally across 90vw)
-  const WORLD_CLOCK_TIME_FONT_SIZE_DESKTOP = '2.03vw';       // EDITABLE Desktop: Actual time font size (scaled proportionally across 90vw)
-  const WORLD_CLOCK_TIME_FONT_SIZE_MOBILE = '2.38vw';        // EDITABLE Mobile: Actual time font size (scaled proportionally across 90vw)
+  // Line 2: Actual Time ("time" - scales proportionally with dials)
+  const WORLD_CLOCK_TIME_FONT_SIZE_DESKTOP = 'calc(var(--world-clock-size) * 0.13)';  // EDITABLE Desktop: Actual time font size
+  const WORLD_CLOCK_TIME_FONT_SIZE_MOBILE = 'calc(var(--world-clock-size) * 0.144)';  // EDITABLE Mobile: Actual time font size
   const WORLD_CLOCK_TIME_FONT_FAMILY_DESKTOP = "'light', sans-serif"; // EDITABLE Desktop: Time font family
   const WORLD_CLOCK_TIME_FONT_FAMILY_MOBILE = "'light', sans-serif";  // EDITABLE Mobile: Time font family
   const WORLD_CLOCK_TIME_COLOR_DESKTOP = '#ffffff';          // EDITABLE Desktop: Time text color
   const WORLD_CLOCK_TIME_COLOR_MOBILE = '#ffffff';           // EDITABLE Mobile: Time text color
   const WORLD_CLOCK_TIME_OPACITY_DESKTOP = 0.85;             // EDITABLE Desktop: Time opacity
   const WORLD_CLOCK_TIME_OPACITY_MOBILE = 0.85;              // EDITABLE Mobile: Time opacity
-  const WORLD_CLOCK_TIME_LETTER_SPACING_DESKTOP = '0.046vw'; // EDITABLE Desktop: Time letter spacing (scaled proportionally across 90vw)
+  const WORLD_CLOCK_TIME_LETTER_SPACING_DESKTOP = '0.046vw'; // EDITABLE Desktop: Time letter spacing
   const WORLD_CLOCK_TIME_LETTER_SPACING_MOBILE = '0.02vw';   // EDITABLE Mobile: Time letter spacing
 
   // Legacy fallback references
@@ -7369,13 +7375,26 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--world-clocks-width-mobile', WORLD_CLOCKS_WIDTH_MOBILE);
     document.documentElement.style.setProperty('--world-clocks-width', isMobile ? WORLD_CLOCKS_WIDTH_MOBILE : WORLD_CLOCKS_WIDTH_DESKTOP);
 
-    document.documentElement.style.setProperty('--world-clock-size-desktop', WORLD_CLOCK_SIZE_DESKTOP);
-    document.documentElement.style.setProperty('--world-clock-size-mobile', WORLD_CLOCK_SIZE_MOBILE);
-    document.documentElement.style.setProperty('--world-clock-size', isMobile ? WORLD_CLOCK_SIZE_MOBILE : WORLD_CLOCK_SIZE_DESKTOP);
-
     document.documentElement.style.setProperty('--world-clocks-gap-desktop', WORLD_CLOCKS_GAP_DESKTOP);
     document.documentElement.style.setProperty('--world-clocks-gap-mobile', WORLD_CLOCKS_GAP_MOBILE);
     document.documentElement.style.setProperty('--world-clocks-gap', isMobile ? WORLD_CLOCKS_GAP_MOBILE : WORLD_CLOCKS_GAP_DESKTOP);
+
+    const isAutoDesktop = !WORLD_CLOCK_SIZE_DESKTOP || WORLD_CLOCK_SIZE_DESKTOP === 'auto';
+    const isAutoMobile = !WORLD_CLOCK_SIZE_MOBILE || WORLD_CLOCK_SIZE_MOBILE === 'auto';
+
+    const dialSizeDesktop = isAutoDesktop 
+      ? 'calc((var(--world-clocks-width-desktop, 90vw) - (4 * var(--world-clocks-gap-desktop, 2.9vw))) / 5)' 
+      : WORLD_CLOCK_SIZE_DESKTOP;
+    const dialSizeMobile = isAutoMobile 
+      ? 'calc((var(--world-clocks-width-mobile, 90vw) - (4 * var(--world-clocks-gap-mobile, 1.875vw))) / 5)' 
+      : WORLD_CLOCK_SIZE_MOBILE;
+    const dialSizeActive = (isMobile ? isAutoMobile : isAutoDesktop)
+      ? 'calc((var(--world-clocks-width) - (4 * var(--world-clocks-gap))) / 5)'
+      : (isMobile ? WORLD_CLOCK_SIZE_MOBILE : WORLD_CLOCK_SIZE_DESKTOP);
+
+    document.documentElement.style.setProperty('--world-clock-size-desktop', dialSizeDesktop);
+    document.documentElement.style.setProperty('--world-clock-size-mobile', dialSizeMobile);
+    document.documentElement.style.setProperty('--world-clock-size', dialSizeActive);
 
     document.documentElement.style.setProperty('--world-clocks-margin-top-desktop', WORLD_CLOCKS_MARGIN_TOP_DESKTOP);
     document.documentElement.style.setProperty('--world-clocks-margin-top-mobile', WORLD_CLOCKS_MARGIN_TOP_MOBILE);
