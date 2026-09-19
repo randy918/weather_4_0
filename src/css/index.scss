@@ -851,6 +851,7 @@ main {
     z-index: var(--lo-bar-z-index, 2);
     padding-top: var(--lo-bar-padding-top-desktop, 0.4vw);
     box-shadow: none; // Disable standard downward shadow
+    background-color: transparent !important; // Keeps parent container transparent so shadow sits Z-under the fill layer
 
     @media (max-width: 767px) {
         padding-top: var(--lo-bar-padding-top-mobile, 0.4vw);
@@ -866,10 +867,11 @@ main {
     }
 
     // EDITABLE: Upward multiply shadow cast from low bars onto the high bars beneath them
+    // Placed at z-index 1 (Z-under the cell fill layer at z-index 2)
     &::before {
         content: '';
         position: absolute;
-        top: 0;
+        top: var(--lo-temp-shadow-top-desktop, var(--lo-temp-shadow-top, 1.2vw));
         left: 0;
         right: 0;
         bottom: 0;
@@ -877,11 +879,31 @@ main {
         box-shadow: var(--lo-temp-shadow-desktop, 0 -0.8vw 1.5vw rgba(0, 0, 0, 0.8));
         mix-blend-mode: var(--lo-temp-shadow-blend-mode, multiply);
         pointer-events: none;
-        z-index: -1;
+        z-index: var(--lo-temp-shadow-z-index, 1);
 
         @media (max-width: 767px) {
+            top: var(--lo-temp-shadow-top-mobile, var(--lo-temp-shadow-top, 1.2vw));
             box-shadow: var(--lo-temp-shadow-mobile, 0 -1.2vw 2.0vw rgba(0, 0, 0, 0.8));
         }
+    }
+
+    // Solid cell fill layer: placed at z-index 2 (above shadow, below text)
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--lo-item-bg, transparent);
+        border-radius: inherit;
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    span {
+        position: relative;
+        z-index: 3;
     }
 }
 

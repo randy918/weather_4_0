@@ -139,6 +139,7 @@ import weatherConditions from '../data/weather-conditions.json';
     document.documentElement.style.setProperty('--rain-fade-top', isMobile ? RAIN_FADE_TOP_MOBILE : RAIN_FADE_TOP_DESKTOP);
     document.documentElement.style.setProperty('--rain-fade-bottom', isMobile ? RAIN_FADE_BOTTOM_MOBILE : RAIN_FADE_BOTTOM_DESKTOP);
     document.documentElement.style.setProperty('--rain-opacity', isMobile ? RAIN_OPACITY_MOBILE : RAIN_OPACITY_DESKTOP);
+    document.documentElement.style.setProperty('--lo-temp-shadow-top', isMobile ? LO_TEMP_SHADOW_TOP_OFFSET_MOBILE : LO_TEMP_SHADOW_TOP_OFFSET_DESKTOP);
   });
 
   // --- CONFIG: Snow Flake Animation ---
@@ -277,6 +278,9 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--lo-bar-padding-top-mobile', LO_BAR_PADDING_TOP_MOBILE);
 
   // --- CONFIG: Low Temp Bar Upward Shadow (8-day forecast) ---
+  // Lower the shadow pseudo-element into the low temp cell (Z-under) so rounded corners never reveal bright wedges
+  const LO_TEMP_SHADOW_TOP_OFFSET_DESKTOP = '1.2vw';    // EDITABLE Desktop: Top offset lowering shadow down under low cell (e.g. '1.0vw', '1.2vw', '1.5vw')
+  const LO_TEMP_SHADOW_TOP_OFFSET_MOBILE = '1.2vw';     // EDITABLE Mobile: Top offset lowering shadow down under low cell
   const LO_TEMP_SHADOW_OFFSET_Y_DESKTOP = '-3vw';     // EDITABLE Desktop: Upward vertical offset (negative is up)
   const LO_TEMP_SHADOW_OFFSET_Y_MOBILE = '-3.0vw';      // EDITABLE Mobile: Upward vertical offset (negative is up)
   const LO_TEMP_SHADOW_BLUR_DESKTOP = '1.2vw';          // EDITABLE Desktop: Shadow blur/spread size
@@ -284,14 +288,19 @@ import weatherConditions from '../data/weather-conditions.json';
   const LO_TEMP_SHADOW_OPACITY_DESKTOP = 0.2;          // EDITABLE Desktop: Shadow opacity (0.0 = clear, 1.0 = pitch black)
   const LO_TEMP_SHADOW_OPACITY_MOBILE = 0.2;           // EDITABLE Mobile: Shadow opacity (0.0 = clear, 1.0 = pitch black)
   const LO_TEMP_SHADOW_BLEND_MODE = 'multiply';         // EDITABLE: Blend mode for the upward shadow
+  const LO_TEMP_SHADOW_Z_INDEX = 1;                     // EDITABLE: Z-index of shadow pseudo-element (placed at z: 1, under cell fill layer at z: 2)
 
   // Construct shadow strings dynamically using the configurations above
   const loTempShadowDesktop = `0 ${LO_TEMP_SHADOW_OFFSET_Y_DESKTOP} ${LO_TEMP_SHADOW_BLUR_DESKTOP} 0 rgba(0, 0, 0, ${LO_TEMP_SHADOW_OPACITY_DESKTOP})`;
   const loTempShadowMobile = `0 ${LO_TEMP_SHADOW_OFFSET_Y_MOBILE} ${LO_TEMP_SHADOW_BLUR_MOBILE} 0 rgba(0, 0, 0, ${LO_TEMP_SHADOW_OPACITY_MOBILE})`;
 
+  document.documentElement.style.setProperty('--lo-temp-shadow-top-desktop', LO_TEMP_SHADOW_TOP_OFFSET_DESKTOP);
+  document.documentElement.style.setProperty('--lo-temp-shadow-top-mobile', LO_TEMP_SHADOW_TOP_OFFSET_MOBILE);
+  document.documentElement.style.setProperty('--lo-temp-shadow-top', window.innerWidth <= 767 ? LO_TEMP_SHADOW_TOP_OFFSET_MOBILE : LO_TEMP_SHADOW_TOP_OFFSET_DESKTOP);
   document.documentElement.style.setProperty('--lo-temp-shadow-desktop', loTempShadowDesktop);
   document.documentElement.style.setProperty('--lo-temp-shadow-mobile', loTempShadowMobile);
   document.documentElement.style.setProperty('--lo-temp-shadow-blend-mode', LO_TEMP_SHADOW_BLEND_MODE);
+  document.documentElement.style.setProperty('--lo-temp-shadow-z-index', String(LO_TEMP_SHADOW_Z_INDEX));
 
   // =========================================================================
   // --- CONFIG: 8-DAY GRID - Low Temp Reflection Gradient Tinges (JCV) ---
@@ -8649,7 +8658,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1210';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1215';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -15391,7 +15400,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
             const colorStyle = oldLoTemp >= 100 ? `style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: ${loTextZIndex};"` : `style="color: var(--theBrown); position: relative; z-index: ${loTextZIndex};"`;
             loItem.innerHTML = `<span ${colorStyle}>${oldLoTempDisplay}°</span>`;
           }
-          loItem.style.backgroundColor = tempToColor(oldLoTemp) || '';
+          const oldLoColor = tempToColor(oldLoTemp) || '';
+          loItem.style.backgroundColor = oldLoColor;
+          loItem.style.setProperty('--lo-item-bg', oldLoColor);
           loItem.style.opacity = '1';
 
           // Force reflow
@@ -15404,7 +15415,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
           // Step 2: After 800ms, update the temp text/colors and animate back UP to the new temperature
           setTimeout(() => {
-            loItem.style.backgroundColor = tempToColor(loTempF) || '';
+            const newLoColor = tempToColor(loTempF) || '';
+            loItem.style.backgroundColor = newLoColor;
+            loItem.style.setProperty('--lo-item-bg', newLoColor);
 
             if (displayUnit === 'BOTH') {
               const loTempC = Math.round((loTempF - 32) * 5 / 9);
@@ -15441,7 +15454,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
             const colorStyle = loTempF >= 100 ? `style="color: hsl(30, 100%, 50%) !important; position: relative; z-index: ${loTextZIndex};"` : `style="color: var(--theBrown); position: relative; z-index: ${loTextZIndex};"`;
             loItem.innerHTML = `<span ${colorStyle}>${loTempDisplay}°</span>`;
           }
-          loItem.style.backgroundColor = tempToColor(loTempF) || '';
+          const normalLoColor = tempToColor(loTempF) || '';
+          loItem.style.backgroundColor = normalLoColor;
+          loItem.style.setProperty('--lo-item-bg', normalLoColor);
           loItem.style.opacity = '1';
         }
       }
