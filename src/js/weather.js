@@ -678,8 +678,8 @@ import weatherConditions from '../data/weather-conditions.json';
   const SCROLL_TOP_BUTTON_ENABLED = true;                    // EDITABLE: Master toggle to enable/disable back-to-top button
 
   // EDITABLE: "APPEARS WHEN" scroll distance (in px) before button appears
-  const SCROLL_TOP_APPEARS_WHEN_DESKTOP = 350;               // EDITABLE Desktop: Pixels scrolled down before button appears
-  const SCROLL_TOP_APPEARS_WHEN_MOBILE  = 600;               // EDITABLE Mobile: Pixels scrolled down before button appears (default 600px so it does not appear immediately on mobile)
+  const SCROLL_TOP_APPEARS_WHEN_DESKTOP = 350;               // EDITABLE Desktop (D): Pixels scrolled down before button appears
+  const SCROLL_TOP_APPEARS_WHEN_MOBILE  = 480;               // EDITABLE Mobile (M): Pixels scrolled down before button appears (instigated 20% sooner: reduced from 600px to 480px)
   // Compatibility aliases
   const SCROLL_TOP_APPEARS_WHEN_PX_DESKTOP = SCROLL_TOP_APPEARS_WHEN_DESKTOP;
   const SCROLL_TOP_APPEARS_WHEN_PX_MOBILE  = SCROLL_TOP_APPEARS_WHEN_MOBILE;
@@ -687,20 +687,20 @@ import weatherConditions from '../data/weather-conditions.json';
   const SCROLL_TOP_THRESHOLD_PX_MOBILE     = SCROLL_TOP_APPEARS_WHEN_MOBILE;
 
   // EDITABLE: Distance from viewport bottom (Lowered down closer to the bottom edge)
-  const SCROLL_TOP_BOTTOM_DESKTOP = '2.0vw';                 // EDITABLE Desktop: Distance from viewport bottom (lowered down)
-  const SCROLL_TOP_BOTTOM_MOBILE  = '2.5vw';                 // EDITABLE Mobile: Distance from viewport bottom (lowered down from 5.0vw)
-  const SCROLL_TOP_RIGHT_DESKTOP  = '2.5vw';                 // EDITABLE Desktop: Distance from viewport right edge
-  const SCROLL_TOP_RIGHT_MOBILE   = '5.0vw';                 // EDITABLE Mobile: Distance from viewport right edge
+  const SCROLL_TOP_BOTTOM_DESKTOP = '2.0vw';                 // EDITABLE Desktop (D): Distance from viewport bottom (lowered down)
+  const SCROLL_TOP_BOTTOM_MOBILE  = '2.5vw';                 // EDITABLE Mobile (M): Distance from viewport bottom (lowered down from 5.0vw)
+  const SCROLL_TOP_RIGHT_DESKTOP  = '2.5vw';                 // EDITABLE Desktop (D): Distance from viewport right edge
+  const SCROLL_TOP_RIGHT_MOBILE   = '5.0vw';                 // EDITABLE Mobile (M): Distance from viewport right edge
 
   // EDITABLE: Dimensions & Strokes (from movie app)
-  const SCROLL_TOP_SIZE_DESKTOP         = '3.2vw';           // EDITABLE Desktop: Button diameter
-  const SCROLL_TOP_SIZE_MOBILE          = '11.0vw';          // EDITABLE Mobile: Button diameter
-  const SCROLL_TOP_ICON_SIZE_DESKTOP    = '1.3vw';           // EDITABLE Desktop: Up arrow icon font-size
-  const SCROLL_TOP_ICON_SIZE_MOBILE     = '4.5vw';           // EDITABLE Mobile: Up arrow icon font-size
-  const SCROLL_TOP_BORDER_WIDTH_DESKTOP = '0.35vw';          // EDITABLE Desktop: Ring border thickness
-  const SCROLL_TOP_BORDER_WIDTH_MOBILE  = '1.1vw';           // EDITABLE Mobile: Ring border thickness
-  const SCROLL_TOP_ARROW_STROKE_DESKTOP = '0.04vw';          // EDITABLE Desktop: Arrow stroke thickness
-  const SCROLL_TOP_ARROW_STROKE_MOBILE  = '0.12vw';          // EDITABLE Mobile: Arrow stroke thickness
+  const SCROLL_TOP_SIZE_DESKTOP         = '3.2vw';           // EDITABLE Desktop (D): Button diameter
+  const SCROLL_TOP_SIZE_MOBILE          = '11.0vw';          // EDITABLE Mobile (M): Button diameter
+  const SCROLL_TOP_ICON_SIZE_DESKTOP    = '1.3vw';           // EDITABLE Desktop (D): Up arrow icon font-size
+  const SCROLL_TOP_ICON_SIZE_MOBILE     = '4.5vw';           // EDITABLE Mobile (M): Up arrow icon font-size
+  const SCROLL_TOP_BORDER_WIDTH_DESKTOP = '0.35vw';          // EDITABLE Desktop (D): Ring border thickness
+  const SCROLL_TOP_BORDER_WIDTH_MOBILE  = '1.1vw';           // EDITABLE Mobile (M): Ring border thickness
+  const SCROLL_TOP_ARROW_STROKE_DESKTOP = '0.04vw';          // EDITABLE Desktop (D): Arrow stroke thickness
+  const SCROLL_TOP_ARROW_STROKE_MOBILE  = '0.12vw';          // EDITABLE Mobile (M): Arrow stroke thickness
 
   // EDITABLE: Colors (The Red from movie app)
   const SCROLL_TOP_COLOR              = 'red';               // EDITABLE: "The red" arrow color (matches movie app)
@@ -714,6 +714,46 @@ import weatherConditions from '../data/weather-conditions.json';
   const SCROLL_TOP_HOVER_OPACITY = '1.0';                    // EDITABLE: Hover opacity
   const SCROLL_TOP_HOVER_SCALE   = '1.08';                   // EDITABLE: Hover scale
   const SCROLL_TOP_Z_INDEX       = '9000';                   // EDITABLE: z-index layer
+
+  // ==========================================================================
+  // --- Floating Sticky Go-To-Bottom Button (JCV Config & Implementation) ---
+  // ==========================================================================
+  const SCROLL_BOTTOM_BUTTON_ENABLED = true;                  // EDITABLE: Master toggle to enable/disable go-to-bottom button
+
+  // EDITABLE: "DISAPPEARS WHEN" distance (in px) from bottom before button disappears
+  const SCROLL_BOTTOM_DISAPPEARS_WHEN_DESKTOP = 300;          // EDITABLE Desktop (D): Pixels from bottom before button disappears
+  const SCROLL_BOTTOM_DISAPPEARS_WHEN_MOBILE  = 400;          // EDITABLE Mobile (M): Pixels from bottom before button disappears
+  const SCROLL_BOTTOM_DISAPPEARS_WHEN_PX_DESKTOP = SCROLL_BOTTOM_DISAPPEARS_WHEN_DESKTOP;
+  const SCROLL_BOTTOM_DISAPPEARS_WHEN_PX_MOBILE  = SCROLL_BOTTOM_DISAPPEARS_WHEN_MOBILE;
+
+  // EDITABLE: Distance from viewport top / sticky banners (JCV Y-positionable for M & D)
+  const SCROLL_BOTTOM_TOP_DESKTOP = '2.0vw';                  // EDITABLE Desktop (D): Distance from viewport top / below sticky banners
+  const SCROLL_BOTTOM_TOP_MOBILE  = '3.0vw';                  // EDITABLE Mobile (M): Distance from viewport top / below sticky banners
+  const SCROLL_BOTTOM_RIGHT_DESKTOP = '2.5vw';                // EDITABLE Desktop (D): Distance from viewport right edge
+  const SCROLL_BOTTOM_RIGHT_MOBILE  = '5.0vw';                // EDITABLE Mobile (M): Distance from viewport right edge
+
+  // EDITABLE: Dimensions & Strokes (from movie app / matches go-to-top button)
+  const SCROLL_BOTTOM_SIZE_DESKTOP         = '3.2vw';         // EDITABLE Desktop (D): Button diameter
+  const SCROLL_BOTTOM_SIZE_MOBILE          = '11.0vw';        // EDITABLE Mobile (M): Button diameter
+  const SCROLL_BOTTOM_ICON_SIZE_DESKTOP    = '1.3vw';         // EDITABLE Desktop (D): Down arrow icon font-size
+  const SCROLL_BOTTOM_ICON_SIZE_MOBILE     = '4.5vw';         // EDITABLE Mobile (M): Down arrow icon font-size
+  const SCROLL_BOTTOM_BORDER_WIDTH_DESKTOP = '0.35vw';        // EDITABLE Desktop (D): Ring border thickness
+  const SCROLL_BOTTOM_BORDER_WIDTH_MOBILE  = '1.1vw';         // EDITABLE Mobile (M): Ring border thickness
+  const SCROLL_BOTTOM_ARROW_STROKE_DESKTOP = '0.04vw';        // EDITABLE Desktop (D): Arrow stroke thickness
+  const SCROLL_BOTTOM_ARROW_STROKE_MOBILE  = '0.12vw';        // EDITABLE Mobile (M): Arrow stroke thickness
+
+  // EDITABLE: Colors (Red matching go-to-top button)
+  const SCROLL_BOTTOM_COLOR              = 'red';             // EDITABLE: "The red" arrow color (matches movie app)
+  const SCROLL_BOTTOM_STROKE_COLOR       = 'red';             // EDITABLE: "The red" ring border color (matches movie app)
+  const SCROLL_BOTTOM_HOVER_COLOR        = '#ff3333';         // EDITABLE: Hover arrow color (matches movie app)
+  const SCROLL_BOTTOM_HOVER_STROKE_COLOR = '#ff3333';         // EDITABLE: Hover ring border color (matches movie app)
+
+  const SCROLL_BOTTOM_BG            = 'rgba(0, 0, 0, 0.45)';  // EDITABLE: Button background color
+  const SCROLL_BOTTOM_HOVER_BG      = 'rgba(0, 0, 0, 0.75)';  // EDITABLE: Button background color on hover
+  const SCROLL_BOTTOM_OPACITY       = '0.9';                  // EDITABLE: Normal resting opacity when visible
+  const SCROLL_BOTTOM_HOVER_OPACITY = '1.0';                  // EDITABLE: Hover opacity
+  const SCROLL_BOTTOM_HOVER_SCALE   = '1.08';                 // EDITABLE: Hover scale
+  const SCROLL_BOTTOM_Z_INDEX       = '9000';                 // EDITABLE: z-index layer
 
   function applyScrollTopButtonConfig() {
     const isMobile = window.innerWidth <= 767;
@@ -754,8 +794,50 @@ import weatherConditions from '../data/weather-conditions.json';
     document.documentElement.style.setProperty('--scroll-top-z-index', SCROLL_TOP_Z_INDEX);
   }
 
+  function applyScrollBottomButtonConfig() {
+    const isMobile = window.innerWidth <= 767;
+    document.documentElement.style.setProperty('--scroll-bottom-top-desktop', SCROLL_BOTTOM_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--scroll-bottom-top-mobile', SCROLL_BOTTOM_TOP_MOBILE);
+    document.documentElement.style.setProperty('--scroll-bottom-top', isMobile ? SCROLL_BOTTOM_TOP_MOBILE : SCROLL_BOTTOM_TOP_DESKTOP);
+
+    document.documentElement.style.setProperty('--scroll-bottom-right-desktop', SCROLL_BOTTOM_RIGHT_DESKTOP);
+    document.documentElement.style.setProperty('--scroll-bottom-right-mobile', SCROLL_BOTTOM_RIGHT_MOBILE);
+    document.documentElement.style.setProperty('--scroll-bottom-right', isMobile ? SCROLL_BOTTOM_RIGHT_MOBILE : SCROLL_BOTTOM_RIGHT_DESKTOP);
+
+    document.documentElement.style.setProperty('--scroll-bottom-size-desktop', SCROLL_BOTTOM_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--scroll-bottom-size-mobile', SCROLL_BOTTOM_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--scroll-bottom-size', isMobile ? SCROLL_BOTTOM_SIZE_MOBILE : SCROLL_BOTTOM_SIZE_DESKTOP);
+
+    document.documentElement.style.setProperty('--scroll-bottom-icon-size-desktop', SCROLL_BOTTOM_ICON_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--scroll-bottom-icon-size-mobile', SCROLL_BOTTOM_ICON_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--scroll-bottom-icon-size', isMobile ? SCROLL_BOTTOM_ICON_SIZE_MOBILE : SCROLL_BOTTOM_ICON_SIZE_DESKTOP);
+
+    document.documentElement.style.setProperty('--scroll-bottom-border-width-desktop', SCROLL_BOTTOM_BORDER_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--scroll-bottom-border-width-mobile', SCROLL_BOTTOM_BORDER_WIDTH_MOBILE);
+    document.documentElement.style.setProperty('--scroll-bottom-btn-border-width', isMobile ? SCROLL_BOTTOM_BORDER_WIDTH_MOBILE : SCROLL_BOTTOM_BORDER_WIDTH_DESKTOP);
+
+    document.documentElement.style.setProperty('--scroll-bottom-arrow-stroke-desktop', SCROLL_BOTTOM_ARROW_STROKE_DESKTOP);
+    document.documentElement.style.setProperty('--scroll-bottom-arrow-stroke-mobile', SCROLL_BOTTOM_ARROW_STROKE_MOBILE);
+    document.documentElement.style.setProperty('--scroll-bottom-arrow-stroke-width', isMobile ? SCROLL_BOTTOM_ARROW_STROKE_MOBILE : SCROLL_BOTTOM_ARROW_STROKE_DESKTOP);
+
+    document.documentElement.style.setProperty('--scroll-bottom-color', SCROLL_BOTTOM_COLOR);
+    document.documentElement.style.setProperty('--scroll-bottom-stroke-color', SCROLL_BOTTOM_STROKE_COLOR);
+    document.documentElement.style.setProperty('--scroll-bottom-hover-color', SCROLL_BOTTOM_HOVER_COLOR);
+    document.documentElement.style.setProperty('--scroll-bottom-hover-stroke-color', SCROLL_BOTTOM_HOVER_STROKE_COLOR);
+
+    document.documentElement.style.setProperty('--scroll-bottom-bg', SCROLL_BOTTOM_BG);
+    document.documentElement.style.setProperty('--scroll-bottom-hover-bg', SCROLL_BOTTOM_HOVER_BG);
+    document.documentElement.style.setProperty('--scroll-bottom-opacity', SCROLL_BOTTOM_OPACITY);
+    document.documentElement.style.setProperty('--scroll-bottom-hover-opacity', SCROLL_BOTTOM_HOVER_OPACITY);
+    document.documentElement.style.setProperty('--scroll-bottom-hover-scale', SCROLL_BOTTOM_HOVER_SCALE);
+    document.documentElement.style.setProperty('--scroll-bottom-z-index', SCROLL_BOTTOM_Z_INDEX);
+  }
+
   function initScrollToTopButton() {
     if (!SCROLL_TOP_BUTTON_ENABLED) return;
+    if (typeof initScrollToBottomButton === 'function') {
+      initScrollToBottomButton();
+    }
     if (document.getElementById('scroll-to-top-btn')) return;
 
     applyScrollTopButtonConfig();
@@ -795,8 +877,61 @@ import weatherConditions from '../data/weather-conditions.json';
     }, { passive: true });
 
     updateVisibility();
+    [500, 1500, 3000].forEach(ms => setTimeout(updateVisibility, ms));
   }
+
+  function initScrollToBottomButton() {
+    if (!SCROLL_BOTTOM_BUTTON_ENABLED) return;
+    if (document.getElementById('scroll-to-bottom-btn')) return;
+
+    applyScrollBottomButtonConfig();
+
+    const btn = document.createElement('button');
+    btn.id = 'scroll-to-bottom-btn';
+    btn.className = 'scroll-to-bottom-btn is-visible';
+    btn.setAttribute('type', 'button');
+    btn.setAttribute('aria-label', 'Go to bottom');
+    btn.innerHTML = `<i class="fa-solid fa-arrow-down" aria-hidden="true"></i>`;
+
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.scrollTo({
+        top: document.documentElement.scrollHeight || document.body.scrollHeight,
+        behavior: 'smooth'
+      });
+    });
+
+    document.body.appendChild(btn);
+
+    const updateVisibility = () => {
+      const isMobile = window.innerWidth <= 767;
+      const threshold = isMobile ? SCROLL_BOTTOM_DISAPPEARS_WHEN_MOBILE : SCROLL_BOTTOM_DISAPPEARS_WHEN_DESKTOP;
+      const scrollPosition = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+      const totalHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+      const distanceToBottom = totalHeight - (scrollPosition + viewportHeight);
+
+      // Initially visible towards the top; only disappears when scrolled near the page bottom
+      if (distanceToBottom <= threshold && scrollPosition > 100) {
+        btn.classList.remove('is-visible');
+      } else {
+        btn.classList.add('is-visible');
+      }
+    };
+
+    window.addEventListener('scroll', updateVisibility, { passive: true });
+    window.addEventListener('resize', () => {
+      applyScrollBottomButtonConfig();
+      updateVisibility();
+    }, { passive: true });
+
+    updateVisibility();
+    [500, 1500, 3000].forEach(ms => setTimeout(updateVisibility, ms));
+  }
+
   applyScrollTopButtonConfig();
+  applyScrollBottomButtonConfig();
+  initScrollToBottomButton();
 
   // EDITABLE: Vertical position of the barometric/humidity/wind trend arrow (scaled to dial size)
   const BAROMETRIC_TREND_TOP_POS = "calc(var(--item-current-size) * -0.28 + 0.25vw)";
@@ -4279,6 +4414,9 @@ import weatherConditions from '../data/weather-conditions.json';
     if (gradientLower) gradientLower.style.setProperty('--alert-push', '0vw');
     if (starfieldContainer) starfieldContainer.style.setProperty('--alert-push', '0vw');
     if (rainCanvas) rainCanvas.style.setProperty('--alert-push', '0vw');
+    const btnBottom = document.getElementById('scroll-to-bottom-btn');
+    if (btnBottom) btnBottom.style.setProperty('--alert-push', '0vw');
+    document.documentElement.style.setProperty('--alert-push', '0vw');
     setTimeout(() => document.body.classList.add('transitions-ready'), 100);
   } else {
     document.addEventListener('DOMContentLoaded', () => {
@@ -4287,6 +4425,7 @@ import weatherConditions from '../data/weather-conditions.json';
       initSnowCanvas();
       initStarfield();
       if (typeof initScrollToTopButton === 'function') initScrollToTopButton();
+      if (typeof initScrollToBottomButton === 'function') initScrollToBottomButton();
       // Initialize fragile elements with starting position
       const moon = document.getElementById('moon-phase-img');
       const descImg = document.getElementById('weather-desc-image');
@@ -4308,6 +4447,9 @@ import weatherConditions from '../data/weather-conditions.json';
       if (gradientLower) gradientLower.style.setProperty('--alert-push', '0vw');
       if (starfieldContainer) starfieldContainer.style.setProperty('--alert-push', '0vw');
       if (rainCanvas) rainCanvas.style.setProperty('--alert-push', '0vw');
+      const btnBottomDom = document.getElementById('scroll-to-bottom-btn');
+      if (btnBottomDom) btnBottomDom.style.setProperty('--alert-push', '0vw');
+      document.documentElement.style.setProperty('--alert-push', '0vw');
       setTimeout(() => document.body.classList.add('transitions-ready'), 100);
     });
   }
@@ -4385,6 +4527,11 @@ import weatherConditions from '../data/weather-conditions.json';
     if (rainCanvas) {
       rainCanvas.style.setProperty('--alert-push', pushValue);
     }
+    const btnBottom = document.getElementById('scroll-to-bottom-btn');
+    if (btnBottom) {
+      btnBottom.style.setProperty('--alert-push', pushValue);
+    }
+    document.documentElement.style.setProperty('--alert-push', pushValue);
     updateLowerGradientPosition();
     setTimeout(updateStarfieldMask, 50);
     setTimeout(updateStarfieldMask, 1050);
@@ -11905,7 +12052,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     }
     startAutoRefresh(currentRefreshMs, autoRefreshAligned);
     
-    const targets = document.querySelectorAll('.clockGridItem-0, #analog-clock, #solar-flare-dial, #radio-blackout-dial');
+    const targets = document.querySelectorAll('.clockGridItem-0, #analog-clock');
     targets.forEach(target => {
       const applyTransition = (opacityVal) => {
         target.style.setProperty('transition', 'opacity 0.5s ease-out', 'important');
@@ -12199,101 +12346,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
   let liveSolarFlareData = null;
   let solarFlareLiveTimer = null;
 
-  // --- Persistent Trend & Sweeping Gauge Animation State (JCV) ---
-  let prevSolarFlareFraction = null;
-  let currentSolarFlareTrend = (function() {
-    try {
-      return localStorage.getItem('weather_trend_solar_flare_direction') || 'down';
-    } catch (e) {
-      return 'down';
-    }
-  })();
-
-  let prevRadioBlackoutFraction = null;
-  let currentRadioBlackoutTrend = (function() {
-    try {
-      return localStorage.getItem('weather_trend_radio_blackout_direction') || 'down';
-    } catch (e) {
-      return 'down';
-    }
-  })();
-
-  function setSolarFlareTrend(newTrend) {
-    currentSolarFlareTrend = newTrend;
-    try {
-      localStorage.setItem('weather_trend_solar_flare_direction', newTrend);
-    } catch (e) {}
-  }
-
-  function setRadioBlackoutTrend(newTrend) {
-    currentRadioBlackoutTrend = newTrend;
-    try {
-      localStorage.setItem('weather_trend_radio_blackout_direction', newTrend);
-    } catch (e) {}
-  }
-
-  function flashDialReset(dialEl) {
-    if (!CELESTIAL_DIAL_RESET_FLASH_ENABLED || !dialEl) return;
-    const applyTransition = (opacityVal) => {
-      dialEl.style.setProperty('transition', `opacity ${CELESTIAL_DIAL_RESET_FLASH_MS / 1000}s ease-out`, 'important');
-      dialEl.style.setProperty('opacity', opacityVal, 'important');
-    };
-    requestAnimationFrame(() => applyTransition('0.15'));
-    setTimeout(() => {
-      requestAnimationFrame(() => applyTransition('1.0'));
-    }, CELESTIAL_DIAL_RESET_FLASH_MS);
-  }
-
-  function animateCelestialGauge(progressEl, newFraction, prevFraction, onComplete) {
-    if (!progressEl) return;
-    const circumference = 289.027; // 2 * PI * 46
-    const clampedNew = Math.max(0, Math.min(1.0, newFraction));
-    const targetOffset = circumference * (1 - clampedNew);
-
-    progressEl.style.transition = 'none'; // Disable CSS transitions so JS RAF has full control
-
-    if (!CELESTIAL_GAUGE_ANIM_ENABLED || prevFraction === null || prevFraction === undefined) {
-      progressEl.style.strokeDashoffset = `${targetOffset.toFixed(2)}`;
-      if (onComplete) onComplete();
-      return;
-    }
-
-    if (Math.abs(newFraction - prevFraction) < 0.001) {
-      progressEl.style.strokeDashoffset = `${targetOffset.toFixed(2)}`;
-      if (onComplete) onComplete();
-      return;
-    }
-
-    const isIncrease = newFraction > prevFraction;
-    const currentOffset = parseFloat(progressEl.style.strokeDashoffset);
-    const startOffset = isNaN(currentOffset) ? (circumference * (1 - prevFraction)) : currentOffset;
-
-    progressEl.dataset.animating = 'true';
-    progressEl.dataset.targetOffset = String(targetOffset);
-
-    if (isIncrease) {
-      // Stage 1: Sweep clockwise to complete full gauge (strokeDashoffset = 0)
-      animateValue(progressEl, startOffset, 0, CELESTIAL_GAUGE_STAGE1_MS, () => {
-        const finalTarget = parseFloat(progressEl.dataset.targetOffset) ?? targetOffset;
-        // Stage 2: Settle counter-clockwise from MAX (0) to new targetOffset
-        animateValue(progressEl, 0, finalTarget, CELESTIAL_GAUGE_STAGE2_MS, () => {
-          progressEl.dataset.animating = 'false';
-          if (onComplete) onComplete();
-        });
-      });
-    } else {
-      // Stage 1: Sweep counter-clockwise to 0 gauge (strokeDashoffset = circumference)
-      animateValue(progressEl, startOffset, circumference, CELESTIAL_GAUGE_STAGE1_MS, () => {
-        const finalTarget = parseFloat(progressEl.dataset.targetOffset) ?? targetOffset;
-        // Stage 2: Settle clockwise from 0 (circumference) to new targetOffset
-        animateValue(progressEl, circumference, finalTarget, CELESTIAL_GAUGE_STAGE2_MS, () => {
-          progressEl.dataset.animating = 'false';
-          if (onComplete) onComplete();
-        });
-      });
-    }
-  }
-
   function formatImpactSublabelHtml(arrowDir, text) {
     const iconClass = (arrowDir === 'down') ? 'fa-solid fa-arrow-down' : 'fa-solid fa-arrow-up';
     if (text.includes('<br>')) {
@@ -12396,14 +12448,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const color = getSolarFlareLevelColor(flareClass);
     const fraction = calculateSolarFlareFraction(flareClass, flareValue);
 
-    // Determine up/down trend based on most recent value change
-    if (prevSolarFlareFraction !== null) {
-      if (fraction > prevSolarFlareFraction + 0.0005) {
-        setSolarFlareTrend('up');
-      } else if (fraction < prevSolarFlareFraction - 0.0005) {
-        setSolarFlareTrend('down');
-      }
-    }
+    // Circumference for r=46 is 2 * PI * 46 = 289.027
+    const circumference = 289.027;
+    const strokeOffset = circumference * (1 - fraction);
 
     const line1El = dial.querySelector('.solar-flare-label-line1');
     const line2El = dial.querySelector('.solar-flare-label-line2');
@@ -12417,19 +12464,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (valueEl && valueEl.textContent !== displayVal) valueEl.textContent = displayVal;
 
     dial.style.setProperty('--solar-flare-current-color', color);
-
-    const progressEl = dial.querySelector('.solar-flare-progress');
-    if (progressEl) {
-      animateCelestialGauge(progressEl, fraction, prevSolarFlareFraction);
-    }
-    prevSolarFlareFraction = fraction;
+    dial.style.setProperty('--solar-flare-stroke-offset', strokeOffset.toFixed(2));
 
     if (SOLAR_FLARE_SUBLABEL_ENABLED) {
       const sublabelEl = document.getElementById('solar-flare-sublabel');
       if (sublabelEl) {
         if (SOLAR_FLARE_SUBLABEL_MODE === 'dynamic') {
           const impact = getSolarFlareImpact(flareClass);
-          sublabelEl.innerHTML = formatImpactSublabelHtml(currentSolarFlareTrend, impact.text);
+          sublabelEl.innerHTML = formatImpactSublabelHtml(impact.arrow, impact.text);
         }
         if (SOLAR_FLARE_SUBLABEL_COLOR === 'auto') {
           sublabelEl.style.color = color;
@@ -12440,7 +12482,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   function handleSolarFlareDialClick(e) {
     if (e) e.stopPropagation();
-    const dial = document.getElementById('solar-flare-dial');
     if (SOLAR_FLARE_MODE === 'live') {
       if (!SOLAR_FLARE_CLICK_CYCLES_CLASSES) {
         fetchLiveSolarFlareData();
@@ -12448,9 +12489,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }
       currentSolarFlareTestIndex = (currentSolarFlareTestIndex + 1) % (SOLAR_FLARE_TEST_LEVELS.length + 1);
       if (currentSolarFlareTestIndex === SOLAR_FLARE_TEST_LEVELS.length) {
-        // Return to live feed & flash dial reset
+        // Return to live feed
         activeSolarFlareState = null;
-        flashDialReset(dial);
         if (liveSolarFlareData) updateSolarFlareDial();
         fetchLiveSolarFlareData();
       } else {
@@ -12700,14 +12740,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const color = getRadioBlackoutLevelColor(rClass);
     const fraction = calculateRadioBlackoutFraction(rClass, rValue);
 
-    // Determine up/down trend based on most recent value change
-    if (prevRadioBlackoutFraction !== null) {
-      if (fraction > prevRadioBlackoutFraction + 0.0005) {
-        setRadioBlackoutTrend('up');
-      } else if (fraction < prevRadioBlackoutFraction - 0.0005) {
-        setRadioBlackoutTrend('down');
-      }
-    }
+    // Circumference for r=46 is 2 * PI * 46 = 289.027
+    const circumference = 289.027;
+    const strokeOffset = circumference * (1 - fraction);
 
     const line1El = dial.querySelector('.radio-blackout-label-line1');
     const line2El = dial.querySelector('.radio-blackout-label-line2');
@@ -12721,19 +12756,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (valueEl && valueEl.textContent !== displayVal) valueEl.textContent = displayVal;
 
     dial.style.setProperty('--radio-blackout-current-color', color);
-
-    const progressEl = dial.querySelector('.radio-blackout-progress');
-    if (progressEl) {
-      animateCelestialGauge(progressEl, fraction, prevRadioBlackoutFraction);
-    }
-    prevRadioBlackoutFraction = fraction;
+    dial.style.setProperty('--radio-blackout-stroke-offset', strokeOffset.toFixed(2));
 
     if (RADIO_BLACKOUT_SUBLABEL_ENABLED) {
       const sublabelEl = document.getElementById('radio-blackout-sublabel');
       if (sublabelEl) {
         if (RADIO_BLACKOUT_SUBLABEL_MODE === 'dynamic') {
           const impact = getRadioBlackoutImpact(rClass);
-          sublabelEl.innerHTML = formatImpactSublabelHtml(currentRadioBlackoutTrend, impact.text);
+          sublabelEl.innerHTML = formatImpactSublabelHtml(impact.arrow, impact.text);
         }
         if (RADIO_BLACKOUT_SUBLABEL_COLOR === 'auto') {
           sublabelEl.style.color = color;
@@ -12744,7 +12774,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   function handleRadioBlackoutDialClick(e) {
     if (e) e.stopPropagation();
-    const dial = document.getElementById('radio-blackout-dial');
     if (RADIO_BLACKOUT_MODE === 'live') {
       if (!RADIO_BLACKOUT_CLICK_CYCLES_CLASSES) {
         fetchLiveRadioBlackoutData();
@@ -12752,9 +12781,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }
       currentRadioBlackoutTestIndex = (currentRadioBlackoutTestIndex + 1) % (RADIO_BLACKOUT_TEST_LEVELS.length + 1);
       if (currentRadioBlackoutTestIndex === RADIO_BLACKOUT_TEST_LEVELS.length) {
-        // Return to live feed & flash dial reset
+        // Return to live feed
         activeRadioBlackoutState = null;
-        flashDialReset(dial);
         if (liveRadioBlackoutData) updateRadioBlackoutDial();
         fetchLiveRadioBlackoutData();
       } else {

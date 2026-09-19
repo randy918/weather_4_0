@@ -2764,3 +2764,67 @@ main {
         transform: translateY(0) scale(0.95);
     }
 }
+
+/* ==========================================================================
+   Floating Sticky Go-To-Bottom Button (JCV Controlled)
+   ========================================================================== */
+.scroll-to-bottom-btn {
+    position: fixed;
+    top: calc(var(--alert-push, 0vw) + var(--scroll-bottom-top, 2.0vw) + env(safe-area-inset-top, 0px));
+    right: var(--scroll-bottom-right, 2.5vw);
+    width: var(--scroll-bottom-size, 3.2vw);
+    height: var(--scroll-bottom-size, 3.2vw);
+    border-radius: var(--scroll-bottom-radius, 50%);
+    background: var(--scroll-bottom-bg, rgba(0, 0, 0, 0.45));
+    color: var(--scroll-bottom-color, red);
+    border: var(--scroll-bottom-btn-border-width, 0.35vw) solid var(--scroll-bottom-stroke-color, red);
+    font-size: var(--scroll-bottom-icon-size, 1.3vw);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    cursor: pointer;
+    z-index: var(--scroll-bottom-z-index, 9000);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    box-shadow: var(--scroll-bottom-shadow, 0 0.4vw 1.5vw rgba(0, 0, 0, 0.6));
+    backdrop-filter: var(--scroll-bottom-backdrop-filter, blur(4px));
+    -webkit-backdrop-filter: var(--scroll-bottom-backdrop-filter, blur(4px));
+    transform: translateY(-12px) scale(0.9);
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), top 0.4s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+
+    i, svg {
+        pointer-events: none;
+        color: inherit;
+        font-size: var(--scroll-bottom-icon-size, 1.3vw);
+        -webkit-text-stroke: var(--scroll-bottom-arrow-stroke-width, 0.04vw) currentColor;
+        transition: transform 0.2s ease;
+    }
+
+    &.is-visible {
+        opacity: var(--scroll-bottom-opacity, 0.9);
+        visibility: visible;
+        pointer-events: auto;
+        transform: translateY(0) scale(1);
+    }
+
+    &:hover {
+        opacity: var(--scroll-bottom-hover-opacity, 1.0);
+        background: var(--scroll-bottom-hover-bg, rgba(0, 0, 0, 0.75));
+        color: var(--scroll-bottom-hover-color, #ff3333);
+        border-color: var(--scroll-bottom-hover-stroke-color, #ff3333);
+        transform: translateY(2px) scale(var(--scroll-bottom-hover-scale, 1.08));
+
+        i, svg {
+            transform: translateY(2px);
+        }
+    }
+
+    &:active {
+        transform: translateY(0) scale(0.95);
+    }
+}
