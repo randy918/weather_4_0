@@ -2293,6 +2293,108 @@ main {
     }
 }
 
+// Solar Flare Scale Dial in Celestial Row (JCV)
+.solar-flare-dial {
+    position: relative;
+    border-radius: 50%;
+    width: var(--solar-flare-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
+    height: var(--solar-flare-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
+    margin-top: var(--celestial-dial-margin-top, 0vw);
+    transform: translate(var(--solar-flare-offset-x, 0vw), var(--solar-flare-offset-y, 0vw));
+    background-color: var(--solar-flare-dial-bg-color, transparent);
+    box-shadow: var(--solar-flare-dial-inner-shadow, inset 0 0 1vw rgba(0, 0, 0, 0.5));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: pointer;
+    box-sizing: border-box;
+
+    .solar-flare-svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transform: rotate(var(--solar-flare-start-angle, 90deg));
+        overflow: visible;
+        z-index: 1;
+
+        .solar-flare-track {
+            stroke: var(--solar-flare-track-color, rgba(255, 255, 255, 0.22));
+            stroke-width: var(--solar-flare-track-stroke-width, 4);
+        }
+
+        .solar-flare-progress {
+            stroke: var(--solar-flare-current-color, hsl(30, 100%, 50%));
+            stroke-width: var(--solar-flare-progress-stroke-width, 4);
+            stroke-dasharray: 289.027;
+            stroke-dashoffset: var(--solar-flare-stroke-offset, 161.85);
+            stroke-linecap: var(--solar-flare-stroke-linecap, butt);
+            transition: stroke-dashoffset var(--solar-flare-anim-duration, 0.8s) cubic-bezier(0.25, 1, 0.5, 1),
+                        stroke 0.4s ease;
+        }
+    }
+
+    .solar-flare-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        color: var(--solar-flare-current-color, hsl(30, 100%, 50%));
+        transform: translateY(var(--solar-flare-content-offset-y, 0vw));
+        pointer-events: none;
+        transition: color 0.4s ease;
+    }
+
+    .solar-flare-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-family: var(--solar-flare-label-font-family, "euro", sans-serif);
+        font-size: var(--solar-flare-label-font-size, calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.125));
+        line-height: var(--solar-flare-label-line-height, 1.05);
+        letter-spacing: var(--solar-flare-label-letter-spacing, 0.04em);
+        text-transform: uppercase;
+        color: inherit;
+        transform: translateY(var(--solar-flare-label-offset-y, 0vw));
+        margin-bottom: var(--solar-flare-gap-label-to-class, calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.04));
+    }
+
+    .solar-flare-class {
+        font-family: var(--solar-flare-class-font-family, "euro-bold", sans-serif);
+        font-size: var(--solar-flare-class-font-size, calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.46));
+        line-height: var(--solar-flare-class-line-height, 0.85);
+        color: inherit;
+        transform: translateY(var(--solar-flare-class-offset-y, 0vw));
+        margin-bottom: var(--solar-flare-gap-class-to-value, calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02));
+    }
+
+    .solar-flare-value {
+        font-family: var(--solar-flare-value-font-family, "euro-bold", sans-serif);
+        font-size: var(--solar-flare-value-font-size, calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.22));
+        line-height: var(--solar-flare-value-line-height, 0.95);
+        letter-spacing: var(--solar-flare-value-letter-spacing, 0.02em);
+        color: inherit;
+        transform: translateY(var(--solar-flare-value-offset-y, 0vw));
+    }
+}
+
+.solar-flare-sublabel {
+    margin-top: var(--celestial-dial-label-margin-top, calc(var(--world-clock-size) * 0.06));
+    transform: translateY(var(--celestial-dial-label-offset-y, 0vw));
+    font-family: var(--world-clock-label-font-family, "bold", sans-serif);
+    font-size: var(--world-clock-label-font-size, calc(var(--world-clock-size) * 0.12));
+    color: var(--temp-color, rgba(255, 255, 255, 0.7));
+    text-align: center;
+    white-space: nowrap;
+}
+
 .sun-column {
     display: flex;
     flex-direction: column;

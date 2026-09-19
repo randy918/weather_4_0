@@ -7160,12 +7160,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // Direct scale multipliers relative to the timezone clock dial size (var(--world-clock-size)):
   // e.g. 1.0 = exactly matches clock size (17.4vw); 1.85 = 185% size (~32vw); 1.2 = 120% size (~21vw)
   // =========================================================================
-  const SUN_SIZE_SCALE_DESKTOP = 1.85;                // EDITABLE Desktop: Sun diameter multiplier (1.85 = ~32vw, 1.2 = ~21vw, 2.0 = ~35vw)
-  const SUN_SIZE_SCALE_MOBILE = 1.60;                 // EDITABLE Mobile: Sun diameter multiplier
+  const SUN_SIZE_SCALE_DESKTOP = 2.0;                // EDITABLE Desktop: Sun diameter multiplier (1.85 = ~32vw, 1.2 = ~21vw, 2.0 = ~35vw)
+  const SUN_SIZE_SCALE_MOBILE = 2.0;                 // EDITABLE Mobile: Sun diameter multiplier
   const SUN_CORONA_SCALE_DESKTOP = SUN_SIZE_SCALE_DESKTOP;
   const SUN_CORONA_SCALE_MOBILE = SUN_SIZE_SCALE_MOBILE;
-  const EARTH_SIZE_SCALE_DESKTOP = 0.92;              // EDITABLE Desktop: Earth diameter multiplier (0.92 = ~16vw, 1.0 = ~17.4vw)
-  const EARTH_SIZE_SCALE_MOBILE = 1.15;               // EDITABLE Mobile: Earth diameter multiplier
+  const EARTH_SIZE_SCALE_DESKTOP = 1.6;              // EDITABLE Desktop: Earth diameter multiplier (0.92 = ~16vw, 1.0 = ~17.4vw)
+  const EARTH_SIZE_SCALE_MOBILE = 1.55;               // EDITABLE Mobile: Earth diameter multiplier
   const EARTH_GLOBE_SCALE_DESKTOP = EARTH_SIZE_SCALE_DESKTOP;
   const EARTH_GLOBE_SCALE_MOBILE = EARTH_SIZE_SCALE_MOBILE;
 
@@ -7191,7 +7191,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   // Object 2: Sun (150% size) <--> Object 3: Earth (Derived Middle Space)
   const SUN_GAP_LEFT_DESKTOP = '-3.6vw';                     // EDITABLE Desktop: Additional gap to the left of Sun (perfected by user)
-  const SUN_GAP_LEFT_MOBILE = '0vw';                          // EDITABLE Mobile: Additional gap to the left of Sun
+  const SUN_GAP_LEFT_MOBILE = '-3.6vw';                          // EDITABLE Mobile: Additional gap to the left of Sun
   // The gap between Sun and Earth is NOT explicitly defined; it is derived automatically
   // from the remaining space in the 95vw row between the left pair (Pacific/Sun) and right pair (Earth/UK).
   // Resizing Sun expands rightward into this space; resizing Earth expands leftward into this space.
@@ -7204,8 +7204,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // Editable fixed gap between Earth (#3) and UK dial (#4).
   // Dial #4 (UK) is fixed at the right 95% edge. When Earth is resized, Dial #4 does NOT move,
   // and this gap stays fixed (Earth grows/shrinks towards the Sun into the derived middle space).
-  const GAP_EARTH_TO_UK_DESKTOP = '3.6vw';                       // EDITABLE Desktop: Spacing between Earth and UK dial (e.g. '0vw', '-2vw', '2.5vw')
-  const GAP_EARTH_TO_UK_MOBILE = '0vw';                        // EDITABLE Mobile: Spacing between Earth and UK dial
+  const GAP_EARTH_TO_UK_DESKTOP = '1.6vw';                       // EDITABLE Desktop: Spacing between Earth and UK dial (e.g. '0vw', '-2vw', '2.5vw')
+  const GAP_EARTH_TO_UK_MOBILE = '1.4vw';                        // EDITABLE Mobile: Spacing between Earth and UK dial
   const EARTH_GAP_RIGHT_DESKTOP = GAP_EARTH_TO_UK_DESKTOP;     // Compatibility alias for Earth-to-UK gap
   const EARTH_GAP_RIGHT_MOBILE = GAP_EARTH_TO_UK_MOBILE;       // Compatibility alias
   const EARTH_GAP_LEFT_DESKTOP = '0vw';                        // EDITABLE Desktop: Additional gap to the left of Earth
@@ -7219,7 +7219,100 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SUN_DUO_GAP_DESKTOP = SUN_GAP_RIGHT_DESKTOP;
   const SUN_DUO_GAP_MOBILE = SUN_GAP_RIGHT_MOBILE;
   const CELESTIAL_DUO_WIDTH_DESKTOP = 'auto';
-  const CELESTIAL_DUO_WIDTH_MOBILE = 'auto';
+  // =========================================================================
+  // --- EDITABLE: Solar Flare Scale Dial Config (JCV) ---
+  // Replaces the left flanking dial placeholder in the Celestial row
+  // =========================================================================
+  const SOLAR_FLARE_DIAL_ENABLED = true;                         // EDITABLE: Enable/disable Solar Flare scale dial in celestial row
+  const SOLAR_FLARE_MODE = 'live';                               // EDITABLE: 'manual' (uses manual class/value below) or 'live' (NOAA SWPC GOES satellite)
+  const SOLAR_FLARE_CLASS_MANUAL = 'C';                          // EDITABLE: Manual test class: 'A', 'B', 'C', 'M', or 'X'
+  const SOLAR_FLARE_VALUE_MANUAL = 2.8;                          // EDITABLE: Manual test value (e.g. 1.0 to 9.9, or higher for X)
+  const SOLAR_FLARE_CLICK_CYCLES_CLASSES = true;                 // EDITABLE: Click/tap dial to cycle through test flare levels (A -> B -> C -> M -> X)
+  const SOLAR_FLARE_AUTO_REFRESH_MS = 60000;                     // EDITABLE: Polling interval in ms for live NOAA flare data
+
+  // --- Temperature Colors per Solar Flare Level (JCV) ---
+  // Assign numeric temperature degree (maps directly to app's TEMP_COLORS palette)
+  // OR assign a custom CSS color string (e.g. 'hsl(30, 100%, 50%)', '#f2534b')
+  const SOLAR_FLARE_COLOR_LEVEL_A = 55;                          // EDITABLE: Level A (Micro/Background) temperature color (50s green/aqua)
+  const SOLAR_FLARE_COLOR_LEVEL_B = 75;                          // EDITABLE: Level B (Minor) temperature color (70s yellow-gold)
+  const SOLAR_FLARE_COLOR_LEVEL_C = 95;                          // EDITABLE: Level C (Small) temperature color (90s tomato red / coral matching screenshot)
+  const SOLAR_FLARE_COLOR_LEVEL_M = 105;                         // EDITABLE: Level M (Medium) temperature color (100s vibrant red)
+  const SOLAR_FLARE_COLOR_LEVEL_X = 115;                         // EDITABLE: Level X (Major) temperature color (110s deep red)
+  const SOLAR_FLARE_COLOR_OVERRIDE = null;                       // EDITABLE: Optional universal color override (e.g. null, 95, or '#f2534b')
+
+  // --- Level Descriptive Labels (JCV) ---
+  const SOLAR_FLARE_LABEL_A_LINE1 = 'MICRO';                     // EDITABLE: Line 1 label for Class A
+  const SOLAR_FLARE_LABEL_A_LINE2 = 'FLARE';                     // EDITABLE: Line 2 label for Class A
+  const SOLAR_FLARE_LABEL_B_LINE1 = 'MINOR';                     // EDITABLE: Line 1 label for Class B
+  const SOLAR_FLARE_LABEL_B_LINE2 = 'FLARE';                     // EDITABLE: Line 2 label for Class B
+  const SOLAR_FLARE_LABEL_C_LINE1 = 'SMALL';                     // EDITABLE: Line 1 label for Class C (matches screenshot)
+  const SOLAR_FLARE_LABEL_C_LINE2 = 'FLARE';                     // EDITABLE: Line 2 label for Class C (matches screenshot)
+  const SOLAR_FLARE_LABEL_M_LINE1 = 'MEDIUM';                    // EDITABLE: Line 1 label for Class M
+  const SOLAR_FLARE_LABEL_M_LINE2 = 'FLARE';                     // EDITABLE: Line 2 label for Class M
+  const SOLAR_FLARE_LABEL_X_LINE1 = 'MAJOR';                     // EDITABLE: Line 1 label for Class X
+  const SOLAR_FLARE_LABEL_X_LINE2 = 'FLARE';                     // EDITABLE: Line 2 label for Class X
+
+  // --- Circular Progress Ring & Track (JCV) ---
+  const SOLAR_FLARE_START_ANGLE_DEG = 90;                        // EDITABLE: Arc start angle (90deg in SVG = 6 o'clock / lowest point)
+  const SOLAR_FLARE_TRACK_COLOR = 'rgba(255, 255, 255, 0.22)';  // EDITABLE: Background circular track ring color
+  const SOLAR_FLARE_TRACK_STROKE_WIDTH_DESKTOP = 4.0;            // EDITABLE Desktop: SVG track stroke thickness
+  const SOLAR_FLARE_TRACK_STROKE_WIDTH_MOBILE = 4.0;             // EDITABLE Mobile: SVG track stroke thickness
+  const SOLAR_FLARE_PROGRESS_STROKE_WIDTH_DESKTOP = 4.0;         // EDITABLE Desktop: SVG active progress stroke thickness
+  const SOLAR_FLARE_PROGRESS_STROKE_WIDTH_MOBILE = 4.0;          // EDITABLE Mobile: SVG active progress stroke thickness
+  const SOLAR_FLARE_STROKE_LINECAP = 'butt';                     // EDITABLE: Progress arc end cap ('butt' for flush radial cut as in screenshot, or 'round')
+  const SOLAR_FLARE_ANIM_DURATION_S = 0.8;                       // EDITABLE: Transition duration in seconds for arc updates
+
+  // --- Dial Frame & Sizing (JCV) ---
+  const SOLAR_FLARE_DIAL_SIZE_DESKTOP = 'auto';                  // EDITABLE Desktop: 'auto' (matches var(--celestial-dial-size)) or custom vw
+  const SOLAR_FLARE_DIAL_SIZE_MOBILE = 'auto';                   // EDITABLE Mobile: 'auto' or custom vw
+  const SOLAR_FLARE_OFFSET_X_DESKTOP = '0vw';                    // EDITABLE Desktop: Fine horizontal nudge for dial circle
+  const SOLAR_FLARE_OFFSET_X_MOBILE = '0vw';                     // EDITABLE Mobile: Fine horizontal nudge
+  const SOLAR_FLARE_OFFSET_Y_DESKTOP = '0vw';                    // EDITABLE Desktop: Fine vertical nudge for dial circle
+  const SOLAR_FLARE_OFFSET_Y_MOBILE = '0vw';                     // EDITABLE Mobile: Fine vertical nudge
+  const SOLAR_FLARE_DIAL_BG_COLOR = 'transparent';               // EDITABLE: Dial circle background color
+  const SOLAR_FLARE_DIAL_INNER_SHADOW = 'inset 0 0 1vw rgba(0, 0, 0, 0.5)'; // EDITABLE: Dial inner shadow
+
+  // --- Typography & Text Positioning (JCV) ---
+  // Top Label ("SMALL FLARE")
+  const SOLAR_FLARE_LABEL_FONT_FAMILY = "'euro', sans-serif";    // EDITABLE: Top label font-family ("euro" = EurostileExtended)
+  const SOLAR_FLARE_LABEL_FONT_SIZE_DESKTOP = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.088)'; // EDITABLE Desktop: Top label font size
+  const SOLAR_FLARE_LABEL_FONT_SIZE_MOBILE = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.088)';  // EDITABLE Mobile: Top label font size
+  const SOLAR_FLARE_LABEL_LINE_HEIGHT = 1.0;                     // EDITABLE: Top label line height
+  const SOLAR_FLARE_LABEL_LETTER_SPACING_DESKTOP = '0.04em';     // EDITABLE Desktop: Top label letter spacing
+  const SOLAR_FLARE_LABEL_LETTER_SPACING_MOBILE = '0.04em';      // EDITABLE Mobile: Top label letter spacing
+  const SOLAR_FLARE_LABEL_OFFSET_Y_DESKTOP = '0vw';              // EDITABLE Desktop: Fine vertical nudge for top label
+  const SOLAR_FLARE_LABEL_OFFSET_Y_MOBILE = '0vw';               // EDITABLE Mobile: Fine vertical nudge for top label
+  const SOLAR_FLARE_GAP_LABEL_TO_CLASS_DESKTOP = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.025)'; // EDITABLE Desktop: Gap between label and giant class letter
+  const SOLAR_FLARE_GAP_LABEL_TO_CLASS_MOBILE = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.025)';  // EDITABLE Mobile: Gap between label and giant class letter
+
+  // Middle Giant Class Letter ("C")
+  const SOLAR_FLARE_CLASS_FONT_FAMILY = "'euro-bold', sans-serif"; // EDITABLE: Giant class letter font-family ("euro-bold" = EurostileExtendedBlack)
+  const SOLAR_FLARE_CLASS_FONT_SIZE_DESKTOP = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.38)'; // EDITABLE Desktop: Giant class letter font size
+  const SOLAR_FLARE_CLASS_FONT_SIZE_MOBILE = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.38)';  // EDITABLE Mobile: Giant class letter font size
+  const SOLAR_FLARE_CLASS_LINE_HEIGHT = 0.82;                    // EDITABLE: Giant class letter line height
+  const SOLAR_FLARE_CLASS_OFFSET_Y_DESKTOP = '0vw';              // EDITABLE Desktop: Fine vertical nudge for giant class letter
+  const SOLAR_FLARE_CLASS_OFFSET_Y_MOBILE = '0vw';               // EDITABLE Mobile: Fine vertical nudge for giant class letter
+  const SOLAR_FLARE_GAP_CLASS_TO_VALUE_DESKTOP = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02)'; // EDITABLE Desktop: Gap between giant class letter and bottom value
+  const SOLAR_FLARE_GAP_CLASS_TO_VALUE_MOBILE = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02)';  // EDITABLE Mobile: Gap between giant class letter and bottom value
+
+  // Bottom Decimal Value ("2.8")
+  const SOLAR_FLARE_VALUE_FONT_FAMILY = "'euro-bold', sans-serif"; // EDITABLE: Bottom value font-family ("euro-bold" = EurostileExtendedBlack)
+  const SOLAR_FLARE_VALUE_FONT_SIZE_DESKTOP = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.175)'; // EDITABLE Desktop: Bottom value font size
+  const SOLAR_FLARE_VALUE_FONT_SIZE_MOBILE = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.175)';  // EDITABLE Mobile: Bottom value font size
+  const SOLAR_FLARE_VALUE_LINE_HEIGHT = 0.92;                    // EDITABLE: Bottom value line height
+  const SOLAR_FLARE_VALUE_LETTER_SPACING_DESKTOP = '0.02em';     // EDITABLE Desktop: Bottom value letter spacing
+  const SOLAR_FLARE_VALUE_LETTER_SPACING_MOBILE = '0.02em';      // EDITABLE Mobile: Bottom value letter spacing
+  const SOLAR_FLARE_VALUE_OFFSET_Y_DESKTOP = '0vw';              // EDITABLE Desktop: Fine vertical nudge for bottom value
+  const SOLAR_FLARE_VALUE_OFFSET_Y_MOBILE = '0vw';               // EDITABLE Mobile: Fine vertical nudge for bottom value
+
+  // Overall Content Block Alignment
+  const SOLAR_FLARE_CONTENT_OFFSET_Y_DESKTOP = '0vw';            // EDITABLE Desktop: Vertical nudge for entire text block inside dial
+  const SOLAR_FLARE_CONTENT_OFFSET_Y_MOBILE = '0vw';             // EDITABLE Mobile: Vertical nudge for entire text block inside dial
+
+  // Sublabel Below Dial (Optional)
+  const SOLAR_FLARE_SUBLABEL_ENABLED = false;                    // EDITABLE: Enable/disable text label below dial circle
+  const SOLAR_FLARE_SUBLABEL_TEXT_DESKTOP = 'Solar Flare';       // EDITABLE Desktop: Sublabel text below dial
+  const SOLAR_FLARE_SUBLABEL_TEXT_MOBILE = 'Solar Flare';        // EDITABLE Mobile: Sublabel text below dial
 
   // --- Flanking Duplicate Timezone Dials Config (JCV) ---
   // Duplicates the 1st (Pacific) and 5th (UK) dials down to the Sun/Earth row: [Pacific, Big Sun, Big Earth, UK]
@@ -7916,6 +8009,84 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }
     }
 
+    // Solar Flare Dial Variables (JCV)
+    const isSolarDialAutoDesktop = !SOLAR_FLARE_DIAL_SIZE_DESKTOP || SOLAR_FLARE_DIAL_SIZE_DESKTOP === 'auto';
+    const isSolarDialAutoMobile = !SOLAR_FLARE_DIAL_SIZE_MOBILE || SOLAR_FLARE_DIAL_SIZE_MOBILE === 'auto';
+    const solarDialSizeDesktop = isSolarDialAutoDesktop ? 'var(--celestial-dial-size-desktop, var(--world-clock-size-desktop))' : SOLAR_FLARE_DIAL_SIZE_DESKTOP;
+    const solarDialSizeMobile = isSolarDialAutoMobile ? 'var(--celestial-dial-size-mobile, var(--world-clock-size-mobile))' : SOLAR_FLARE_DIAL_SIZE_MOBILE;
+    const solarDialSize = (isMobile ? isSolarDialAutoMobile : isSolarDialAutoDesktop) ? 'var(--celestial-dial-size, var(--world-clock-size))' : (isMobile ? SOLAR_FLARE_DIAL_SIZE_MOBILE : SOLAR_FLARE_DIAL_SIZE_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-flare-dial-size-desktop', solarDialSizeDesktop);
+    document.documentElement.style.setProperty('--solar-flare-dial-size-mobile', solarDialSizeMobile);
+    document.documentElement.style.setProperty('--solar-flare-dial-size', solarDialSize);
+
+    document.documentElement.style.setProperty('--solar-flare-offset-x-desktop', SOLAR_FLARE_OFFSET_X_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-offset-x-mobile', SOLAR_FLARE_OFFSET_X_MOBILE);
+    document.documentElement.style.setProperty('--solar-flare-offset-x', isMobile ? SOLAR_FLARE_OFFSET_X_MOBILE : SOLAR_FLARE_OFFSET_X_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-flare-offset-y-desktop', SOLAR_FLARE_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-offset-y-mobile', SOLAR_FLARE_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--solar-flare-offset-y', isMobile ? SOLAR_FLARE_OFFSET_Y_MOBILE : SOLAR_FLARE_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-flare-start-angle', `${SOLAR_FLARE_START_ANGLE_DEG}deg`);
+    document.documentElement.style.setProperty('--solar-flare-track-color', SOLAR_FLARE_TRACK_COLOR);
+    document.documentElement.style.setProperty('--solar-flare-track-stroke-width', String(isMobile ? SOLAR_FLARE_TRACK_STROKE_WIDTH_MOBILE : SOLAR_FLARE_TRACK_STROKE_WIDTH_DESKTOP));
+    document.documentElement.style.setProperty('--solar-flare-progress-stroke-width', String(isMobile ? SOLAR_FLARE_PROGRESS_STROKE_WIDTH_MOBILE : SOLAR_FLARE_PROGRESS_STROKE_WIDTH_DESKTOP));
+    document.documentElement.style.setProperty('--solar-flare-stroke-linecap', SOLAR_FLARE_STROKE_LINECAP);
+    document.documentElement.style.setProperty('--solar-flare-anim-duration', `${SOLAR_FLARE_ANIM_DURATION_S}s`);
+
+    document.documentElement.style.setProperty('--solar-flare-dial-bg-color', SOLAR_FLARE_DIAL_BG_COLOR);
+    document.documentElement.style.setProperty('--solar-flare-dial-inner-shadow', SOLAR_FLARE_DIAL_INNER_SHADOW);
+
+    document.documentElement.style.setProperty('--solar-flare-content-offset-y-desktop', SOLAR_FLARE_CONTENT_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-content-offset-y-mobile', SOLAR_FLARE_CONTENT_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--solar-flare-content-offset-y', isMobile ? SOLAR_FLARE_CONTENT_OFFSET_Y_MOBILE : SOLAR_FLARE_CONTENT_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-flare-label-font-family', SOLAR_FLARE_LABEL_FONT_FAMILY);
+    document.documentElement.style.setProperty('--solar-flare-label-font-size-desktop', SOLAR_FLARE_LABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-label-font-size-mobile', SOLAR_FLARE_LABEL_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--solar-flare-label-font-size', isMobile ? SOLAR_FLARE_LABEL_FONT_SIZE_MOBILE : SOLAR_FLARE_LABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-label-line-height', String(SOLAR_FLARE_LABEL_LINE_HEIGHT));
+    document.documentElement.style.setProperty('--solar-flare-label-letter-spacing-desktop', SOLAR_FLARE_LABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-label-letter-spacing-mobile', SOLAR_FLARE_LABEL_LETTER_SPACING_MOBILE);
+    document.documentElement.style.setProperty('--solar-flare-label-letter-spacing', isMobile ? SOLAR_FLARE_LABEL_LETTER_SPACING_MOBILE : SOLAR_FLARE_LABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-label-offset-y-desktop', SOLAR_FLARE_LABEL_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-label-offset-y-mobile', SOLAR_FLARE_LABEL_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--solar-flare-label-offset-y', isMobile ? SOLAR_FLARE_LABEL_OFFSET_Y_MOBILE : SOLAR_FLARE_LABEL_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-flare-gap-label-to-class-desktop', SOLAR_FLARE_GAP_LABEL_TO_CLASS_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-gap-label-to-class-mobile', SOLAR_FLARE_GAP_LABEL_TO_CLASS_MOBILE);
+    document.documentElement.style.setProperty('--solar-flare-gap-label-to-class', isMobile ? SOLAR_FLARE_GAP_LABEL_TO_CLASS_MOBILE : SOLAR_FLARE_GAP_LABEL_TO_CLASS_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-flare-class-font-family', SOLAR_FLARE_CLASS_FONT_FAMILY);
+    document.documentElement.style.setProperty('--solar-flare-class-font-size-desktop', SOLAR_FLARE_CLASS_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-class-font-size-mobile', SOLAR_FLARE_CLASS_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--solar-flare-class-font-size', isMobile ? SOLAR_FLARE_CLASS_FONT_SIZE_MOBILE : SOLAR_FLARE_CLASS_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-class-line-height', String(SOLAR_FLARE_CLASS_LINE_HEIGHT));
+    document.documentElement.style.setProperty('--solar-flare-class-offset-y-desktop', SOLAR_FLARE_CLASS_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-class-offset-y-mobile', SOLAR_FLARE_CLASS_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--solar-flare-class-offset-y', isMobile ? SOLAR_FLARE_CLASS_OFFSET_Y_MOBILE : SOLAR_FLARE_CLASS_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-flare-gap-class-to-value-desktop', SOLAR_FLARE_GAP_CLASS_TO_VALUE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-gap-class-to-value-mobile', SOLAR_FLARE_GAP_CLASS_TO_VALUE_MOBILE);
+    document.documentElement.style.setProperty('--solar-flare-gap-class-to-value', isMobile ? SOLAR_FLARE_GAP_CLASS_TO_VALUE_MOBILE : SOLAR_FLARE_GAP_CLASS_TO_VALUE_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-flare-value-font-family', SOLAR_FLARE_VALUE_FONT_FAMILY);
+    document.documentElement.style.setProperty('--solar-flare-value-font-size-desktop', SOLAR_FLARE_VALUE_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-value-font-size-mobile', SOLAR_FLARE_VALUE_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--solar-flare-value-font-size', isMobile ? SOLAR_FLARE_VALUE_FONT_SIZE_MOBILE : SOLAR_FLARE_VALUE_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-value-line-height', String(SOLAR_FLARE_VALUE_LINE_HEIGHT));
+    document.documentElement.style.setProperty('--solar-flare-value-letter-spacing-desktop', SOLAR_FLARE_VALUE_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-value-letter-spacing-mobile', SOLAR_FLARE_VALUE_LETTER_SPACING_MOBILE);
+    document.documentElement.style.setProperty('--solar-flare-value-letter-spacing', isMobile ? SOLAR_FLARE_VALUE_LETTER_SPACING_MOBILE : SOLAR_FLARE_VALUE_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-value-offset-y-desktop', SOLAR_FLARE_VALUE_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-value-offset-y-mobile', SOLAR_FLARE_VALUE_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--solar-flare-value-offset-y', isMobile ? SOLAR_FLARE_VALUE_OFFSET_Y_MOBILE : SOLAR_FLARE_VALUE_OFFSET_Y_DESKTOP);
+
+    if (typeof updateSolarFlareDial === 'function') {
+      updateSolarFlareDial();
+    }
+
     // Common margins & settings
     document.documentElement.style.setProperty('--sun-image-margin-top-desktop', SUN_IMAGE_MARGIN_TOP_DESKTOP);
     document.documentElement.style.setProperty('--sun-image-margin-top-mobile', SUN_IMAGE_MARGIN_TOP_MOBILE);
@@ -8057,7 +8228,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1198';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1202';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -11750,6 +11921,239 @@ Plan ahead for significantly warmer conditions tomorrow!`
     }
   ];
 
+  /* --- Solar Flare Scale Dial Component --- */
+  const SOLAR_FLARE_TEST_LEVELS = [
+    { class: 'A', value: 1.5 },
+    { class: 'B', value: 3.2 },
+    { class: 'C', value: 2.8 },
+    { class: 'M', value: 4.5 },
+    { class: 'X', value: 2.1 }
+  ];
+  let currentSolarFlareTestIndex = 2; // Default C 2.8 (matches screenshot)
+  let activeSolarFlareState = (SOLAR_FLARE_MODE === 'live') ? null : { class: SOLAR_FLARE_CLASS_MANUAL, value: SOLAR_FLARE_VALUE_MANUAL };
+  let liveSolarFlareData = null;
+  let solarFlareLiveTimer = null;
+
+  function getSolarFlareLabels(flareClass) {
+    const upper = String(flareClass || 'C').toUpperCase();
+    switch (upper) {
+      case 'A': return { line1: SOLAR_FLARE_LABEL_A_LINE1, line2: SOLAR_FLARE_LABEL_A_LINE2 };
+      case 'B': return { line1: SOLAR_FLARE_LABEL_B_LINE1, line2: SOLAR_FLARE_LABEL_B_LINE2 };
+      case 'C': return { line1: SOLAR_FLARE_LABEL_C_LINE1, line2: SOLAR_FLARE_LABEL_C_LINE2 };
+      case 'M': return { line1: SOLAR_FLARE_LABEL_M_LINE1, line2: SOLAR_FLARE_LABEL_M_LINE2 };
+      case 'X': return { line1: SOLAR_FLARE_LABEL_X_LINE1, line2: SOLAR_FLARE_LABEL_X_LINE2 };
+      default:  return { line1: 'SOLAR', line2: 'FLARE' };
+    }
+  }
+
+  function getSolarFlareLevelColor(flareClass) {
+    if (SOLAR_FLARE_COLOR_OVERRIDE !== null && SOLAR_FLARE_COLOR_OVERRIDE !== undefined) {
+      if (typeof SOLAR_FLARE_COLOR_OVERRIDE === 'number') {
+        return tempToColor(SOLAR_FLARE_COLOR_OVERRIDE) || 'hsl(30, 100%, 50%)';
+      }
+      return SOLAR_FLARE_COLOR_OVERRIDE;
+    }
+    const upper = String(flareClass || 'C').toUpperCase();
+    let setting;
+    switch (upper) {
+      case 'A': setting = SOLAR_FLARE_COLOR_LEVEL_A; break;
+      case 'B': setting = SOLAR_FLARE_COLOR_LEVEL_B; break;
+      case 'C': setting = SOLAR_FLARE_COLOR_LEVEL_C; break;
+      case 'M': setting = SOLAR_FLARE_COLOR_LEVEL_M; break;
+      case 'X': setting = SOLAR_FLARE_COLOR_LEVEL_X; break;
+      default:  setting = SOLAR_FLARE_COLOR_LEVEL_C; break;
+    }
+    if (typeof setting === 'number') {
+      return tempToColor(setting) || 'hsl(30, 100%, 50%)';
+    }
+    return setting || 'hsl(30, 100%, 50%)';
+  }
+
+  function calculateSolarFlareFraction(flareClass, flareValue) {
+    const cls = String(flareClass || 'C').toUpperCase();
+    const val = parseFloat(flareValue) || 1.0;
+
+    // 5 Class buckets across 360 degrees (0.0 to 1.0)
+    const ranges = {
+      A: { min: 0.00, max: 0.20 },
+      B: { min: 0.20, max: 0.40 },
+      C: { min: 0.40, max: 0.60 },
+      M: { min: 0.60, max: 0.80 },
+      X: { min: 0.80, max: 1.00 }
+    };
+    const range = ranges[cls] || ranges['C'];
+    // intra-class: 1.0 to 10.0 maps from range.min to range.max
+    const normalized = Math.max(0, Math.min(1.0, (val - 1.0) / 9.0));
+    return range.min + (normalized * (range.max - range.min));
+  }
+
+  function updateSolarFlareDial() {
+    const dial = document.getElementById('solar-flare-dial');
+    if (!dial) return;
+
+    let flareClass = 'C';
+    let flareValue = 2.8;
+
+    if (activeSolarFlareState) {
+      flareClass = activeSolarFlareState.class;
+      flareValue = activeSolarFlareState.value;
+    } else if (SOLAR_FLARE_MODE === 'live' && liveSolarFlareData) {
+      flareClass = liveSolarFlareData.class;
+      flareValue = liveSolarFlareData.value;
+    } else {
+      flareClass = SOLAR_FLARE_CLASS_MANUAL;
+      flareValue = SOLAR_FLARE_VALUE_MANUAL;
+    }
+
+    const labels = getSolarFlareLabels(flareClass);
+    const color = getSolarFlareLevelColor(flareClass);
+    const fraction = calculateSolarFlareFraction(flareClass, flareValue);
+
+    // Circumference for r=46 is 2 * PI * 46 = 289.027
+    const circumference = 289.027;
+    const strokeOffset = circumference * (1 - fraction);
+
+    const line1El = dial.querySelector('.solar-flare-label-line1');
+    const line2El = dial.querySelector('.solar-flare-label-line2');
+    const classEl = dial.querySelector('.solar-flare-class');
+    const valueEl = dial.querySelector('.solar-flare-value');
+
+    if (line1El && line1El.textContent !== labels.line1) line1El.textContent = labels.line1;
+    if (line2El && line2El.textContent !== labels.line2) line2El.textContent = labels.line2;
+    if (classEl && classEl.textContent !== flareClass) classEl.textContent = flareClass;
+    const displayVal = (typeof flareValue === 'number') ? flareValue.toFixed(1) : String(flareValue);
+    if (valueEl && valueEl.textContent !== displayVal) valueEl.textContent = displayVal;
+
+    dial.style.setProperty('--solar-flare-current-color', color);
+    dial.style.setProperty('--solar-flare-stroke-offset', strokeOffset.toFixed(2));
+  }
+
+  function handleSolarFlareDialClick(e) {
+    if (e) e.stopPropagation();
+    if (SOLAR_FLARE_MODE === 'live') {
+      if (!SOLAR_FLARE_CLICK_CYCLES_CLASSES) {
+        fetchLiveSolarFlareData();
+        return;
+      }
+      currentSolarFlareTestIndex = (currentSolarFlareTestIndex + 1) % (SOLAR_FLARE_TEST_LEVELS.length + 1);
+      if (currentSolarFlareTestIndex === SOLAR_FLARE_TEST_LEVELS.length) {
+        // Return to live feed
+        activeSolarFlareState = null;
+        fetchLiveSolarFlareData();
+      } else {
+        activeSolarFlareState = SOLAR_FLARE_TEST_LEVELS[currentSolarFlareTestIndex];
+        updateSolarFlareDial();
+      }
+      return;
+    }
+    if (!SOLAR_FLARE_CLICK_CYCLES_CLASSES) return;
+    currentSolarFlareTestIndex = (currentSolarFlareTestIndex + 1) % SOLAR_FLARE_TEST_LEVELS.length;
+    activeSolarFlareState = SOLAR_FLARE_TEST_LEVELS[currentSolarFlareTestIndex];
+    updateSolarFlareDial();
+  }
+
+  async function fetchLiveSolarFlareData() {
+    if (SOLAR_FLARE_MODE !== 'live') return;
+    try {
+      const response = await fetch('https://services.swpc.noaa.gov/json/goes/primary/xrays-6-hour.json', { cache: 'no-store' });
+      if (!response.ok) return;
+      const data = await response.json();
+      if (!Array.isArray(data) || data.length === 0) return;
+      const primaryReadings = data.filter(d => d.energy === '0.1-0.8nm' && typeof d.flux === 'number');
+      const latest = primaryReadings[primaryReadings.length - 1];
+      if (!latest) return;
+      const flux = latest.flux;
+      let cls = 'A';
+      let val = 1.0;
+      if (flux < 1e-7) {
+        cls = 'A';
+        val = flux / 1e-8;
+      } else if (flux < 1e-6) {
+        cls = 'B';
+        val = flux / 1e-7;
+      } else if (flux < 1e-5) {
+        cls = 'C';
+        val = flux / 1e-6;
+      } else if (flux < 1e-4) {
+        cls = 'M';
+        val = flux / 1e-5;
+      } else {
+        cls = 'X';
+        val = flux / 1e-4;
+      }
+      liveSolarFlareData = {
+        class: cls,
+        value: parseFloat(val.toFixed(1))
+      };
+      updateSolarFlareDial();
+    } catch (err) {
+      console.warn('Unable to fetch live solar flare data from NOAA SWPC:', err);
+    }
+  }
+
+  function buildSolarFlareColumn() {
+    const isMobile = window.innerWidth <= 767;
+    const col = document.createElement('div');
+    col.className = 'world-clock-column celestial-clock-column celestial-clock-column-left solar-flare-column';
+    col.id = 'celestial-clock-left';
+
+    const dial = document.createElement('div');
+    dial.className = 'world-clock-dial celestial-clock-dial solar-flare-dial';
+    dial.id = 'solar-flare-dial';
+    const titleText = (SOLAR_FLARE_MODE === 'live') ? 'Live Solar Flare (NOAA SWPC GOES satellite)' : 'Solar Flare Scale (Click to test levels)';
+    dial.setAttribute('title', titleText);
+
+    const initialClass = (SOLAR_FLARE_MODE === 'live' && liveSolarFlareData)
+      ? liveSolarFlareData.class
+      : (activeSolarFlareState?.class || SOLAR_FLARE_CLASS_MANUAL);
+    const initialVal = (SOLAR_FLARE_MODE === 'live' && liveSolarFlareData)
+      ? liveSolarFlareData.value
+      : (activeSolarFlareState?.value || SOLAR_FLARE_VALUE_MANUAL);
+    const labels = getSolarFlareLabels(initialClass);
+    const displayVal = (typeof initialVal === 'number') ? initialVal.toFixed(1) : String(initialVal);
+
+    dial.innerHTML = `
+      <svg class="solar-flare-svg clock-timer-svg" viewBox="0 0 100 100">
+        <circle class="solar-flare-track countdown-track" cx="50" cy="50" r="46" fill="none" />
+        <circle class="solar-flare-progress countdown-progress" cx="50" cy="50" r="46" fill="none" />
+      </svg>
+      <div class="solar-flare-content">
+        <div class="solar-flare-label">
+          <span class="solar-flare-label-line1">${labels.line1}</span>
+          <span class="solar-flare-label-line2">${labels.line2}</span>
+        </div>
+        <div class="solar-flare-class">${initialClass}</div>
+        <div class="solar-flare-value">${displayVal}</div>
+      </div>
+    `;
+
+    if (SOLAR_FLARE_CLICK_CYCLES_CLASSES) {
+      dial.addEventListener('click', handleSolarFlareDialClick);
+    }
+
+    col.appendChild(dial);
+
+    if (SOLAR_FLARE_SUBLABEL_ENABLED) {
+      const sublabel = document.createElement('div');
+      sublabel.className = 'world-clock-label celestial-clock-label solar-flare-sublabel';
+      sublabel.id = 'solar-flare-sublabel';
+      const text = isMobile ? SOLAR_FLARE_SUBLABEL_TEXT_MOBILE : SOLAR_FLARE_SUBLABEL_TEXT_DESKTOP;
+      sublabel.innerHTML = `<span class="world-clock-name">${text}</span>`;
+      col.appendChild(sublabel);
+    }
+
+    if (SOLAR_FLARE_MODE === 'live' && !solarFlareLiveTimer) {
+      fetchLiveSolarFlareData();
+      solarFlareLiveTimer = setInterval(fetchLiveSolarFlareData, SOLAR_FLARE_AUTO_REFRESH_MS);
+    }
+
+    requestAnimationFrame(() => {
+      updateSolarFlareDial();
+    });
+
+    return col;
+  }
+
   function buildWorldClockColumn(zoneConfig) {
     const {
       id,
@@ -12087,6 +12491,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
           }
         }
       });
+      if (SOLAR_FLARE_DIAL_ENABLED && typeof updateSolarFlareDial === 'function') {
+        updateSolarFlareDial();
+      }
     }
   }
 
@@ -12102,7 +12509,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
   function createSunImageIfMissing() {
     const existingSunsRow = document.getElementById('suns-row-wrapper');
     if (existingSunsRow) {
-      if (CELESTIAL_DIALS_ENABLED && !document.getElementById('celestial-clock-left')) {
+      const leftCol = document.getElementById('celestial-clock-left');
+      const hasSolarDial = !!document.getElementById('solar-flare-dial');
+      const needsRebuild = CELESTIAL_DIALS_ENABLED && (!leftCol || (SOLAR_FLARE_DIAL_ENABLED && !hasSolarDial) || (!SOLAR_FLARE_DIAL_ENABLED && hasSolarDial));
+      if (needsRebuild) {
         existingSunsRow.remove();
         const existingSpacer = document.getElementById('sun-image-spacer');
         if (existingSpacer) existingSpacer.remove();
@@ -12351,21 +12761,26 @@ Plan ahead for significantly warmer conditions tomorrow!`
       mainWrapper.style.opacity = '0';
       mainWrapper.style.transition = 'opacity 1s ease';
 
-      // 1. Duplicate 1st timezone dial (Pacific) on the left
+      // 1. Left dial in celestial row: Solar Flare Scale dial (or duplicate Pacific dial)
       if (CELESTIAL_DIALS_ENABLED) {
-        const isMobile = window.innerWidth <= 767;
-        const leftDial = buildWorldClockColumn({
-          id: 'left',
-          colId: 'celestial-clock-left',
-          dialId: 'world-clock-dial-celestial-left',
-          labelId: 'world-clock-label-celestial-left',
-          timeId: 'world-clock-time-celestial-left',
-          name: isMobile ? CELESTIAL_DIAL_LEFT_NAME_MOBILE : CELESTIAL_DIAL_LEFT_NAME_DESKTOP,
-          timeZone: CELESTIAL_DIAL_LEFT_TIMEZONE,
-          showTime: CELESTIAL_DIAL_LEFT_SHOW_TIME,
-          isCelestial: true
-        });
-        mainWrapper.appendChild(leftDial);
+        if (SOLAR_FLARE_DIAL_ENABLED) {
+          const leftDial = buildSolarFlareColumn();
+          mainWrapper.appendChild(leftDial);
+        } else {
+          const isMobile = window.innerWidth <= 767;
+          const leftDial = buildWorldClockColumn({
+            id: 'left',
+            colId: 'celestial-clock-left',
+            dialId: 'world-clock-dial-celestial-left',
+            labelId: 'world-clock-label-celestial-left',
+            timeId: 'world-clock-time-celestial-left',
+            name: isMobile ? CELESTIAL_DIAL_LEFT_NAME_MOBILE : CELESTIAL_DIAL_LEFT_NAME_DESKTOP,
+            timeZone: CELESTIAL_DIAL_LEFT_TIMEZONE,
+            showTime: CELESTIAL_DIAL_LEFT_SHOW_TIME,
+            isCelestial: true
+          });
+          mainWrapper.appendChild(leftDial);
+        }
       }
 
       // 2. Big Sun column (150% size, vertically centered with other 3 circles)

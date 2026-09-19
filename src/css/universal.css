@@ -106,6 +106,14 @@
   font-family: "anton";
   src: url("../fonts/Anton-Regular.ttf");
 }
+@font-face {
+  font-family: "euro";
+  src: url("../assets/fonts/EurostileExtended.ttf");
+}
+@font-face {
+  font-family: "euro-bold";
+  src: url("../assets/fonts/EurostileExtendedBlack.ttf");
+}
 * {
   font-family: "bold";
   font-size: 5vw;
