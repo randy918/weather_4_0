@@ -7302,17 +7302,167 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SOLAR_FLARE_VALUE_LINE_HEIGHT = 0.92;                    // EDITABLE: Bottom value line height
   const SOLAR_FLARE_VALUE_LETTER_SPACING_DESKTOP = '0.02em';     // EDITABLE Desktop: Bottom value letter spacing
   const SOLAR_FLARE_VALUE_LETTER_SPACING_MOBILE = '0.02em';      // EDITABLE Mobile: Bottom value letter spacing
-  const SOLAR_FLARE_VALUE_OFFSET_Y_DESKTOP = '0vw';              // EDITABLE Desktop: Fine vertical nudge for bottom value
+  const SOLAR_FLARE_VALUE_OFFSET_Y_DESKTOP = '-.5vw';              // EDITABLE Desktop: Fine vertical nudge for bottom value
   const SOLAR_FLARE_VALUE_OFFSET_Y_MOBILE = '0vw';               // EDITABLE Mobile: Fine vertical nudge for bottom value
 
   // Overall Content Block Alignment
   const SOLAR_FLARE_CONTENT_OFFSET_Y_DESKTOP = '0vw';            // EDITABLE Desktop: Vertical nudge for entire text block inside dial
   const SOLAR_FLARE_CONTENT_OFFSET_Y_MOBILE = '0vw';             // EDITABLE Mobile: Vertical nudge for entire text block inside dial
 
-  // Sublabel Below Dial (Optional)
-  const SOLAR_FLARE_SUBLABEL_ENABLED = false;                    // EDITABLE: Enable/disable text label below dial circle
-  const SOLAR_FLARE_SUBLABEL_TEXT_DESKTOP = 'Solar Flare';       // EDITABLE Desktop: Sublabel text below dial
-  const SOLAR_FLARE_SUBLABEL_TEXT_MOBILE = 'Solar Flare';        // EDITABLE Mobile: Sublabel text below dial
+  // Sublabel Below Dial (Strategy 3: Live Impact)
+  const SOLAR_FLARE_SUBLABEL_ENABLED = true;                     // EDITABLE: Enable/disable live impact label below dial
+  const SOLAR_FLARE_SUBLABEL_MODE = 'dynamic';                   // EDITABLE: 'dynamic' (strategy 3: changes with level) or 'static' (uses static text below)
+  const SOLAR_FLARE_SUBLABEL_TEXT_DESKTOP = 'Solar Flare';       // EDITABLE Desktop: Static fallback text
+  const SOLAR_FLARE_SUBLABEL_TEXT_MOBILE = 'Solar Flare';        // EDITABLE Mobile: Static fallback text
+  const SOLAR_FLARE_SUBLABEL_FONT_FAMILY = "var(--sun-label-font-family, 'light', sans-serif)"; // EDITABLE: Font family ('light', 'euro', 'bold', etc.)
+  const SOLAR_FLARE_SUBLABEL_FONT_SIZE_DESKTOP = '1.35vw';        // EDITABLE Desktop: Sublabel font size
+  const SOLAR_FLARE_SUBLABEL_FONT_SIZE_MOBILE = '2.6vw';         // EDITABLE Mobile: Sublabel font size
+  const SOLAR_FLARE_SUBLABEL_LINE_HEIGHT = 1.15;                 // EDITABLE: Sublabel line height for multi-line
+  const SOLAR_FLARE_SUBLABEL_LETTER_SPACING_DESKTOP = '0.04vw';  // EDITABLE Desktop: Sublabel letter spacing
+  const SOLAR_FLARE_SUBLABEL_LETTER_SPACING_MOBILE = '0.04vw';   // EDITABLE Mobile: Sublabel letter spacing
+  const SOLAR_FLARE_SUBLABEL_COLOR = 'auto';                     // EDITABLE: 'auto' (matches dial color) or custom CSS color (e.g. 'rgba(255, 255, 255, 0.70)')
+  const SOLAR_FLARE_SUBLABEL_MARGIN_TOP_DESKTOP = '0.8vw';       // EDITABLE Desktop: Margin top below dial circle
+  const SOLAR_FLARE_SUBLABEL_MARGIN_TOP_MOBILE = '1.5vw';        // EDITABLE Mobile: Margin top below dial circle
+  const SOLAR_FLARE_SUBLABEL_OFFSET_Y_DESKTOP = '0vw';           // EDITABLE Desktop: Fine vertical nudge
+  const SOLAR_FLARE_SUBLABEL_OFFSET_Y_MOBILE = '0vw';            // EDITABLE Mobile: Fine vertical nudge
+
+  // Strategy 3: Dynamic Live Impact Sublabels per Solar Flare Level
+  const SOLAR_FLARE_IMPACT_LEVEL_A_ARROW = 'down';               // EDITABLE: Arrow direction ('up' or 'down')
+  const SOLAR_FLARE_IMPACT_LEVEL_A_TEXT = 'Quiet Sun';           // EDITABLE: Situation text (can use <br> for multi-line)
+  const SOLAR_FLARE_IMPACT_LEVEL_B_ARROW = 'down';               // EDITABLE: Arrow direction ('up' or 'down')
+  const SOLAR_FLARE_IMPACT_LEVEL_B_TEXT = 'Nominal Activity';    // EDITABLE: Situation text
+  const SOLAR_FLARE_IMPACT_LEVEL_C_ARROW = 'up';                 // EDITABLE: Arrow direction ('up' or 'down')
+  const SOLAR_FLARE_IMPACT_LEVEL_C_TEXT = 'Low Activity';        // EDITABLE: Situation text
+  const SOLAR_FLARE_IMPACT_LEVEL_M_ARROW = 'up';                 // EDITABLE: Arrow direction ('up' or 'down')
+  const SOLAR_FLARE_IMPACT_LEVEL_M_TEXT = 'Radio Comm<br>Advisory'; // EDITABLE: Situation text
+  const SOLAR_FLARE_IMPACT_LEVEL_X_ARROW = 'up';                 // EDITABLE: Arrow direction ('up' or 'down')
+  const SOLAR_FLARE_IMPACT_LEVEL_X_TEXT = 'Radiation<br>Hazard'; // EDITABLE: Situation text
+
+  // =========================================================================
+  // --- EDITABLE: Radio Blackout (R-Scale) Dial Config (JCV) ---
+  // Replaces the right flanking dial (UK) in the Celestial row
+  // =========================================================================
+  const RADIO_BLACKOUT_DIAL_ENABLED = true;                      // EDITABLE: Enable/disable Radio Blackout dial in celestial row
+  const RADIO_BLACKOUT_MODE = 'live';                            // EDITABLE: 'live' (NOAA SWPC real-time) or 'manual' (uses manual class/value below)
+  const RADIO_BLACKOUT_CLASS_MANUAL = 'R2';                      // EDITABLE: Manual test class: 'R0', 'R1', 'R2', 'R3', 'R4', 'R5'
+  const RADIO_BLACKOUT_VALUE_MANUAL = 2.8;                       // EDITABLE: Manual test value in dB (e.g. 2.8db matches mockup)
+  const RADIO_BLACKOUT_CLICK_CYCLES_CLASSES = true;              // EDITABLE: Click/tap dial to cycle through test levels (R0 -> R1 -> R2 -> R3 -> R4 -> R5 -> Live)
+  const RADIO_BLACKOUT_AUTO_REFRESH_MS = 60000;                  // EDITABLE: Polling interval in ms for live NOAA blackout data
+
+  // --- Temperature Colors per Radio Blackout Level (JCV) ---
+  // Assign numeric temperature degree (maps directly to app's TEMP_COLORS palette)
+  // OR assign a custom CSS color string (e.g. 'hsl(30, 100%, 50%)', '#f60')
+  const RADIO_BLACKOUT_COLOR_LEVEL_R0 = 55;                      // EDITABLE: Level R0 (No Fade / Normal) temperature color (50s green)
+  const RADIO_BLACKOUT_COLOR_LEVEL_R1 = 75;                      // EDITABLE: Level R1 (Weak Fade) temperature color (70s yellow-gold)
+  const RADIO_BLACKOUT_COLOR_LEVEL_R2 = 85;                      // EDITABLE: Level R2 (Partial Fade) temperature color (80s orange, matches mockup)
+  const RADIO_BLACKOUT_COLOR_LEVEL_R3 = 95;                      // EDITABLE: Level R3 (Strong Fade) temperature color (90s tomato coral/red)
+  const RADIO_BLACKOUT_COLOR_LEVEL_R4 = 105;                     // EDITABLE: Level R4 (Severe Fade) temperature color (100s vibrant red)
+  const RADIO_BLACKOUT_COLOR_LEVEL_R5 = 115;                     // EDITABLE: Level R5 (Extreme Fade) temperature color (110s deep maroon red)
+  const RADIO_BLACKOUT_COLOR_OVERRIDE = null;                    // EDITABLE: Optional universal color override (e.g. null, 85, or '#f60')
+
+  // --- Level Descriptive Labels (JCV) ---
+  const RADIO_BLACKOUT_LABEL_R0_LINE1 = 'NO';                    // EDITABLE: Line 1 label for R0
+  const RADIO_BLACKOUT_LABEL_R0_LINE2 = 'FADE';                  // EDITABLE: Line 2 label for R0
+  const RADIO_BLACKOUT_LABEL_R1_LINE1 = 'WEAK';                  // EDITABLE: Line 1 label for R1
+  const RADIO_BLACKOUT_LABEL_R1_LINE2 = 'FADE';                  // EDITABLE: Line 2 label for R1
+  const RADIO_BLACKOUT_LABEL_R2_LINE1 = 'PARTIAL';               // EDITABLE: Line 1 label for R2 (matches mockup)
+  const RADIO_BLACKOUT_LABEL_R2_LINE2 = 'FADE';                  // EDITABLE: Line 2 label for R2 (matches mockup)
+  const RADIO_BLACKOUT_LABEL_R3_LINE1 = 'STRONG';                // EDITABLE: Line 1 label for R3
+  const RADIO_BLACKOUT_LABEL_R3_LINE2 = 'FADE';                  // EDITABLE: Line 2 label for R3
+  const RADIO_BLACKOUT_LABEL_R4_LINE1 = 'SEVERE';                // EDITABLE: Line 1 label for R4
+  const RADIO_BLACKOUT_LABEL_R4_LINE2 = 'FADE';                  // EDITABLE: Line 2 label for R4
+  const RADIO_BLACKOUT_LABEL_R5_LINE1 = 'EXTREME';               // EDITABLE: Line 1 label for R5
+  const RADIO_BLACKOUT_LABEL_R5_LINE2 = 'FADE';                  // EDITABLE: Line 2 label for R5
+
+  // --- Circular Progress Ring & Track (JCV) ---
+  const RADIO_BLACKOUT_START_ANGLE_DEG = 90;                     // EDITABLE: Arc start angle (90deg in SVG = 6 o'clock / lowest point)
+  const RADIO_BLACKOUT_TRACK_COLOR = 'rgba(255, 255, 255, 0.22)';// EDITABLE: Background circular track ring color
+  const RADIO_BLACKOUT_TRACK_STROKE_WIDTH_DESKTOP = 4.0;         // EDITABLE Desktop: SVG track stroke thickness
+  const RADIO_BLACKOUT_TRACK_STROKE_WIDTH_MOBILE = 4.0;          // EDITABLE Mobile: SVG track stroke thickness
+  const RADIO_BLACKOUT_PROGRESS_STROKE_WIDTH_DESKTOP = 4.0;      // EDITABLE Desktop: SVG active progress stroke thickness
+  const RADIO_BLACKOUT_PROGRESS_STROKE_WIDTH_MOBILE = 4.0;       // EDITABLE Mobile: SVG active progress stroke thickness
+  const RADIO_BLACKOUT_STROKE_LINECAP = 'butt';                  // EDITABLE: Progress arc end cap ('butt' or 'round')
+  const RADIO_BLACKOUT_ANIM_DURATION_S = 0.8;                    // EDITABLE: Transition duration in seconds for arc updates
+
+  // --- Dial Frame & Sizing (JCV) ---
+  const RADIO_BLACKOUT_DIAL_SIZE_DESKTOP = 'auto';               // EDITABLE Desktop: 'auto' (matches var(--celestial-dial-size)) or custom vw
+  const RADIO_BLACKOUT_DIAL_SIZE_MOBILE = 'auto';                // EDITABLE Mobile: 'auto' or custom vw
+  const RADIO_BLACKOUT_OFFSET_X_DESKTOP = '0vw';                 // EDITABLE Desktop: Fine horizontal nudge for dial circle
+  const RADIO_BLACKOUT_OFFSET_X_MOBILE = '0vw';                  // EDITABLE Mobile: Fine horizontal nudge
+  const RADIO_BLACKOUT_OFFSET_Y_DESKTOP = '0vw';                 // EDITABLE Desktop: Fine vertical nudge for dial circle
+  const RADIO_BLACKOUT_OFFSET_Y_MOBILE = '0vw';                  // EDITABLE Mobile: Fine vertical nudge
+  const RADIO_BLACKOUT_DIAL_BG_COLOR = 'transparent';            // EDITABLE: Dial circle background color
+  const RADIO_BLACKOUT_DIAL_INNER_SHADOW = 'inset 0 0 1vw rgba(0, 0, 0, 0.5)'; // EDITABLE: Dial inner shadow
+
+  // --- Typography & Text Positioning (JCV) ---
+  // Top Label ("PARTIAL FADE")
+  const RADIO_BLACKOUT_LABEL_FONT_FAMILY = "'euro', sans-serif"; // EDITABLE: Top label font-family ("euro" = EurostileExtended)
+  const RADIO_BLACKOUT_LABEL_FONT_SIZE_DESKTOP = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.088)'; // EDITABLE Desktop: Top label font size
+  const RADIO_BLACKOUT_LABEL_FONT_SIZE_MOBILE = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.088)';  // EDITABLE Mobile: Top label font size
+  const RADIO_BLACKOUT_LABEL_LINE_HEIGHT = 1.0;                  // EDITABLE: Top label line height
+  const RADIO_BLACKOUT_LABEL_LETTER_SPACING_DESKTOP = '0.04em';  // EDITABLE Desktop: Top label letter spacing
+  const RADIO_BLACKOUT_LABEL_LETTER_SPACING_MOBILE = '0.04em';   // EDITABLE Mobile: Top label letter spacing
+  const RADIO_BLACKOUT_LABEL_OFFSET_Y_DESKTOP = '0vw';           // EDITABLE Desktop: Fine vertical nudge for top label
+  const RADIO_BLACKOUT_LABEL_OFFSET_Y_MOBILE = '0vw';            // EDITABLE Mobile: Fine vertical nudge for top label
+  const RADIO_BLACKOUT_GAP_LABEL_TO_CLASS_DESKTOP = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.025)'; // EDITABLE Desktop: Gap between label and giant class text
+  const RADIO_BLACKOUT_GAP_LABEL_TO_CLASS_MOBILE = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.025)';  // EDITABLE Mobile: Gap between label and giant class text
+
+  // Middle Giant Class ("R2")
+  const RADIO_BLACKOUT_CLASS_FONT_FAMILY = "'euro-bold', sans-serif"; // EDITABLE: Giant class font-family ("euro-bold" = EurostileExtendedBlack)
+  const RADIO_BLACKOUT_CLASS_FONT_SIZE_DESKTOP = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.34)'; // EDITABLE Desktop: Giant class text font size
+  const RADIO_BLACKOUT_CLASS_FONT_SIZE_MOBILE = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.34)';  // EDITABLE Mobile: Giant class text font size
+  const RADIO_BLACKOUT_CLASS_LINE_HEIGHT = 0.82;                 // EDITABLE: Giant class line height
+  const RADIO_BLACKOUT_CLASS_OFFSET_Y_DESKTOP = '0vw';           // EDITABLE Desktop: Fine vertical nudge for giant class text
+  const RADIO_BLACKOUT_CLASS_OFFSET_Y_MOBILE = '0vw';            // EDITABLE Mobile: Fine vertical nudge for giant class text
+  const RADIO_BLACKOUT_GAP_CLASS_TO_VALUE_DESKTOP = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02)'; // EDITABLE Desktop: Gap between giant class and bottom value
+  const RADIO_BLACKOUT_GAP_CLASS_TO_VALUE_MOBILE = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02)';  // EDITABLE Mobile: Gap between giant class and bottom value
+
+  // Bottom Value ("2.8dB")
+  const RADIO_BLACKOUT_UNIT = 'dB';                              // EDITABLE: SI/IEEE decibel unit symbol ('dB', 'db', or '')
+  const RADIO_BLACKOUT_TWO_SIG_DIGITS = true;                    // EDITABLE: If true, formats to 2 significant digits (e.g. 2.8dB, 16dB vs 16.0dB) to avoid circle crowding
+  const RADIO_BLACKOUT_VALUE_FONT_FAMILY = "'euro-bold', sans-serif"; // EDITABLE: Bottom value font-family ("euro-bold" = EurostileExtendedBlack)
+  const RADIO_BLACKOUT_VALUE_FONT_SIZE_DESKTOP = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.165)'; // EDITABLE Desktop: Bottom value font size
+  const RADIO_BLACKOUT_VALUE_FONT_SIZE_MOBILE = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.165)';  // EDITABLE Mobile: Bottom value font size
+  const RADIO_BLACKOUT_VALUE_LINE_HEIGHT = 0.92;                 // EDITABLE: Bottom value line height
+  const RADIO_BLACKOUT_VALUE_LETTER_SPACING_DESKTOP = '-.015em';  // EDITABLE Desktop: Bottom value letter spacing
+  const RADIO_BLACKOUT_VALUE_LETTER_SPACING_MOBILE = '-.03em';   // EDITABLE Mobile: Bottom value letter spacing
+  const RADIO_BLACKOUT_VALUE_OFFSET_Y_DESKTOP = '-.5vw';           // EDITABLE Desktop: Fine vertical nudge for bottom value
+  const RADIO_BLACKOUT_VALUE_OFFSET_Y_MOBILE = '0vw';            // EDITABLE Mobile: Fine vertical nudge for bottom value
+
+  // Overall Content Block Alignment
+  const RADIO_BLACKOUT_CONTENT_OFFSET_Y_DESKTOP = '0vw';         // EDITABLE Desktop: Vertical nudge for entire text block inside dial
+  const RADIO_BLACKOUT_CONTENT_OFFSET_Y_MOBILE = '0vw';          // EDITABLE Mobile: Vertical nudge for entire text block inside dial
+
+  // Sublabel Below Dial (Strategy 3: Live Impact)
+  const RADIO_BLACKOUT_SUBLABEL_ENABLED = true;                  // EDITABLE: Enable/disable live impact label below dial
+  const RADIO_BLACKOUT_SUBLABEL_MODE = 'dynamic';                // EDITABLE: 'dynamic' (strategy 3: changes with level) or 'static' (uses static text below)
+  const RADIO_BLACKOUT_SUBLABEL_TEXT_DESKTOP = 'Radio Blackout'; // EDITABLE Desktop: Static fallback text
+  const RADIO_BLACKOUT_SUBLABEL_TEXT_MOBILE = 'Radio Blackout';  // EDITABLE Mobile: Static fallback text
+  const RADIO_BLACKOUT_SUBLABEL_FONT_FAMILY = "var(--sun-label-font-family, 'light', sans-serif)"; // EDITABLE: Font family ('light', 'euro', 'bold', etc.)
+  const RADIO_BLACKOUT_SUBLABEL_FONT_SIZE_DESKTOP = '1.35vw';     // EDITABLE Desktop: Sublabel font size
+  const RADIO_BLACKOUT_SUBLABEL_FONT_SIZE_MOBILE = '2.6vw';      // EDITABLE Mobile: Sublabel font size
+  const RADIO_BLACKOUT_SUBLABEL_LINE_HEIGHT = 1.15;              // EDITABLE: Sublabel line height for multi-line
+  const RADIO_BLACKOUT_SUBLABEL_LETTER_SPACING_DESKTOP = '0.04vw';// EDITABLE Desktop: Sublabel letter spacing
+  const RADIO_BLACKOUT_SUBLABEL_LETTER_SPACING_MOBILE = '0.04vw'; // EDITABLE Mobile: Sublabel letter spacing
+  const RADIO_BLACKOUT_SUBLABEL_COLOR = 'auto';                  // EDITABLE: 'auto' (matches dial color) or custom CSS color (e.g. 'rgba(255, 255, 255, 0.70)')
+  const RADIO_BLACKOUT_SUBLABEL_MARGIN_TOP_DESKTOP = '0.8vw';    // EDITABLE Desktop: Margin top below dial circle
+  const RADIO_BLACKOUT_SUBLABEL_MARGIN_TOP_MOBILE = '1.5vw';     // EDITABLE Mobile: Margin top below dial circle
+  const RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_DESKTOP = '0vw';        // EDITABLE Desktop: Fine vertical nudge
+  const RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_MOBILE = '0vw';         // EDITABLE Mobile: Fine vertical nudge
+
+  // Strategy 3: Dynamic Live Impact Sublabels per Radio Blackout Level
+  const RADIO_BLACKOUT_IMPACT_LEVEL_R0_ARROW = 'down';           // EDITABLE: Arrow direction ('up' or 'down')
+  const RADIO_BLACKOUT_IMPACT_LEVEL_R0_TEXT = 'All Bands Clear'; // EDITABLE: Situation text
+  const RADIO_BLACKOUT_IMPACT_LEVEL_R1_ARROW = 'up';             // EDITABLE: Arrow direction ('up' or 'down')
+  const RADIO_BLACKOUT_IMPACT_LEVEL_R1_TEXT = 'Minor HF Noise';  // EDITABLE: Situation text
+  const RADIO_BLACKOUT_IMPACT_LEVEL_R2_ARROW = 'up';             // EDITABLE: Arrow direction ('up' or 'down')
+  const RADIO_BLACKOUT_IMPACT_LEVEL_R2_TEXT = 'HF Signal Loss';  // EDITABLE: Situation text
+  const RADIO_BLACKOUT_IMPACT_LEVEL_R3_ARROW = 'up';             // EDITABLE: Arrow direction ('up' or 'down')
+  const RADIO_BLACKOUT_IMPACT_LEVEL_R3_TEXT = 'Wide HF Outage';  // EDITABLE: Situation text
+  const RADIO_BLACKOUT_IMPACT_LEVEL_R4_ARROW = 'up';             // EDITABLE: Arrow direction ('up' or 'down')
+  const RADIO_BLACKOUT_IMPACT_LEVEL_R4_TEXT = 'Major Day Outage';// EDITABLE: Situation text
+  const RADIO_BLACKOUT_IMPACT_LEVEL_R5_ARROW = 'up';             // EDITABLE: Arrow direction ('up' or 'down')
+  const RADIO_BLACKOUT_IMPACT_LEVEL_R5_TEXT = 'Total Dayside<br>Blackout'; // EDITABLE: Situation text
 
   // --- Flanking Duplicate Timezone Dials Config (JCV) ---
   // Duplicates the 1st (Pacific) and 5th (UK) dials down to the Sun/Earth row: [Pacific, Big Sun, Big Earth, UK]
@@ -7325,6 +7475,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const CELESTIAL_DIAL_RIGHT_NAME_MOBILE = 'UK';                // EDITABLE Mobile: Right dial label name
   const CELESTIAL_DIAL_RIGHT_TIMEZONE = 'Europe/London';        // EDITABLE: Right dial IANA timezone string
   const CELESTIAL_DIAL_RIGHT_SHOW_TIME = true;                  // EDITABLE: Show dynamic time under right dial
+
+  // --- Sweeping Gauge Two-Stage Animation & Reset Flash Controls (JCV) ---
+  const CELESTIAL_GAUGE_ANIM_ENABLED = true;                   // EDITABLE: Enable two-stage sweeping animation on value change (like Barometer/Humidity)
+  const CELESTIAL_GAUGE_STAGE1_MS = 600;                       // EDITABLE: Stage 1 duration (sweep to full if 'up', sweep to 0 if 'down') in ms
+  const CELESTIAL_GAUGE_STAGE2_MS = 600;                       // EDITABLE: Stage 2 duration (settle to target offset) in ms
+  const CELESTIAL_DIAL_RESET_FLASH_ENABLED = true;             // EDITABLE: Flash dial opacity during resets (fade out to 0.15 & in to 1.0)
+  const CELESTIAL_DIAL_RESET_FLASH_MS = 500;                   // EDITABLE: Reset flash duration in ms
 
   // Flanking Dials Lateral & Vertical Centering Controls (JCV)
   // 'center' aligns the dial circle's horizontal midline with the Sun & Earth equator
@@ -8083,8 +8240,116 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--solar-flare-value-offset-y-mobile', SOLAR_FLARE_VALUE_OFFSET_Y_MOBILE);
     document.documentElement.style.setProperty('--solar-flare-value-offset-y', isMobile ? SOLAR_FLARE_VALUE_OFFSET_Y_MOBILE : SOLAR_FLARE_VALUE_OFFSET_Y_DESKTOP);
 
+    document.documentElement.style.setProperty('--solar-flare-sublabel-font-family', SOLAR_FLARE_SUBLABEL_FONT_FAMILY);
+    document.documentElement.style.setProperty('--solar-flare-sublabel-font-size-desktop', SOLAR_FLARE_SUBLABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-sublabel-font-size-mobile', SOLAR_FLARE_SUBLABEL_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--solar-flare-sublabel-font-size', isMobile ? SOLAR_FLARE_SUBLABEL_FONT_SIZE_MOBILE : SOLAR_FLARE_SUBLABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-sublabel-line-height', String(SOLAR_FLARE_SUBLABEL_LINE_HEIGHT));
+    document.documentElement.style.setProperty('--solar-flare-sublabel-letter-spacing-desktop', SOLAR_FLARE_SUBLABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-sublabel-letter-spacing-mobile', SOLAR_FLARE_SUBLABEL_LETTER_SPACING_MOBILE);
+    document.documentElement.style.setProperty('--solar-flare-sublabel-letter-spacing', isMobile ? SOLAR_FLARE_SUBLABEL_LETTER_SPACING_MOBILE : SOLAR_FLARE_SUBLABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-sublabel-margin-top-desktop', SOLAR_FLARE_SUBLABEL_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-sublabel-margin-top-mobile', SOLAR_FLARE_SUBLABEL_MARGIN_TOP_MOBILE);
+    document.documentElement.style.setProperty('--solar-flare-sublabel-margin-top', isMobile ? SOLAR_FLARE_SUBLABEL_MARGIN_TOP_MOBILE : SOLAR_FLARE_SUBLABEL_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-sublabel-offset-y-desktop', SOLAR_FLARE_SUBLABEL_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-sublabel-offset-y-mobile', SOLAR_FLARE_SUBLABEL_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--solar-flare-sublabel-offset-y', isMobile ? SOLAR_FLARE_SUBLABEL_OFFSET_Y_MOBILE : SOLAR_FLARE_SUBLABEL_OFFSET_Y_DESKTOP);
+
     if (typeof updateSolarFlareDial === 'function') {
       updateSolarFlareDial();
+    }
+
+    // Radio Blackout (R-Scale) Dial Variables (JCV)
+    const isRadioDialAutoDesktop = !RADIO_BLACKOUT_DIAL_SIZE_DESKTOP || RADIO_BLACKOUT_DIAL_SIZE_DESKTOP === 'auto';
+    const isRadioDialAutoMobile = !RADIO_BLACKOUT_DIAL_SIZE_MOBILE || RADIO_BLACKOUT_DIAL_SIZE_MOBILE === 'auto';
+    const radioDialSizeDesktop = isRadioDialAutoDesktop ? 'var(--celestial-dial-size-desktop, var(--world-clock-size-desktop))' : RADIO_BLACKOUT_DIAL_SIZE_DESKTOP;
+    const radioDialSizeMobile = isRadioDialAutoMobile ? 'var(--celestial-dial-size-mobile, var(--world-clock-size-mobile))' : RADIO_BLACKOUT_DIAL_SIZE_MOBILE;
+    const radioDialSize = (isMobile ? isRadioDialAutoMobile : isRadioDialAutoDesktop) ? 'var(--celestial-dial-size, var(--world-clock-size))' : (isMobile ? RADIO_BLACKOUT_DIAL_SIZE_MOBILE : RADIO_BLACKOUT_DIAL_SIZE_DESKTOP);
+
+    document.documentElement.style.setProperty('--radio-blackout-dial-size-desktop', radioDialSizeDesktop);
+    document.documentElement.style.setProperty('--radio-blackout-dial-size-mobile', radioDialSizeMobile);
+    document.documentElement.style.setProperty('--radio-blackout-dial-size', radioDialSize);
+
+    document.documentElement.style.setProperty('--radio-blackout-offset-x-desktop', RADIO_BLACKOUT_OFFSET_X_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-offset-x-mobile', RADIO_BLACKOUT_OFFSET_X_MOBILE);
+    document.documentElement.style.setProperty('--radio-blackout-offset-x', isMobile ? RADIO_BLACKOUT_OFFSET_X_MOBILE : RADIO_BLACKOUT_OFFSET_X_DESKTOP);
+
+    document.documentElement.style.setProperty('--radio-blackout-offset-y-desktop', RADIO_BLACKOUT_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-offset-y-mobile', RADIO_BLACKOUT_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--radio-blackout-offset-y', isMobile ? RADIO_BLACKOUT_OFFSET_Y_MOBILE : RADIO_BLACKOUT_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--radio-blackout-start-angle', `${RADIO_BLACKOUT_START_ANGLE_DEG}deg`);
+    document.documentElement.style.setProperty('--radio-blackout-track-color', RADIO_BLACKOUT_TRACK_COLOR);
+    document.documentElement.style.setProperty('--radio-blackout-track-stroke-width', String(isMobile ? RADIO_BLACKOUT_TRACK_STROKE_WIDTH_MOBILE : RADIO_BLACKOUT_TRACK_STROKE_WIDTH_DESKTOP));
+    document.documentElement.style.setProperty('--radio-blackout-progress-stroke-width', String(isMobile ? RADIO_BLACKOUT_PROGRESS_STROKE_WIDTH_MOBILE : RADIO_BLACKOUT_PROGRESS_STROKE_WIDTH_DESKTOP));
+    document.documentElement.style.setProperty('--radio-blackout-stroke-linecap', RADIO_BLACKOUT_STROKE_LINECAP);
+    document.documentElement.style.setProperty('--radio-blackout-anim-duration', `${RADIO_BLACKOUT_ANIM_DURATION_S}s`);
+
+    document.documentElement.style.setProperty('--radio-blackout-dial-bg-color', RADIO_BLACKOUT_DIAL_BG_COLOR);
+    document.documentElement.style.setProperty('--radio-blackout-dial-inner-shadow', RADIO_BLACKOUT_DIAL_INNER_SHADOW);
+
+    document.documentElement.style.setProperty('--radio-blackout-content-offset-y-desktop', RADIO_BLACKOUT_CONTENT_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-content-offset-y-mobile', RADIO_BLACKOUT_CONTENT_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--radio-blackout-content-offset-y', isMobile ? RADIO_BLACKOUT_CONTENT_OFFSET_Y_MOBILE : RADIO_BLACKOUT_CONTENT_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--radio-blackout-label-font-family', RADIO_BLACKOUT_LABEL_FONT_FAMILY);
+    document.documentElement.style.setProperty('--radio-blackout-label-font-size-desktop', RADIO_BLACKOUT_LABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-label-font-size-mobile', RADIO_BLACKOUT_LABEL_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--radio-blackout-label-font-size', isMobile ? RADIO_BLACKOUT_LABEL_FONT_SIZE_MOBILE : RADIO_BLACKOUT_LABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-label-line-height', String(RADIO_BLACKOUT_LABEL_LINE_HEIGHT));
+    document.documentElement.style.setProperty('--radio-blackout-label-letter-spacing-desktop', RADIO_BLACKOUT_LABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-label-letter-spacing-mobile', RADIO_BLACKOUT_LABEL_LETTER_SPACING_MOBILE);
+    document.documentElement.style.setProperty('--radio-blackout-label-letter-spacing', isMobile ? RADIO_BLACKOUT_LABEL_LETTER_SPACING_MOBILE : RADIO_BLACKOUT_LABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-label-offset-y-desktop', RADIO_BLACKOUT_LABEL_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-label-offset-y-mobile', RADIO_BLACKOUT_LABEL_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--radio-blackout-label-offset-y', isMobile ? RADIO_BLACKOUT_LABEL_OFFSET_Y_MOBILE : RADIO_BLACKOUT_LABEL_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--radio-blackout-gap-label-to-class-desktop', RADIO_BLACKOUT_GAP_LABEL_TO_CLASS_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-gap-label-to-class-mobile', RADIO_BLACKOUT_GAP_LABEL_TO_CLASS_MOBILE);
+    document.documentElement.style.setProperty('--radio-blackout-gap-label-to-class', isMobile ? RADIO_BLACKOUT_GAP_LABEL_TO_CLASS_MOBILE : RADIO_BLACKOUT_GAP_LABEL_TO_CLASS_DESKTOP);
+
+    document.documentElement.style.setProperty('--radio-blackout-class-font-family', RADIO_BLACKOUT_CLASS_FONT_FAMILY);
+    document.documentElement.style.setProperty('--radio-blackout-class-font-size-desktop', RADIO_BLACKOUT_CLASS_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-class-font-size-mobile', RADIO_BLACKOUT_CLASS_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--radio-blackout-class-font-size', isMobile ? RADIO_BLACKOUT_CLASS_FONT_SIZE_MOBILE : RADIO_BLACKOUT_CLASS_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-class-line-height', String(RADIO_BLACKOUT_CLASS_LINE_HEIGHT));
+    document.documentElement.style.setProperty('--radio-blackout-class-offset-y-desktop', RADIO_BLACKOUT_CLASS_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-class-offset-y-mobile', RADIO_BLACKOUT_CLASS_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--radio-blackout-class-offset-y', isMobile ? RADIO_BLACKOUT_CLASS_OFFSET_Y_MOBILE : RADIO_BLACKOUT_CLASS_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--radio-blackout-gap-class-to-value-desktop', RADIO_BLACKOUT_GAP_CLASS_TO_VALUE_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-gap-class-to-value-mobile', RADIO_BLACKOUT_GAP_CLASS_TO_VALUE_MOBILE);
+    document.documentElement.style.setProperty('--radio-blackout-gap-class-to-value', isMobile ? RADIO_BLACKOUT_GAP_CLASS_TO_VALUE_MOBILE : RADIO_BLACKOUT_GAP_CLASS_TO_VALUE_DESKTOP);
+
+    document.documentElement.style.setProperty('--radio-blackout-value-font-family', RADIO_BLACKOUT_VALUE_FONT_FAMILY);
+    document.documentElement.style.setProperty('--radio-blackout-value-font-size-desktop', RADIO_BLACKOUT_VALUE_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-value-font-size-mobile', RADIO_BLACKOUT_VALUE_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--radio-blackout-value-font-size', isMobile ? RADIO_BLACKOUT_VALUE_FONT_SIZE_MOBILE : RADIO_BLACKOUT_VALUE_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-value-line-height', String(RADIO_BLACKOUT_VALUE_LINE_HEIGHT));
+    document.documentElement.style.setProperty('--radio-blackout-value-letter-spacing-desktop', RADIO_BLACKOUT_VALUE_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-value-letter-spacing-mobile', RADIO_BLACKOUT_VALUE_LETTER_SPACING_MOBILE);
+    document.documentElement.style.setProperty('--radio-blackout-value-letter-spacing', isMobile ? RADIO_BLACKOUT_VALUE_LETTER_SPACING_MOBILE : RADIO_BLACKOUT_VALUE_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-value-offset-y-desktop', RADIO_BLACKOUT_VALUE_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-value-offset-y-mobile', RADIO_BLACKOUT_VALUE_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--radio-blackout-value-offset-y', isMobile ? RADIO_BLACKOUT_VALUE_OFFSET_Y_MOBILE : RADIO_BLACKOUT_VALUE_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--radio-blackout-sublabel-font-family', RADIO_BLACKOUT_SUBLABEL_FONT_FAMILY);
+    document.documentElement.style.setProperty('--radio-blackout-sublabel-font-size-desktop', RADIO_BLACKOUT_SUBLABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-sublabel-font-size-mobile', RADIO_BLACKOUT_SUBLABEL_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--radio-blackout-sublabel-font-size', isMobile ? RADIO_BLACKOUT_SUBLABEL_FONT_SIZE_MOBILE : RADIO_BLACKOUT_SUBLABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-sublabel-line-height', String(RADIO_BLACKOUT_SUBLABEL_LINE_HEIGHT));
+    document.documentElement.style.setProperty('--radio-blackout-sublabel-letter-spacing-desktop', RADIO_BLACKOUT_SUBLABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-sublabel-letter-spacing-mobile', RADIO_BLACKOUT_SUBLABEL_LETTER_SPACING_MOBILE);
+    document.documentElement.style.setProperty('--radio-blackout-sublabel-letter-spacing', isMobile ? RADIO_BLACKOUT_SUBLABEL_LETTER_SPACING_MOBILE : RADIO_BLACKOUT_SUBLABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-sublabel-margin-top-desktop', RADIO_BLACKOUT_SUBLABEL_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-sublabel-margin-top-mobile', RADIO_BLACKOUT_SUBLABEL_MARGIN_TOP_MOBILE);
+    document.documentElement.style.setProperty('--radio-blackout-sublabel-margin-top', isMobile ? RADIO_BLACKOUT_SUBLABEL_MARGIN_TOP_MOBILE : RADIO_BLACKOUT_SUBLABEL_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-sublabel-offset-y-desktop', RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-sublabel-offset-y-mobile', RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--radio-blackout-sublabel-offset-y', isMobile ? RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_MOBILE : RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_DESKTOP);
+
+    if (typeof updateRadioBlackoutDial === 'function') {
+      updateRadioBlackoutDial();
     }
 
     // Common margins & settings
@@ -11640,7 +11905,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     }
     startAutoRefresh(currentRefreshMs, autoRefreshAligned);
     
-    const targets = document.querySelectorAll('.clockGridItem-0, #analog-clock');
+    const targets = document.querySelectorAll('.clockGridItem-0, #analog-clock, #solar-flare-dial, #radio-blackout-dial');
     targets.forEach(target => {
       const applyTransition = (opacityVal) => {
         target.style.setProperty('transition', 'opacity 0.5s ease-out', 'important');
@@ -11934,6 +12199,128 @@ Plan ahead for significantly warmer conditions tomorrow!`
   let liveSolarFlareData = null;
   let solarFlareLiveTimer = null;
 
+  // --- Persistent Trend & Sweeping Gauge Animation State (JCV) ---
+  let prevSolarFlareFraction = null;
+  let currentSolarFlareTrend = (function() {
+    try {
+      return localStorage.getItem('weather_trend_solar_flare_direction') || 'down';
+    } catch (e) {
+      return 'down';
+    }
+  })();
+
+  let prevRadioBlackoutFraction = null;
+  let currentRadioBlackoutTrend = (function() {
+    try {
+      return localStorage.getItem('weather_trend_radio_blackout_direction') || 'down';
+    } catch (e) {
+      return 'down';
+    }
+  })();
+
+  function setSolarFlareTrend(newTrend) {
+    currentSolarFlareTrend = newTrend;
+    try {
+      localStorage.setItem('weather_trend_solar_flare_direction', newTrend);
+    } catch (e) {}
+  }
+
+  function setRadioBlackoutTrend(newTrend) {
+    currentRadioBlackoutTrend = newTrend;
+    try {
+      localStorage.setItem('weather_trend_radio_blackout_direction', newTrend);
+    } catch (e) {}
+  }
+
+  function flashDialReset(dialEl) {
+    if (!CELESTIAL_DIAL_RESET_FLASH_ENABLED || !dialEl) return;
+    const applyTransition = (opacityVal) => {
+      dialEl.style.setProperty('transition', `opacity ${CELESTIAL_DIAL_RESET_FLASH_MS / 1000}s ease-out`, 'important');
+      dialEl.style.setProperty('opacity', opacityVal, 'important');
+    };
+    requestAnimationFrame(() => applyTransition('0.15'));
+    setTimeout(() => {
+      requestAnimationFrame(() => applyTransition('1.0'));
+    }, CELESTIAL_DIAL_RESET_FLASH_MS);
+  }
+
+  function animateCelestialGauge(progressEl, newFraction, prevFraction, onComplete) {
+    if (!progressEl) return;
+    const circumference = 289.027; // 2 * PI * 46
+    const clampedNew = Math.max(0, Math.min(1.0, newFraction));
+    const targetOffset = circumference * (1 - clampedNew);
+
+    progressEl.style.transition = 'none'; // Disable CSS transitions so JS RAF has full control
+
+    if (!CELESTIAL_GAUGE_ANIM_ENABLED || prevFraction === null || prevFraction === undefined) {
+      progressEl.style.strokeDashoffset = `${targetOffset.toFixed(2)}`;
+      if (onComplete) onComplete();
+      return;
+    }
+
+    if (Math.abs(newFraction - prevFraction) < 0.001) {
+      progressEl.style.strokeDashoffset = `${targetOffset.toFixed(2)}`;
+      if (onComplete) onComplete();
+      return;
+    }
+
+    const isIncrease = newFraction > prevFraction;
+    const currentOffset = parseFloat(progressEl.style.strokeDashoffset);
+    const startOffset = isNaN(currentOffset) ? (circumference * (1 - prevFraction)) : currentOffset;
+
+    progressEl.dataset.animating = 'true';
+    progressEl.dataset.targetOffset = String(targetOffset);
+
+    if (isIncrease) {
+      // Stage 1: Sweep clockwise to complete full gauge (strokeDashoffset = 0)
+      animateValue(progressEl, startOffset, 0, CELESTIAL_GAUGE_STAGE1_MS, () => {
+        const finalTarget = parseFloat(progressEl.dataset.targetOffset) ?? targetOffset;
+        // Stage 2: Settle counter-clockwise from MAX (0) to new targetOffset
+        animateValue(progressEl, 0, finalTarget, CELESTIAL_GAUGE_STAGE2_MS, () => {
+          progressEl.dataset.animating = 'false';
+          if (onComplete) onComplete();
+        });
+      });
+    } else {
+      // Stage 1: Sweep counter-clockwise to 0 gauge (strokeDashoffset = circumference)
+      animateValue(progressEl, startOffset, circumference, CELESTIAL_GAUGE_STAGE1_MS, () => {
+        const finalTarget = parseFloat(progressEl.dataset.targetOffset) ?? targetOffset;
+        // Stage 2: Settle clockwise from 0 (circumference) to new targetOffset
+        animateValue(progressEl, circumference, finalTarget, CELESTIAL_GAUGE_STAGE2_MS, () => {
+          progressEl.dataset.animating = 'false';
+          if (onComplete) onComplete();
+        });
+      });
+    }
+  }
+
+  function formatImpactSublabelHtml(arrowDir, text) {
+    const iconClass = (arrowDir === 'down') ? 'fa-solid fa-arrow-down' : 'fa-solid fa-arrow-up';
+    if (text.includes('<br>')) {
+      const parts = text.split('<br>');
+      return `<span style="white-space: nowrap;"><i class="${iconClass}" aria-hidden="true"></i> ${parts[0]}</span><br><span>${parts.slice(1).join('<br>')}</span>`;
+    }
+    const words = text.split(' ');
+    if (words.length > 1) {
+      const first = words[0];
+      const rest = words.slice(1).join(' ');
+      return `<span style="white-space: nowrap;"><i class="${iconClass}" aria-hidden="true"></i> ${first}</span> ${rest}`;
+    }
+    return `<i class="${iconClass}" aria-hidden="true"></i> ${text}`;
+  }
+
+  function getSolarFlareImpact(flareClass) {
+    const upper = String(flareClass || 'B').toUpperCase();
+    switch (upper) {
+      case 'A': return { arrow: SOLAR_FLARE_IMPACT_LEVEL_A_ARROW, text: SOLAR_FLARE_IMPACT_LEVEL_A_TEXT };
+      case 'B': return { arrow: SOLAR_FLARE_IMPACT_LEVEL_B_ARROW, text: SOLAR_FLARE_IMPACT_LEVEL_B_TEXT };
+      case 'C': return { arrow: SOLAR_FLARE_IMPACT_LEVEL_C_ARROW, text: SOLAR_FLARE_IMPACT_LEVEL_C_TEXT };
+      case 'M': return { arrow: SOLAR_FLARE_IMPACT_LEVEL_M_ARROW, text: SOLAR_FLARE_IMPACT_LEVEL_M_TEXT };
+      case 'X': return { arrow: SOLAR_FLARE_IMPACT_LEVEL_X_ARROW, text: SOLAR_FLARE_IMPACT_LEVEL_X_TEXT };
+      default:  return { arrow: 'down', text: 'Nominal Activity' };
+    }
+  }
+
   function getSolarFlareLabels(flareClass) {
     const upper = String(flareClass || 'C').toUpperCase();
     switch (upper) {
@@ -12009,9 +12396,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const color = getSolarFlareLevelColor(flareClass);
     const fraction = calculateSolarFlareFraction(flareClass, flareValue);
 
-    // Circumference for r=46 is 2 * PI * 46 = 289.027
-    const circumference = 289.027;
-    const strokeOffset = circumference * (1 - fraction);
+    // Determine up/down trend based on most recent value change
+    if (prevSolarFlareFraction !== null) {
+      if (fraction > prevSolarFlareFraction + 0.0005) {
+        setSolarFlareTrend('up');
+      } else if (fraction < prevSolarFlareFraction - 0.0005) {
+        setSolarFlareTrend('down');
+      }
+    }
 
     const line1El = dial.querySelector('.solar-flare-label-line1');
     const line2El = dial.querySelector('.solar-flare-label-line2');
@@ -12025,11 +12417,30 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (valueEl && valueEl.textContent !== displayVal) valueEl.textContent = displayVal;
 
     dial.style.setProperty('--solar-flare-current-color', color);
-    dial.style.setProperty('--solar-flare-stroke-offset', strokeOffset.toFixed(2));
+
+    const progressEl = dial.querySelector('.solar-flare-progress');
+    if (progressEl) {
+      animateCelestialGauge(progressEl, fraction, prevSolarFlareFraction);
+    }
+    prevSolarFlareFraction = fraction;
+
+    if (SOLAR_FLARE_SUBLABEL_ENABLED) {
+      const sublabelEl = document.getElementById('solar-flare-sublabel');
+      if (sublabelEl) {
+        if (SOLAR_FLARE_SUBLABEL_MODE === 'dynamic') {
+          const impact = getSolarFlareImpact(flareClass);
+          sublabelEl.innerHTML = formatImpactSublabelHtml(currentSolarFlareTrend, impact.text);
+        }
+        if (SOLAR_FLARE_SUBLABEL_COLOR === 'auto') {
+          sublabelEl.style.color = color;
+        }
+      }
+    }
   }
 
   function handleSolarFlareDialClick(e) {
     if (e) e.stopPropagation();
+    const dial = document.getElementById('solar-flare-dial');
     if (SOLAR_FLARE_MODE === 'live') {
       if (!SOLAR_FLARE_CLICK_CYCLES_CLASSES) {
         fetchLiveSolarFlareData();
@@ -12037,8 +12448,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }
       currentSolarFlareTestIndex = (currentSolarFlareTestIndex + 1) % (SOLAR_FLARE_TEST_LEVELS.length + 1);
       if (currentSolarFlareTestIndex === SOLAR_FLARE_TEST_LEVELS.length) {
-        // Return to live feed
+        // Return to live feed & flash dial reset
         activeSolarFlareState = null;
+        flashDialReset(dial);
+        if (liveSolarFlareData) updateSolarFlareDial();
         fetchLiveSolarFlareData();
       } else {
         activeSolarFlareState = SOLAR_FLARE_TEST_LEVELS[currentSolarFlareTestIndex];
@@ -12137,8 +12550,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const sublabel = document.createElement('div');
       sublabel.className = 'world-clock-label celestial-clock-label solar-flare-sublabel';
       sublabel.id = 'solar-flare-sublabel';
-      const text = isMobile ? SOLAR_FLARE_SUBLABEL_TEXT_MOBILE : SOLAR_FLARE_SUBLABEL_TEXT_DESKTOP;
-      sublabel.innerHTML = `<span class="world-clock-name">${text}</span>`;
+      const impact = getSolarFlareImpact(initialClass);
+      const innerContent = (SOLAR_FLARE_SUBLABEL_MODE === 'dynamic')
+        ? formatImpactSublabelHtml(impact.arrow, impact.text)
+        : (isMobile ? SOLAR_FLARE_SUBLABEL_TEXT_MOBILE : SOLAR_FLARE_SUBLABEL_TEXT_DESKTOP);
+      sublabel.innerHTML = innerContent;
+      if (SOLAR_FLARE_SUBLABEL_COLOR === 'auto') {
+        sublabel.style.color = getSolarFlareLevelColor(initialClass);
+      }
       col.appendChild(sublabel);
     }
 
@@ -12149,6 +12568,316 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
     requestAnimationFrame(() => {
       updateSolarFlareDial();
+    });
+
+    return col;
+  }
+
+  /* --- Radio Blackout (R-Scale) Dial Component --- */
+  const RADIO_BLACKOUT_TEST_LEVELS = [
+    { class: 'R0', value: 0.2 },
+    { class: 'R1', value: 1.5 },
+    { class: 'R2', value: 2.8 },
+    { class: 'R3', value: 6.5 },
+    { class: 'R4', value: 16.0 },
+    { class: 'R5', value: 32.0 }
+  ];
+  let currentRadioBlackoutTestIndex = 2; // Default R2 2.8 (matches mockup)
+  let activeRadioBlackoutState = (RADIO_BLACKOUT_MODE === 'live') ? null : { class: RADIO_BLACKOUT_CLASS_MANUAL, value: RADIO_BLACKOUT_VALUE_MANUAL };
+  let liveRadioBlackoutData = null;
+  let radioBlackoutLiveTimer = null;
+
+  function getRadioBlackoutImpact(rClass) {
+    const upper = String(rClass || 'R0').toUpperCase();
+    switch (upper) {
+      case 'R0': return { arrow: RADIO_BLACKOUT_IMPACT_LEVEL_R0_ARROW, text: RADIO_BLACKOUT_IMPACT_LEVEL_R0_TEXT };
+      case 'R1': return { arrow: RADIO_BLACKOUT_IMPACT_LEVEL_R1_ARROW, text: RADIO_BLACKOUT_IMPACT_LEVEL_R1_TEXT };
+      case 'R2': return { arrow: RADIO_BLACKOUT_IMPACT_LEVEL_R2_ARROW, text: RADIO_BLACKOUT_IMPACT_LEVEL_R2_TEXT };
+      case 'R3': return { arrow: RADIO_BLACKOUT_IMPACT_LEVEL_R3_ARROW, text: RADIO_BLACKOUT_IMPACT_LEVEL_R3_TEXT };
+      case 'R4': return { arrow: RADIO_BLACKOUT_IMPACT_LEVEL_R4_ARROW, text: RADIO_BLACKOUT_IMPACT_LEVEL_R4_TEXT };
+      case 'R5': return { arrow: RADIO_BLACKOUT_IMPACT_LEVEL_R5_ARROW, text: RADIO_BLACKOUT_IMPACT_LEVEL_R5_TEXT };
+      default:   return { arrow: 'down', text: 'All Bands Clear' };
+    }
+  }
+
+  function getRadioBlackoutLabels(rClass) {
+    const upper = String(rClass || 'R0').toUpperCase();
+    switch (upper) {
+      case 'R0': return { line1: RADIO_BLACKOUT_LABEL_R0_LINE1, line2: RADIO_BLACKOUT_LABEL_R0_LINE2 };
+      case 'R1': return { line1: RADIO_BLACKOUT_LABEL_R1_LINE1, line2: RADIO_BLACKOUT_LABEL_R1_LINE2 };
+      case 'R2': return { line1: RADIO_BLACKOUT_LABEL_R2_LINE1, line2: RADIO_BLACKOUT_LABEL_R2_LINE2 };
+      case 'R3': return { line1: RADIO_BLACKOUT_LABEL_R3_LINE1, line2: RADIO_BLACKOUT_LABEL_R3_LINE2 };
+      case 'R4': return { line1: RADIO_BLACKOUT_LABEL_R4_LINE1, line2: RADIO_BLACKOUT_LABEL_R4_LINE2 };
+      case 'R5': return { line1: RADIO_BLACKOUT_LABEL_R5_LINE1, line2: RADIO_BLACKOUT_LABEL_R5_LINE2 };
+      default:   return { line1: 'RADIO', line2: 'BLACKOUT' };
+    }
+  }
+
+  function getRadioBlackoutLevelColor(rClass) {
+    if (RADIO_BLACKOUT_COLOR_OVERRIDE !== null && RADIO_BLACKOUT_COLOR_OVERRIDE !== undefined) {
+      if (typeof RADIO_BLACKOUT_COLOR_OVERRIDE === 'number') {
+        return tempToColor(RADIO_BLACKOUT_COLOR_OVERRIDE) || 'hsl(30, 100%, 50%)';
+      }
+      return RADIO_BLACKOUT_COLOR_OVERRIDE;
+    }
+    const upper = String(rClass || 'R0').toUpperCase();
+    let setting;
+    switch (upper) {
+      case 'R0': setting = RADIO_BLACKOUT_COLOR_LEVEL_R0; break;
+      case 'R1': setting = RADIO_BLACKOUT_COLOR_LEVEL_R1; break;
+      case 'R2': setting = RADIO_BLACKOUT_COLOR_LEVEL_R2; break;
+      case 'R3': setting = RADIO_BLACKOUT_COLOR_LEVEL_R3; break;
+      case 'R4': setting = RADIO_BLACKOUT_COLOR_LEVEL_R4; break;
+      case 'R5': setting = RADIO_BLACKOUT_COLOR_LEVEL_R5; break;
+      default:   setting = RADIO_BLACKOUT_COLOR_LEVEL_R0; break;
+    }
+    if (typeof setting === 'number') {
+      return tempToColor(setting) || 'hsl(30, 100%, 50%)';
+    }
+    return setting || 'hsl(30, 100%, 50%)';
+  }
+
+  function calculateRadioBlackoutFraction(rClass, rValue) {
+    const cls = String(rClass || 'R0').toUpperCase();
+    const val = parseFloat(rValue) || 0.0;
+
+    // 6 scale ranges across 360 degrees [0.0 to 1.0]
+    // R2 at 2.8db lands at ~0.40 (144 deg from 6 o'clock = 10:48 on clock face, matching mockup)
+    const ranges = {
+      R0: { min: 0.00, max: 0.16, valMin: 0.0, valMax: 1.0 },
+      R1: { min: 0.16, max: 0.33, valMin: 1.0, valMax: 2.5 },
+      R2: { min: 0.33, max: 0.50, valMin: 2.0, valMax: 4.0 },
+      R3: { min: 0.50, max: 0.67, valMin: 4.0, valMax: 15.0 },
+      R4: { min: 0.67, max: 0.84, valMin: 15.0, valMax: 25.0 },
+      R5: { min: 0.84, max: 1.00, valMin: 25.0, valMax: 40.0 }
+    };
+    const range = ranges[cls] || ranges['R2'];
+    const span = range.valMax - range.valMin;
+    const normalized = span > 0 ? Math.max(0, Math.min(1.0, (val - range.valMin) / span)) : 0.5;
+    return range.min + (normalized * (range.max - range.min));
+  }
+
+  function formatRadioBlackoutValue(rValue) {
+    if (typeof rValue !== 'number') {
+      const parsed = parseFloat(rValue);
+      if (isNaN(parsed)) return `${rValue}${RADIO_BLACKOUT_UNIT}`;
+      rValue = parsed;
+    }
+    let formatted;
+    if (RADIO_BLACKOUT_TWO_SIG_DIGITS) {
+      if (rValue >= 10) {
+        // e.g. 16, 32 (two significant digits, avoids crowding inside circular dial)
+        formatted = Math.round(rValue).toString();
+      } else {
+        // e.g. 2.8, 0.1 (two significant digits / 1 decimal place)
+        formatted = rValue.toFixed(1);
+      }
+    } else {
+      formatted = rValue.toFixed(1);
+    }
+    return `${formatted}${RADIO_BLACKOUT_UNIT}`;
+  }
+
+  function updateRadioBlackoutDial() {
+    const dial = document.getElementById('radio-blackout-dial');
+    if (!dial) return;
+
+    let rClass = 'R2';
+    let rValue = 2.8;
+
+    if (activeRadioBlackoutState) {
+      rClass = activeRadioBlackoutState.class;
+      rValue = activeRadioBlackoutState.value;
+    } else if (RADIO_BLACKOUT_MODE === 'live' && liveRadioBlackoutData) {
+      rClass = liveRadioBlackoutData.class;
+      rValue = liveRadioBlackoutData.value;
+    } else {
+      rClass = RADIO_BLACKOUT_CLASS_MANUAL;
+      rValue = RADIO_BLACKOUT_VALUE_MANUAL;
+    }
+
+    const labels = getRadioBlackoutLabels(rClass);
+    const color = getRadioBlackoutLevelColor(rClass);
+    const fraction = calculateRadioBlackoutFraction(rClass, rValue);
+
+    // Determine up/down trend based on most recent value change
+    if (prevRadioBlackoutFraction !== null) {
+      if (fraction > prevRadioBlackoutFraction + 0.0005) {
+        setRadioBlackoutTrend('up');
+      } else if (fraction < prevRadioBlackoutFraction - 0.0005) {
+        setRadioBlackoutTrend('down');
+      }
+    }
+
+    const line1El = dial.querySelector('.radio-blackout-label-line1');
+    const line2El = dial.querySelector('.radio-blackout-label-line2');
+    const classEl = dial.querySelector('.radio-blackout-class');
+    const valueEl = dial.querySelector('.radio-blackout-value');
+
+    if (line1El && line1El.textContent !== labels.line1) line1El.textContent = labels.line1;
+    if (line2El && line2El.textContent !== labels.line2) line2El.textContent = labels.line2;
+    if (classEl && classEl.textContent !== rClass) classEl.textContent = rClass;
+    const displayVal = formatRadioBlackoutValue(rValue);
+    if (valueEl && valueEl.textContent !== displayVal) valueEl.textContent = displayVal;
+
+    dial.style.setProperty('--radio-blackout-current-color', color);
+
+    const progressEl = dial.querySelector('.radio-blackout-progress');
+    if (progressEl) {
+      animateCelestialGauge(progressEl, fraction, prevRadioBlackoutFraction);
+    }
+    prevRadioBlackoutFraction = fraction;
+
+    if (RADIO_BLACKOUT_SUBLABEL_ENABLED) {
+      const sublabelEl = document.getElementById('radio-blackout-sublabel');
+      if (sublabelEl) {
+        if (RADIO_BLACKOUT_SUBLABEL_MODE === 'dynamic') {
+          const impact = getRadioBlackoutImpact(rClass);
+          sublabelEl.innerHTML = formatImpactSublabelHtml(currentRadioBlackoutTrend, impact.text);
+        }
+        if (RADIO_BLACKOUT_SUBLABEL_COLOR === 'auto') {
+          sublabelEl.style.color = color;
+        }
+      }
+    }
+  }
+
+  function handleRadioBlackoutDialClick(e) {
+    if (e) e.stopPropagation();
+    const dial = document.getElementById('radio-blackout-dial');
+    if (RADIO_BLACKOUT_MODE === 'live') {
+      if (!RADIO_BLACKOUT_CLICK_CYCLES_CLASSES) {
+        fetchLiveRadioBlackoutData();
+        return;
+      }
+      currentRadioBlackoutTestIndex = (currentRadioBlackoutTestIndex + 1) % (RADIO_BLACKOUT_TEST_LEVELS.length + 1);
+      if (currentRadioBlackoutTestIndex === RADIO_BLACKOUT_TEST_LEVELS.length) {
+        // Return to live feed & flash dial reset
+        activeRadioBlackoutState = null;
+        flashDialReset(dial);
+        if (liveRadioBlackoutData) updateRadioBlackoutDial();
+        fetchLiveRadioBlackoutData();
+      } else {
+        activeRadioBlackoutState = RADIO_BLACKOUT_TEST_LEVELS[currentRadioBlackoutTestIndex];
+        updateRadioBlackoutDial();
+      }
+      return;
+    }
+    if (!RADIO_BLACKOUT_CLICK_CYCLES_CLASSES) return;
+    currentRadioBlackoutTestIndex = (currentRadioBlackoutTestIndex + 1) % RADIO_BLACKOUT_TEST_LEVELS.length;
+    activeRadioBlackoutState = RADIO_BLACKOUT_TEST_LEVELS[currentRadioBlackoutTestIndex];
+    updateRadioBlackoutDial();
+  }
+
+  async function fetchLiveRadioBlackoutData() {
+    if (RADIO_BLACKOUT_MODE !== 'live') return;
+    try {
+      const response = await fetch('https://services.swpc.noaa.gov/json/goes/primary/xrays-6-hour.json', { cache: 'no-store' });
+      if (!response.ok) return;
+      const data = await response.json();
+      if (!Array.isArray(data) || data.length === 0) return;
+      const primaryReadings = data.filter(d => d.energy === '0.1-0.8nm' && typeof d.flux === 'number');
+      const latest = primaryReadings[primaryReadings.length - 1];
+      if (!latest) return;
+      const flux = latest.flux;
+
+      let cls = 'R0';
+      let val = 0.2;
+
+      if (flux < 1e-5) {
+        cls = 'R0';
+        val = Math.max(0.1, Math.min(0.9, (flux / 1e-5) * 0.8 + 0.1));
+      } else if (flux < 5e-5) {
+        cls = 'R1';
+        val = 1.0 + ((flux - 1e-5) / 4e-5) * 1.5;
+      } else if (flux < 1e-4) {
+        cls = 'R2';
+        val = 2.5 + ((flux - 5e-5) / 5e-5) * 2.5;
+      } else if (flux < 1e-3) {
+        cls = 'R3';
+        val = 5.0 + ((flux - 1e-4) / 9e-4) * 10.0;
+      } else if (flux < 2e-3) {
+        cls = 'R4';
+        val = 15.0 + ((flux - 1e-3) / 1e-3) * 10.0;
+      } else {
+        cls = 'R5';
+        val = 25.0 + Math.min(15.0, ((flux - 2e-3) / 1e-3) * 10.0);
+      }
+
+      liveRadioBlackoutData = {
+        class: cls,
+        value: parseFloat(val.toFixed(1))
+      };
+      updateRadioBlackoutDial();
+    } catch (err) {
+      console.warn('Unable to fetch live radio blackout data from NOAA SWPC:', err);
+    }
+  }
+
+  function buildRadioBlackoutColumn() {
+    const isMobile = window.innerWidth <= 767;
+    const col = document.createElement('div');
+    col.className = 'world-clock-column celestial-clock-column celestial-clock-column-right radio-blackout-column';
+    col.id = 'celestial-clock-right';
+
+    const dial = document.createElement('div');
+    dial.className = 'world-clock-dial celestial-clock-dial radio-blackout-dial';
+    dial.id = 'radio-blackout-dial';
+    const titleText = (RADIO_BLACKOUT_MODE === 'live') ? 'Live Radio Blackout Scale (NOAA SWPC R-Scale)' : 'Radio Blackout Scale (Click to test levels)';
+    dial.setAttribute('title', titleText);
+
+    const initialClass = (RADIO_BLACKOUT_MODE === 'live' && liveRadioBlackoutData)
+      ? liveRadioBlackoutData.class
+      : (activeRadioBlackoutState?.class || RADIO_BLACKOUT_CLASS_MANUAL);
+    const initialVal = (RADIO_BLACKOUT_MODE === 'live' && liveRadioBlackoutData)
+      ? liveRadioBlackoutData.value
+      : (activeRadioBlackoutState?.value || RADIO_BLACKOUT_VALUE_MANUAL);
+    const labels = getRadioBlackoutLabels(initialClass);
+    const displayVal = formatRadioBlackoutValue(initialVal);
+
+    dial.innerHTML = `
+      <svg class="radio-blackout-svg clock-timer-svg" viewBox="0 0 100 100">
+        <circle class="radio-blackout-track countdown-track" cx="50" cy="50" r="46" fill="none" />
+        <circle class="radio-blackout-progress countdown-progress" cx="50" cy="50" r="46" fill="none" />
+      </svg>
+      <div class="radio-blackout-content">
+        <div class="radio-blackout-label">
+          <span class="radio-blackout-label-line1">${labels.line1}</span>
+          <span class="radio-blackout-label-line2">${labels.line2}</span>
+        </div>
+        <div class="radio-blackout-class">${initialClass}</div>
+        <div class="radio-blackout-value">${displayVal}</div>
+      </div>
+    `;
+
+    if (RADIO_BLACKOUT_CLICK_CYCLES_CLASSES) {
+      dial.addEventListener('click', handleRadioBlackoutDialClick);
+    }
+
+    col.appendChild(dial);
+
+    if (RADIO_BLACKOUT_SUBLABEL_ENABLED) {
+      const sublabel = document.createElement('div');
+      sublabel.className = 'world-clock-label celestial-clock-label radio-blackout-sublabel';
+      sublabel.id = 'radio-blackout-sublabel';
+      const impact = getRadioBlackoutImpact(initialClass);
+      const innerContent = (RADIO_BLACKOUT_SUBLABEL_MODE === 'dynamic')
+        ? formatImpactSublabelHtml(impact.arrow, impact.text)
+        : (isMobile ? RADIO_BLACKOUT_SUBLABEL_TEXT_MOBILE : RADIO_BLACKOUT_SUBLABEL_TEXT_DESKTOP);
+      sublabel.innerHTML = innerContent;
+      if (RADIO_BLACKOUT_SUBLABEL_COLOR === 'auto') {
+        sublabel.style.color = getRadioBlackoutLevelColor(initialClass);
+      }
+      col.appendChild(sublabel);
+    }
+
+    if (RADIO_BLACKOUT_MODE === 'live' && !radioBlackoutLiveTimer) {
+      fetchLiveRadioBlackoutData();
+      radioBlackoutLiveTimer = setInterval(fetchLiveRadioBlackoutData, RADIO_BLACKOUT_AUTO_REFRESH_MS);
+    }
+
+    requestAnimationFrame(() => {
+      updateRadioBlackoutDial();
     });
 
     return col;
@@ -12789,21 +13518,26 @@ Plan ahead for significantly warmer conditions tomorrow!`
       // 3. Earth column (vertically centered with other 3 circles)
       mainWrapper.appendChild(rightCol);
 
-      // 4. Duplicate 5th timezone dial (UK) on the right
+      // 4. Duplicate 5th timezone dial (UK) or Radio Blackout dial on the right
       if (CELESTIAL_DIALS_ENABLED) {
-        const isMobile = window.innerWidth <= 767;
-        const rightDial = buildWorldClockColumn({
-          id: 'right',
-          colId: 'celestial-clock-right',
-          dialId: 'world-clock-dial-celestial-right',
-          labelId: 'world-clock-label-celestial-right',
-          timeId: 'world-clock-time-celestial-right',
-          name: isMobile ? CELESTIAL_DIAL_RIGHT_NAME_MOBILE : CELESTIAL_DIAL_RIGHT_NAME_DESKTOP,
-          timeZone: CELESTIAL_DIAL_RIGHT_TIMEZONE,
-          showTime: CELESTIAL_DIAL_RIGHT_SHOW_TIME,
-          isCelestial: true
-        });
-        mainWrapper.appendChild(rightDial);
+        if (RADIO_BLACKOUT_DIAL_ENABLED) {
+          const rightDial = buildRadioBlackoutColumn();
+          mainWrapper.appendChild(rightDial);
+        } else {
+          const isMobile = window.innerWidth <= 767;
+          const rightDial = buildWorldClockColumn({
+            id: 'right',
+            colId: 'celestial-clock-right',
+            dialId: 'world-clock-dial-celestial-right',
+            labelId: 'world-clock-label-celestial-right',
+            timeId: 'world-clock-time-celestial-right',
+            name: isMobile ? CELESTIAL_DIAL_RIGHT_NAME_MOBILE : CELESTIAL_DIAL_RIGHT_NAME_DESKTOP,
+            timeZone: CELESTIAL_DIAL_RIGHT_TIMEZONE,
+            showTime: CELESTIAL_DIAL_RIGHT_SHOW_TIME,
+            isCelestial: true
+          });
+          mainWrapper.appendChild(rightDial);
+        }
       }
     } else {
       leftCol.classList.add('single-mode');

@@ -2386,13 +2386,142 @@ main {
 }
 
 .solar-flare-sublabel {
-    margin-top: var(--celestial-dial-label-margin-top, calc(var(--world-clock-size) * 0.06));
-    transform: translateY(var(--celestial-dial-label-offset-y, 0vw));
-    font-family: var(--world-clock-label-font-family, "bold", sans-serif);
-    font-size: var(--world-clock-label-font-size, calc(var(--world-clock-size) * 0.12));
-    color: var(--temp-color, rgba(255, 255, 255, 0.7));
+    margin-top: var(--solar-flare-sublabel-margin-top, var(--celestial-dial-label-margin-top, 0.8vw));
+    transform: translateY(var(--solar-flare-sublabel-offset-y, 0vw));
+    font-family: var(--solar-flare-sublabel-font-family, var(--sun-label-font-family, 'light', sans-serif));
+    font-size: var(--solar-flare-sublabel-font-size, 1.6vw);
+    line-height: var(--solar-flare-sublabel-line-height, 1.15);
+    letter-spacing: var(--solar-flare-sublabel-letter-spacing, 0.04vw);
+    color: var(--solar-flare-sublabel-color, var(--temp-color, rgba(255, 255, 255, 0.70)));
     text-align: center;
-    white-space: nowrap;
+    width: 100%;
+    max-width: var(--solar-flare-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
+    white-space: normal;
+    word-break: normal;
+    user-select: none;
+    box-sizing: border-box;
+
+    i {
+        font-size: 0.85em;
+        vertical-align: 0.02em;
+        margin-right: 0.22em;
+    }
+}
+
+// Radio Blackout (R-Scale) Dial in Celestial Row (JCV)
+.radio-blackout-dial {
+    position: relative;
+    border-radius: 50%;
+    width: var(--radio-blackout-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
+    height: var(--radio-blackout-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
+    margin-top: var(--celestial-dial-margin-top, 0vw);
+    transform: translate(var(--radio-blackout-offset-x, 0vw), var(--radio-blackout-offset-y, 0vw));
+    background-color: var(--radio-blackout-dial-bg-color, transparent);
+    box-shadow: var(--radio-blackout-dial-inner-shadow, inset 0 0 1vw rgba(0, 0, 0, 0.5));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: pointer;
+    box-sizing: border-box;
+
+    .radio-blackout-svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transform: rotate(var(--radio-blackout-start-angle, 90deg));
+        overflow: visible;
+        z-index: 1;
+
+        .radio-blackout-track {
+            stroke: var(--radio-blackout-track-color, rgba(255, 255, 255, 0.22));
+            stroke-width: var(--radio-blackout-track-stroke-width, 4);
+        }
+
+        .radio-blackout-progress {
+            stroke: var(--radio-blackout-current-color, hsl(30, 100%, 50%));
+            stroke-width: var(--radio-blackout-progress-stroke-width, 4);
+            stroke-dasharray: 289.027;
+            stroke-dashoffset: var(--radio-blackout-stroke-offset, 161.85);
+            stroke-linecap: var(--radio-blackout-stroke-linecap, butt);
+            transition: stroke-dashoffset var(--radio-blackout-anim-duration, 0.8s) cubic-bezier(0.25, 1, 0.5, 1),
+                        stroke 0.4s ease;
+        }
+    }
+
+    .radio-blackout-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        color: var(--radio-blackout-current-color, hsl(30, 100%, 50%));
+        transform: translateY(var(--radio-blackout-content-offset-y, 0vw));
+        pointer-events: none;
+        transition: color 0.4s ease;
+    }
+
+    .radio-blackout-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-family: var(--radio-blackout-label-font-family, "euro", sans-serif);
+        font-size: var(--radio-blackout-label-font-size, calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.088));
+        line-height: var(--radio-blackout-label-line-height, 1.05);
+        letter-spacing: var(--radio-blackout-label-letter-spacing, 0.04em);
+        text-transform: uppercase;
+        color: inherit;
+        transform: translateY(var(--radio-blackout-label-offset-y, 0vw));
+        margin-bottom: var(--radio-blackout-gap-label-to-class, calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.04));
+    }
+
+    .radio-blackout-class {
+        font-family: var(--radio-blackout-class-font-family, "euro-bold", sans-serif);
+        font-size: var(--radio-blackout-class-font-size, calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.34));
+        line-height: var(--radio-blackout-class-line-height, 0.82);
+        letter-spacing: var(--radio-blackout-class-letter-spacing, 0.01em);
+        color: inherit;
+        transform: translateY(var(--radio-blackout-class-offset-y, 0vw));
+        margin-bottom: var(--radio-blackout-gap-class-to-value, calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02));
+    }
+
+    .radio-blackout-value {
+        font-family: var(--radio-blackout-value-font-family, "euro-bold", sans-serif);
+        font-size: var(--radio-blackout-value-font-size, calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.165));
+        line-height: var(--radio-blackout-value-line-height, 0.92);
+        letter-spacing: var(--radio-blackout-value-letter-spacing, 0.02em);
+        color: inherit;
+        transform: translateY(var(--radio-blackout-value-offset-y, 0vw));
+    }
+}
+
+.radio-blackout-sublabel {
+    margin-top: var(--radio-blackout-sublabel-margin-top, var(--celestial-dial-label-margin-top, 0.8vw));
+    transform: translateY(var(--radio-blackout-sublabel-offset-y, 0vw));
+    font-family: var(--radio-blackout-sublabel-font-family, var(--sun-label-font-family, 'light', sans-serif));
+    font-size: var(--radio-blackout-sublabel-font-size, 1.6vw);
+    line-height: var(--radio-blackout-sublabel-line-height, 1.15);
+    letter-spacing: var(--radio-blackout-sublabel-letter-spacing, 0.04vw);
+    color: var(--radio-blackout-sublabel-color, var(--temp-color, rgba(255, 255, 255, 0.70)));
+    text-align: center;
+    width: 100%;
+    max-width: var(--radio-blackout-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
+    white-space: normal;
+    word-break: normal;
+    user-select: none;
+    box-sizing: border-box;
+
+    i {
+        font-size: 0.85em;
+        vertical-align: 0.02em;
+        margin-right: 0.22em;
+    }
 }
 
 .sun-column {
