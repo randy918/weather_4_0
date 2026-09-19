@@ -2641,7 +2641,7 @@ import weatherConditions from '../data/weather-conditions.json';
     if (minTemp !== Infinity && maxTemp !== -Infinity) {
       tempRangeMin = Math.round(minTemp); // Exactly the lowest low of the week
       tempRangeMax = Math.round(maxTemp);
-      /* eslint-disable */console.log(...oo_oo(`2266558813_861_6_861_105_4`,`Dynamic temp range updated: ${tempRangeMin}°F - ${tempRangeMax}°F (from weekly data)`));
+      console.log(`Dynamic temp range updated: ${tempRangeMin}°F - ${tempRangeMax}°F (from weekly data)`);
     }
   }
 
@@ -2884,7 +2884,7 @@ import weatherConditions from '../data/weather-conditions.json';
     // Format with leading zero if needed (e.g. 1 -> "01")
     const imgIndexStr = imgIndex.toString().padStart(2, '0');
     
-    /* eslint-disable */console.log(...oo_oo(`2266558813_1097_4_1097_127_4`,`Moon phase: ${moonPhase.toFixed(3)}, raw=${rawIndex}, offset=${MOON_IMAGE_OFFSET} -> 2moon${imgIndexStr}.png`));
+    console.log(`Moon phase: ${moonPhase.toFixed(3)}, raw=${rawIndex}, offset=${MOON_IMAGE_OFFSET} -> 2moon${imgIndexStr}.png`);
 
     // EDITABLE: Set this to true to force show the track circle for testing/visual verification
     const DEBUG_FORCE_NEW_MOON_TRACK = true;
@@ -3001,7 +3001,7 @@ import weatherConditions from '../data/weather-conditions.json';
     }
     
     document.documentElement.style.setProperty('--rain-spawn-interval-ms', currentRainSpawnIntervalMs + 'ms');
-    /* eslint-disable */console.log(...oo_oo(`2266558813_1214_4_1214_188_4`,`🌧️ Rain animation state updated: isRainingCurrently=${isRainingCurrently}, precipitation=${precipitation} mm/h, spawnInterval=${currentRainSpawnIntervalMs.toFixed(0)}ms`));
+    console.log(`🌧️ Rain animation state updated: isRainingCurrently=${isRainingCurrently}, precipitation=${precipitation} mm/h, spawnInterval=${currentRainSpawnIntervalMs.toFixed(0)}ms`);
   }
 
   function updateSnowAnimationState(data) {
@@ -3029,7 +3029,7 @@ import weatherConditions from '../data/weather-conditions.json';
     }
     
     document.documentElement.style.setProperty('--snow-spawn-interval-ms', currentSnowSpawnIntervalMs + 'ms');
-    /* eslint-disable */console.log(...oo_oo(`2266558813_1242_4_1242_195_4`,`❄️ Snow animation state updated: isSnowingCurrently=${isSnowingCurrently}, snowPrecipitation=${snowPrecipitation} mm/h, spawnInterval=${currentSnowSpawnIntervalMs.toFixed(0)}ms`));
+    console.log(`❄️ Snow animation state updated: isSnowingCurrently=${isSnowingCurrently}, snowPrecipitation=${snowPrecipitation} mm/h, spawnInterval=${currentSnowSpawnIntervalMs.toFixed(0)}ms`);
   }
 
   function updateFields(data) {
@@ -3047,12 +3047,12 @@ import weatherConditions from '../data/weather-conditions.json';
             const trendDir = getPersistentTrendDirection('weather_trend_temp', tempRounded);
             if (trendDir === 'up') {
               displayText += '▲';
-              /* eslint-disable */console.log(...oo_oo(`2266558813_1260_14_1260_60_4`,`Temp trend: ▲ (${tempRounded}°)`));
+              console.log(`Temp trend: ▲ (${tempRounded}°)`);
             } else if (trendDir === 'down') {
               displayText += '▼';
-              /* eslint-disable */console.log(...oo_oo(`2266558813_1263_14_1263_60_4`,`Temp trend: ▼ (${tempRounded}°)`));
+              console.log(`Temp trend: ▼ (${tempRounded}°)`);
             } else {
-              /* eslint-disable */console.log(...oo_oo(`2266558813_1265_14_1265_68_4`,`Temp trend: blank/off (${tempRounded}°)`));
+              console.log(`Temp trend: blank/off (${tempRounded}°)`);
             }
           }
 
@@ -3073,7 +3073,7 @@ import weatherConditions from '../data/weather-conditions.json';
           el.style.removeProperty('color');
         }
       } catch (e) {
-        /* eslint-disable */console.error(...oo_tx(`2266558813_1286_8_1286_60_11`,`Error computing field ${f.name}:`, e));
+        console.error(`Error computing field ${f.name}:`, e);
         el.textContent = f.placeholder;
         el.style.removeProperty('color');
       }
@@ -3127,8 +3127,8 @@ import weatherConditions from '../data/weather-conditions.json';
     // Calculate wind direction
     // Fallback: If current wind is 0/calm, use the nearest hourly forecast to show prevailing direction
     let windDeg = data.current?.wind_deg;
-    /* eslint-disable */console.log(...oo_oo(`2266558813_1340_4_1340_141_4`,'🧭 RAW API Wind Direction:', windDeg, '° | Wind Speed:', data.current?.wind_speed, 'mph | Full current data:', data.current));
-    /* eslint-disable */console.log(...oo_oo(`2266558813_1341_4_1341_110_4`,'🧭 Current Wind Direction:', windDeg, '° (meteorological - direction FROM which wind blows)'));
+    console.log('🧭 RAW API Wind Direction:', windDeg, '° | Wind Speed:', data.current?.wind_speed, 'mph | Full current data:', data.current);
+    console.log('🧭 Current Wind Direction:', windDeg, '° (meteorological - direction FROM which wind blows)');
     if ((!windDeg || data.current?.wind_speed === 0) && data.hourly && data.hourly.length > 0) {
       // Find the closest hourly forecast in the future
       const now = Date.now() / 1000;
@@ -3136,7 +3136,7 @@ import weatherConditions from '../data/weather-conditions.json';
       if (nextHour && nextHour.wind_deg) {
           const previousWindDeg = windDeg;
           windDeg = nextHour.wind_deg;
-          /* eslint-disable */console.log(...oo_oo(`2266558813_1349_10_1349_114_4`,`Current wind is calm/0°. Changed from ${previousWindDeg}° to hourly forecast: ${windDeg}°`));
+          console.log(`Current wind is calm/0°. Changed from ${previousWindDeg}° to hourly forecast: ${windDeg}°`);
       }
     }
 
@@ -3480,7 +3480,7 @@ import weatherConditions from '../data/weather-conditions.json';
       }
     });
     
-    /* eslint-disable */console.log(...oo_oo(`2266558813_1693_4_1693_160_4`,`Wind updated: Speed ${Math.round(windSpeed)} mph (${speedPercent.toFixed(1)}%), Gust ${Math.round(windGust)} mph (${gustPercent.toFixed(1)}%)`));
+    console.log(`Wind updated: Speed ${Math.round(windSpeed)} mph (${speedPercent.toFixed(1)}%), Gust ${Math.round(windGust)} mph (${gustPercent.toFixed(1)}%)`);
   }
 
   // Update the barometric pressure gauge
@@ -3592,7 +3592,7 @@ import weatherConditions from '../data/weather-conditions.json';
       humidityLabel.textContent = `${Math.round(humidity)}%`;
     }
     
-    /* eslint-disable */console.log(...oo_oo(`2266558813_1805_4_1805_71_4`,`Humidity updated: ${humidity}% (${humidityPercent}%)`));
+    console.log(`Humidity updated: ${humidity}% (${humidityPercent}%)`);
   }
 
 
@@ -4540,7 +4540,7 @@ import weatherConditions from '../data/weather-conditions.json';
     setTimeout(updateStarfieldMask, 50);
     setTimeout(updateStarfieldMask, 1050);
     
-    /* eslint-disable */console.log(...oo_oo(`2266558813_2709_4_2709_67_4`,`Fragile elements pushed down by ${totalHeight}vw`));
+    console.log(`Fragile elements pushed down by ${totalHeight}vw`);
   }
 
   // Helper: Formats screaming ALL-CAPS NWS text into readable sentence case with paragraphs
@@ -5329,22 +5329,22 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const container = document.getElementById('alerts-container');
     
     // Console logging to debug tornado watch
-    /* eslint-disable */console.log(...oo_oo(`2266558813_3270_4_3270_62_4`,'🚨 ALERTS DEBUG - Raw alerts array:', alerts));
-    /* eslint-disable */console.log(...oo_oo(`2266558813_3271_4_3271_69_4`,'🚨 ALERTS DEBUG - Number of alerts:', alerts.length));
-    /* eslint-disable */console.log(...oo_oo(`2266558813_3272_4_3272_67_4`,'🚨 ALERTS DEBUG - Full data.alerts:', data.alerts));
+    console.log('🚨 ALERTS DEBUG - Raw alerts array:', alerts);
+    console.log('🚨 ALERTS DEBUG - Number of alerts:', alerts.length);
+    console.log('🚨 ALERTS DEBUG - Full data.alerts:', data.alerts);
     if (alerts.length > 0) {
       alerts.forEach((alert, index) => {
-        /* eslint-disable */console.log(...oo_oo(`2266558813_3275_8_3282_10_4`,`🚨 Alert ${index + 1}:`, {
+        console.log(`🚨 Alert ${index + 1}:`, {
           event: alert.event,
           sender_name: alert.sender_name,
           start: alert.start,
           end: alert.end,
           description: alert.description?.substring(0, 100) + '...',
           tags: alert.tags
-        }));
+        });
       });
     } else {
-      /* eslint-disable */console.log(...oo_oo(`2266558813_3285_6_3285_66_4`,'🚨 ALERTS DEBUG - No alerts found in API data'));
+      console.log('🚨 ALERTS DEBUG - No alerts found in API data');
     }
     
     if (!container) return;
@@ -5369,7 +5369,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     let prevBannerColor = null;
     
     alerts.forEach((alert, index) => {
-      /* eslint-disable */console.log(...oo_oo(`2266558813_3310_6_3310_39_4`,'Alert data:', alert)); // Debug: see what properties are available
+      console.log('Alert data:', alert); // Debug: see what properties are available
       
       const banner = document.createElement('div');
       banner.className = 'alert-banner';
@@ -5468,9 +5468,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
         const displayHours = hours % 12 || 12; // Convert 0 to 12 for midnight
         const expiresText = `expires ${displayHours}:${minutes} ${ampm}${dayLabel}`;
         alertText += ` <span class="alert-expires">${expiresText}</span>`;
-        /* eslint-disable */console.log(...oo_oo(`2266558813_3392_8_3392_86_4`,`Alert expires at: ${displayHours}:${minutes} ${ampm}${dayLabel}`));
+        console.log(`Alert expires at: ${displayHours}:${minutes} ${ampm}${dayLabel}`);
       } else {
-        /* eslint-disable */console.log(...oo_oo(`2266558813_3394_8_3394_48_4`,'Alert has no end property'));
+        console.log('Alert has no end property');
       }
       text.innerHTML = alertText; // Use innerHTML to support span tag
       textWrapper.appendChild(text);
@@ -6365,16 +6365,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
         if (cond.maxHum !== undefined && h > cond.maxHum) match = false;
         
         if (match) {
-          /* eslint-disable */console.log(...oo_oo(`2266558813_4157_10_4157_102_4`,`🔍 Derived Phrase Match: "${cond.phrase}" (Temp: ${t}, Wind: ${w}, Hum: ${h})`));
+          console.log(`🔍 Derived Phrase Match: "${cond.phrase}" (Temp: ${t}, Wind: ${w}, Hum: ${h})`);
           return cond.phrase + '.';
         }
       }
-      /* eslint-disable */console.log(...oo_oo(`2266558813_4161_6_4161_86_4`,`🔍 Derived Phrase: NO MATCH for Temp: ${t}, Wind: ${w}, Hum: ${h}`));
+      console.log(`🔍 Derived Phrase: NO MATCH for Temp: ${t}, Wind: ${w}, Hum: ${h}`);
       return ''; // Fallback if no conditions match
     }
     
     // Console report: Current weather description
-    /* eslint-disable */console.log(...oo_oo(`2266558813_4166_4_4166_73_4`,'🌤️ CURRENT Weather Description:', description || 'N/A'));
+    console.log('🌤️ CURRENT Weather Description:', description || 'N/A');
     
     if (description) {
       const formattedDescription = description.charAt(0).toUpperCase() + description.slice(1) + '.';
@@ -8658,7 +8658,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1215';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1220';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -8902,14 +8902,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
     // 1. Use directly passed temperature (most reliable)
     if (typeof currentTemp === 'number' && !Number.isNaN(currentTemp)) {
       color = tempToColor(currentTemp);
-      /* eslint-disable */console.log(...oo_oo(`2266558813_5129_6_5129_81_4`,'[Dots] Using passed temperature:', currentTemp, '°F →', color));
+      console.log('[Dots] Using passed temperature:', currentTemp, '°F →', color);
     }
     // 2. Try CSS variable (set when current temperature is displayed)
     else {
       const rootColor = document.documentElement.style.getPropertyValue('--temp-color');
       if (rootColor && rootColor.trim() !== '') {
         color = rootColor.trim();
-        /* eslint-disable */console.log(...oo_oo(`2266558813_5136_8_5136_74_4`,'[Dots] Using --temp-color from CSS variable:', color));
+        console.log('[Dots] Using --temp-color from CSS variable:', color);
       } else {
         // 3. Fallback to calculating from stored temperature
         try {
@@ -8918,11 +8918,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
             const temp = parseFloat(lastTempStr);
             if (!Number.isNaN(temp)) {
               color = tempToColor(temp);
-              /* eslint-disable */console.log(...oo_oo(`2266558813_5145_14_5145_97_4`,'[Dots] Calculated color from localStorage temp:', temp, '°F →', color));
+              console.log('[Dots] Calculated color from localStorage temp:', temp, '°F →', color);
             }
           }
         } catch(e) {
-          /* eslint-disable */console.log(...oo_oo(`2266558813_5149_10_5149_72_4`,'[Dots] Error reading temp from localStorage:', e));
+          console.log('[Dots] Error reading temp from localStorage:', e);
         }
       }
     }
@@ -8935,7 +8935,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         inactive = `hsla(${parsed[0]}, ${parsed[1]}%, ${parsed[2]}%, 0.15)`;
       }
     } else {
-      /* eslint-disable */console.log(...oo_oo(`2266558813_5162_6_5162_79_4`,'[Dots] No temperature color found, using defaults:', active));
+      console.log('[Dots] No temperature color found, using defaults:', active);
     }
     
     return { active, inactive };
@@ -10335,7 +10335,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const celestialColor = currentTemp !== null ? (tempToColor(currentTemp + 10) || tempColor) : null;
     
     if (typeof sunrise !== 'number' || typeof sunset !== 'number') {
-      /* eslint-disable */console.log(...oo_oo(`2266558813_6564_6_6564_62_4`,'Sun dial: sunrise/sunset data unavailable'));
+      console.log('Sun dial: sunrise/sunset data unavailable');
       const circumference = 2 * Math.PI * 46;
       gridSunProgressEls.forEach(gridSunProgressEl => {
         gridSunProgressEl.style.strokeDashoffset = circumference; // hide progress
@@ -10449,7 +10449,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const celestialColor = currentTemp !== null ? (tempToColor(currentTemp + 10) || tempColor) : null;
     
     if (typeof moonrise !== 'number' || typeof moonset !== 'number') {
-      /* eslint-disable */console.log(...oo_oo(`2266558813_6678_6_6678_65_4`,'Moon dial: moonrise/moonset data unavailable'));
+      console.log('Moon dial: moonrise/moonset data unavailable');
       const circumference = 2 * Math.PI * 46;
       gridMoonProgressEls.forEach(gridMoonProgressEl => {
         gridMoonProgressEl.style.strokeDashoffset = circumference; // hide progress
@@ -10588,7 +10588,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const windGust = (rawWindGust - windSpeed >= 5) ? rawWindGust : windSpeed;
     const currentTemp = data?.current?.temp || null;
     
-    /* eslint-disable */console.log(...oo_oo(`2266558813_6817_4_6817_196_4`,`%c[WIND TEST] Raw API Speed: ${data?.current?.wind_speed} mph | Raw API Gust: ${data?.current?.wind_gust} mph`, 'background: #222; color: #00ffff; font-size: 16px; padding: 4px;'));
+    console.log(`%c[WIND TEST] Raw API Speed: ${data?.current?.wind_speed} mph | Raw API Gust: ${data?.current?.wind_gust} mph`, 'background: #222; color: #00ffff; font-size: 16px; padding: 4px;');
     
     const wrapperId = 'wind-dots-wrapper';
     let wrapper = document.getElementById(wrapperId);
@@ -10696,9 +10696,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
       
       // Log gust information
       if (windGust > windSpeed) {
-        /* eslint-disable */console.log(...oo_oo(`2266558813_6925_8_6925_201_4`,`Wind: ${Math.round(windSpeed)} mph, Gusts: ${Math.round(windGust)} mph (${Math.round(windGust - windSpeed)} mph additional) - ${speedCount} to ${gustCount} of ${dots.length} dots`));
+        console.log(`Wind: ${Math.round(windSpeed)} mph, Gusts: ${Math.round(windGust)} mph (${Math.round(windGust - windSpeed)} mph additional) - ${speedCount} to ${gustCount} of ${dots.length} dots`);
       } else {
-        /* eslint-disable */console.log(...oo_oo(`2266558813_6927_8_6927_115_4`,`Wind: ${Math.round(windSpeed)} mph, No gusts detected - ${speedCount} of ${dots.length} dots`));
+        console.log(`Wind: ${Math.round(windSpeed)} mph, No gusts detected - ${speedCount} of ${dots.length} dots`);
       }
       
       for (let i = 0; i < dots.length; i++) {
@@ -10861,7 +10861,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       // Calculate proportion: if 41% humidity and 60 dots, light up 41% of 60 = ~25 dots
       const activeCount = Math.round((humidity / 100) * dots.length);
       
-      /* eslint-disable */console.log(...oo_oo(`2266558813_7090_6_7090_99_4`,`Humidity: ${Math.round(humidity)}% (${activeCount} of ${dots.length} dots lit)`));
+      console.log(`Humidity: ${Math.round(humidity)}% (${activeCount} of ${dots.length} dots lit)`);
       
       for (let i = 0; i < dots.length; i++) {
         const isActive = i < activeCount;
@@ -11050,7 +11050,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const dewpointPosition = (clampedDewpoint - DEWPOINT_MIN_TEMP) / tempRange;
       const activeDotIndex = Math.round(dewpointPosition * (dots.length - 1));
       
-      /* eslint-disable */console.log(...oo_oo(`2266558813_7279_6_7279_99_4`,`Dewpoint: ${Math.round(dewpointF)}°F (dot ${activeDotIndex} of ${dots.length})`));
+      console.log(`Dewpoint: ${Math.round(dewpointF)}°F (dot ${activeDotIndex} of ${dots.length})`);
       
       for (let i = 0; i < dots.length; i++) {
         // Light up dots from the start up to the current dewpoint
@@ -11185,7 +11185,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const sunset = today?.sunset;
     
     if (typeof sunrise !== 'number' || typeof sunset !== 'number') {
-      /* eslint-disable */console.log(...oo_oo(`2266558813_7414_6_7414_66_4`,'Sun position: sunrise/sunset data unavailable'));
+      console.log('Sun position: sunrise/sunset data unavailable');
       return;
     }
     
@@ -11205,7 +11205,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const dayColor = 'hsl(45, 100%, 50%)';     // Gold yellow (from 70s range)
     const nightColor = 'hsla(45, 100%, 50%, 0.15)'; // Dim version
     
-    /* eslint-disable */console.log(...oo_oo(`2266558813_7434_4_7434_173_4`,`Sun position: sunrise=${new Date(sunrise*1000).toLocaleTimeString()}, sunset=${new Date(sunset*1000).toLocaleTimeString()}, current dot=${currentDotIndex}`));
+    console.log(`Sun position: sunrise=${new Date(sunrise*1000).toLocaleTimeString()}, sunset=${new Date(sunset*1000).toLocaleTimeString()}, current dot=${currentDotIndex}`);
     
     // Calculate dot indices for sunrise and sunset
     const sunriseDotIndex = Math.floor(((sunrise - midnightToday) / 86400) * SUN_DOTS_COUNT);
@@ -11284,7 +11284,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         sunriseFormatted = sunriseFormatted.replace(/(am|pm)$/, '<span style="font-family: light !important; opacity: 0.8 !important; color: inherit !important; font-size: inherit !important;">$1</span>');
         sunriseLabel.innerHTML = sunriseFormatted;
         
-        /* eslint-disable */console.log(...oo_oo(`2266558813_7513_8_7513_98_4`,`Creating sunrise label: ${sunriseFormatted} at dot index ${sunriseDotIndex}`));
+        console.log(`Creating sunrise label: ${sunriseFormatted} at dot index ${sunriseDotIndex}`);
         
         // Position sunrise label CENTERED UNDER the first bright dot (transition dot)
         const safeDotIndex = Math.max(0, Math.min(SUN_DOTS_COUNT - 1, sunriseDotIndex));
@@ -11302,7 +11302,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           sunriseLabel.style.right = 'auto';
           sunriseLabel.style.top = `calc(100% + ${SUN_LABEL_OFFSET_Y})`;
           sunriseLabel.style.transform = 'translateX(-50%)';
-          /* eslint-disable */console.log(...oo_oo(`2266558813_7531_10_7531_90_4`,`Sunrise label positioned centered under dot at left: ${leftPos}vw`));
+          console.log(`Sunrise label positioned centered under dot at left: ${leftPos}vw`);
         }
       }
       
@@ -11317,7 +11317,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         sunsetFormatted = sunsetFormatted.replace(/(am|pm)$/, '<span style="font-family: light !important; opacity: 0.8 !important; color: inherit !important; font-size: inherit !important;">$1</span>');
         sunsetLabel.innerHTML = sunsetFormatted;
         
-        /* eslint-disable */console.log(...oo_oo(`2266558813_7546_8_7546_95_4`,`Creating sunset label: ${sunsetFormatted} at dot index ${sunsetDotIndex}`));
+        console.log(`Creating sunset label: ${sunsetFormatted} at dot index ${sunsetDotIndex}`);
         
         // Position sunset label CENTERED UNDER the last bright dot (transition dot)
         const safeDotIndex = Math.max(0, Math.min(SUN_DOTS_COUNT - 1, sunsetDotIndex));
@@ -11335,7 +11335,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           sunsetLabel.style.right = 'auto';
           sunsetLabel.style.top = `calc(100% + ${SUN_LABEL_OFFSET_Y})`;
           sunsetLabel.style.transform = 'translateX(-50%)';
-          /* eslint-disable */console.log(...oo_oo(`2266558813_7564_10_7564_89_4`,`Sunset label positioned centered under dot at left: ${leftPos}vw`));
+          console.log(`Sunset label positioned centered under dot at left: ${leftPos}vw`);
         }
       }
     }
@@ -11394,7 +11394,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const moonset = today?.moonset;
     
     if (typeof moonrise !== 'number' || typeof moonset !== 'number') {
-      /* eslint-disable */console.log(...oo_oo(`2266558813_7623_6_7623_69_4`,'Moon position: moonrise/moonset data unavailable'));
+      console.log('Moon position: moonrise/moonset data unavailable');
       return;
     }
     
@@ -11425,7 +11425,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       isMoonUp = now >= moonrise || now < moonset;
     }
     
-    /* eslint-disable */console.log(...oo_oo(`2266558813_7654_4_7654_215_4`,`Moon position: moonrise=${new Date(moonrise*1000).toLocaleTimeString()}, moonset=${new Date(moonset*1000).toLocaleTimeString()}, current dot=${currentDotIndex}, moon is ${isMoonUp ? 'UP' : 'DOWN'}`));
+    console.log(`Moon position: moonrise=${new Date(moonrise*1000).toLocaleTimeString()}, moonset=${new Date(moonset*1000).toLocaleTimeString()}, current dot=${currentDotIndex}, moon is ${isMoonUp ? 'UP' : 'DOWN'}`);
     
     // Calculate dot indices for moonrise and moonset
     const moonriseDotIndex = Math.floor(((moonrise - midnightToday) / 86400) * MOON_DOTS_COUNT);
@@ -11514,7 +11514,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         if (moonrise === 0) moonriseFormatted = '12:00 <span style="font-family: light !important; opacity: 0.8 !important; color: inherit !important; font-size: inherit !important;">am</span>';
         moonriseLabel.innerHTML = moonriseFormatted;
         
-        /* eslint-disable */console.log(...oo_oo(`2266558813_7743_8_7743_101_4`,`Creating moonrise label: ${moonriseFormatted} at dot index ${moonriseDotIndex}`));
+        console.log(`Creating moonrise label: ${moonriseFormatted} at dot index ${moonriseDotIndex}`);
         
         // Position moonrise label CENTERED UNDER the first bright dot (transition dot)
         const safeDotIndex = moonrise === 0 ? 0 : Math.max(0, Math.min(MOON_DOTS_COUNT - 1, moonriseDotIndex));
@@ -11532,7 +11532,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           moonriseLabel.style.right = 'auto';
           moonriseLabel.style.top = `calc(100% + ${MOON_LABEL_OFFSET_Y})`;
           moonriseLabel.style.transform = 'translateX(-50%)';
-          /* eslint-disable */console.log(...oo_oo(`2266558813_7761_10_7761_91_4`,`Moonrise label positioned centered under dot at left: ${leftPos}vw`));
+          console.log(`Moonrise label positioned centered under dot at left: ${leftPos}vw`);
         }
       }
       
@@ -11546,7 +11546,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         if (moonset === 0) moonsetFormatted = '11:59 <span style="font-family: light !important; opacity: 0.8 !important; color: inherit !important; font-size: inherit !important;">pm</span>';
         moonsetLabel.innerHTML = moonsetFormatted;
         
-        /* eslint-disable */console.log(...oo_oo(`2266558813_7775_8_7775_98_4`,`Creating moonset label: ${moonsetFormatted} at dot index ${moonsetDotIndex}`));
+        console.log(`Creating moonset label: ${moonsetFormatted} at dot index ${moonsetDotIndex}`);
         
         // Position moonset label CENTERED UNDER the last bright dot (transition dot)
         const safeDotIndex = moonset === 0 ? MOON_DOTS_COUNT - 1 : Math.max(0, Math.min(MOON_DOTS_COUNT - 1, moonsetDotIndex));
@@ -11564,7 +11564,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           moonsetLabel.style.right = 'auto';
           moonsetLabel.style.top = `calc(100% + ${MOON_LABEL_OFFSET_Y})`;
           moonsetLabel.style.transform = 'translateX(-50%)';
-          /* eslint-disable */console.log(...oo_oo(`2266558813_7793_10_7793_90_4`,`Moonset label positioned centered under dot at left: ${leftPos}vw`));
+          console.log(`Moonset label positioned centered under dot at left: ${leftPos}vw`);
         }
       }
     }
@@ -11759,7 +11759,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       });
 
       cityEl.addEventListener('click', () => {
-        /* eslint-disable */console.log(...oo_oo(`2266558813_7963_8_7963_85_4`,`📍 Switching location to: ${loc.name} (${loc.lat}, ${loc.lon})`));
+        console.log(`📍 Switching location to: ${loc.name} (${loc.lat}, ${loc.lon})`);
         LAT = loc.lat;
         LON = loc.lon;
         getLocalWeather(); // Re-fetch weather data & update display
@@ -11997,7 +11997,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         }
         const avgLum = totalLum / count;
         dynamicLuminanceCache[filename] = avgLum;
-        /* eslint-disable */console.log(...oo_oo(`2266558813_8197_8_8197_136_4`,`📸 Dynamic image luminance for ${filename}: ${avgLum.toFixed(1)} / 255 => ${avgLum > 115 ? 'DEEP BLUE' : 'WHITE'}`));
+        console.log(`📸 Dynamic image luminance for ${filename}: ${avgLum.toFixed(1)} / 255 => ${avgLum > 115 ? 'DEEP BLUE' : 'WHITE'}`);
         updateSimpleMonthColors();
       } catch (e) {
         /* CORS or canvas read error fallback */
@@ -12060,7 +12060,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   function handleTimeDialReset(e) {
     e.stopPropagation();
-    /* eslint-disable */console.log(...oo_oo(`2266558813_8260_4_8260_82_4`,'🔄 Time dial clicked - resetting API timer & forcing refresh...'));
+    console.log('🔄 Time dial clicked - resetting API timer & forcing refresh...');
     
     stopAutoRefresh();
     getLocalWeather();
@@ -12121,7 +12121,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           SHOW_DOPPLER_RADAR_RIGHT = !SHOW_DOPPLER_RADAR_RIGHT;
           USER_DOPPLER_OVERRIDE_RIGHT = SHOW_DOPPLER_RADAR_RIGHT;
           rightRadarHovered = false; // Reset hover state on click to prevent immediate peek inversion
-          /* eslint-disable */console.log(...oo_oo(`2266558813_8318_10_8318_200_4`,`🔄 Right circle clicked. Manual Override: ${SHOW_DOPPLER_RADAR_RIGHT ? 'FORCING DOPPLER' : 'FORCING TIME'} (Natural state is: ${AUTO_DOPPLER_RADAR_RIGHT ? 'DOPPLER' : 'TIME'})`));
+          console.log(`🔄 Right circle clicked. Manual Override: ${SHOW_DOPPLER_RADAR_RIGHT ? 'FORCING DOPPLER' : 'FORCING TIME'} (Natural state is: ${AUTO_DOPPLER_RADAR_RIGHT ? 'DOPPLER' : 'TIME'})`);
           
           if (rightDopplerOverrideTimerId) {
             clearTimeout(rightDopplerOverrideTimerId);
@@ -12131,7 +12131,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
             USER_DOPPLER_OVERRIDE_RIGHT = null;
             SHOW_DOPPLER_RADAR_RIGHT = AUTO_DOPPLER_RADAR_RIGHT;
             rightDopplerOverrideTimerId = null;
-            /* eslint-disable */console.log(...oo_oo(`2266558813_8328_12_8328_136_4`,`⏳ Right circle override expired. Reverting to natural state: ${AUTO_DOPPLER_RADAR_RIGHT ? 'DOPPLER' : 'TIME'}`));
+            console.log(`⏳ Right circle override expired. Reverting to natural state: ${AUTO_DOPPLER_RADAR_RIGHT ? 'DOPPLER' : 'TIME'}`);
             updateWeatherDescription(lastWeatherData || {});
           }, DOPPLER_OVERRIDE_DURATION_MS);
           
@@ -12178,7 +12178,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           SHOW_DOPPLER_RADAR_LEFT = !SHOW_DOPPLER_RADAR_LEFT;
           USER_DOPPLER_OVERRIDE_LEFT = SHOW_DOPPLER_RADAR_LEFT;
           leftRadarHovered = false; // Reset hover state on click to prevent immediate peek inversion
-          /* eslint-disable */console.log(...oo_oo(`2266558813_8375_10_8375_197_4`,`🔄 Left circle clicked. Manual Override: ${SHOW_DOPPLER_RADAR_LEFT ? 'FORCING DOPPLER' : 'FORCING TIME'} (Natural state is: ${AUTO_DOPPLER_RADAR_LEFT ? 'DOPPLER' : 'TIME'})`));
+          console.log(`🔄 Left circle clicked. Manual Override: ${SHOW_DOPPLER_RADAR_LEFT ? 'FORCING DOPPLER' : 'FORCING TIME'} (Natural state is: ${AUTO_DOPPLER_RADAR_LEFT ? 'DOPPLER' : 'TIME'})`);
           
           if (leftDopplerOverrideTimerId) {
             clearTimeout(leftDopplerOverrideTimerId);
@@ -12188,7 +12188,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
             USER_DOPPLER_OVERRIDE_LEFT = null;
             SHOW_DOPPLER_RADAR_LEFT = AUTO_DOPPLER_RADAR_LEFT;
             leftDopplerOverrideTimerId = null;
-            /* eslint-disable */console.log(...oo_oo(`2266558813_8385_12_8385_134_4`,`⏳ Left circle override expired. Reverting to natural state: ${AUTO_DOPPLER_RADAR_LEFT ? 'DOPPLER' : 'TIME'}`));
+            console.log(`⏳ Left circle override expired. Reverting to natural state: ${AUTO_DOPPLER_RADAR_LEFT ? 'DOPPLER' : 'TIME'}`);
             updateWeatherDescription(lastWeatherData || {});
           }, DOPPLER_OVERRIDE_DURATION_MS);
           
@@ -14399,7 +14399,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const c1 = `hsla(${randomHue.toFixed(1)}, ${sCommon.toFixed(1)}%, ${l1.toFixed(1)}%, ${alpha})`;
     const c2 = `hsla(${randomHue.toFixed(1)}, ${sCommon.toFixed(1)}%, ${l2.toFixed(1)}%, ${alpha})`;
     
-    /* eslint-disable */console.log(...oo_oo(`2266558813_8612_4_8612_90_4`,`🎨 Background Gradient: Hue=${randomHue}° | Color1=${c1} | Color2=${c2}`));
+    console.log(`🎨 Background Gradient: Hue=${randomHue}° | Color1=${c1} | Color2=${c2}`);
     
     return [c1, c2];
   }
@@ -14656,9 +14656,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
     });
     
     // Debug: log rain probabilities with dates
-    /* eslint-disable */console.log(...oo_oo(`2266558813_8869_4_8869_54_4`,'Rain probabilities for next 7 days:'));
+    console.log('Rain probabilities for next 7 days:');
     rainData.forEach((d, i) => {
-      /* eslint-disable */console.log(...oo_oo(`2266558813_8871_6_8871_95_4`,`  ${d.date}: ${(d.pop * 100).toFixed(0)}% (${(d.rain / 25.4).toFixed(2)}")`));
+      console.log(`  ${d.date}: ${(d.pop * 100).toFixed(0)}% (${(d.rain / 25.4).toFixed(2)}")`);
     });
 
     // Ensure exactly 7 dot elements exist
@@ -15529,14 +15529,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const tempRange = hiTemp - loTemp;
     let ratio = tempRange > 0 ? (currentTemp - loTemp) / tempRange : 0.5;
     
-    /* eslint-disable */console.log(...oo_oo(`2266558813_9604_4_9604_98_4`,`🎯 TEMP POINTER CALC - Current: ${currentTemp}°, Lo: ${loTemp}°, Hi: ${hiTemp}°`));
-    /* eslint-disable */console.log(...oo_oo(`2266558813_9605_4_9605_99_4`,`🎯 TEMP POINTER CALC - Temp Range: ${tempRange}°, Raw Ratio: ${ratio.toFixed(4)}`));
-    /* eslint-disable */console.log(...oo_oo(`2266558813_9606_4_9606_107_4`,`🎯 TEMP POINTER CALC - (${currentTemp} - ${loTemp}) / ${tempRange} = ${ratio.toFixed(4)}`));
+    console.log(`🎯 TEMP POINTER CALC - Current: ${currentTemp}°, Lo: ${loTemp}°, Hi: ${hiTemp}°`);
+    console.log(`🎯 TEMP POINTER CALC - Temp Range: ${tempRange}°, Raw Ratio: ${ratio.toFixed(4)}`);
+    console.log(`🎯 TEMP POINTER CALC - (${currentTemp} - ${loTemp}) / ${tempRange} = ${ratio.toFixed(4)}`);
     
     // Clamp ratio to 0-1 range (current temp might be outside hi/lo range)
     ratio = Math.max(0, Math.min(1, ratio));
     
-    /* eslint-disable */console.log(...oo_oo(`2266558813_9611_4_9611_76_4`,`🎯 TEMP POINTER CALC - Clamped Ratio: ${ratio.toFixed(4)}`));
+    console.log(`🎯 TEMP POINTER CALC - Clamped Ratio: ${ratio.toFixed(4)}`);
 
     // Calculate position: start from loTop, move up by ratio * barRange
     // Check if bars are actively in the "dip down, dip back up" animation
@@ -15603,8 +15603,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
       pointer.style.transition = hadTransition || 'top 0.5s ease-out, opacity 0.3s ease';
     });
 
-    /* eslint-disable */console.log(...oo_oo(`2266558813_9645_4_9645_235_4`,`Temp pointer: current=${currentTemp}°, today's range=${loTemp}°-${hiTemp}°, ratio=${ratio.toFixed(2)}, Y=${pointerY.toFixed(1)}px, hiTop=${hiTop.toFixed(1)}, loTop=${loTop.toFixed(1)}, barRange=${barRange.toFixed(1)}`));
-    /* eslint-disable */console.log(...oo_oo(`2266558813_9646_4_9646_116_4`,`🎯 VISIBLE TEMPS - Hi Bar displays: ${hiItem.textContent}, Lo Bar displays: ${loItem.textContent}`));
+    console.log(`Temp pointer: current=${currentTemp}°, today's range=${loTemp}°-${hiTemp}°, ratio=${ratio.toFixed(2)}, Y=${pointerY.toFixed(1)}px, hiTop=${hiTop.toFixed(1)}, loTop=${loTop.toFixed(1)}, barRange=${barRange.toFixed(1)}`);
+    console.log(`🎯 VISIBLE TEMPS - Hi Bar displays: ${hiItem.textContent}, Lo Bar displays: ${loItem.textContent}`);
 
     // Update Day 0 high box 10-degree horizontal lines
     updateDay0TempLines(data);
@@ -15973,12 +15973,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const dailyData = data?.daily || [];
     
     // Console report: 8-day descriptions from API
-    /* eslint-disable */console.log(...oo_oo(`2266558813_9692_4_9692_62_4`,'📅 === 8-Day DAILY Weather Descriptions ==='));
+    console.log('📅 === 8-Day DAILY Weather Descriptions ===');
     dailyData.slice(0, 8).forEach((day, index) => {
       const description = day?.weather?.[0]?.description || 'N/A';
-      /* eslint-disable */console.log(...oo_oo(`2266558813_9695_6_9695_56_4`,`   Day ${index + 1}: ${description}`));
+      console.log(`   Day ${index + 1}: ${description}`);
     });
-    /* eslint-disable */console.log(...oo_oo(`2266558813_9697_4_9697_61_4`,'=========================================='));
+    console.log('==========================================');
     
     cells.forEach((cell, index) => {
       const dayData = dailyData[index];
@@ -16148,7 +16148,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       currentCityLat = lat;
       currentCityLon = lon;
     } catch (e) {
-      /* eslint-disable */console.error(...oo_tx(`2266558813_9831_6_9831_51_11`,'Error fetching city name:', e));
+      console.error('Error fetching city name:', e);
       setFallbackLocation();
     }
   }
@@ -16166,7 +16166,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         const stationId = parts[parts.length - 1]; // e.g. "KINX"
         if (stationId && stationId.length === 4) {
           currentRadarStation = stationId.toUpperCase();
-          /* eslint-disable */console.log(...oo_oo(`2266558813_9849_10_9849_82_4`,`📡 Dynamic Radar Station resolved: ${currentRadarStation}`));
+          console.log(`📡 Dynamic Radar Station resolved: ${currentRadarStation}`);
         }
       }
     } catch (e) {
@@ -16297,7 +16297,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
    */
   async function checkRadarPrecipitationActivity(zoomLevel) {
     if (!latestRainViewerData || !latestRainViewerData.radar || !latestRainViewerData.radar.past || latestRainViewerData.radar.past.length === 0) {
-      /* eslint-disable */console.log(...oo_oo(`2266558813_9980_6_9980_81_4`,'📡 RainViewer: No RainViewer data cached, fallback to false.'));
+      console.log('📡 RainViewer: No RainViewer data cached, fallback to false.');
       return false;
     }
 
@@ -16336,7 +16336,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
             const res = await fetch(url);
             if (!res.ok) {
               // 404 is standard for no-rain tiles
-              /* eslint-disable */console.log(...oo_oo(`2266558813_10019_14_10019_101_4`,`📡 RainViewer Info: Empty or missing tile (status ${res.status}): ${url}`));
+              console.log(`📡 RainViewer Info: Empty or missing tile (status ${res.status}): ${url}`);
               return null;
             }
             const blob = await res.blob();
@@ -16352,14 +16352,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
               img.src = objectUrl;
             });
           } catch (e) {
-            /* eslint-disable */console.log(...oo_oo(`2266558813_10035_12_10035_104_4`,`📡 RainViewer Fetch Info: Failed to fetch tile (treating as empty): ${url}`, e));
+            console.log(`📡 RainViewer Fetch Info: Failed to fetch tile (treating as empty): ${url}`, e);
             return null;
           }
         };
 
         // Safety timeout for loading the tiles (6 seconds)
         const timeoutId = setTimeout(() => {
-          /* eslint-disable */console.error(...oo_tx(`2266558813_10042_10_10042_62_11`,'❌ RainViewer pixel check timed out.'));
+          console.error('❌ RainViewer pixel check timed out.');
           resolve(false);
         }, 6000);
 
@@ -16443,7 +16443,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           threshold = cssVal ? parseInt(cssVal, 10) : RAINVIEWER_PRECIPITATION_PIXEL_THRESHOLD_RIGHT;
         }
 
-        /* eslint-disable */console.log(...oo_oo(`2266558813_10126_8_10126_151_4`,`📡 RainViewer Pixel Check (Zoom ${zoomLevel} Circle): Found ${precipitationPixelCount} active pixels (Threshold is ${threshold})`));
+        console.log(`📡 RainViewer Pixel Check (Zoom ${zoomLevel} Circle): Found ${precipitationPixelCount} active pixels (Threshold is ${threshold})`);
         
         if (!window.RadarDebug) {
           window.RadarDebug = { leftCount: 0, rightCount: 0, leftActive: false, rightActive: false, lastError: 'None', thresholdLeft: 0, thresholdRight: 0 };
@@ -16460,7 +16460,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
         resolve(precipitationPixelCount >= threshold);
       } catch (e) {
-        /* eslint-disable */console.error(...oo_tx(`2266558813_10143_8_10143_76_11`,'❌ RainViewer pixel check failed during analysis:', e));
+        console.error('❌ RainViewer pixel check failed during analysis:', e);
         if (!window.RadarDebug) {
           window.RadarDebug = { leftCount: 0, rightCount: 0, leftActive: false, rightActive: false, lastError: 'None', thresholdLeft: 0, thresholdRight: 0 };
         }
@@ -16479,7 +16479,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     // 1. Current weather condition ID indicates rain/storm/snow (OpenWeather codes: 2xx = Storm, 3xx = Drizzle, 5xx = Rain, 6xx = Snow)
     const currentId = data.current?.weather?.[0]?.id;
     if (currentId && (currentId >= 200 && currentId < 700)) {
-      /* eslint-disable */console.log(...oo_oo(`2266558813_10162_6_10162_98_4`,`🌧️ activeNow Check: Current weather ID ${currentId} indicates precipitation.`));
+      console.log(`🌧️ activeNow Check: Current weather ID ${currentId} indicates precipitation.`);
       return true;
     }
 
@@ -16487,7 +16487,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const currentRain = data.current?.rain?.['1h'] || data.current?.rain || 0;
     const currentSnow = data.current?.snow?.['1h'] || data.current?.snow || 0;
     if (currentRain > 0.01 || currentSnow > 0.01) {
-      /* eslint-disable */console.log(...oo_oo(`2266558813_10170_6_10170_71_4`,`🌧️ activeNow Check: Current rain/snow volume > 0.`));
+      console.log(`🌧️ activeNow Check: Current rain/snow volume > 0.`);
       return true;
     }
 
@@ -16507,7 +16507,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
                event.includes('hail');
       });
       if (activePrecipAlert) {
-        /* eslint-disable */console.log(...oo_oo(`2266558813_10190_8_10190_94_4`,`🌧️ activeNow Check: Active storm/precipitation weather alert detected.`));
+        console.log(`🌧️ activeNow Check: Active storm/precipitation weather alert detected.`);
         return true;
       }
     }
@@ -16517,7 +16517,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   async function determineRadarStatus(data) {
     if (FORCE_DOPPLER_RADAR) {
-      /* eslint-disable */console.log(...oo_oo(`2266558813_10200_6_10200_70_4`,`📡 Dynamic Radar: FORCE_DOPPLER_RADAR is enabled.`));
+      console.log(`📡 Dynamic Radar: FORCE_DOPPLER_RADAR is enabled.`);
       return { left: true, right: true };
     }
     
@@ -16560,15 +16560,15 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   // Expose diagnostic tool to browser console
   window.testRadar = async () => {
-    /* eslint-disable */console.log(...oo_oo(`2266558813_10243_4_10243_54_4`,"🔍 Running radar diagnostic test..."));
+    console.log("🔍 Running radar diagnostic test...");
     if (!currentRadarStation) {
-      /* eslint-disable */console.error(...oo_tx(`2266558813_10245_6_10245_64_11`,"❌ No radar station is currently resolved."));
+      console.error("❌ No radar station is currently resolved.");
       return;
     }
     const rawUrl = `https://radar.weather.gov/ridge/standard/${currentRadarStation}_0.gif?t=${Date.now()}`;
     const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(rawUrl)}`;
     
-    /* eslint-disable */console.log(...oo_oo(`2266558813_10251_4_10251_66_4`,`📡 Fetching radar image from proxy: ${proxyUrl}`));
+    console.log(`📡 Fetching radar image from proxy: ${proxyUrl}`);
     const img = new Image();
     img.crossOrigin = 'anonymous';
     
@@ -16580,7 +16580,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         canvas.height = size;
         const ctx = canvas.getContext('2d');
         if (!ctx) {
-          /* eslint-disable */console.error(...oo_tx(`2266558813_10263_10_10263_61_11`,"❌ Failed to get 2D canvas context."));
+          console.error("❌ Failed to get 2D canvas context.");
           return;
         }
         ctx.drawImage(img, 0, 0, size, size);
@@ -16633,20 +16633,20 @@ Plan ahead for significantly warmer conditions tomorrow!`
           }
         }
         
-        /* eslint-disable */console.log(...oo_oo(`2266558813_10316_8_10316_72_4`,`📊 DIAGNOSTIC RESULTS for ${currentRadarStation}:`));
-        /* eslint-disable */console.log(...oo_oo(`2266558813_10317_8_10317_59_4`,`   - Cropped Area Size: 4,640 pixels`));
-        /* eslint-disable */console.log(...oo_oo(`2266558813_10318_8_10318_74_4`,`   - Base Map / Background pixels: ${baseMapPixels}`));
-        /* eslint-disable */console.log(...oo_oo(`2266558813_10319_8_10319_72_4`,`   - Precipitation / Echo pixels: ${precipPixels}`));
-        /* eslint-disable */console.log(...oo_oo(`2266558813_10320_8_10320_88_4`,`   - Configured Threshold: ${RADAR_PRECIPITATION_PIXEL_THRESHOLD}`));
-        /* eslint-disable */console.log(...oo_oo(`2266558813_10321_8_10321_146_4`,`   - Decision: ${precipPixels >= RADAR_PRECIPITATION_PIXEL_THRESHOLD ? "🔴 TRIGGER RADAR MODE" : "🟢 SHOW SCROLLING MONTH"}`));
+        console.log(`📊 DIAGNOSTIC RESULTS for ${currentRadarStation}:`);
+        console.log(`   - Cropped Area Size: 4,640 pixels`);
+        console.log(`   - Base Map / Background pixels: ${baseMapPixels}`);
+        console.log(`   - Precipitation / Echo pixels: ${precipPixels}`);
+        console.log(`   - Configured Threshold: ${RADAR_PRECIPITATION_PIXEL_THRESHOLD}`);
+        console.log(`   - Decision: ${precipPixels >= RADAR_PRECIPITATION_PIXEL_THRESHOLD ? "🔴 TRIGGER RADAR MODE" : "🟢 SHOW SCROLLING MONTH"}`);
         if (colorsSample.length > 0) {
-          /* eslint-disable */console.log(...oo_oo(`2266558813_10323_10_10323_78_4`,`   - Sample Precipitation Colors found:`, colorsSample));
+          console.log(`   - Sample Precipitation Colors found:`, colorsSample);
         }
       } catch (e) {
-        /* eslint-disable */console.error(...oo_tx(`2266558813_10326_8_10326_57_11`,"❌ Diagnostic analysis failed:", e));
+        console.error("❌ Diagnostic analysis failed:", e);
       }
     };
-    img.onerror = (e) => /* eslint-disable */console.error(...oo_tx(`2266558813_10329_25_10329_90_11`,"❌ Failed to load radar image for diagnostics:", e));
+    img.onerror = (e) => console.error("❌ Failed to load radar image for diagnostics:", e);
     img.src = proxyUrl;
   };
 
@@ -16656,7 +16656,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   // 1. GUARD: Stop if hidden
   if (document.visibilityState === 'hidden') {
-      /* eslint-disable */console.log(...oo_oo(`2266558813_10339_6_10339_75_4`,"Tab hidden, skipping weather update to save API calls."));
+      console.log("Tab hidden, skipping weather update to save API calls.");
       return; // <--- THIS IS CRITICAL. It stops the function here.
   }
   // If visible, the code just continues downwards...
@@ -16684,11 +16684,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       // Fetch RainViewer map data asynchronously
       try {
-        /* eslint-disable */console.log(...oo_oo(`2266558813_10367_8_10367_54_4`,'Fetching RainViewer map data...'));
+        console.log('Fetching RainViewer map data...');
         const rvRes = await fetch('https://api.rainviewer.com/public/weather-maps.json');
         if (rvRes.ok) {
           latestRainViewerData = await rvRes.json();
-          /* eslint-disable */console.log(...oo_oo(`2266558813_10371_10_10371_66_4`,'RainViewer map data fetched successfully.'));
+          console.log('RainViewer map data fetched successfully.');
         } else {
           console.warn(`RainViewer API returned status: ${rvRes.status}`);
         }
@@ -16698,7 +16698,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       // We removed the double-fetch block! The OneCall API fetches what it needs directly.
       const url = getUrl();
-      /* eslint-disable */console.log(...oo_oo(`2266558813_10381_6_10381_66_4`,`Fetching weather for LAT: ${LAT}, LON: ${LON}`));
+      console.log(`Fetching weather for LAT: ${LAT}, LON: ${LON}`);
       const res = await fetch(url, { cache: 'no-store' });
       if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
       const data = await res.json();
@@ -16710,7 +16710,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         AUTO_DOPPLER_RADAR_RIGHT = radarStatus.right;
         SHOW_DOPPLER_RADAR_LEFT = USER_DOPPLER_OVERRIDE_LEFT !== null ? USER_DOPPLER_OVERRIDE_LEFT : AUTO_DOPPLER_RADAR_LEFT;
         SHOW_DOPPLER_RADAR_RIGHT = USER_DOPPLER_OVERRIDE_RIGHT !== null ? USER_DOPPLER_OVERRIDE_RIGHT : AUTO_DOPPLER_RADAR_RIGHT;
-        /* eslint-disable */console.log(...oo_oo(`2266558813_10393_8_10393_568_4`,`📡 Dynamic Radar Status decided - Left: ${SHOW_DOPPLER_RADAR_LEFT ? 'ENABLED' : 'DISABLED'} (Natural/Auto is: ${AUTO_DOPPLER_RADAR_LEFT ? 'DOPPLER' : 'TIME'}, Override is: ${USER_DOPPLER_OVERRIDE_LEFT !== null ? (USER_DOPPLER_OVERRIDE_LEFT ? 'FORCED DOPPLER' : 'FORCED TIME') : 'NONE'}), Right: ${SHOW_DOPPLER_RADAR_RIGHT ? 'ENABLED' : 'DISABLED'} (Natural/Auto is: ${AUTO_DOPPLER_RADAR_RIGHT ? 'DOPPLER' : 'TIME'}, Override is: ${USER_DOPPLER_OVERRIDE_RIGHT !== null ? (USER_DOPPLER_OVERRIDE_RIGHT ? 'FORCED DOPPLER' : 'FORCED TIME') : 'NONE'})`));
+        console.log(`📡 Dynamic Radar Status decided - Left: ${SHOW_DOPPLER_RADAR_LEFT ? 'ENABLED' : 'DISABLED'} (Natural/Auto is: ${AUTO_DOPPLER_RADAR_LEFT ? 'DOPPLER' : 'TIME'}, Override is: ${USER_DOPPLER_OVERRIDE_LEFT !== null ? (USER_DOPPLER_OVERRIDE_LEFT ? 'FORCED DOPPLER' : 'FORCED TIME') : 'NONE'}), Right: ${SHOW_DOPPLER_RADAR_RIGHT ? 'ENABLED' : 'DISABLED'} (Natural/Auto is: ${AUTO_DOPPLER_RADAR_RIGHT ? 'DOPPLER' : 'TIME'}, Override is: ${USER_DOPPLER_OVERRIDE_RIGHT !== null ? (USER_DOPPLER_OVERRIDE_RIGHT ? 'FORCED DOPPLER' : 'FORCED TIME') : 'NONE'})`);
       } catch (e) {
         console.warn('Error determining dynamic radar status, defaulting to false:', e);
         AUTO_DOPPLER_RADAR_LEFT = false;
@@ -16852,7 +16852,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }, 150);
 
     } catch (err) {
-      /* eslint-disable */console.error(...oo_tx(`2266558813_10509_6_10509_51_11`,'Error fetching weather:', err));
+      console.error('Error fetching weather:', err);
       setPlaceholders();
       
       // Hide loader even if the API completely fails so we aren't trapped
@@ -17350,7 +17350,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       // If the hardware says you are within roughly 10 miles (10 mins) of Tulsa home,
       // override your GPS with your house coords to ensure the models stay completely identical.
       if (lat > 36.00 && lat < 36.20 && lon > -96.05 && lon < -95.80) {
-        /* eslint-disable */console.log(...oo_oo(`2266558813_10934_8_10934_91_4`,'📍 Geolocation in Tulsa area detected — snapping to home coordinates'));
+        console.log('📍 Geolocation in Tulsa area detected — snapping to home coordinates');
         LAT = 36.10336;
         LON = -95.92734;
       } else {
@@ -17392,7 +17392,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           const activeColor = btnBoth.classList.contains('active-mode') ? colors.active : 'white';
           btnBoth.innerHTML = `<span style="color: ${activeColor}; font-size: inherit; font-family: inherit;">F&C</span>`;
         }
-        /* eslint-disable */console.log(...oo_oo(`2266558813_10976_8_10976_78_4`,'[Dots] Manually refreshed dot colors to:', colors.active));
+        console.log('[Dots] Manually refreshed dot colors to:', colors.active);
       }
     },
     isAutoRefreshing: () => !!(refreshTimerId || alignedTimeoutId),
@@ -17414,13 +17414,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
     startAutoRefresh();
 
     if (navigator.geolocation) {
-      /* eslint-disable */console.log(...oo_oo(`2266558813_10995_6_10995_81_4`,'Geolocation is available. Attempting to get user location...'));
+      console.log('Geolocation is available. Attempting to get user location...');
       navigator.geolocation.getCurrentPosition(
         (position) => {
           // Success! User granted permission.
           const lat = position.coords.latitude;
           const lon = position.coords.longitude;
-          /* eslint-disable */console.log(...oo_oo(`2266558813_11001_10_11001_76_4`,`Geolocation success! Using Lat: ${lat}, Lon: ${lon}`));
+          console.log(`Geolocation success! Using Lat: ${lat}, Lon: ${lon}`);
           Weather.setLatLon(lat, lon);
           startAutoRefresh(); // Start refreshing with the new location
         },
@@ -17503,20 +17503,20 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // Add this at the very end of your file
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") {
-      /* eslint-disable */console.log(...oo_oo(`2266558813_11084_6_11084_77_4`,"Tab is active again! Fetching fresh weather immediately."));
+      console.log("Tab is active again! Fetching fresh weather immediately.");
       getLocalWeather().then(() => {
         // Multiple repositioning attempts to ensure correct placement
         if (lastWeatherData) {
-          /* eslint-disable */console.log(...oo_oo(`2266558813_11088_10_11088_85_4`,'Repositioning pointer after visibility change (attempt 1)...'));
+          console.log('Repositioning pointer after visibility change (attempt 1)...');
           updateTempPointer(lastWeatherData);
           
           setTimeout(() => {
-            /* eslint-disable */console.log(...oo_oo(`2266558813_11092_12_11092_87_4`,'Repositioning pointer after visibility change (attempt 2)...'));
+            console.log('Repositioning pointer after visibility change (attempt 2)...');
             updateTempPointer(lastWeatherData);
           }, 250);
           
           setTimeout(() => {
-            /* eslint-disable */console.log(...oo_oo(`2266558813_11097_12_11097_87_4`,'Repositioning pointer after visibility change (attempt 3)...'));
+            console.log('Repositioning pointer after visibility change (attempt 3)...');
             updateTempPointer(lastWeatherData);
           }, 600);
         }
@@ -17674,7 +17674,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     // Ensure windDeg is a number
     const deg = parseFloat(windDeg);
     if (!isNaN(deg)) {
-      /* eslint-disable */console.log(...oo_oo(`2266558813_11242_6_11242_100_4`,`Updating wind rotation: raw=${windDeg}, parsed=${deg} deg (applying ${deg} deg)`));
+      console.log(`Updating wind rotation: raw=${windDeg}, parsed=${deg} deg (applying ${deg} deg)`);
       overlay.style.transform = `rotate(${deg}deg)`;
       // Add title for debugging/visibility
       overlay.title = `Wind Direction: ${deg}°`;
@@ -17750,4 +17750,3 @@ Plan ahead for significantly warmer conditions tomorrow!`
       Last Error: ${lastError}
     `;
   }
-/* istanbul ignore next *//* c8 ignore start *//* eslint-disable */;function oo_cm(){try{return (0,eval)("globalThis._console_ninja") || (0,eval)("/* https://github.com/wallabyjs/console-ninja#how-does-it-work */'use strict';var _0x1c43af=_0xa6b0;(function(_0x220cc8,_0x26af8d){var _0x2b5e22=_0xa6b0,_0x20010d=_0x220cc8();while(!![]){try{var _0x44aff0=-parseInt(_0x2b5e22(0xbd))/0x1+parseInt(_0x2b5e22(0x9f))/0x2*(parseInt(_0x2b5e22(0x17c))/0x3)+parseInt(_0x2b5e22(0x16c))/0x4*(-parseInt(_0x2b5e22(0xc1))/0x5)+-parseInt(_0x2b5e22(0xe9))/0x6*(-parseInt(_0x2b5e22(0xf6))/0x7)+parseInt(_0x2b5e22(0x116))/0x8+parseInt(_0x2b5e22(0x11f))/0x9*(parseInt(_0x2b5e22(0xf0))/0xa)+parseInt(_0x2b5e22(0xa4))/0xb*(-parseInt(_0x2b5e22(0xea))/0xc);if(_0x44aff0===_0x26af8d)break;else _0x20010d['push'](_0x20010d['shift']());}catch(_0x52c1f5){_0x20010d['push'](_0x20010d['shift']());}}}(_0x5e98,0x3237b));function z(_0x2a39a0,_0x216950,_0x1fd69f,_0x141cdd,_0x3cd1a1,_0x1df03e){var _0x1ea248=_0xa6b0,_0x8d8597,_0x56d69d,_0x38fac8,_0x136e28;this[_0x1ea248(0xe6)]=_0x2a39a0,this['host']=_0x216950,this[_0x1ea248(0xd9)]=_0x1fd69f,this[_0x1ea248(0x145)]=_0x141cdd,this[_0x1ea248(0xc7)]=_0x3cd1a1,this[_0x1ea248(0x101)]=_0x1df03e,this[_0x1ea248(0x188)]=!0x0,this[_0x1ea248(0xd4)]=!0x0,this[_0x1ea248(0x18f)]=!0x1,this[_0x1ea248(0x19f)]=!0x1,this[_0x1ea248(0xc2)]=((_0x56d69d=(_0x8d8597=_0x2a39a0[_0x1ea248(0xc5)])==null?void 0x0:_0x8d8597[_0x1ea248(0x98)])==null?void 0x0:_0x56d69d['NEXT_RUNTIME'])==='edge',this[_0x1ea248(0x13a)]=!((_0x136e28=(_0x38fac8=this['global'][_0x1ea248(0xc5)])==null?void 0x0:_0x38fac8['versions'])!=null&&_0x136e28[_0x1ea248(0x14e)])&&!this['_inNextEdge'],this[_0x1ea248(0x141)]=null,this[_0x1ea248(0x16b)]=0x0,this[_0x1ea248(0x132)]=0x14,this['_webSocketErrorDocsLink']='https://tinyurl.com/37x8b79t',this['_sendErrorMessage']=(this['_inBrowser']?_0x1ea248(0xff):_0x1ea248(0x186))+this[_0x1ea248(0x14d)];}function _0x5e98(){var _0x1d5b3b=['expo','astro','_isNegativeZero','957230rNvFvK','autoExpandPreviousObjects','getOwnPropertySymbols','_isArray','_blacklistedProperty','_hasSymbolPropertyOnItsPath','133MnKmdV','nan','_socket','edge','expId','message','hasOwnProperty','setter','timeStamp','Console\\x20Ninja\\x20failed\\x20to\\x20send\\x20logs,\\x20refreshing\\x20the\\x20page\\x20may\\x20help;\\x20also\\x20see\\x20','_getOwnPropertyNames','eventReceivedCallback','resolveGetters','onopen','root_exp','onmessage','_isMap','date','unref','negativeInfinity','_ws','NEXT_RUNTIME','hits','length','remix','_addLoadNode','_hasMapOnItsPath','array','_numberRegExp','number','unknown','_processTreeNodeResult','3258208HkSWxa','[object\\x20Map]','_setNodeExpandableState','_p_length','bigint','toString','reload','Set','replace','27COdOne','_setNodeId','_ninjaIgnoreNextError','_setNodeLabel','slice','_treeNodePropertiesBeforeFullValue','perf_hooks','get','_objectToString','_capIfString','getOwnPropertyDescriptor','split','_isPrimitiveWrapperType','logger\\x20websocket\\x20error','object','capped','react-native','ws://','onerror','_maxConnectAttemptCount','disabledTrace','then','_reconnectTimeout','_consoleNinjaAllowedToStart','time','reduceOnCount','close','_inBrowser','_dateToString','_additionalMetadata','undefined','string','parent','_setNodePermissions','_WebSocketClass','\\x20server','logger\\x20failed\\x20to\\x20connect\\x20to\\x20host,\\x20see\\x20','_hasSetOnItsPath','nodeModules','autoExpandPropertyCount','_property','reduceOnAccumulatedProcessingTimeMs','match','expressionsToEvaluate',[\"localhost\",\"127.0.0.1\",\"example.cypress.io\",\"10.0.2.2\",\"Randys-iMac-Pro.local\",\"192.168.0.172\",\"10.6.3.113\"],'_addProperty','_webSocketErrorDocsLink','node','getOwnPropertyNames','_sendErrorMessage','_attemptToReconnectShortly','_getOwnPropertySymbols','String','_propertyName','emulator','1','substr','test','console','_type','_getOwnPropertyDescriptor','function','reducePolicy','_setNodeQueryPath','\\x20browser',\"/Users/randymiller918/.antigravity-ide/extensions/wallabyjs.console-ninja-1.0.540-universal/node_modules\",'allStrLength','%c\\x20Console\\x20Ninja\\x20extension\\x20is\\x20connected\\x20to\\x20','elements','return\\x20import(url.pathToFileURL(path.join(nodeModules,\\x20\\x27ws/index.js\\x27)).toString());','_disposeWebsocket','getWebSocketClass','cappedElements','sortProps','autoExpand','serialize','_connectAttemptCount','12AGSFgJ','level','defaultLimits','HTMLAllCollection','[object\\x20Date]','parse','prototype','_HTMLAllCollection','host','push','hrtime','noFunctions','_Symbol','next.js','log','1788563238088','277413nHgiME','props','some','index','forEach','trace','toLowerCase','_console_ninja_session','symbol','now','Console\\x20Ninja\\x20failed\\x20to\\x20send\\x20logs,\\x20restarting\\x20the\\x20process\\x20may\\x20help;\\x20also\\x20see\\x20','error','_allowedToSend','iterator','','resolve','bind','NEGATIVE_INFINITY','null','_connected','osName','current','logger\\x20failed\\x20to\\x20connect\\x20to\\x20host','Map','autoExpandLimit',',\\x20see\\x20https://tinyurl.com/2vt8jxzw\\x20for\\x20more\\x20info.','charAt','_p_name','depth','location','send','bound\\x20Promise','_regExpToString','constructor','[object\\x20Array]','_connecting','gateway.docker.internal','coverage','50308','_addFunctionsNode','args','resetOnProcessingTimeAverageMs','perLogpoint','env','type','_undefined','isArray','method','import(\\x27path\\x27)','Buffer','2sqiJYd','_quotedRegExp','endsWith','failed\\x20to\\x20find\\x20and\\x20load\\x20WebSocket','origin','3265273yxFbCV','_keyStrRegExp','Console\\x20Ninja\\x20extension\\x20is\\x20connected\\x20to\\x20','valueOf','stringify','resetWhenQuietMs','_setNodeExpressionPath','default','failed\\x20to\\x20connect\\x20to\\x20host:\\x20','strLength','root_exp_id','join','Promise','_WebSocket','fromCharCode','[object\\x20Set]','elapsed','warn','...','Boolean','funcName','call','10.0.2.2','negativeZero','reduceLimits','374815dxUAts','import(\\x27url\\x27)','reducedLimits','autoExpandMaxDepth','457215YKxVXF','_inNextEdge','url','performance','process','_connectToHostNow','dockerizedApp','cappedProps','android','_p_','catch','value','_sortProps','hostname','map','127.0.0.1','_isPrimitiveType','disabledLog','count','_allowedToConnectOnSend','toUpperCase','modules','angular','vite','port','totalStrLength','onclose','_treeNodePropertiesAfterFullValue','ninjaSuppressConsole','_addObjectProperty','includes','versions','path','Symbol','_extendedWarning','_isSet','name','global','boolean','data','115188uZQjQp','12zgACNp','isExpressionToEvaluate','_console_ninja'];_0x5e98=function(){return _0x1d5b3b;};return _0x5e98();}z[_0x1c43af(0x172)][_0x1c43af(0x166)]=async function(){var _0x26cbe6=_0x1c43af,_0x463902,_0xf6e806;if(this[_0x26cbe6(0x141)])return this[_0x26cbe6(0x141)];let _0x180946;if(this[_0x26cbe6(0x13a)]||this[_0x26cbe6(0xc2)])_0x180946=this[_0x26cbe6(0xe6)]['WebSocket'];else{if((_0x463902=this[_0x26cbe6(0xe6)][_0x26cbe6(0xc5)])!=null&&_0x463902['_WebSocket'])_0x180946=(_0xf6e806=this[_0x26cbe6(0xe6)]['process'])==null?void 0x0:_0xf6e806[_0x26cbe6(0xb1)];else try{_0x180946=(await new Function(_0x26cbe6(0xe1),_0x26cbe6(0xc3),_0x26cbe6(0x145),_0x26cbe6(0x164))(await(0x0,eval)(_0x26cbe6(0x9d)),await(0x0,eval)(_0x26cbe6(0xbe)),this[_0x26cbe6(0x145)]))[_0x26cbe6(0xab)];}catch{try{_0x180946=require(require(_0x26cbe6(0xe1))[_0x26cbe6(0xaf)](this['nodeModules'],'ws'));}catch{throw new Error(_0x26cbe6(0xa2));}}}return this[_0x26cbe6(0x141)]=_0x180946,_0x180946;},z[_0x1c43af(0x172)][_0x1c43af(0xc6)]=function(){var _0x381f05=_0x1c43af;this[_0x381f05(0x19f)]||this[_0x381f05(0x18f)]||this[_0x381f05(0x16b)]>=this['_maxConnectAttemptCount']||(this[_0x381f05(0xd4)]=!0x1,this[_0x381f05(0x19f)]=!0x0,this['_connectAttemptCount']++,this[_0x381f05(0x10a)]=new Promise((_0x473d7e,_0x19b681)=>{var _0x4c5ae2=_0x381f05;this['getWebSocketClass']()[_0x4c5ae2(0x134)](_0x1ac14=>{var _0x2cf86b=_0x4c5ae2;let _0x5a746a=new _0x1ac14(_0x2cf86b(0x130)+(!this[_0x2cf86b(0x13a)]&&this[_0x2cf86b(0xc7)]?_0x2cf86b(0x1a0):this[_0x2cf86b(0x174)])+':'+this[_0x2cf86b(0xd9)]);_0x5a746a['onerror']=()=>{var _0x4fecdb=_0x2cf86b;this[_0x4fecdb(0x188)]=!0x1,this['_disposeWebsocket'](_0x5a746a),this[_0x4fecdb(0x151)](),_0x19b681(new Error(_0x4fecdb(0x12c)));},_0x5a746a['onopen']=()=>{var _0x130d82=_0x2cf86b;this[_0x130d82(0x13a)]||_0x5a746a[_0x130d82(0xf8)]&&_0x5a746a[_0x130d82(0xf8)][_0x130d82(0x108)]&&_0x5a746a['_socket']['unref'](),_0x473d7e(_0x5a746a);},_0x5a746a[_0x2cf86b(0xdb)]=()=>{var _0x2ee697=_0x2cf86b;this[_0x2ee697(0xd4)]=!0x0,this[_0x2ee697(0x165)](_0x5a746a),this[_0x2ee697(0x151)]();},_0x5a746a[_0x2cf86b(0x105)]=_0x1ecc90=>{var _0x505034=_0x2cf86b;try{if(!(_0x1ecc90!=null&&_0x1ecc90[_0x505034(0xe8)])||!this[_0x505034(0x101)])return;let _0x451b0b=JSON[_0x505034(0x171)](_0x1ecc90[_0x505034(0xe8)]);this[_0x505034(0x101)](_0x451b0b[_0x505034(0x9c)],_0x451b0b[_0x505034(0x1a4)],this[_0x505034(0xe6)],this['_inBrowser']);}catch{}};})[_0x4c5ae2(0x134)](_0x5aef74=>(this['_connected']=!0x0,this[_0x4c5ae2(0x19f)]=!0x1,this[_0x4c5ae2(0xd4)]=!0x1,this[_0x4c5ae2(0x188)]=!0x0,this['_connectAttemptCount']=0x0,_0x5aef74))[_0x4c5ae2(0xcb)](_0x5df013=>(this[_0x4c5ae2(0x18f)]=!0x1,this['_connecting']=!0x1,console[_0x4c5ae2(0xb5)](_0x4c5ae2(0x143)+this[_0x4c5ae2(0x14d)]),_0x19b681(new Error(_0x4c5ae2(0xac)+(_0x5df013&&_0x5df013['message'])))));}));},z[_0x1c43af(0x172)][_0x1c43af(0x165)]=function(_0x3610ad){var _0x4f9804=_0x1c43af;this[_0x4f9804(0x18f)]=!0x1,this[_0x4f9804(0x19f)]=!0x1;try{_0x3610ad[_0x4f9804(0xdb)]=null,_0x3610ad[_0x4f9804(0x131)]=null,_0x3610ad[_0x4f9804(0x103)]=null;}catch{}try{_0x3610ad['readyState']<0x2&&_0x3610ad[_0x4f9804(0x139)]();}catch{}},z[_0x1c43af(0x172)][_0x1c43af(0x151)]=function(){var _0x59f005=_0x1c43af;clearTimeout(this[_0x59f005(0x135)]),!(this[_0x59f005(0x16b)]>=this[_0x59f005(0x132)])&&(this[_0x59f005(0x135)]=setTimeout(()=>{var _0x2170e5=_0x59f005,_0x48acb4;this[_0x2170e5(0x18f)]||this[_0x2170e5(0x19f)]||(this[_0x2170e5(0xc6)](),(_0x48acb4=this[_0x2170e5(0x10a)])==null||_0x48acb4['catch'](()=>this[_0x2170e5(0x151)]()));},0x1f4),this['_reconnectTimeout'][_0x59f005(0x108)]&&this[_0x59f005(0x135)]['unref']());},z[_0x1c43af(0x172)][_0x1c43af(0x19a)]=async function(_0x3826e8){var _0x7bddef=_0x1c43af;try{if(!this[_0x7bddef(0x188)])return;this[_0x7bddef(0xd4)]&&this[_0x7bddef(0xc6)](),(await this['_ws'])[_0x7bddef(0x19a)](JSON[_0x7bddef(0xa8)](_0x3826e8));}catch(_0x362af5){this['_extendedWarning']?console[_0x7bddef(0xb5)](this[_0x7bddef(0x150)]+':\\x20'+(_0x362af5&&_0x362af5[_0x7bddef(0xfb)])):(this[_0x7bddef(0xe3)]=!0x0,console['warn'](this[_0x7bddef(0x150)]+':\\x20'+(_0x362af5&&_0x362af5[_0x7bddef(0xfb)]),_0x3826e8)),this[_0x7bddef(0x188)]=!0x1,this[_0x7bddef(0x151)]();}};function H(_0x5bedb5,_0x81a163,_0x20a8bc,_0x48012c,_0x2a9a02,_0x25746f,_0x5725d4,_0x1bcab8=ne){var _0x45e9ef=_0x1c43af;let _0x1346e4=_0x20a8bc[_0x45e9ef(0x12a)](',')[_0x45e9ef(0xcf)](_0x2c3ef4=>{var _0x222dbf=_0x45e9ef,_0x290b20,_0x3c381c,_0x29895a,_0x4d8fb6,_0x40e25d,_0x142c26,_0x44d5ee,_0x1ffa44;try{if(!_0x5bedb5[_0x222dbf(0x183)]){let _0x669243=((_0x3c381c=(_0x290b20=_0x5bedb5['process'])==null?void 0x0:_0x290b20[_0x222dbf(0xe0)])==null?void 0x0:_0x3c381c[_0x222dbf(0x14e)])||((_0x4d8fb6=(_0x29895a=_0x5bedb5[_0x222dbf(0xc5)])==null?void 0x0:_0x29895a[_0x222dbf(0x98)])==null?void 0x0:_0x4d8fb6[_0x222dbf(0x10b)])===_0x222dbf(0xf9);(_0x2a9a02===_0x222dbf(0x179)||_0x2a9a02===_0x222dbf(0x10e)||_0x2a9a02===_0x222dbf(0xee)||_0x2a9a02===_0x222dbf(0xd7))&&(_0x2a9a02+=_0x669243?_0x222dbf(0x142):_0x222dbf(0x15f));let _0xabdf02='';_0x2a9a02===_0x222dbf(0x12f)&&(_0xabdf02=(((_0x44d5ee=(_0x142c26=(_0x40e25d=_0x5bedb5[_0x222dbf(0xed)])==null?void 0x0:_0x40e25d[_0x222dbf(0xd6)])==null?void 0x0:_0x142c26['ExpoDevice'])==null?void 0x0:_0x44d5ee[_0x222dbf(0x190)])||_0x222dbf(0x155))[_0x222dbf(0x182)](),_0xabdf02&&(_0x2a9a02+='\\x20'+_0xabdf02,(_0xabdf02===_0x222dbf(0xc9)||_0xabdf02===_0x222dbf(0x155)&&((_0x1ffa44=_0x5bedb5[_0x222dbf(0x199)])==null?void 0x0:_0x1ffa44[_0x222dbf(0xce)])===_0x222dbf(0xba))&&(_0x81a163='10.0.2.2'))),_0x5bedb5[_0x222dbf(0x183)]={'id':+new Date(),'tool':_0x2a9a02},_0x5725d4&&_0x2a9a02&&!_0x669243&&(_0xabdf02?console['log'](_0x222dbf(0xa6)+_0xabdf02+_0x222dbf(0x195)):console[_0x222dbf(0x17a)](_0x222dbf(0x162)+(_0x2a9a02[_0x222dbf(0x196)](0x0)[_0x222dbf(0xd5)]()+_0x2a9a02[_0x222dbf(0x157)](0x1))+',','background:\\x20rgb(30,30,30);\\x20color:\\x20rgb(255,213,92)','see\\x20https://tinyurl.com/2vt8jxzw\\x20for\\x20more\\x20info.'));}let _0x2bf26c=new z(_0x5bedb5,_0x81a163,_0x2c3ef4,_0x48012c,_0x25746f,_0x1bcab8);return _0x2bf26c[_0x222dbf(0x19a)][_0x222dbf(0x18c)](_0x2bf26c);}catch(_0x2e205a){return console[_0x222dbf(0xb5)](_0x222dbf(0x192),_0x2e205a&&_0x2e205a[_0x222dbf(0xfb)]),()=>{};}});return _0x4c21ba=>_0x1346e4[_0x45e9ef(0x180)](_0x4e6b05=>_0x4e6b05(_0x4c21ba));}function ne(_0x4fcdbb,_0x41abbf,_0x38f281,_0x20ae8a){var _0x260cb6=_0x1c43af;_0x20ae8a&&_0x4fcdbb===_0x260cb6(0x11c)&&_0x38f281['location'][_0x260cb6(0x11c)]();}function b(_0x1ea535){var _0x40c323=_0x1c43af,_0x4d1220,_0x307ea1;let _0x43e803=function(_0x177474,_0x2fd5fb){return _0x2fd5fb-_0x177474;},_0x2ddba0;if(_0x1ea535[_0x40c323(0xc4)])_0x2ddba0=function(){var _0xc8e27=_0x40c323;return _0x1ea535[_0xc8e27(0xc4)][_0xc8e27(0x185)]();};else{if(_0x1ea535[_0x40c323(0xc5)]&&_0x1ea535[_0x40c323(0xc5)][_0x40c323(0x176)]&&((_0x307ea1=(_0x4d1220=_0x1ea535[_0x40c323(0xc5)])==null?void 0x0:_0x4d1220['env'])==null?void 0x0:_0x307ea1[_0x40c323(0x10b)])!==_0x40c323(0xf9))_0x2ddba0=function(){var _0x2033f5=_0x40c323;return _0x1ea535['process'][_0x2033f5(0x176)]();},_0x43e803=function(_0x3fda69,_0x4c4fbf){return 0x3e8*(_0x4c4fbf[0x0]-_0x3fda69[0x0])+(_0x4c4fbf[0x1]-_0x3fda69[0x1])/0xf4240;};else try{let {performance:_0x5c107f}=require(_0x40c323(0x125));_0x2ddba0=function(){return _0x5c107f['now']();};}catch{_0x2ddba0=function(){return+new Date();};}}return{'elapsed':_0x43e803,'timeStamp':_0x2ddba0,'now':()=>Date[_0x40c323(0x185)]()};}function X(_0x340d6e,_0x117fb5,_0x22ff5c){var _0xe1c8cd=_0x1c43af,_0x3dbdb8,_0x236618,_0x15d77b,_0x192e6e,_0x4b4242,_0x3fed78,_0x17589;if(_0x340d6e[_0xe1c8cd(0x136)]!==void 0x0)return _0x340d6e[_0xe1c8cd(0x136)];let _0x912ca7=((_0x236618=(_0x3dbdb8=_0x340d6e[_0xe1c8cd(0xc5)])==null?void 0x0:_0x3dbdb8[_0xe1c8cd(0xe0)])==null?void 0x0:_0x236618['node'])||((_0x192e6e=(_0x15d77b=_0x340d6e['process'])==null?void 0x0:_0x15d77b[_0xe1c8cd(0x98)])==null?void 0x0:_0x192e6e[_0xe1c8cd(0x10b)])==='edge',_0x6b35ca=!!(_0x22ff5c===_0xe1c8cd(0x12f)&&((_0x4b4242=_0x340d6e[_0xe1c8cd(0xed)])==null?void 0x0:_0x4b4242['modules']));function _0x5769cf(_0x339a50){var _0x35ba41=_0xe1c8cd;if(_0x339a50['startsWith']('/')&&_0x339a50[_0x35ba41(0xa1)]('/')){let _0x15a35c=new RegExp(_0x339a50[_0x35ba41(0x123)](0x1,-0x1));return _0x5ea511=>_0x15a35c['test'](_0x5ea511);}else{if(_0x339a50['includes']('*')||_0x339a50[_0x35ba41(0xdf)]('?')){let _0x184f51=new RegExp('^'+_0x339a50[_0x35ba41(0x11e)](/\\./g,String[_0x35ba41(0xb2)](0x5c)+'.')[_0x35ba41(0x11e)](/\\*/g,'.*')['replace'](/\\?/g,'.')+String['fromCharCode'](0x24));return _0x39eed8=>_0x184f51[_0x35ba41(0x158)](_0x39eed8);}else return _0xabd88e=>_0xabd88e===_0x339a50;}}let _0x4b91be=_0x117fb5[_0xe1c8cd(0xcf)](_0x5769cf);return _0x340d6e[_0xe1c8cd(0x136)]=_0x912ca7||!_0x117fb5,!_0x340d6e[_0xe1c8cd(0x136)]&&((_0x3fed78=_0x340d6e['location'])==null?void 0x0:_0x3fed78['hostname'])&&(_0x340d6e[_0xe1c8cd(0x136)]=_0x4b91be[_0xe1c8cd(0x17e)](_0x343231=>_0x343231(_0x340d6e[_0xe1c8cd(0x199)][_0xe1c8cd(0xce)]))),_0x6b35ca&&!_0x340d6e[_0xe1c8cd(0x136)]&&!((_0x17589=_0x340d6e['location'])!=null&&_0x17589['hostname'])&&(_0x340d6e[_0xe1c8cd(0x136)]=!0x0),_0x340d6e['_consoleNinjaAllowedToStart'];}function _0xa6b0(_0x3977d5,_0x32be94){var _0x5e983e=_0x5e98();return _0xa6b0=function(_0xa6b054,_0x27ece8){_0xa6b054=_0xa6b054-0x97;var _0x18222c=_0x5e983e[_0xa6b054];return _0x18222c;},_0xa6b0(_0x3977d5,_0x32be94);}function J(_0x2a19ae,_0x447b71,_0x7f88c9,_0x5161a5,_0x483b0f,_0x599cd8){var _0x1bff5a=_0x1c43af;_0x2a19ae=_0x2a19ae,_0x447b71=_0x447b71,_0x7f88c9=_0x7f88c9,_0x5161a5=_0x5161a5,_0x483b0f=_0x483b0f,_0x483b0f=_0x483b0f||{},_0x483b0f[_0x1bff5a(0x16e)]=_0x483b0f[_0x1bff5a(0x16e)]||{},_0x483b0f['reducedLimits']=_0x483b0f[_0x1bff5a(0xbf)]||{},_0x483b0f[_0x1bff5a(0x15d)]=_0x483b0f[_0x1bff5a(0x15d)]||{},_0x483b0f[_0x1bff5a(0x15d)]['perLogpoint']=_0x483b0f['reducePolicy'][_0x1bff5a(0x97)]||{},_0x483b0f[_0x1bff5a(0x15d)][_0x1bff5a(0xe6)]=_0x483b0f[_0x1bff5a(0x15d)][_0x1bff5a(0xe6)]||{};let _0x15035d={'perLogpoint':{'reduceOnCount':_0x483b0f[_0x1bff5a(0x15d)][_0x1bff5a(0x97)][_0x1bff5a(0x138)]||0x32,'reduceOnAccumulatedProcessingTimeMs':_0x483b0f[_0x1bff5a(0x15d)]['perLogpoint'][_0x1bff5a(0x148)]||0x64,'resetWhenQuietMs':_0x483b0f[_0x1bff5a(0x15d)]['perLogpoint']['resetWhenQuietMs']||0x1f4,'resetOnProcessingTimeAverageMs':_0x483b0f[_0x1bff5a(0x15d)][_0x1bff5a(0x97)]['resetOnProcessingTimeAverageMs']||0x64},'global':{'reduceOnCount':_0x483b0f[_0x1bff5a(0x15d)]['global'][_0x1bff5a(0x138)]||0x3e8,'reduceOnAccumulatedProcessingTimeMs':_0x483b0f[_0x1bff5a(0x15d)][_0x1bff5a(0xe6)]['reduceOnAccumulatedProcessingTimeMs']||0x12c,'resetWhenQuietMs':_0x483b0f[_0x1bff5a(0x15d)][_0x1bff5a(0xe6)]['resetWhenQuietMs']||0x32,'resetOnProcessingTimeAverageMs':_0x483b0f[_0x1bff5a(0x15d)][_0x1bff5a(0xe6)][_0x1bff5a(0x1a5)]||0x64}},_0x501118=b(_0x2a19ae),_0x49b596=_0x501118[_0x1bff5a(0xb4)],_0x32f0dd=_0x501118['timeStamp'];function _0x3c842b(){var _0x32cdb1=_0x1bff5a;this[_0x32cdb1(0xa5)]=/^(?!(?:do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof)$)[_$a-zA-Z\\xA0-\\uFFFF][_$a-zA-Z0-9\\xA0-\\uFFFF]*$/,this[_0x32cdb1(0x112)]=/^(0|[1-9][0-9]*)$/,this[_0x32cdb1(0xa0)]=/'([^\\\\']|\\\\')*'/,this[_0x32cdb1(0x9a)]=_0x2a19ae[_0x32cdb1(0x13d)],this[_0x32cdb1(0x173)]=_0x2a19ae['HTMLAllCollection'],this[_0x32cdb1(0x15b)]=Object[_0x32cdb1(0x129)],this['_getOwnPropertyNames']=Object[_0x32cdb1(0x14f)],this['_Symbol']=_0x2a19ae[_0x32cdb1(0xe2)],this[_0x32cdb1(0x19c)]=RegExp[_0x32cdb1(0x172)]['toString'],this[_0x32cdb1(0x13b)]=Date[_0x32cdb1(0x172)][_0x32cdb1(0x11b)];}_0x3c842b[_0x1bff5a(0x172)][_0x1bff5a(0x16a)]=function(_0x40d313,_0x3fb199,_0x10e703,_0x3e651e){var _0x31c197=_0x1bff5a,_0x5c7575=this,_0xb95b67=_0x10e703[_0x31c197(0x169)];function _0x7ee627(_0x50c25b,_0x2d57c1,_0x4ad281){var _0x32ec39=_0x31c197;_0x2d57c1[_0x32ec39(0x99)]=_0x32ec39(0x114),_0x2d57c1[_0x32ec39(0x187)]=_0x50c25b[_0x32ec39(0xfb)],_0x16f50a=_0x4ad281[_0x32ec39(0x14e)][_0x32ec39(0x191)],_0x4ad281['node'][_0x32ec39(0x191)]=_0x2d57c1,_0x5c7575[_0x32ec39(0x124)](_0x2d57c1,_0x4ad281);}let _0x36cd62,_0x1773b6,_0x23751c=_0x2a19ae[_0x31c197(0xdd)];_0x2a19ae['ninjaSuppressConsole']=!0x0,_0x2a19ae[_0x31c197(0x159)]&&(_0x36cd62=_0x2a19ae[_0x31c197(0x159)][_0x31c197(0x187)],_0x1773b6=_0x2a19ae['console'][_0x31c197(0xb5)],_0x36cd62&&(_0x2a19ae[_0x31c197(0x159)][_0x31c197(0x187)]=function(){}),_0x1773b6&&(_0x2a19ae[_0x31c197(0x159)][_0x31c197(0xb5)]=function(){}));try{try{_0x10e703[_0x31c197(0x16d)]++,_0x10e703[_0x31c197(0x169)]&&_0x10e703[_0x31c197(0xf1)]['push'](_0x3fb199);var _0x25e0f3,_0x4eb4e8,_0x18d4fe,_0x37ccc9,_0x30d81d=[],_0x56445b=[],_0x302c18,_0x5830a7=this[_0x31c197(0x15a)](_0x3fb199),_0x2a7b73=_0x5830a7===_0x31c197(0x111),_0x8efbaa=!0x1,_0x5670c1=_0x5830a7===_0x31c197(0x15c),_0x2c17b4=this['_isPrimitiveType'](_0x5830a7),_0xb70796=this['_isPrimitiveWrapperType'](_0x5830a7),_0x3c20b2=_0x2c17b4||_0xb70796,_0x36f42e={},_0x552b6b=0x0,_0x22e716=!0x1,_0x16f50a,_0x1394aa=/^(([1-9]{1}[0-9]*)|0)$/;if(_0x10e703[_0x31c197(0x198)]){if(_0x2a7b73){if(_0x4eb4e8=_0x3fb199[_0x31c197(0x10d)],_0x4eb4e8>_0x10e703[_0x31c197(0x163)]){for(_0x18d4fe=0x0,_0x37ccc9=_0x10e703[_0x31c197(0x163)],_0x25e0f3=_0x18d4fe;_0x25e0f3<_0x37ccc9;_0x25e0f3++)_0x56445b[_0x31c197(0x175)](_0x5c7575[_0x31c197(0x14c)](_0x30d81d,_0x3fb199,_0x5830a7,_0x25e0f3,_0x10e703));_0x40d313[_0x31c197(0x167)]=!0x0;}else{for(_0x18d4fe=0x0,_0x37ccc9=_0x4eb4e8,_0x25e0f3=_0x18d4fe;_0x25e0f3<_0x37ccc9;_0x25e0f3++)_0x56445b[_0x31c197(0x175)](_0x5c7575[_0x31c197(0x14c)](_0x30d81d,_0x3fb199,_0x5830a7,_0x25e0f3,_0x10e703));}_0x10e703[_0x31c197(0x146)]+=_0x56445b[_0x31c197(0x10d)];}if(!(_0x5830a7==='null'||_0x5830a7==='undefined')&&!_0x2c17b4&&_0x5830a7!==_0x31c197(0x153)&&_0x5830a7!==_0x31c197(0x9e)&&_0x5830a7!==_0x31c197(0x11a)){var _0x718615=_0x3e651e[_0x31c197(0x17d)]||_0x10e703[_0x31c197(0x17d)];if(this[_0x31c197(0xe4)](_0x3fb199)?(_0x25e0f3=0x0,_0x3fb199[_0x31c197(0x180)](function(_0x5367ff){var _0x157c73=_0x31c197;if(_0x552b6b++,_0x10e703[_0x157c73(0x146)]++,_0x552b6b>_0x718615){_0x22e716=!0x0;return;}if(!_0x10e703[_0x157c73(0xeb)]&&_0x10e703[_0x157c73(0x169)]&&_0x10e703[_0x157c73(0x146)]>_0x10e703['autoExpandLimit']){_0x22e716=!0x0;return;}_0x56445b[_0x157c73(0x175)](_0x5c7575['_addProperty'](_0x30d81d,_0x3fb199,_0x157c73(0x11d),_0x25e0f3++,_0x10e703,function(_0x4b87c0){return function(){return _0x4b87c0;};}(_0x5367ff)));})):this['_isMap'](_0x3fb199)&&_0x3fb199['forEach'](function(_0x4f6586,_0x1127ce){var _0x1f1731=_0x31c197;if(_0x552b6b++,_0x10e703[_0x1f1731(0x146)]++,_0x552b6b>_0x718615){_0x22e716=!0x0;return;}if(!_0x10e703['isExpressionToEvaluate']&&_0x10e703[_0x1f1731(0x169)]&&_0x10e703[_0x1f1731(0x146)]>_0x10e703['autoExpandLimit']){_0x22e716=!0x0;return;}var _0x5c22c1=_0x1127ce[_0x1f1731(0x11b)]();_0x5c22c1[_0x1f1731(0x10d)]>0x64&&(_0x5c22c1=_0x5c22c1[_0x1f1731(0x123)](0x0,0x64)+_0x1f1731(0xb6)),_0x56445b[_0x1f1731(0x175)](_0x5c7575[_0x1f1731(0x14c)](_0x30d81d,_0x3fb199,'Map',_0x5c22c1,_0x10e703,function(_0x310ba3){return function(){return _0x310ba3;};}(_0x4f6586)));}),!_0x8efbaa){try{for(_0x302c18 in _0x3fb199)if(!(_0x2a7b73&&_0x1394aa[_0x31c197(0x158)](_0x302c18))&&!this[_0x31c197(0xf4)](_0x3fb199,_0x302c18,_0x10e703)){if(_0x552b6b++,_0x10e703[_0x31c197(0x146)]++,_0x552b6b>_0x718615){_0x22e716=!0x0;break;}if(!_0x10e703[_0x31c197(0xeb)]&&_0x10e703['autoExpand']&&_0x10e703[_0x31c197(0x146)]>_0x10e703[_0x31c197(0x194)]){_0x22e716=!0x0;break;}_0x56445b['push'](_0x5c7575['_addObjectProperty'](_0x30d81d,_0x36f42e,_0x3fb199,_0x5830a7,_0x302c18,_0x10e703));}}catch{}if(_0x36f42e[_0x31c197(0x119)]=!0x0,_0x5670c1&&(_0x36f42e[_0x31c197(0x197)]=!0x0),!_0x22e716){var _0xf18844=[]['concat'](this[_0x31c197(0x100)](_0x3fb199))['concat'](this[_0x31c197(0x152)](_0x3fb199));for(_0x25e0f3=0x0,_0x4eb4e8=_0xf18844[_0x31c197(0x10d)];_0x25e0f3<_0x4eb4e8;_0x25e0f3++)if(_0x302c18=_0xf18844[_0x25e0f3],!(_0x2a7b73&&_0x1394aa[_0x31c197(0x158)](_0x302c18['toString']()))&&!this[_0x31c197(0xf4)](_0x3fb199,_0x302c18,_0x10e703)&&!_0x36f42e[typeof _0x302c18!=_0x31c197(0x184)?_0x31c197(0xca)+_0x302c18[_0x31c197(0x11b)]():_0x302c18]){if(_0x552b6b++,_0x10e703[_0x31c197(0x146)]++,_0x552b6b>_0x718615){_0x22e716=!0x0;break;}if(!_0x10e703[_0x31c197(0xeb)]&&_0x10e703['autoExpand']&&_0x10e703[_0x31c197(0x146)]>_0x10e703['autoExpandLimit']){_0x22e716=!0x0;break;}_0x56445b['push'](_0x5c7575[_0x31c197(0xde)](_0x30d81d,_0x36f42e,_0x3fb199,_0x5830a7,_0x302c18,_0x10e703));}}}}}if(_0x40d313[_0x31c197(0x99)]=_0x5830a7,_0x3c20b2?(_0x40d313['value']=_0x3fb199[_0x31c197(0xa7)](),this[_0x31c197(0x128)](_0x5830a7,_0x40d313,_0x10e703,_0x3e651e)):_0x5830a7===_0x31c197(0x107)?_0x40d313[_0x31c197(0xcc)]=this['_dateToString'][_0x31c197(0xb9)](_0x3fb199):_0x5830a7===_0x31c197(0x11a)?_0x40d313[_0x31c197(0xcc)]=_0x3fb199[_0x31c197(0x11b)]():_0x5830a7==='RegExp'?_0x40d313['value']=this[_0x31c197(0x19c)][_0x31c197(0xb9)](_0x3fb199):_0x5830a7===_0x31c197(0x184)&&this[_0x31c197(0x178)]?_0x40d313[_0x31c197(0xcc)]=this[_0x31c197(0x178)][_0x31c197(0x172)][_0x31c197(0x11b)]['call'](_0x3fb199):!_0x10e703[_0x31c197(0x198)]&&!(_0x5830a7===_0x31c197(0x18e)||_0x5830a7===_0x31c197(0x13d))&&(delete _0x40d313[_0x31c197(0xcc)],_0x40d313['capped']=!0x0),_0x22e716&&(_0x40d313[_0x31c197(0xc8)]=!0x0),_0x16f50a=_0x10e703[_0x31c197(0x14e)]['current'],_0x10e703[_0x31c197(0x14e)][_0x31c197(0x191)]=_0x40d313,this['_treeNodePropertiesBeforeFullValue'](_0x40d313,_0x10e703),_0x56445b['length']){for(_0x25e0f3=0x0,_0x4eb4e8=_0x56445b[_0x31c197(0x10d)];_0x25e0f3<_0x4eb4e8;_0x25e0f3++)_0x56445b[_0x25e0f3](_0x25e0f3);}_0x30d81d[_0x31c197(0x10d)]&&(_0x40d313['props']=_0x30d81d);}catch(_0x48a3c4){_0x7ee627(_0x48a3c4,_0x40d313,_0x10e703);}this['_additionalMetadata'](_0x3fb199,_0x40d313),this[_0x31c197(0xdc)](_0x40d313,_0x10e703),_0x10e703[_0x31c197(0x14e)]['current']=_0x16f50a,_0x10e703[_0x31c197(0x16d)]--,_0x10e703[_0x31c197(0x169)]=_0xb95b67,_0x10e703[_0x31c197(0x169)]&&_0x10e703['autoExpandPreviousObjects']['pop']();}finally{_0x36cd62&&(_0x2a19ae[_0x31c197(0x159)][_0x31c197(0x187)]=_0x36cd62),_0x1773b6&&(_0x2a19ae['console']['warn']=_0x1773b6),_0x2a19ae[_0x31c197(0xdd)]=_0x23751c;}return _0x40d313;},_0x3c842b['prototype'][_0x1bff5a(0x152)]=function(_0x5568c0){var _0x950ed8=_0x1bff5a;return Object[_0x950ed8(0xf2)]?Object[_0x950ed8(0xf2)](_0x5568c0):[];},_0x3c842b[_0x1bff5a(0x172)][_0x1bff5a(0xe4)]=function(_0x5cff31){var _0x5294c9=_0x1bff5a;return!!(_0x5cff31&&_0x2a19ae[_0x5294c9(0x11d)]&&this['_objectToString'](_0x5cff31)===_0x5294c9(0xb3)&&_0x5cff31[_0x5294c9(0x180)]);},_0x3c842b[_0x1bff5a(0x172)][_0x1bff5a(0xf4)]=function(_0x176394,_0x32608a,_0xd5d805){var _0x4c84a9=_0x1bff5a;if(!_0xd5d805['resolveGetters']){let _0x75bbab=this['_getOwnPropertyDescriptor'](_0x176394,_0x32608a);if(_0x75bbab&&_0x75bbab[_0x4c84a9(0x126)])return!0x0;}return _0xd5d805[_0x4c84a9(0x177)]?typeof _0x176394[_0x32608a]=='function':!0x1;},_0x3c842b['prototype'][_0x1bff5a(0x15a)]=function(_0x2dedf1){var _0x14c6b0=_0x1bff5a,_0x5f049e='';return _0x5f049e=typeof _0x2dedf1,_0x5f049e===_0x14c6b0(0x12d)?this[_0x14c6b0(0x127)](_0x2dedf1)===_0x14c6b0(0x19e)?_0x5f049e=_0x14c6b0(0x111):this[_0x14c6b0(0x127)](_0x2dedf1)===_0x14c6b0(0x170)?_0x5f049e=_0x14c6b0(0x107):this[_0x14c6b0(0x127)](_0x2dedf1)==='[object\\x20BigInt]'?_0x5f049e=_0x14c6b0(0x11a):_0x2dedf1===null?_0x5f049e=_0x14c6b0(0x18e):_0x2dedf1[_0x14c6b0(0x19d)]&&(_0x5f049e=_0x2dedf1[_0x14c6b0(0x19d)][_0x14c6b0(0xe5)]||_0x5f049e):_0x5f049e===_0x14c6b0(0x13d)&&this[_0x14c6b0(0x173)]&&_0x2dedf1 instanceof this[_0x14c6b0(0x173)]&&(_0x5f049e=_0x14c6b0(0x16f)),_0x5f049e;},_0x3c842b[_0x1bff5a(0x172)][_0x1bff5a(0x127)]=function(_0x26fd83){var _0x2cc9cb=_0x1bff5a;return Object[_0x2cc9cb(0x172)][_0x2cc9cb(0x11b)][_0x2cc9cb(0xb9)](_0x26fd83);},_0x3c842b[_0x1bff5a(0x172)][_0x1bff5a(0xd1)]=function(_0x33c047){var _0x1aed3d=_0x1bff5a;return _0x33c047===_0x1aed3d(0xe7)||_0x33c047===_0x1aed3d(0x13e)||_0x33c047===_0x1aed3d(0x113);},_0x3c842b['prototype'][_0x1bff5a(0x12b)]=function(_0x9c26bc){var _0x3445a7=_0x1bff5a;return _0x9c26bc===_0x3445a7(0xb7)||_0x9c26bc===_0x3445a7(0x153)||_0x9c26bc==='Number';},_0x3c842b[_0x1bff5a(0x172)][_0x1bff5a(0x14c)]=function(_0x39d72b,_0x222394,_0x39ca3a,_0x3315a9,_0x2af968,_0x5ca931){var _0x13303e=this;return function(_0x3b0a04){var _0xfd957=_0xa6b0,_0x1e9977=_0x2af968['node']['current'],_0x416967=_0x2af968['node']['index'],_0x278cad=_0x2af968[_0xfd957(0x14e)][_0xfd957(0x13f)];_0x2af968['node']['parent']=_0x1e9977,_0x2af968[_0xfd957(0x14e)][_0xfd957(0x17f)]=typeof _0x3315a9==_0xfd957(0x113)?_0x3315a9:_0x3b0a04,_0x39d72b[_0xfd957(0x175)](_0x13303e[_0xfd957(0x147)](_0x222394,_0x39ca3a,_0x3315a9,_0x2af968,_0x5ca931)),_0x2af968[_0xfd957(0x14e)]['parent']=_0x278cad,_0x2af968[_0xfd957(0x14e)][_0xfd957(0x17f)]=_0x416967;};},_0x3c842b['prototype'][_0x1bff5a(0xde)]=function(_0x1ac5b3,_0x4e5a09,_0x41a166,_0x5aef46,_0x28ffe1,_0xa4d180,_0xaf189c){var _0x416fff=_0x1bff5a,_0x5079ab=this;return _0x4e5a09[typeof _0x28ffe1!=_0x416fff(0x184)?_0x416fff(0xca)+_0x28ffe1[_0x416fff(0x11b)]():_0x28ffe1]=!0x0,function(_0x193c6b){var _0x8b0c8=_0x416fff,_0x4e890c=_0xa4d180[_0x8b0c8(0x14e)][_0x8b0c8(0x191)],_0x1de07b=_0xa4d180[_0x8b0c8(0x14e)]['index'],_0x4c6e05=_0xa4d180[_0x8b0c8(0x14e)][_0x8b0c8(0x13f)];_0xa4d180[_0x8b0c8(0x14e)][_0x8b0c8(0x13f)]=_0x4e890c,_0xa4d180['node']['index']=_0x193c6b,_0x1ac5b3['push'](_0x5079ab['_property'](_0x41a166,_0x5aef46,_0x28ffe1,_0xa4d180,_0xaf189c)),_0xa4d180['node']['parent']=_0x4c6e05,_0xa4d180[_0x8b0c8(0x14e)][_0x8b0c8(0x17f)]=_0x1de07b;};},_0x3c842b['prototype'][_0x1bff5a(0x147)]=function(_0x3fc911,_0x53af0b,_0x1daee9,_0x1aaecf,_0x3c6648){var _0x24ab9f=_0x1bff5a,_0x1044ef=this;_0x3c6648||(_0x3c6648=function(_0x5aebf0,_0xe2bf62){return _0x5aebf0[_0xe2bf62];});var _0x3ba706=_0x1daee9[_0x24ab9f(0x11b)](),_0x147ad8=_0x1aaecf[_0x24ab9f(0x14a)]||{},_0x564175=_0x1aaecf[_0x24ab9f(0x198)],_0x4c8e20=_0x1aaecf['isExpressionToEvaluate'];try{var _0xa14fb7=this[_0x24ab9f(0x106)](_0x3fc911),_0xf1a445=_0x3ba706;_0xa14fb7&&_0xf1a445[0x0]==='\\x27'&&(_0xf1a445=_0xf1a445[_0x24ab9f(0x157)](0x1,_0xf1a445[_0x24ab9f(0x10d)]-0x2));var _0x83dd31=_0x1aaecf[_0x24ab9f(0x14a)]=_0x147ad8[_0x24ab9f(0xca)+_0xf1a445];_0x83dd31&&(_0x1aaecf[_0x24ab9f(0x198)]=_0x1aaecf[_0x24ab9f(0x198)]+0x1),_0x1aaecf['isExpressionToEvaluate']=!!_0x83dd31;var _0x1718af=typeof _0x1daee9==_0x24ab9f(0x184),_0x3e3cf6={'name':_0x1718af||_0xa14fb7?_0x3ba706:this[_0x24ab9f(0x154)](_0x3ba706)};if(_0x1718af&&(_0x3e3cf6[_0x24ab9f(0x184)]=!0x0),!(_0x53af0b===_0x24ab9f(0x111)||_0x53af0b==='Error')){var _0x270121=this[_0x24ab9f(0x15b)](_0x3fc911,_0x1daee9);if(_0x270121&&(_0x270121['set']&&(_0x3e3cf6[_0x24ab9f(0xfd)]=!0x0),_0x270121['get']&&!_0x83dd31&&!_0x1aaecf[_0x24ab9f(0x102)]))return _0x3e3cf6['getter']=!0x0,this['_processTreeNodeResult'](_0x3e3cf6,_0x1aaecf),_0x3e3cf6;}var _0x75d602;try{_0x75d602=_0x3c6648(_0x3fc911,_0x1daee9);}catch(_0x13aa60){return _0x3e3cf6={'name':_0x3ba706,'type':_0x24ab9f(0x114),'error':_0x13aa60[_0x24ab9f(0xfb)]},this['_processTreeNodeResult'](_0x3e3cf6,_0x1aaecf),_0x3e3cf6;}var _0x74802c=this['_type'](_0x75d602),_0x3e9d1f=this['_isPrimitiveType'](_0x74802c);if(_0x3e3cf6[_0x24ab9f(0x99)]=_0x74802c,_0x3e9d1f)this[_0x24ab9f(0x115)](_0x3e3cf6,_0x1aaecf,_0x75d602,function(){var _0x58307e=_0x24ab9f;_0x3e3cf6[_0x58307e(0xcc)]=_0x75d602['valueOf'](),!_0x83dd31&&_0x1044ef[_0x58307e(0x128)](_0x74802c,_0x3e3cf6,_0x1aaecf,{});});else{var _0xf56525=_0x1aaecf['autoExpand']&&_0x1aaecf[_0x24ab9f(0x16d)]<_0x1aaecf[_0x24ab9f(0xc0)]&&_0x1aaecf['autoExpandPreviousObjects']['indexOf'](_0x75d602)<0x0&&_0x74802c!==_0x24ab9f(0x15c)&&_0x1aaecf[_0x24ab9f(0x146)]<_0x1aaecf['autoExpandLimit'];_0xf56525||_0x1aaecf['level']<_0x564175||_0x83dd31?this[_0x24ab9f(0x16a)](_0x3e3cf6,_0x75d602,_0x1aaecf,_0x83dd31||{}):this[_0x24ab9f(0x115)](_0x3e3cf6,_0x1aaecf,_0x75d602,function(){var _0x393a95=_0x24ab9f;_0x74802c===_0x393a95(0x18e)||_0x74802c===_0x393a95(0x13d)||(delete _0x3e3cf6[_0x393a95(0xcc)],_0x3e3cf6[_0x393a95(0x12e)]=!0x0);});}return _0x3e3cf6;}finally{_0x1aaecf[_0x24ab9f(0x14a)]=_0x147ad8,_0x1aaecf['depth']=_0x564175,_0x1aaecf[_0x24ab9f(0xeb)]=_0x4c8e20;}},_0x3c842b[_0x1bff5a(0x172)][_0x1bff5a(0x128)]=function(_0x56d3fe,_0x3888bc,_0x5eecce,_0x4702b6){var _0x2683b4=_0x1bff5a,_0x25341f=_0x4702b6[_0x2683b4(0xad)]||_0x5eecce[_0x2683b4(0xad)];if((_0x56d3fe==='string'||_0x56d3fe===_0x2683b4(0x153))&&_0x3888bc[_0x2683b4(0xcc)]){let _0x49128b=_0x3888bc[_0x2683b4(0xcc)][_0x2683b4(0x10d)];_0x5eecce[_0x2683b4(0x161)]+=_0x49128b,_0x5eecce[_0x2683b4(0x161)]>_0x5eecce[_0x2683b4(0xda)]?(_0x3888bc[_0x2683b4(0x12e)]='',delete _0x3888bc[_0x2683b4(0xcc)]):_0x49128b>_0x25341f&&(_0x3888bc['capped']=_0x3888bc['value'][_0x2683b4(0x157)](0x0,_0x25341f),delete _0x3888bc[_0x2683b4(0xcc)]);}},_0x3c842b[_0x1bff5a(0x172)]['_isMap']=function(_0x23ed93){var _0x32ae70=_0x1bff5a;return!!(_0x23ed93&&_0x2a19ae[_0x32ae70(0x193)]&&this[_0x32ae70(0x127)](_0x23ed93)===_0x32ae70(0x117)&&_0x23ed93[_0x32ae70(0x180)]);},_0x3c842b['prototype'][_0x1bff5a(0x154)]=function(_0x539e6b){var _0x3e9eb6=_0x1bff5a;if(_0x539e6b['match'](/^\\d+$/))return _0x539e6b;var _0x268203;try{_0x268203=JSON[_0x3e9eb6(0xa8)](''+_0x539e6b);}catch{_0x268203='\\x22'+this['_objectToString'](_0x539e6b)+'\\x22';}return _0x268203[_0x3e9eb6(0x149)](/^\"([a-zA-Z_][a-zA-Z_0-9]*)\"$/)?_0x268203=_0x268203['substr'](0x1,_0x268203[_0x3e9eb6(0x10d)]-0x2):_0x268203=_0x268203['replace'](/'/g,'\\x5c\\x27')[_0x3e9eb6(0x11e)](/\\\\\"/g,'\\x22')[_0x3e9eb6(0x11e)](/(^\"|\"$)/g,'\\x27'),_0x268203;},_0x3c842b['prototype'][_0x1bff5a(0x115)]=function(_0x1b22e6,_0x139c74,_0x26c1fb,_0x18f60b){var _0x59810d=_0x1bff5a;this[_0x59810d(0x124)](_0x1b22e6,_0x139c74),_0x18f60b&&_0x18f60b(),this[_0x59810d(0x13c)](_0x26c1fb,_0x1b22e6),this[_0x59810d(0xdc)](_0x1b22e6,_0x139c74);},_0x3c842b[_0x1bff5a(0x172)][_0x1bff5a(0x124)]=function(_0x3de57f,_0x633f7e){var _0x3b15c7=_0x1bff5a;this[_0x3b15c7(0x120)](_0x3de57f,_0x633f7e),this['_setNodeQueryPath'](_0x3de57f,_0x633f7e),this[_0x3b15c7(0xaa)](_0x3de57f,_0x633f7e),this[_0x3b15c7(0x140)](_0x3de57f,_0x633f7e);},_0x3c842b['prototype'][_0x1bff5a(0x120)]=function(_0x212392,_0x5350c2){},_0x3c842b['prototype'][_0x1bff5a(0x15e)]=function(_0x254f19,_0xb65cfa){},_0x3c842b[_0x1bff5a(0x172)]['_setNodeLabel']=function(_0x5174e1,_0x4a4537){},_0x3c842b[_0x1bff5a(0x172)]['_isUndefined']=function(_0x4b9a4e){var _0x29d539=_0x1bff5a;return _0x4b9a4e===this[_0x29d539(0x9a)];},_0x3c842b[_0x1bff5a(0x172)][_0x1bff5a(0xdc)]=function(_0x112fbe,_0xc2b2f8){var _0x13069a=_0x1bff5a;this[_0x13069a(0x122)](_0x112fbe,_0xc2b2f8),this[_0x13069a(0x118)](_0x112fbe),_0xc2b2f8[_0x13069a(0x168)]&&this[_0x13069a(0xcd)](_0x112fbe),this[_0x13069a(0x1a3)](_0x112fbe,_0xc2b2f8),this['_addLoadNode'](_0x112fbe,_0xc2b2f8),this['_cleanNode'](_0x112fbe);},_0x3c842b[_0x1bff5a(0x172)]['_additionalMetadata']=function(_0x480177,_0x5bf51c){var _0x36c251=_0x1bff5a;try{_0x480177&&typeof _0x480177[_0x36c251(0x10d)]==_0x36c251(0x113)&&(_0x5bf51c[_0x36c251(0x10d)]=_0x480177[_0x36c251(0x10d)]);}catch{}if(_0x5bf51c[_0x36c251(0x99)]===_0x36c251(0x113)||_0x5bf51c[_0x36c251(0x99)]==='Number'){if(isNaN(_0x5bf51c[_0x36c251(0xcc)]))_0x5bf51c[_0x36c251(0xf7)]=!0x0,delete _0x5bf51c[_0x36c251(0xcc)];else switch(_0x5bf51c['value']){case Number['POSITIVE_INFINITY']:_0x5bf51c['positiveInfinity']=!0x0,delete _0x5bf51c[_0x36c251(0xcc)];break;case Number[_0x36c251(0x18d)]:_0x5bf51c[_0x36c251(0x109)]=!0x0,delete _0x5bf51c[_0x36c251(0xcc)];break;case 0x0:this[_0x36c251(0xef)](_0x5bf51c[_0x36c251(0xcc)])&&(_0x5bf51c[_0x36c251(0xbb)]=!0x0);break;}}else _0x5bf51c[_0x36c251(0x99)]===_0x36c251(0x15c)&&typeof _0x480177[_0x36c251(0xe5)]==_0x36c251(0x13e)&&_0x480177[_0x36c251(0xe5)]&&_0x5bf51c[_0x36c251(0xe5)]&&_0x480177['name']!==_0x5bf51c[_0x36c251(0xe5)]&&(_0x5bf51c[_0x36c251(0xb8)]=_0x480177['name']);},_0x3c842b[_0x1bff5a(0x172)][_0x1bff5a(0xef)]=function(_0x5f59c6){var _0x3d7094=_0x1bff5a;return 0x1/_0x5f59c6===Number[_0x3d7094(0x18d)];},_0x3c842b[_0x1bff5a(0x172)]['_sortProps']=function(_0x341845){var _0xf1b50d=_0x1bff5a;!_0x341845['props']||!_0x341845[_0xf1b50d(0x17d)][_0xf1b50d(0x10d)]||_0x341845[_0xf1b50d(0x99)]===_0xf1b50d(0x111)||_0x341845['type']===_0xf1b50d(0x193)||_0x341845[_0xf1b50d(0x99)]===_0xf1b50d(0x11d)||_0x341845[_0xf1b50d(0x17d)]['sort'](function(_0x18e25d,_0x2e5ca7){var _0x5d8ea4=_0xf1b50d,_0x2086c0=_0x18e25d[_0x5d8ea4(0xe5)]['toLowerCase'](),_0x11bbd3=_0x2e5ca7[_0x5d8ea4(0xe5)]['toLowerCase']();return _0x2086c0<_0x11bbd3?-0x1:_0x2086c0>_0x11bbd3?0x1:0x0;});},_0x3c842b[_0x1bff5a(0x172)][_0x1bff5a(0x1a3)]=function(_0x54949b,_0x4cb346){var _0x5e9777=_0x1bff5a;if(!(_0x4cb346[_0x5e9777(0x177)]||!_0x54949b[_0x5e9777(0x17d)]||!_0x54949b['props'][_0x5e9777(0x10d)])){for(var _0x4f6972=[],_0x78d8a8=[],_0x20bd98=0x0,_0x5628f1=_0x54949b['props'][_0x5e9777(0x10d)];_0x20bd98<_0x5628f1;_0x20bd98++){var _0x5c1147=_0x54949b[_0x5e9777(0x17d)][_0x20bd98];_0x5c1147[_0x5e9777(0x99)]===_0x5e9777(0x15c)?_0x4f6972[_0x5e9777(0x175)](_0x5c1147):_0x78d8a8[_0x5e9777(0x175)](_0x5c1147);}if(!(!_0x78d8a8['length']||_0x4f6972[_0x5e9777(0x10d)]<=0x1)){_0x54949b[_0x5e9777(0x17d)]=_0x78d8a8;var _0x1ffed3={'functionsNode':!0x0,'props':_0x4f6972};this[_0x5e9777(0x120)](_0x1ffed3,_0x4cb346),this[_0x5e9777(0x122)](_0x1ffed3,_0x4cb346),this[_0x5e9777(0x118)](_0x1ffed3),this['_setNodePermissions'](_0x1ffed3,_0x4cb346),_0x1ffed3['id']+='\\x20f',_0x54949b[_0x5e9777(0x17d)]['unshift'](_0x1ffed3);}}},_0x3c842b[_0x1bff5a(0x172)][_0x1bff5a(0x10f)]=function(_0x3e2ffa,_0x7cf6a2){},_0x3c842b['prototype'][_0x1bff5a(0x118)]=function(_0x25a8d7){},_0x3c842b[_0x1bff5a(0x172)][_0x1bff5a(0xf3)]=function(_0x1726d6){var _0x4469e7=_0x1bff5a;return Array[_0x4469e7(0x9b)](_0x1726d6)||typeof _0x1726d6==_0x4469e7(0x12d)&&this[_0x4469e7(0x127)](_0x1726d6)===_0x4469e7(0x19e);},_0x3c842b[_0x1bff5a(0x172)][_0x1bff5a(0x140)]=function(_0x4c1d3c,_0x349781){},_0x3c842b['prototype']['_cleanNode']=function(_0x4d21c1){var _0xd58577=_0x1bff5a;delete _0x4d21c1[_0xd58577(0xf5)],delete _0x4d21c1[_0xd58577(0x144)],delete _0x4d21c1[_0xd58577(0x110)];},_0x3c842b[_0x1bff5a(0x172)][_0x1bff5a(0xaa)]=function(_0x43e4e6,_0x3cf6da){};let _0x22e9d1=new _0x3c842b(),_0x31d042={'props':_0x483b0f[_0x1bff5a(0x16e)][_0x1bff5a(0x17d)]||0x64,'elements':_0x483b0f[_0x1bff5a(0x16e)][_0x1bff5a(0x163)]||0x64,'strLength':_0x483b0f[_0x1bff5a(0x16e)][_0x1bff5a(0xad)]||0x400*0x32,'totalStrLength':_0x483b0f['defaultLimits'][_0x1bff5a(0xda)]||0x400*0x32,'autoExpandLimit':_0x483b0f[_0x1bff5a(0x16e)][_0x1bff5a(0x194)]||0x1388,'autoExpandMaxDepth':_0x483b0f['defaultLimits'][_0x1bff5a(0xc0)]||0xa},_0x5134cc={'props':_0x483b0f[_0x1bff5a(0xbf)][_0x1bff5a(0x17d)]||0x5,'elements':_0x483b0f[_0x1bff5a(0xbf)][_0x1bff5a(0x163)]||0x5,'strLength':_0x483b0f[_0x1bff5a(0xbf)][_0x1bff5a(0xad)]||0x100,'totalStrLength':_0x483b0f['reducedLimits'][_0x1bff5a(0xda)]||0x100*0x3,'autoExpandLimit':_0x483b0f[_0x1bff5a(0xbf)][_0x1bff5a(0x194)]||0x1e,'autoExpandMaxDepth':_0x483b0f[_0x1bff5a(0xbf)]['autoExpandMaxDepth']||0x2};if(_0x599cd8){let _0x10c22a=_0x22e9d1[_0x1bff5a(0x16a)][_0x1bff5a(0x18c)](_0x22e9d1);_0x22e9d1[_0x1bff5a(0x16a)]=function(_0x63dc8a,_0xf87bc8,_0xed8b,_0x3030e4){return _0x10c22a(_0x63dc8a,_0x599cd8(_0xf87bc8),_0xed8b,_0x3030e4);};}function _0x36e6e0(_0x4b7ae2,_0x7448e6,_0x1e6871,_0x13e959,_0x54bcfa,_0x5e46fe){var _0x55e03f=_0x1bff5a;let _0x581fa4,_0x572fc2;try{_0x572fc2=_0x32f0dd(),_0x581fa4=_0x7f88c9[_0x7448e6],!_0x581fa4||_0x572fc2-_0x581fa4['ts']>_0x15035d['perLogpoint'][_0x55e03f(0xa9)]&&_0x581fa4['count']&&_0x581fa4[_0x55e03f(0x137)]/_0x581fa4[_0x55e03f(0xd3)]<_0x15035d['perLogpoint']['resetOnProcessingTimeAverageMs']?(_0x7f88c9[_0x7448e6]=_0x581fa4={'count':0x0,'time':0x0,'ts':_0x572fc2},_0x7f88c9[_0x55e03f(0x10c)]={}):_0x572fc2-_0x7f88c9[_0x55e03f(0x10c)]['ts']>_0x15035d[_0x55e03f(0xe6)][_0x55e03f(0xa9)]&&_0x7f88c9[_0x55e03f(0x10c)][_0x55e03f(0xd3)]&&_0x7f88c9[_0x55e03f(0x10c)][_0x55e03f(0x137)]/_0x7f88c9[_0x55e03f(0x10c)]['count']<_0x15035d[_0x55e03f(0xe6)][_0x55e03f(0x1a5)]&&(_0x7f88c9[_0x55e03f(0x10c)]={});let _0x592aa0=[],_0x201cd8=_0x581fa4['reduceLimits']||_0x7f88c9[_0x55e03f(0x10c)][_0x55e03f(0xbc)]?_0x5134cc:_0x31d042,_0x1c3b41=_0x440706=>{var _0x380ff0=_0x55e03f;let _0x2fbc49={};return _0x2fbc49['props']=_0x440706['props'],_0x2fbc49['elements']=_0x440706[_0x380ff0(0x163)],_0x2fbc49['strLength']=_0x440706['strLength'],_0x2fbc49[_0x380ff0(0xda)]=_0x440706[_0x380ff0(0xda)],_0x2fbc49[_0x380ff0(0x194)]=_0x440706[_0x380ff0(0x194)],_0x2fbc49[_0x380ff0(0xc0)]=_0x440706[_0x380ff0(0xc0)],_0x2fbc49[_0x380ff0(0x168)]=!0x1,_0x2fbc49[_0x380ff0(0x177)]=!_0x447b71,_0x2fbc49[_0x380ff0(0x198)]=0x1,_0x2fbc49['level']=0x0,_0x2fbc49[_0x380ff0(0xfa)]=_0x380ff0(0xae),_0x2fbc49['rootExpression']=_0x380ff0(0x104),_0x2fbc49[_0x380ff0(0x169)]=!0x0,_0x2fbc49[_0x380ff0(0xf1)]=[],_0x2fbc49['autoExpandPropertyCount']=0x0,_0x2fbc49[_0x380ff0(0x102)]=_0x483b0f[_0x380ff0(0x102)],_0x2fbc49[_0x380ff0(0x161)]=0x0,_0x2fbc49[_0x380ff0(0x14e)]={'current':void 0x0,'parent':void 0x0,'index':0x0},_0x2fbc49;};for(var _0x34cb46=0x0;_0x34cb46<_0x54bcfa['length'];_0x34cb46++)_0x592aa0[_0x55e03f(0x175)](_0x22e9d1[_0x55e03f(0x16a)]({'timeNode':_0x4b7ae2==='time'||void 0x0},_0x54bcfa[_0x34cb46],_0x1c3b41(_0x201cd8),{}));if(_0x4b7ae2==='trace'||_0x4b7ae2===_0x55e03f(0x187)){let _0x38f028=Error['stackTraceLimit'];try{Error['stackTraceLimit']=0x1/0x0,_0x592aa0[_0x55e03f(0x175)](_0x22e9d1[_0x55e03f(0x16a)]({'stackNode':!0x0},new Error()['stack'],_0x1c3b41(_0x201cd8),{'strLength':0x1/0x0}));}finally{Error['stackTraceLimit']=_0x38f028;}}return{'method':_0x55e03f(0x17a),'version':_0x5161a5,'args':[{'ts':_0x1e6871,'session':_0x13e959,'args':_0x592aa0,'id':_0x7448e6,'context':_0x5e46fe}]};}catch(_0x38023d){return{'method':_0x55e03f(0x17a),'version':_0x5161a5,'args':[{'ts':_0x1e6871,'session':_0x13e959,'args':[{'type':_0x55e03f(0x114),'error':_0x38023d&&_0x38023d['message']}],'id':_0x7448e6,'context':_0x5e46fe}]};}finally{try{if(_0x581fa4&&_0x572fc2){let _0x4a1dc5=_0x32f0dd();_0x581fa4['count']++,_0x581fa4['time']+=_0x49b596(_0x572fc2,_0x4a1dc5),_0x581fa4['ts']=_0x4a1dc5,_0x7f88c9['hits'][_0x55e03f(0xd3)]++,_0x7f88c9['hits'][_0x55e03f(0x137)]+=_0x49b596(_0x572fc2,_0x4a1dc5),_0x7f88c9[_0x55e03f(0x10c)]['ts']=_0x4a1dc5,(_0x581fa4[_0x55e03f(0xd3)]>_0x15035d['perLogpoint'][_0x55e03f(0x138)]||_0x581fa4['time']>_0x15035d['perLogpoint'][_0x55e03f(0x148)])&&(_0x581fa4['reduceLimits']=!0x0),(_0x7f88c9[_0x55e03f(0x10c)][_0x55e03f(0xd3)]>_0x15035d[_0x55e03f(0xe6)]['reduceOnCount']||_0x7f88c9[_0x55e03f(0x10c)][_0x55e03f(0x137)]>_0x15035d['global'][_0x55e03f(0x148)])&&(_0x7f88c9['hits'][_0x55e03f(0xbc)]=!0x0);}}catch{}}}return _0x36e6e0;}function G(_0x4bcced){var _0x3ca5c0=_0x1c43af;if(_0x4bcced&&typeof _0x4bcced==_0x3ca5c0(0x12d)&&_0x4bcced[_0x3ca5c0(0x19d)])switch(_0x4bcced[_0x3ca5c0(0x19d)][_0x3ca5c0(0xe5)]){case _0x3ca5c0(0xb0):return _0x4bcced[_0x3ca5c0(0xfc)](Symbol[_0x3ca5c0(0x189)])?Promise[_0x3ca5c0(0x18b)]():_0x4bcced;case _0x3ca5c0(0x19b):return Promise['resolve']();}return _0x4bcced;}((_0x48d785,_0x3c846c,_0x54e7b9,_0x233cc4,_0x4d1fbe,_0x5efe0f,_0xeb603e,_0x2e7e15,_0x351bad,_0x341637,_0x3428c5,_0x343bd6)=>{var _0x1125dc=_0x1c43af;if(_0x48d785[_0x1125dc(0xec)])return _0x48d785['_console_ninja'];let _0x3cd4f6={'consoleLog':()=>{},'consoleTrace':()=>{},'consoleTime':()=>{},'consoleTimeEnd':()=>{},'autoLog':()=>{},'autoLogMany':()=>{},'autoTraceMany':()=>{},'coverage':()=>{},'autoTrace':()=>{},'autoTime':()=>{},'autoTimeEnd':()=>{}};if(!X(_0x48d785,_0x2e7e15,_0x4d1fbe))return _0x48d785[_0x1125dc(0xec)]=_0x3cd4f6,_0x48d785[_0x1125dc(0xec)];let _0xaf0d67=b(_0x48d785),_0x281f2e=_0xaf0d67[_0x1125dc(0xb4)],_0xae8681=_0xaf0d67[_0x1125dc(0xfe)],_0x4e0fc5=_0xaf0d67['now'],_0xa2e8a7={'hits':{},'ts':{}},_0x91e1f5=J(_0x48d785,_0x351bad,_0xa2e8a7,_0x5efe0f,_0x343bd6,_0x4d1fbe===_0x1125dc(0x179)?G:void 0x0),_0x536854=(_0x530578,_0x31dfad,_0x4c757a,_0x143a26,_0x88e3a8,_0x4bf8d3)=>{var _0x348500=_0x1125dc;let _0x3306b6=_0x48d785['_console_ninja'];try{return _0x48d785[_0x348500(0xec)]=_0x3cd4f6,_0x91e1f5(_0x530578,_0x31dfad,_0x4c757a,_0x143a26,_0x88e3a8,_0x4bf8d3);}finally{_0x48d785[_0x348500(0xec)]=_0x3306b6;}},_0x11e42f=_0x3660d4=>{_0xa2e8a7['ts'][_0x3660d4]=_0xae8681();},_0x308a38=(_0x227f0b,_0x4baf5a)=>{var _0x286c56=_0x1125dc;let _0x459036=_0xa2e8a7['ts'][_0x4baf5a];if(delete _0xa2e8a7['ts'][_0x4baf5a],_0x459036){let _0xaca72e=_0x281f2e(_0x459036,_0xae8681());_0x223f4e(_0x536854(_0x286c56(0x137),_0x227f0b,_0x4e0fc5(),_0x3b9616,[_0xaca72e],_0x4baf5a));}},_0x11c122=_0x2d5a87=>{var _0x28fe2c=_0x1125dc,_0x1c2128;return _0x4d1fbe===_0x28fe2c(0x179)&&_0x48d785[_0x28fe2c(0xa3)]&&((_0x1c2128=_0x2d5a87==null?void 0x0:_0x2d5a87[_0x28fe2c(0x1a4)])==null?void 0x0:_0x1c2128[_0x28fe2c(0x10d)])&&(_0x2d5a87[_0x28fe2c(0x1a4)][0x0][_0x28fe2c(0xa3)]=_0x48d785['origin']),_0x2d5a87;};_0x48d785['_console_ninja']={'consoleLog':(_0x535a72,_0x3d708e)=>{var _0xee4f6a=_0x1125dc;_0x48d785['console'][_0xee4f6a(0x17a)][_0xee4f6a(0xe5)]!==_0xee4f6a(0xd2)&&_0x223f4e(_0x536854(_0xee4f6a(0x17a),_0x535a72,_0x4e0fc5(),_0x3b9616,_0x3d708e));},'consoleTrace':(_0x3cb025,_0x49aa51)=>{var _0x2f4b5c=_0x1125dc,_0x4599c8,_0x3c6c91;_0x48d785[_0x2f4b5c(0x159)][_0x2f4b5c(0x17a)][_0x2f4b5c(0xe5)]!==_0x2f4b5c(0x133)&&((_0x3c6c91=(_0x4599c8=_0x48d785[_0x2f4b5c(0xc5)])==null?void 0x0:_0x4599c8[_0x2f4b5c(0xe0)])!=null&&_0x3c6c91[_0x2f4b5c(0x14e)]&&(_0x48d785['_ninjaIgnoreNextError']=!0x0),_0x223f4e(_0x11c122(_0x536854(_0x2f4b5c(0x181),_0x3cb025,_0x4e0fc5(),_0x3b9616,_0x49aa51))));},'consoleError':(_0x1bcfbb,_0x5dfcc2)=>{var _0x5127a8=_0x1125dc;_0x48d785[_0x5127a8(0x121)]=!0x0,_0x223f4e(_0x11c122(_0x536854(_0x5127a8(0x187),_0x1bcfbb,_0x4e0fc5(),_0x3b9616,_0x5dfcc2)));},'consoleTime':_0x1240c5=>{_0x11e42f(_0x1240c5);},'consoleTimeEnd':(_0x45b15f,_0xedf120)=>{_0x308a38(_0xedf120,_0x45b15f);},'autoLog':(_0x476380,_0x430396)=>{var _0x381ac9=_0x1125dc;_0x223f4e(_0x536854(_0x381ac9(0x17a),_0x430396,_0x4e0fc5(),_0x3b9616,[_0x476380]));},'autoLogMany':(_0x496baf,_0x2de83e)=>{_0x223f4e(_0x536854('log',_0x496baf,_0x4e0fc5(),_0x3b9616,_0x2de83e));},'autoTrace':(_0x580506,_0xdd93fb)=>{var _0x545a58=_0x1125dc;_0x223f4e(_0x11c122(_0x536854(_0x545a58(0x181),_0xdd93fb,_0x4e0fc5(),_0x3b9616,[_0x580506])));},'autoTraceMany':(_0x35b68e,_0x1bf390)=>{var _0x53bd89=_0x1125dc;_0x223f4e(_0x11c122(_0x536854(_0x53bd89(0x181),_0x35b68e,_0x4e0fc5(),_0x3b9616,_0x1bf390)));},'autoTime':(_0x1f9f08,_0x36b878,_0x2bba7b)=>{_0x11e42f(_0x2bba7b);},'autoTimeEnd':(_0x5b5318,_0x42dbfa,_0x2fdc68)=>{_0x308a38(_0x42dbfa,_0x2fdc68);},'coverage':_0x3c7d3b=>{var _0x2e75e3=_0x1125dc;_0x223f4e({'method':_0x2e75e3(0x1a1),'version':_0x5efe0f,'args':[{'id':_0x3c7d3b}]});}};let _0x223f4e=H(_0x48d785,_0x3c846c,_0x54e7b9,_0x233cc4,_0x4d1fbe,_0x341637,_0x3428c5),_0x3b9616=_0x48d785[_0x1125dc(0x183)];return _0x48d785[_0x1125dc(0xec)];})(globalThis,_0x1c43af(0xd0),_0x1c43af(0x1a2),_0x1c43af(0x160),_0x1c43af(0xd8),'1.0.0',_0x1c43af(0x17b),_0x1c43af(0x14b),_0x1c43af(0x18a),'',_0x1c43af(0x156),{\"resolveGetters\":false,\"defaultLimits\":{\"props\":100,\"elements\":100,\"strLength\":51200,\"totalStrLength\":51200,\"autoExpandLimit\":5000,\"autoExpandMaxDepth\":10},\"reducedLimits\":{\"props\":5,\"elements\":5,\"strLength\":256,\"totalStrLength\":768,\"autoExpandLimit\":30,\"autoExpandMaxDepth\":2},\"reducePolicy\":{\"perLogpoint\":{\"reduceOnCount\":50,\"reduceOnAccumulatedProcessingTimeMs\":100,\"resetWhenQuietMs\":500,\"resetOnProcessingTimeAverageMs\":100},\"global\":{\"reduceOnCount\":1000,\"reduceOnAccumulatedProcessingTimeMs\":300,\"resetWhenQuietMs\":50,\"resetOnProcessingTimeAverageMs\":100}}});");}catch(e){}};/* istanbul ignore next */function oo_oo(/**@type{any}**/i,/**@type{any}**/...v){try{oo_cm().consoleLog(i, v);}catch(e){} return v};/* istanbul ignore next */function oo_tr(/**@type{any}**/i,/**@type{any}**/...v){try{oo_cm().consoleTrace(i, v);}catch(e){} return v};/* istanbul ignore next */function oo_tx(/**@type{any}**/i,/**@type{any}**/...v){try{oo_cm().consoleError(i, v);}catch(e){} return v};/* istanbul ignore next */function oo_ts(/**@type{any}**/v){try{oo_cm().consoleTime(v);}catch(e){} return v;};/* istanbul ignore next */function oo_te(/**@type{any}**/v, /**@type{any}**/i){try{oo_cm().consoleTimeEnd(v, i);}catch(e){} return v;};/*eslint unicorn/no-abusive-eslint-disable:,eslint-comments/disable-enable-pair:,eslint-comments/no-unlimited-disable:,eslint-comments/no-aggregating-enable:,eslint-comments/no-duplicate-disable:,eslint-comments/no-unused-disable:,eslint-comments/no-unused-enable:,*/
