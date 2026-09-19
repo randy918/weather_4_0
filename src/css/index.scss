@@ -706,14 +706,14 @@ main {
     .time-hour {
         font-family: 'bold', sans-serif;
         color: white; // Force white to prevent inheriting brown
-        font-size: 1em; // Enforce scaling exactly with parent
+        font-size: inherit; // Enforce scaling exactly with parent
     }
 
     .time-ampm {
         font-family: 'medium', sans-serif;
         opacity: 0.8;
         color: white; // Force white to prevent inheriting brown
-        font-size: 1em; // Enforce scaling exactly with parent
+        font-size: inherit; // Enforce scaling exactly with parent
     }
 }
 
@@ -742,7 +742,7 @@ main {
         display: inline-block;
         color: white; // Enforce white text
         line-height: 1; // Keep text block compact
-        font-size: 1em; // Guarantee it matches JS inline style exactly
+        font-size: inherit; // Guarantee it matches JS inline style exactly
         font-family: 'bold', sans-serif;
     }
 }
@@ -1899,10 +1899,21 @@ main {
 }
 
 #weather-feels-like {
+    position: relative;
+    z-index: 60;
+    pointer-events: auto !important;
     display: inline-flex !important;
     flex-direction: row !important;
     align-items: center !important;
     justify-content: center !important;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: filter 0.2s ease;
+
+    &:active {
+        filter: brightness(1.18);
+    }
 
     .feels-like-current-temp.optical-center-digits {
         .odometer-degree {
@@ -1936,33 +1947,38 @@ main {
 .odometer-digit {
     position: relative;
     display: inline-block;
-    height: 1.1em;
-    line-height: 1.1em;
+    height: 1.15em;
+    line-height: 1.15em;
     overflow: hidden;
     vertical-align: middle;
-    /* Soft vertical mask fade on top and bottom of digits */
-    mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+    /* Soft vertical mask fade on top and bottom of digits to mimic a recessed drum aperture */
+    mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.4) 10%, black 25%, black 75%, rgba(0, 0, 0, 0.4) 90%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.4) 10%, black 25%, black 75%, rgba(0, 0, 0, 0.4) 90%, transparent 100%);
 }
 
 .odometer-strip {
     display: block;
-    transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); /* Elastic spring scroll */
+    transition: transform var(--odometer-transition-duration, 0.6s) var(--odometer-easing, cubic-bezier(0.35, 0.05, 0.25, 1));
     will-change: transform;
     
     span {
         display: block;
-        height: 1.1em;
-        line-height: 1.1em;
+        height: 1.15em;
+        line-height: 1.15em;
         text-align: center;
     }
 }
 
 .odometer-static {
     display: inline-block;
-    height: 1.1em;
-    line-height: 1.1em;
+    height: 1.15em;
+    line-height: 1.15em;
     vertical-align: middle;
+
+    &.odometer-slash {
+        font-family: 'light', sans-serif !important;
+        margin: 0 var(--odometer-slash-margin, -0.20vw) !important;
+    }
 }
 
 // Clock Hands Reset Spin Animation
@@ -2381,7 +2397,7 @@ main {
         font-family: var(--solar-flare-label-font-family, "euro", sans-serif);
         font-size: var(--solar-flare-label-font-size, calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.125));
         line-height: var(--solar-flare-label-line-height, 1.05);
-        letter-spacing: var(--solar-flare-label-letter-spacing, 0.04em);
+        letter-spacing: var(--solar-flare-label-letter-spacing, 0.05vw);
         text-transform: uppercase;
         color: inherit;
         transform: translateY(var(--solar-flare-label-offset-y, 0vw));
@@ -2401,7 +2417,7 @@ main {
         font-family: var(--solar-flare-value-font-family, "euro-bold", sans-serif);
         font-size: var(--solar-flare-value-font-size, calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.22));
         line-height: var(--solar-flare-value-line-height, 0.95);
-        letter-spacing: var(--solar-flare-value-letter-spacing, 0.02em);
+        letter-spacing: var(--solar-flare-value-letter-spacing, 0.04vw);
         color: inherit;
         transform: translateY(var(--solar-flare-value-offset-y, 0vw));
     }
@@ -2425,8 +2441,8 @@ main {
 
     i {
         font-size: 0.85em;
-        vertical-align: 0.02em;
-        margin-right: 0.22em;
+        vertical-align: 0.03vw;
+        margin-right: 0.35vw;
     }
 }
 
@@ -2496,7 +2512,7 @@ main {
         font-family: var(--radio-blackout-label-font-family, "euro", sans-serif);
         font-size: var(--radio-blackout-label-font-size, calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.088));
         line-height: var(--radio-blackout-label-line-height, 1.05);
-        letter-spacing: var(--radio-blackout-label-letter-spacing, 0.04em);
+        letter-spacing: var(--radio-blackout-label-letter-spacing, 0.05vw);
         text-transform: uppercase;
         color: inherit;
         transform: translateY(var(--radio-blackout-label-offset-y, 0vw));
@@ -2507,7 +2523,7 @@ main {
         font-family: var(--radio-blackout-class-font-family, "euro-bold", sans-serif);
         font-size: var(--radio-blackout-class-font-size, calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.34));
         line-height: var(--radio-blackout-class-line-height, 0.82);
-        letter-spacing: var(--radio-blackout-class-letter-spacing, 0.01em);
+        letter-spacing: var(--radio-blackout-class-letter-spacing, 0.02vw);
         color: inherit;
         transform: translateY(var(--radio-blackout-class-offset-y, 0vw));
         margin-bottom: var(--radio-blackout-gap-class-to-value, calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02));
@@ -2517,7 +2533,7 @@ main {
         font-family: var(--radio-blackout-value-font-family, "euro-bold", sans-serif);
         font-size: var(--radio-blackout-value-font-size, calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.165));
         line-height: var(--radio-blackout-value-line-height, 0.92);
-        letter-spacing: var(--radio-blackout-value-letter-spacing, 0.02em);
+        letter-spacing: var(--radio-blackout-value-letter-spacing, -0.03vw);
         color: inherit;
         transform: translateY(var(--radio-blackout-value-offset-y, 0vw));
     }
@@ -2541,8 +2557,8 @@ main {
 
     i {
         font-size: 0.85em;
-        vertical-align: 0.02em;
-        margin-right: 0.22em;
+        vertical-align: 0.03vw;
+        margin-right: 0.35vw;
     }
 }
 
@@ -2788,13 +2804,13 @@ main {
 
     &.mode-top:hover {
         i, svg {
-            transform: translateY(-2px);
+            transform: translateY(-0.15vw);
         }
     }
 
     &.mode-bottom:hover {
         i, svg {
-            transform: translateY(2px);
+            transform: translateY(0.15vw);
         }
     }
 }
@@ -2814,5 +2830,105 @@ main {
             font-size: var(--scroll-nav-icon-size, var(--scroll-nav-icon-size-mobile, 4.5vw));
             -webkit-text-stroke: var(--scroll-nav-arrow-stroke-width, var(--scroll-nav-arrow-stroke-mobile, 0.12vw)) currentColor;
         }
+    }
+}
+
+/* ==========================================================================
+   --- Orrery / Solar System Planetary Orbit Ring Section (JCV Driven) ---
+   ========================================================================== */
+#orrery-section {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: var(--orrery-margin-top, 3vw);
+    margin-bottom: var(--orrery-margin-bottom, 2vw);
+    pointer-events: none;
+    z-index: var(--orrery-z-index, 10);
+}
+
+.orrery-ring-container {
+    position: relative;
+    width: calc(var(--orrery-radius, 30vw) * 2);
+    height: calc(var(--orrery-radius, 30vw) * 2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.orrery-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.orrery-orbit-track {
+    fill: none;
+    stroke: var(--orrery-track-color, rgba(255, 255, 255, 0.2));
+    stroke-width: var(--orrery-track-width, 0.15vw);
+}
+
+/* --- Saturn Orbit Arm, Body & Styling --- */
+.orrery-saturn-arm {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform-origin: 0 0;
+    transform: rotate(var(--orrery-saturn-orbit-angle, 0deg));
+    z-index: var(--orrery-saturn-z-index, 15);
+    pointer-events: none;
+    animation: var(--orrery-saturn-orbit-animation, none);
+    will-change: transform;
+}
+
+.orrery-saturn-body {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-radius, 30vw) + var(--orrery-saturn-radial-offset, 0vw))));
+    pointer-events: auto;
+    will-change: transform;
+}
+
+.orrery-saturn-img {
+    width: var(--orrery-saturn-width, 6.5vw);
+    height: var(--orrery-saturn-height, auto);
+    max-width: none;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: auto;
+    opacity: var(--orrery-saturn-opacity, 1.0);
+    transform: var(--orrery-saturn-image-rotation, rotate(0deg));
+    animation: var(--orrery-saturn-counter-animation, none);
+    will-change: transform, filter;
+    filter: drop-shadow(var(--orrery-saturn-shadow-x, 0.3vw) var(--orrery-saturn-shadow-y, 0.6vw) var(--orrery-saturn-shadow-blur, 0.8vw) var(--orrery-saturn-shadow-color, rgba(0, 0, 0, 0.75)))
+            drop-shadow(0 0 var(--orrery-saturn-glow-blur, 0vw) var(--orrery-saturn-glow-color, transparent));
+    transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+/* Continuous Orbit Revolution Keyframes */
+@keyframes orrery-orbit-spin {
+    from {
+        transform: rotate(var(--orrery-saturn-orbit-angle, 0deg));
+    }
+    to {
+        transform: rotate(calc(var(--orrery-saturn-orbit-angle, 0deg) + 360deg));
+    }
+}
+
+/* Counter-spin Keyframes to keep Saturn axial tilt constant in astronomical space during revolution */
+@keyframes orrery-saturn-counter-spin {
+    from {
+        transform: rotate(calc(-1 * var(--orrery-saturn-orbit-angle, 0deg) + var(--orrery-saturn-axial-tilt, 0deg)));
+    }
+    to {
+        transform: rotate(calc(-1 * var(--orrery-saturn-orbit-angle, 0deg) + var(--orrery-saturn-axial-tilt, 0deg) - 360deg));
     }
 }

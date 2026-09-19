@@ -9,7 +9,7 @@ import weatherConditions from '../data/weather-conditions.json';
   let displayUnit = 'F';
 
   // Helper to render dual temperature slash in light font style with tight horizontal margin spacing
-  const formatSlash = () => `<span style="font-family: 'light', sans-serif; margin: 0 -0.06em;">/</span>`;
+  const formatSlash = () => `<span style="font-family: 'light', sans-serif; margin: 0 -0.20vw;">/</span>`;
 
   // Dynamic NWS radar station identifier (defaults to Tulsa's KINX)
   let currentRadarStation = 'KINX';
@@ -528,7 +528,8 @@ import weatherConditions from '../data/weather-conditions.json';
     [-96.883,33.868],[-96.8957,33.8964],[-96.8994,33.9337],[-96.9074,33.95],
     [-96.9221,33.9596],[-96.9729,33.9357],[-96.9856,33.8865],[-97.048,33.8179],
     [-97.0924,33.7332],[-97.1072,33.7211],[-97.1211,33.7172],[-97.1513,33.7226],
-    [-97.1722,33.7375],[-97.2048,33.7999],[-97.205,33.8189],[-97.1997,33.8273],
+    [-97.1722,33.7375],[-97.2048,33.7999],[-97.205,33.8189],[-97.1997,33.8273],3
+    
     [-97.1716,33.8353],[-97.1666,33.8473],[-97.1808,33.8952],[-97.2109,33.9161],
     [-97.2265,33.9146],[-97.3108,33.8725],[-97.3729,33.8195],[-97.4265,33.8194],
     [-97.4531,33.8285],[-97.4629,33.8418],[-97.4515,33.8709],[-97.451,33.8914],
@@ -3714,7 +3715,7 @@ import weatherConditions from '../data/weather-conditions.json';
         font-size: 3.5vw;
         font-family: 'bold', sans-serif;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.18vw;
         line-height: var(--alert-banner-line-height, 1.1);
         color: #ffffff;
       }
@@ -3724,7 +3725,7 @@ import weatherConditions from '../data/weather-conditions.json';
         font-style: normal;
         color: #ffffff; /* White */
         font-size: 3.5vw; /* Same size as alert text */
-        letter-spacing: -0.05em; /* EDITABLE: Kerning for expiration time */
+        letter-spacing: -0.18vw; /* EDITABLE: Kerning for expiration time */
         text-transform: lowercase; /* Lowercase expires text */
       }
       #moon-phase-img {
@@ -4003,8 +4004,8 @@ import weatherConditions from '../data/weather-conditions.json';
       }
       .alert-modal-body p.alert-bullet .heavy-bullet {
         font-family: 'bold', sans-serif;
-        font-size: 1.5em; /* Make the actual dot visibly larger/bolder */
-        vertical-align: -0.1em; /* Subtly lower the larger bullet to align with lowercase letters */
+        font-size: 3.6vw; /* Make the actual dot visibly larger/bolder */
+        vertical-align: -0.24vw; /* Subtly lower the larger bullet to align with lowercase letters */
       }
       .alert-modal-body p:last-child {
         margin-bottom: 0; /* Keeps the bottom of the modal tidy */
@@ -5858,11 +5859,151 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // (d) Leading space before first number in "feels like" mode
   const FEELS_LIKE_FIRST_TEMP_LEADING_SPACE = true;     // EDITABLE: Add a space just before first temp in feels like line only (e.g. " 99° feels...")
 
-  // --- Odometer Digit "1" Kerning Config ---
-  const ODOMETER_ONE_MARGIN_LEFT = '-0.06em';  // EDITABLE: Left margin adjustment for digit 1 to tighten kerning
-  const ODOMETER_ONE_MARGIN_RIGHT = '-0.06em'; // EDITABLE: Right margin adjustment for digit 1 to tighten kerning
+  // --- Odometer Config (JCV) ---
+  const ODOMETER_STEP_DURATION_DESKTOP = 280;           // EDITABLE Desktop: Milliseconds per digit step (e.g. 4->5->6 takes 2 * 280ms = 560ms)
+  const ODOMETER_STEP_DURATION_MOBILE = 280;            // EDITABLE Mobile: Milliseconds per digit step
+  const ODOMETER_MIN_DURATION_DESKTOP = 500;            // EDITABLE Desktop: Minimum roll duration in ms for 1-step moves
+  const ODOMETER_MIN_DURATION_MOBILE = 500;             // EDITABLE Mobile: Minimum roll duration in ms for 1-step moves
+  const ODOMETER_DIGIT_STAGGER_DESKTOP = 140;           // EDITABLE Desktop: Stagger between consecutive digits in ms
+  const ODOMETER_DIGIT_STAGGER_MOBILE = 140;            // EDITABLE Mobile: Stagger between consecutive digits in ms
+  const ODOMETER_STARTUP_DELAY_DESKTOP = 1350;          // EDITABLE Desktop: Delay in ms before initial roll (waits for startup loader to finish fading)
+  const ODOMETER_STARTUP_DELAY_MOBILE = 1350;           // EDITABLE Mobile: Delay in ms before initial roll (waits for startup loader to finish fading)
+  const ODOMETER_EASING_DESKTOP = 'cubic-bezier(0.35, 0.05, 0.25, 1)'; // EDITABLE Desktop: Smooth mechanical roll easing
+  const ODOMETER_EASING_MOBILE = 'cubic-bezier(0.35, 0.05, 0.25, 1)';  // EDITABLE Mobile: Smooth mechanical roll easing
+  const ODOMETER_ONE_MARGIN_LEFT_DESKTOP = '-0.44vw';   // EDITABLE Desktop: Left margin adjustment for digit 1 to tighten kerning
+  const ODOMETER_ONE_MARGIN_LEFT_MOBILE = '-0.80vw';    // EDITABLE Mobile: Left margin adjustment for digit 1 to tighten kerning
+  const ODOMETER_ONE_MARGIN_RIGHT_DESKTOP = '-0.44vw';  // EDITABLE Desktop: Right margin adjustment for digit 1 to tighten kerning
+  const ODOMETER_ONE_MARGIN_RIGHT_MOBILE = '-0.80vw';   // EDITABLE Mobile: Right margin adjustment for digit 1 to tighten kerning
+  const ODOMETER_SLASH_MARGIN_DESKTOP = '-0.20vw';      // EDITABLE Desktop: Dual-mode slash '/' left & right margins
+  const ODOMETER_SLASH_MARGIN_MOBILE = '-0.20vw';       // EDITABLE Mobile: Dual-mode slash '/' left & right margins
 
-  // Helper function to dynamically update odometer numbers without destroying DOM elements
+  function applyOdometerConfig() {
+    const isMobile = window.innerWidth <= 767;
+    const root = document.documentElement;
+    root.style.setProperty('--odometer-easing', isMobile ? ODOMETER_EASING_MOBILE : ODOMETER_EASING_DESKTOP);
+    root.style.setProperty('--odometer-one-margin-left', isMobile ? ODOMETER_ONE_MARGIN_LEFT_MOBILE : ODOMETER_ONE_MARGIN_LEFT_DESKTOP);
+    root.style.setProperty('--odometer-one-margin-right', isMobile ? ODOMETER_ONE_MARGIN_RIGHT_MOBILE : ODOMETER_ONE_MARGIN_RIGHT_DESKTOP);
+    root.style.setProperty('--odometer-slash-margin', isMobile ? ODOMETER_SLASH_MARGIN_MOBILE : ODOMETER_SLASH_MARGIN_DESKTOP);
+  }
+
+  let odometerStartupRevealed = false;
+  let isOdometerSpinning = false;
+  const ODOMETER_CYCLE_HTML = '<span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span>';
+  const ODOMETER_FULL_STRIP_HTML = ODOMETER_CYCLE_HTML + ODOMETER_CYCLE_HTML + ODOMETER_CYCLE_HTML;
+  const ODOMETER_TOTAL_SPANS = 30;
+
+  // Roll a single strip forward from current digit to target digit (e.g. 4 -> 5 -> 6)
+  function rollDigitStrip(strip, targetDigit, isFullSpin = false, delayMs = 0) {
+    if (!strip) return;
+    const isMobile = window.innerWidth <= 767;
+    const stepDuration = isMobile ? ODOMETER_STEP_DURATION_MOBILE : ODOMETER_STEP_DURATION_DESKTOP;
+    const minDuration = isMobile ? ODOMETER_MIN_DURATION_MOBILE : ODOMETER_MIN_DURATION_DESKTOP;
+    const easing = isMobile ? ODOMETER_EASING_MOBILE : ODOMETER_EASING_DESKTOP;
+
+    const currentDigit = parseInt(strip.getAttribute('data-digit') || '0', 10);
+    let steps = 0;
+    if (isFullSpin) {
+      steps = 10;
+    } else {
+      steps = (targetDigit - currentDigit + 10) % 10;
+    }
+
+    if (steps === 0) {
+      strip.setAttribute('data-target-digit', targetDigit);
+      return;
+    }
+
+    const durationMs = Math.max(minDuration, steps * stepDuration);
+    const targetIndex = currentDigit + steps;
+
+    setTimeout(() => {
+      strip.style.transition = `transform ${durationMs / 1000}s ${easing}`;
+      void strip.offsetWidth; // Force reflow to guarantee browser registers transition before setting transform!
+      strip.style.transform = `translateY(-${(targetIndex / ODOMETER_TOTAL_SPANS) * 100}%)`;
+      strip.setAttribute('data-target-digit', targetDigit);
+
+      setTimeout(() => {
+        // Silently normalize back to Cycle 0
+        const normalizedIndex = targetDigit % 10;
+        strip.style.transition = 'none';
+        strip.style.transform = `translateY(-${(normalizedIndex / ODOMETER_TOTAL_SPANS) * 100}%)`;
+        strip.setAttribute('data-digit', normalizedIndex);
+        void strip.offsetHeight; // Force reflow
+      }, durationMs + 25);
+    }, delayMs);
+  }
+
+  // Roll all digits in a container (sequential forward roll)
+  function rollOdometerContainer(container, isFullSpin = false) {
+    if (!container) return;
+    const digitWrappers = Array.from(container.querySelectorAll('.odometer-digit'));
+    if (!digitWrappers || digitWrappers.length === 0) return;
+
+    const isMobile = window.innerWidth <= 767;
+    const staggerMs = isMobile ? ODOMETER_DIGIT_STAGGER_MOBILE : ODOMETER_DIGIT_STAGGER_DESKTOP;
+
+    digitWrappers.forEach((wrapper, colIndex) => {
+      const strip = wrapper.querySelector('.odometer-strip');
+      if (!strip) return;
+      const targetDigit = parseInt(strip.getAttribute('data-target-digit') || strip.getAttribute('data-digit') || '0', 10);
+      rollDigitStrip(strip, targetDigit, isFullSpin, colIndex * staggerMs);
+    });
+  }
+
+  function triggerOdometerStartupReveal() {
+    if (odometerStartupRevealed) return;
+    odometerStartupRevealed = true;
+
+    const isMobile = window.innerWidth <= 767;
+    const startupDelay = isMobile ? ODOMETER_STARTUP_DELAY_MOBILE : ODOMETER_STARTUP_DELAY_DESKTOP;
+
+    setTimeout(() => {
+      const container = document.getElementById('weather-feels-like');
+      if (container) {
+        rollOdometerContainer(container, false);
+      }
+    }, startupDelay);
+  }
+
+  function triggerOdometerSpin(container) {
+    if (!container || isOdometerSpinning) return;
+    isOdometerSpinning = true;
+    rollOdometerContainer(container, true);
+    const isMobile = window.innerWidth <= 767;
+    const stepDuration = isMobile ? ODOMETER_STEP_DURATION_MOBILE : ODOMETER_STEP_DURATION_DESKTOP;
+    const spinDuration = (10 * stepDuration) + 600;
+    setTimeout(() => {
+      isOdometerSpinning = false;
+    }, spinDuration);
+  }
+
+  function createOdometerDigit(digit) {
+    const digitEl = document.createElement('span');
+    digitEl.className = 'odometer-digit';
+    digitEl.innerHTML = `<span class="odometer-strip" style="transform: translateY(0%);" data-digit="0" data-target-digit="${digit}">` +
+                        ODOMETER_FULL_STRIP_HTML +
+                        `</span>`;
+    return digitEl;
+  }
+
+  function createOdometerStatic(char) {
+    const staticEl = document.createElement('span');
+    staticEl.className = 'odometer-static';
+    if (char === '°') {
+      staticEl.classList.add('odometer-degree');
+    } else if (char === '/') {
+      staticEl.classList.add('odometer-slash');
+    }
+    if (char === ' ' || char === '\u00A0') {
+      staticEl.innerHTML = '&nbsp;';
+      staticEl.style.whiteSpace = 'pre';
+    } else {
+      staticEl.textContent = char;
+    }
+    return staticEl;
+  }
+
+  // Helper function to dynamically update odometer numbers with smooth sequential forward roll
   function updateOdometer(container, newStr) {
     if (!container) return;
     
@@ -5871,83 +6012,64 @@ Plan ahead for significantly warmer conditions tomorrow!`
     }
     
     const chars = Array.from(newStr);
-    const existingChildren = Array.from(container.children);
+    let anyDigitChanged = false;
     
-    // If the number of characters or structural types don't match, rebuild the DOM
-    let needsRebuild = chars.length !== existingChildren.length;
-    if (!needsRebuild) {
-      for (let i = 0; i < chars.length; i++) {
-        const isDigit = chars[i] >= '0' && chars[i] <= '9';
-        const wasDigit = existingChildren[i].classList.contains('odometer-digit');
-        if (isDigit !== wasDigit) {
-          needsRebuild = true;
-          break;
+    // Reconcile children to match chars length and types
+    while (container.children.length > chars.length) {
+      container.removeChild(container.lastElementChild);
+      anyDigitChanged = true;
+    }
+    
+    chars.forEach((char, i) => {
+      const isDigit = char >= '0' && char <= '9';
+      let child = container.children[i];
+      
+      // If child doesn't exist or has mismatched type (digit vs static), replace or append
+      if (!child || (isDigit !== child.classList.contains('odometer-digit'))) {
+        const newChild = isDigit
+          ? createOdometerDigit(parseInt(char, 10))
+          : createOdometerStatic(char);
+          
+        if (child) {
+          container.replaceChild(newChild, child);
+        } else {
+          container.appendChild(newChild);
+        }
+        child = newChild;
+        if (isDigit) anyDigitChanged = true;
+      }
+      
+      // If it's a digit element, check if target changed
+      if (isDigit) {
+        const digit = parseInt(char, 10);
+        const strip = child.querySelector('.odometer-strip');
+        if (strip) {
+          const oldTarget = parseInt(strip.getAttribute('data-target-digit') || strip.getAttribute('data-digit') || '0', 10);
+          if (oldTarget !== digit) {
+            anyDigitChanged = true;
+          }
+          strip.setAttribute('data-target-digit', digit);
+        }
+      } else {
+        // Static character update
+        if (char === ' ' || char === '\u00A0') {
+          child.innerHTML = '&nbsp;';
+          child.style.whiteSpace = 'pre';
+        } else if (child.textContent !== char) {
+          child.textContent = char;
+        }
+        if (char === '°') {
+          child.classList.add('odometer-degree');
+        } else {
+          child.classList.remove('odometer-degree');
+        }
+        if (char === '/') {
+          child.classList.add('odometer-slash');
+        } else {
+          child.classList.remove('odometer-slash');
         }
       }
-    }
-    
-    if (needsRebuild) {
-      container.innerHTML = '';
-      chars.forEach(char => {
-        const isDigit = char >= '0' && char <= '9';
-        if (isDigit) {
-          const digit = parseInt(char);
-          const digitEl = document.createElement('span');
-          digitEl.className = 'odometer-digit';
-          digitEl.innerHTML = `<span class="odometer-strip" style="transform: translateY(0%);" data-digit="0">` +
-                              `<span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span>` +
-                              `</span>`;
-          container.appendChild(digitEl);
-          
-          // Force reflow and transition to the target digit
-          void digitEl.offsetHeight;
-          const strip = digitEl.querySelector('.odometer-strip');
-          strip.style.transform = `translateY(-${digit * 10}%)`;
-          strip.setAttribute('data-digit', digit);
-        } else {
-          const staticEl = document.createElement('span');
-          staticEl.className = 'odometer-static';
-          if (char === '°') {
-            staticEl.classList.add('odometer-degree');
-          }
-          if (char === ' ' || char === '\u00A0') {
-            staticEl.innerHTML = '&nbsp;';
-            staticEl.style.whiteSpace = 'pre';
-          } else {
-            staticEl.textContent = char;
-          }
-          container.appendChild(staticEl);
-        }
-      });
-    } else {
-      // Update existing elements
-      chars.forEach((char, i) => {
-        const child = existingChildren[i];
-        if (char >= '0' && char <= '9') {
-          const digit = parseInt(char);
-          const strip = child.querySelector('.odometer-strip');
-          if (strip) {
-            const currentDigit = parseInt(strip.getAttribute('data-digit') || '0');
-            if (currentDigit !== digit) {
-              strip.style.transform = `translateY(-${digit * 10}%)`;
-              strip.setAttribute('data-digit', digit);
-            }
-          }
-        } else {
-          if (char === ' ' || char === '\u00A0') {
-            child.innerHTML = '&nbsp;';
-            child.style.whiteSpace = 'pre';
-          } else if (child.textContent !== char) {
-            child.textContent = char;
-          }
-          if (char === '°') {
-            child.classList.add('odometer-degree');
-          } else {
-            child.classList.remove('odometer-degree');
-          }
-        }
-      });
-    }
+    });
     
     // Apply digit "1" kerning margins
     const children = Array.from(container.children);
@@ -5956,7 +6078,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       if (child.classList.contains('odometer-digit')) {
         const strip = child.querySelector('.odometer-strip');
         if (strip) {
-          const digitVal = strip.getAttribute('data-digit');
+          const digitVal = strip.getAttribute('data-digit') || strip.getAttribute('data-target-digit');
           isOne = (digitVal === '1');
         }
       } else {
@@ -5964,25 +6086,26 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }
 
       if (isOne) {
-        // Adjust left margin (skip first element to prevent shifting start position)
         if (i > 0) {
-          child.style.marginLeft = ODOMETER_ONE_MARGIN_LEFT;
+          child.style.marginLeft = 'var(--odometer-one-margin-left, -0.44vw)';
         } else {
           child.style.marginLeft = '';
         }
-        
-        // Adjust right margin (skip last element to prevent shifting end position)
         if (i < children.length - 1) {
-          child.style.marginRight = ODOMETER_ONE_MARGIN_RIGHT;
+          child.style.marginRight = 'var(--odometer-one-margin-right, -0.44vw)';
         } else {
           child.style.marginRight = '';
         }
       } else {
-        // Reset margins for non-one digits/static characters
         child.style.marginLeft = '';
         child.style.marginRight = '';
       }
     });
+
+    // If startup already revealed and digits changed, trigger the sequential mechanical roll!
+    if (odometerStartupRevealed && anyDigitChanged) {
+      rollOdometerContainer(container, false);
+    }
   }
 
   // Create and update "Feels like" element
@@ -6014,6 +6137,15 @@ Plan ahead for significantly warmer conditions tomorrow!`
           (document.querySelector('main.content') || document.body).appendChild(el);
         }
       }
+    }
+    
+    if (!el._odometerClickBound) {
+      el._odometerClickBound = true;
+      el.style.cursor = 'pointer';
+      el.setAttribute('title', 'Click to roll odometer');
+      el.addEventListener('click', () => {
+        triggerOdometerSpin(el);
+      });
     }
     
     const feelsLike = data?.current?.feels_like;
@@ -6183,7 +6315,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         if (displayUnit === 'BOTH') {
           const cF = Math.round(currentTemp);
           const cC = Math.round((currentTemp - 32) * 5 / 9);
-          currentText = `${cF}${formatSlash()}${cC}`;
+          currentText = `${cF}/${cC}`;
         } else {
           const displayCurrent = displayUnit === 'C' ? (currentTemp - 32) * 5 / 9 : currentTemp;
           currentText = `${Math.round(displayCurrent)}°`;
@@ -6230,7 +6362,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         if (displayUnit === 'BOTH') {
           const fF = Math.round(feelsLike);
           const fC = Math.round((feelsLike - 32) * 5 / 9);
-          feelsLikeText = `${fF}${formatSlash()}${fC}`;
+          feelsLikeText = `${fF}/${fC}`;
         } else {
           const displayFeelsLike = displayUnit === 'C' ? (feelsLike - 32) * 5 / 9 : feelsLike;
           feelsLikeText = `${Math.round(displayFeelsLike)}°`;
@@ -7443,8 +7575,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SOLAR_FLARE_LABEL_FONT_SIZE_DESKTOP = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.088)'; // EDITABLE Desktop: Top label font size
   const SOLAR_FLARE_LABEL_FONT_SIZE_MOBILE = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.088)';  // EDITABLE Mobile: Top label font size
   const SOLAR_FLARE_LABEL_LINE_HEIGHT = 1.0;                     // EDITABLE: Top label line height
-  const SOLAR_FLARE_LABEL_LETTER_SPACING_DESKTOP = '0.04em';     // EDITABLE Desktop: Top label letter spacing
-  const SOLAR_FLARE_LABEL_LETTER_SPACING_MOBILE = '0.04em';      // EDITABLE Mobile: Top label letter spacing
+  const SOLAR_FLARE_LABEL_LETTER_SPACING_DESKTOP = '0.05vw';     // EDITABLE Desktop: Top label letter spacing
+  const SOLAR_FLARE_LABEL_LETTER_SPACING_MOBILE = '0.05vw';      // EDITABLE Mobile: Top label letter spacing
   const SOLAR_FLARE_LABEL_OFFSET_Y_DESKTOP = '0vw';              // EDITABLE Desktop: Fine vertical nudge for top label
   const SOLAR_FLARE_LABEL_OFFSET_Y_MOBILE = '0vw';               // EDITABLE Mobile: Fine vertical nudge for top label
   const SOLAR_FLARE_GAP_LABEL_TO_CLASS_DESKTOP = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.025)'; // EDITABLE Desktop: Gap between label and giant class letter
@@ -7465,8 +7597,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SOLAR_FLARE_VALUE_FONT_SIZE_DESKTOP = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.175)'; // EDITABLE Desktop: Bottom value font size
   const SOLAR_FLARE_VALUE_FONT_SIZE_MOBILE = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.175)';  // EDITABLE Mobile: Bottom value font size
   const SOLAR_FLARE_VALUE_LINE_HEIGHT = 0.92;                    // EDITABLE: Bottom value line height
-  const SOLAR_FLARE_VALUE_LETTER_SPACING_DESKTOP = '0.02em';     // EDITABLE Desktop: Bottom value letter spacing
-  const SOLAR_FLARE_VALUE_LETTER_SPACING_MOBILE = '0.02em';      // EDITABLE Mobile: Bottom value letter spacing
+  const SOLAR_FLARE_VALUE_LETTER_SPACING_DESKTOP = '0.04vw';     // EDITABLE Desktop: Bottom value letter spacing
+  const SOLAR_FLARE_VALUE_LETTER_SPACING_MOBILE = '0.04vw';      // EDITABLE Mobile: Bottom value letter spacing
   const SOLAR_FLARE_VALUE_OFFSET_Y_DESKTOP = '-.5vw';              // EDITABLE Desktop: Fine vertical nudge for bottom value
   const SOLAR_FLARE_VALUE_OFFSET_Y_MOBILE = '-.5vw';               // EDITABLE Mobile: Fine vertical nudge for bottom value
 
@@ -7565,8 +7697,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const RADIO_BLACKOUT_LABEL_FONT_SIZE_DESKTOP = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.088)'; // EDITABLE Desktop: Top label font size
   const RADIO_BLACKOUT_LABEL_FONT_SIZE_MOBILE = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.088)';  // EDITABLE Mobile: Top label font size
   const RADIO_BLACKOUT_LABEL_LINE_HEIGHT = 1.0;                  // EDITABLE: Top label line height
-  const RADIO_BLACKOUT_LABEL_LETTER_SPACING_DESKTOP = '0.04em';  // EDITABLE Desktop: Top label letter spacing
-  const RADIO_BLACKOUT_LABEL_LETTER_SPACING_MOBILE = '0.04em';   // EDITABLE Mobile: Top label letter spacing
+  const RADIO_BLACKOUT_LABEL_LETTER_SPACING_DESKTOP = '0.05vw';  // EDITABLE Desktop: Top label letter spacing
+  const RADIO_BLACKOUT_LABEL_LETTER_SPACING_MOBILE = '0.05vw';   // EDITABLE Mobile: Top label letter spacing
   const RADIO_BLACKOUT_LABEL_OFFSET_Y_DESKTOP = '0vw';           // EDITABLE Desktop: Fine vertical nudge for top label
   const RADIO_BLACKOUT_LABEL_OFFSET_Y_MOBILE = '0vw';            // EDITABLE Mobile: Fine vertical nudge for top label
   const RADIO_BLACKOUT_GAP_LABEL_TO_CLASS_DESKTOP = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.025)'; // EDITABLE Desktop: Gap between label and giant class text
@@ -7589,8 +7721,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const RADIO_BLACKOUT_VALUE_FONT_SIZE_DESKTOP = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.165)'; // EDITABLE Desktop: Bottom value font size
   const RADIO_BLACKOUT_VALUE_FONT_SIZE_MOBILE = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.165)';  // EDITABLE Mobile: Bottom value font size
   const RADIO_BLACKOUT_VALUE_LINE_HEIGHT = 0.92;                 // EDITABLE: Bottom value line height
-  const RADIO_BLACKOUT_VALUE_LETTER_SPACING_DESKTOP = '-.015em';  // EDITABLE Desktop: Bottom value letter spacing
-  const RADIO_BLACKOUT_VALUE_LETTER_SPACING_MOBILE = '-.03em';   // EDITABLE Mobile: Bottom value letter spacing
+  const RADIO_BLACKOUT_VALUE_LETTER_SPACING_DESKTOP = '-0.03vw'; // EDITABLE Desktop: Bottom value letter spacing
+  const RADIO_BLACKOUT_VALUE_LETTER_SPACING_MOBILE = '-0.06vw';  // EDITABLE Mobile: Bottom value letter spacing
   const RADIO_BLACKOUT_VALUE_OFFSET_Y_DESKTOP = '-.5vw';           // EDITABLE Desktop: Fine vertical nudge for bottom value
   const RADIO_BLACKOUT_VALUE_OFFSET_Y_MOBILE = '-.5vw';            // EDITABLE Mobile: Fine vertical nudge for bottom value
 
@@ -8622,15 +8754,191 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--sun-sizzle-fetch-length', String(SUN_SIZZLE_FETCH_LENGTH));
   }
 
-  // Initialize World Clocks, Earth Image, and Celestial Duo configurations in proper dependency order
+  // ==========================================
+  // --- Orrery Ephemeris: Real-Time Planet Position Calculator ---
+  // ==========================================
+  //
+  // calcPlanetOrreryAngle(planet) → string e.g. '347.2deg'
+  //
+  // Returns the planet's current ecliptic longitude converted to the orrery's
+  // clockwise CSS rotation convention:
+  //   0deg   = 12 o'clock  = Vernal Equinox (♈ Aries, 0° ecliptic)
+  //   90deg  = 3 o'clock   = Summer Solstice (♋ Cancer, 90° ecliptic)
+  //   180deg = 6 o'clock   = Autumnal Equinox (♎ Libra, 180° ecliptic)
+  //   270deg = 9 o'clock   = Winter Solstice (♑ Capricorn, 270° ecliptic)
+  //
+  // Uses simplified VSOP87 mean longitude elements (accurate to ~0.5° for
+  // display purposes). T is Julian centuries since J2000.0 (Jan 1.5, 2000).
+  //
+  // HOW TO USE FOR FUTURE OBJECTS:
+  //   Replace a hardcoded angle constant with calcPlanetOrreryAngle('jupiter')
+  //   Supported keys: 'mercury','venus','mars','jupiter','saturn','uranus','neptune'
+  //
+  function calcPlanetOrreryAngle(planet) {
+    // Mean longitude elements: L = L0 + L1 * T  (degrees)
+    // Source: Meeus "Astronomical Algorithms" Table 31.a (VSOP87 abbreviated)
+    const ELEMENTS = {
+      mercury: { L0: 252.250906, L1: 149472.6746358 },
+      venus:   { L0: 181.979801, L1:  58517.8156760 },
+      mars:    { L0: 355.433000, L1:  19140.2993313 },
+      jupiter: { L0:  34.351519, L1:   3034.9056606 },
+      saturn:  { L0:  50.077444, L1:   1222.1137943 },
+      uranus:  { L0: 314.055005, L1:    428.4669983 },
+      neptune: { L0: 304.348665, L1:    218.4862002 },
+    };
+
+    const el = ELEMENTS[planet.toLowerCase()];
+    if (!el) {
+      console.warn(`calcPlanetOrreryAngle: unknown planet '${planet}'. Returning 0deg.`);
+      return '0deg';
+    }
+
+    // Julian Date for today (noon UTC)
+    const now    = new Date();
+    const JD     = (now.getTime() / 86400000) + 2440587.5;
+    // Julian centuries since J2000.0
+    const T      = (JD - 2451545.0) / 36525.0;
+
+    // Mean ecliptic longitude, normalised to [0, 360)
+    let lon = (el.L0 + el.L1 * T) % 360;
+    if (lon < 0) lon += 360;
+
+    // Orrery CSS convention: clockwise from 12 o'clock = ecliptic longitude
+    // (0° ecliptic = Vernal Equinox = 12 o'clock = 0deg CSS rotation)
+    // Ecliptic runs counterclockwise in astronomy, but the orrery arm rotates
+    // clockwise in CSS — so we simply pass the longitude directly as a clockwise
+    // angle because the orrery is viewed from above the north pole where prograde
+    // (counterclockwise orbits) map identically to increasing clockwise CSS degrees
+    // when the reference (0°) is placed at the top (12 o'clock).
+    const cssAngle = lon.toFixed(2);
+    return `${cssAngle}deg`;
+  }
+
+  // ==========================================
+  // --- EDITABLE: Orrery / Planetary Orbit Ring Config (JCV) ---
+  // ==========================================
+  const ORRERY_ENABLED = true;                         // EDITABLE: Toggle visibility of Orrery section
+  const ORRERY_MARGIN_TOP_DESKTOP = '3vw';             // EDITABLE Desktop: Spacing above Orrery section
+  const ORRERY_MARGIN_TOP_MOBILE = '4vw';              // EDITABLE Mobile: Spacing above Orrery section
+  const ORRERY_MARGIN_BOTTOM_DESKTOP = '2vw';          // EDITABLE Desktop: Spacing below Orrery section
+  const ORRERY_MARGIN_BOTTOM_MOBILE = '3vw';           // EDITABLE Mobile: Spacing below Orrery section
+  const ORRERY_RADIUS_DESKTOP = '30vw';                // EDITABLE Desktop: Planetary orbit ring radius (diameter = 2x)
+  const ORRERY_RADIUS_MOBILE = '30vw';                 // EDITABLE Mobile: Planetary orbit ring radius (diameter = 2x)
+  const ORRERY_TRACK_COLOR = 'rgba(255, 255, 255, 0.2)'; // EDITABLE: Orbit ring track stroke color (matches app gauges)
+  const ORRERY_TRACK_WIDTH_DESKTOP = '0.15vw';         // EDITABLE Desktop: Orbit ring track stroke width
+  const ORRERY_TRACK_WIDTH_MOBILE = '0.20vw';          // EDITABLE Mobile: Orbit ring track stroke width
+  const ORRERY_Z_INDEX = '10';                         // EDITABLE: Stacking context layer index
+
+  // --- EDITABLE: Saturn Planet On Orbit Ring Config (JCV) ---
+  const ORRERY_SATURN_IMAGE_URL = 'img/p-sa.png';       // EDITABLE: Saturn transparent PNG asset path
+  const ORRERY_SATURN_WIDTH_DESKTOP = '6.5vw';         // EDITABLE Desktop: Saturn planet width (aspect ratio maintained)
+  const ORRERY_SATURN_WIDTH_MOBILE = '10vw';           // EDITABLE Mobile: Saturn planet width (aspect ratio maintained)
+  const ORRERY_SATURN_HEIGHT_DESKTOP = 'auto';         // EDITABLE Desktop: Saturn height ('auto' preserves natural 855:400 aspect ratio)
+  const ORRERY_SATURN_HEIGHT_MOBILE = 'auto';          // EDITABLE Mobile: Saturn height ('auto' preserves natural 855:400 aspect ratio)
+  // AUTO-CALCULATED: Saturn's real ecliptic longitude for today → orrery clockwise CSS angle
+  // To override, replace calcPlanetOrreryAngle('saturn') with a literal e.g. '347deg'
+  const ORRERY_SATURN_ORBIT_ANGLE_DESKTOP = calcPlanetOrreryAngle('saturn'); // AUTO: real ephemeris
+  const ORRERY_SATURN_ORBIT_ANGLE_MOBILE  = calcPlanetOrreryAngle('saturn'); // AUTO: real ephemeris
+  const ORRERY_SATURN_RADIAL_OFFSET_DESKTOP = '0vw';   // EDITABLE Desktop: Radial offset from orbit track (+ outward, - inward)
+  const ORRERY_SATURN_RADIAL_OFFSET_MOBILE = '0vw';    // EDITABLE Mobile: Radial offset from orbit track
+  const ORRERY_SATURN_ROTATION_ENABLED = false;        // EDITABLE: Toggle continuous revolution around orbit ring (true = orbiting, false = stationary at orbit angle)
+  const ORRERY_SATURN_ORBIT_PERIOD_DESKTOP = '120s';   // EDITABLE Desktop: Duration for 1 full 360-degree orbit revolution
+  const ORRERY_SATURN_ORBIT_PERIOD_MOBILE = '120s';    // EDITABLE Mobile: Duration for 1 full 360-degree orbit revolution
+  const ORRERY_SATURN_ROTATION_DIRECTION = 'normal';   // EDITABLE: Orbit direction ('normal' = clockwise, 'reverse' = counter-clockwise)
+  const ORRERY_SATURN_AXIAL_TILT_DESKTOP = '0deg';     // EDITABLE Desktop: Saturn ring tilt angle (e.g. 0deg, -15deg, 26.7deg)
+  const ORRERY_SATURN_AXIAL_TILT_MOBILE = '0deg';      // EDITABLE Mobile: Saturn ring tilt angle
+  const ORRERY_SATURN_KEEP_AXIAL_TILT = true;          // EDITABLE: Keep celestial axial ring tilt fixed in space during revolution
+  const ORRERY_SATURN_OPACITY = '1.0';                 // EDITABLE: Saturn opacity (0.0 to 1.0)
+  const ORRERY_SATURN_Z_INDEX = '15';                  // EDITABLE: Saturn layer index above orbit track
+  
+  // --- EDITABLE: Saturn Drop Shadow & Atmosphere Glow Config (JCV) ---
+  const ORRERY_SATURN_SHADOW_COLOR = 'rgba(0, 0, 0, 0.75)'; // EDITABLE: Saturn drop shadow color & opacity
+  const ORRERY_SATURN_SHADOW_BLUR_DESKTOP = '0.8vw';   // EDITABLE Desktop: Saturn drop shadow blur radius
+  const ORRERY_SATURN_SHADOW_BLUR_MOBILE = '1.2vw';    // EDITABLE Mobile: Saturn drop shadow blur radius
+  const ORRERY_SATURN_SHADOW_X_DESKTOP = '0.3vw';      // EDITABLE Desktop: Saturn drop shadow horizontal offset
+  const ORRERY_SATURN_SHADOW_X_MOBILE = '0.5vw';       // EDITABLE Mobile: Saturn drop shadow horizontal offset
+  const ORRERY_SATURN_SHADOW_Y_DESKTOP = '0.6vw';      // EDITABLE Desktop: Saturn drop shadow vertical offset
+  const ORRERY_SATURN_SHADOW_Y_MOBILE = '0.9vw';       // EDITABLE Mobile: Saturn drop shadow vertical offset
+  const ORRERY_SATURN_GLOW_COLOR = 'rgba(255, 220, 150, 0.35)'; // EDITABLE: Optional atmospheric celestial glow color
+  const ORRERY_SATURN_GLOW_BLUR_DESKTOP = '0vw';       // EDITABLE Desktop: Optional glow blur radius (set e.g. 0.8vw to enable aura)
+  const ORRERY_SATURN_GLOW_BLUR_MOBILE = '0vw';        // EDITABLE Mobile: Optional glow blur radius
+
+  function applyOrreryConfig() {
+    const isMobile = window.innerWidth <= 767;
+    // Base Orrery section variables
+    document.documentElement.style.setProperty('--orrery-margin-top', isMobile ? ORRERY_MARGIN_TOP_MOBILE : ORRERY_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-margin-bottom', isMobile ? ORRERY_MARGIN_BOTTOM_MOBILE : ORRERY_MARGIN_BOTTOM_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-radius', isMobile ? ORRERY_RADIUS_MOBILE : ORRERY_RADIUS_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-track-color', ORRERY_TRACK_COLOR);
+    document.documentElement.style.setProperty('--orrery-track-width', isMobile ? ORRERY_TRACK_WIDTH_MOBILE : ORRERY_TRACK_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-z-index', ORRERY_Z_INDEX);
+
+    // Saturn Position & Alignment variables
+    const saturnAngle = isMobile ? ORRERY_SATURN_ORBIT_ANGLE_MOBILE : ORRERY_SATURN_ORBIT_ANGLE_DESKTOP;
+    const saturnTilt = isMobile ? ORRERY_SATURN_AXIAL_TILT_MOBILE : ORRERY_SATURN_AXIAL_TILT_DESKTOP;
+    const saturnPeriod = isMobile ? ORRERY_SATURN_ORBIT_PERIOD_MOBILE : ORRERY_SATURN_ORBIT_PERIOD_DESKTOP;
+
+    document.documentElement.style.setProperty('--orrery-saturn-orbit-angle', saturnAngle);
+    document.documentElement.style.setProperty('--orrery-saturn-orbit-period', saturnPeriod);
+    document.documentElement.style.setProperty('--orrery-saturn-axial-tilt', saturnTilt);
+    document.documentElement.style.setProperty('--orrery-saturn-radial-offset', isMobile ? ORRERY_SATURN_RADIAL_OFFSET_MOBILE : ORRERY_SATURN_RADIAL_OFFSET_DESKTOP);
+
+    // Saturn Size & Layer variables
+    document.documentElement.style.setProperty('--orrery-saturn-width', isMobile ? ORRERY_SATURN_WIDTH_MOBILE : ORRERY_SATURN_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-saturn-height', isMobile ? ORRERY_SATURN_HEIGHT_MOBILE : ORRERY_SATURN_HEIGHT_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-saturn-opacity', ORRERY_SATURN_OPACITY);
+    document.documentElement.style.setProperty('--orrery-saturn-z-index', ORRERY_SATURN_Z_INDEX);
+
+    // Saturn Drop Shadow variables
+    document.documentElement.style.setProperty('--orrery-saturn-shadow-x', isMobile ? ORRERY_SATURN_SHADOW_X_MOBILE : ORRERY_SATURN_SHADOW_X_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-saturn-shadow-y', isMobile ? ORRERY_SATURN_SHADOW_Y_MOBILE : ORRERY_SATURN_SHADOW_Y_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-saturn-shadow-blur', isMobile ? ORRERY_SATURN_SHADOW_BLUR_MOBILE : ORRERY_SATURN_SHADOW_BLUR_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-saturn-shadow-color', ORRERY_SATURN_SHADOW_COLOR);
+
+    // Optional Atmosphere Glow variables
+    document.documentElement.style.setProperty('--orrery-saturn-glow-blur', isMobile ? ORRERY_SATURN_GLOW_BLUR_MOBILE : ORRERY_SATURN_GLOW_BLUR_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-saturn-glow-color', ORRERY_SATURN_GLOW_COLOR);
+
+    // Rotation Animation setup
+    if (ORRERY_SATURN_ROTATION_ENABLED) {
+      document.documentElement.style.setProperty('--orrery-saturn-orbit-animation', `orrery-orbit-spin ${saturnPeriod} linear infinite ${ORRERY_SATURN_ROTATION_DIRECTION}`);
+      if (ORRERY_SATURN_KEEP_AXIAL_TILT) {
+        document.documentElement.style.setProperty('--orrery-saturn-counter-animation', `orrery-saturn-counter-spin ${saturnPeriod} linear infinite ${ORRERY_SATURN_ROTATION_DIRECTION}`);
+      } else {
+        document.documentElement.style.setProperty('--orrery-saturn-counter-animation', 'none');
+      }
+    } else {
+      document.documentElement.style.setProperty('--orrery-saturn-orbit-animation', 'none');
+      document.documentElement.style.setProperty('--orrery-saturn-counter-animation', 'none');
+    }
+
+    // Static counter-rotation angle when keep axial tilt is active
+    if (ORRERY_SATURN_KEEP_AXIAL_TILT) {
+      document.documentElement.style.setProperty('--orrery-saturn-image-rotation', `rotate(calc(-1 * var(--orrery-saturn-orbit-angle, 0deg) + var(--orrery-saturn-axial-tilt, 0deg)))`);
+    } else {
+      document.documentElement.style.setProperty('--orrery-saturn-image-rotation', `rotate(var(--orrery-saturn-axial-tilt, 0deg))`);
+    }
+
+    // Ensure DOM exists
+    createOrrerySectionIfMissing();
+  }
+
+  // Expose for external access and console testing
+  window.applyOrreryConfig = applyOrreryConfig;
+
+  // Initialize World Clocks, Earth Image, Celestial Duo, Orrery, and Odometer configurations in proper dependency order
   applyWorldClocksConfig();
   applyEarthImageConfig();
   applySunImageConfig();
+  applyOrreryConfig();
+  applyOdometerConfig();
 
   window.addEventListener('resize', () => {
     applyWorldClocksConfig();
     applyEarthImageConfig();
     applySunImageConfig();
+    applyOrreryConfig();
+    applyOdometerConfig();
   });
 
   // --- EDITABLE: Location Switcher Config (Positioned above Weather Last Updated) ---
@@ -8658,7 +8966,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1220';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1228';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -10189,7 +10497,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const DAILY_SUMMARY_FONT_SIZE_DESKTOP = '3.6vw';       // EDITABLE Desktop: Font size (e.g. '1.6vw', '2vw', '3.6vw')
   const DAILY_SUMMARY_FONT_SIZE_MOBILE = '4vw';          // EDITABLE Mobile: Font size (e.g. '4vw', '5vw', '3.5vw')
 
-  const DAILY_SUMMARY_LETTER_SPACING_DESKTOP = '-0.05em';// EDITABLE Desktop: Kerning matching dial labels
+  const DAILY_SUMMARY_LETTER_SPACING_DESKTOP = '-0.08vw';// EDITABLE Desktop: Kerning matching dial labels
   const DAILY_SUMMARY_LETTER_SPACING_MOBILE = '0vw';  // EDITABLE Mobile: Kerning matching top text lines
 
   const DAILY_SUMMARY_LINE_HEIGHT_DESKTOP = '1';         // EDITABLE Desktop: Line height / leading
@@ -11688,7 +11996,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--location-active-color', LOCATION_ACTIVE_COLOR);
     document.documentElement.style.setProperty('--location-inactive-color', LOCATION_INACTIVE_COLOR);
 
-    // Ensure container is inserted directly in mainContainer, below the celestial row spacer (#sun-image-spacer) or #suns-row-wrapper
+    // Ensure container is inserted directly in mainContainer, below the orrery section or celestial row spacer (#sun-image-spacer) or #suns-row-wrapper
+    createOrrerySectionIfMissing();
+    const orrerySec = document.getElementById('orrery-section');
     const sunSpacer = document.getElementById('sun-image-spacer');
     const sunsRow = document.getElementById('suns-row-wrapper');
     const singleSunCol = document.querySelector('.sun-column.single-mode');
@@ -11697,7 +12007,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const worldClocks = document.getElementById('world-clocks-row-wrapper');
 
     let rowAnchor = null;
-    if (sunSpacer && sunSpacer.parentNode === mainContainer) {
+    if (orrerySec && orrerySec.parentNode === mainContainer) {
+      rowAnchor = orrerySec;
+    } else if (sunSpacer && sunSpacer.parentNode === mainContainer) {
       rowAnchor = sunSpacer;
     } else if (sunsRow && sunsRow.parentNode === mainContainer) {
       rowAnchor = sunsRow;
@@ -12231,7 +12543,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       lastSimpleMonthStr = newStr;
       
       if (el) {
-        el.innerHTML = `<span style="font-family: 'light', sans-serif; font-weight: normal; color: inherit; letter-spacing: -0.06em; margin-right: 0.18em;">${month}</span><span style="font-family: 'bold', sans-serif; font-weight: normal; color: inherit; letter-spacing: -0.06em; margin-right: 0.18em;">${day}</span><span style="font-family: 'light', sans-serif; font-weight: normal; color: inherit; letter-spacing: -0.06em;">${dayOfWeek}</span>`;
+        el.innerHTML = `<span style="font-family: 'light', sans-serif; font-weight: normal; color: inherit; letter-spacing: -0.31vw; margin-right: 0.94vw;">${month}</span><span style="font-family: 'bold', sans-serif; font-weight: normal; color: inherit; letter-spacing: -0.31vw; margin-right: 0.94vw;">${day}</span><span style="font-family: 'light', sans-serif; font-weight: normal; color: inherit; letter-spacing: -0.31vw;">${dayOfWeek}</span>`;
       }
       // Left circle date update removed as it now displays the current digital time with seconds instead.
     } catch (e) { /* noop */ }
@@ -13645,9 +13957,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
       mainContainer.appendChild(spacer);
     }
 
-    // Ensure cities location switcher, F/C buttons, version #, and last updated are directly in mainContainer below celestial spacer
+    // Ensure Orrery section, cities location switcher, F/C buttons, version #, and last updated are directly in mainContainer below celestial spacer
+    createOrrerySectionIfMissing();
+    const orrerySec = document.getElementById('orrery-section');
+    const anchorForSwitcher = (orrerySec && orrerySec.parentNode === mainContainer) ? orrerySec : spacer;
+
     if (locSwitcher) {
-      mainContainer.insertBefore(locSwitcher, spacer.nextSibling);
+      mainContainer.insertBefore(locSwitcher, anchorForSwitcher.nextSibling);
       const btnContainer = document.getElementById('temp-format-buttons');
       if (btnContainer) mainContainer.insertBefore(btnContainer, locSwitcher.nextSibling);
       const versionEl = document.getElementById('weather-version');
@@ -14312,6 +14628,120 @@ Plan ahead for significantly warmer conditions tomorrow!`
   function createEarthImageIfMissing() {
     // Earth is integrated side-by-side with Sun in the duo row
     createSunImageIfMissing();
+  }
+
+  // Render and position the Orrery / Solar System planetary orbit ring section
+  function createOrrerySectionIfMissing() {
+    if (!ORRERY_ENABLED) {
+      const existing = document.getElementById('orrery-section');
+      if (existing) existing.remove();
+      return;
+    }
+
+    const mainContainer = document.querySelector('main.content') || document.querySelector('main') || document.body;
+    let section = document.getElementById('orrery-section');
+
+    if (!section) {
+      section = document.createElement('div');
+      section.id = 'orrery-section';
+      section.className = 'orrery-section';
+      
+      const ringContainer = document.createElement('div');
+      ringContainer.className = 'orrery-ring-container';
+      
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('class', 'orrery-svg');
+      svg.setAttribute('viewBox', '0 0 100 100');
+      
+      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('class', 'orrery-orbit-track');
+      circle.setAttribute('cx', '50');
+      circle.setAttribute('cy', '50');
+      circle.setAttribute('r', '50');
+      
+      svg.appendChild(circle);
+      ringContainer.appendChild(svg);
+
+      // Create Saturn orbit arm and body
+      const saturnArm = document.createElement('div');
+      saturnArm.className = 'orrery-saturn-arm';
+      saturnArm.id = 'orrery-saturn-arm';
+
+      const saturnBody = document.createElement('div');
+      saturnBody.className = 'orrery-saturn-body';
+      saturnBody.id = 'orrery-saturn-body';
+
+      const saturnImg = document.createElement('img');
+      saturnImg.className = 'orrery-saturn-img';
+      saturnImg.id = 'orrery-saturn-img';
+      saturnImg.src = ORRERY_SATURN_IMAGE_URL || 'img/p-sa.png';
+      saturnImg.alt = 'Saturn';
+      saturnImg.draggable = false;
+
+      saturnBody.appendChild(saturnImg);
+      saturnArm.appendChild(saturnBody);
+      ringContainer.appendChild(saturnArm);
+
+      section.appendChild(ringContainer);
+    } else {
+      const circle = section.querySelector('.orrery-orbit-track');
+      if (circle) circle.setAttribute('r', '50');
+
+      const ringContainer = section.querySelector('.orrery-ring-container');
+      if (ringContainer) {
+        let saturnArm = ringContainer.querySelector('.orrery-saturn-arm');
+        if (!saturnArm) {
+          saturnArm = document.createElement('div');
+          saturnArm.className = 'orrery-saturn-arm';
+          saturnArm.id = 'orrery-saturn-arm';
+
+          const saturnBody = document.createElement('div');
+          saturnBody.className = 'orrery-saturn-body';
+          saturnBody.id = 'orrery-saturn-body';
+
+          const saturnImg = document.createElement('img');
+          saturnImg.className = 'orrery-saturn-img';
+          saturnImg.id = 'orrery-saturn-img';
+          saturnImg.src = ORRERY_SATURN_IMAGE_URL || 'img/p-sa.png';
+          saturnImg.alt = 'Saturn';
+          saturnImg.draggable = false;
+
+          saturnBody.appendChild(saturnImg);
+          saturnArm.appendChild(saturnBody);
+          ringContainer.appendChild(saturnArm);
+        } else {
+          const saturnImg = saturnArm.querySelector('.orrery-saturn-img');
+          if (saturnImg && ORRERY_SATURN_IMAGE_URL && saturnImg.getAttribute('src') !== ORRERY_SATURN_IMAGE_URL) {
+            saturnImg.src = ORRERY_SATURN_IMAGE_URL;
+          }
+        }
+      }
+    }
+
+    // Position directly below #sun-image-spacer (or celestial row)
+    const sunSpacer = document.getElementById('sun-image-spacer');
+    const sunsRow = document.getElementById('suns-row-wrapper');
+    const singleSunCol = document.querySelector('.sun-column.single-mode');
+    const locSwitcher = document.getElementById('weather-location-switcher');
+
+    let rowAnchor = null;
+    if (sunSpacer && sunSpacer.parentNode === mainContainer) {
+      rowAnchor = sunSpacer;
+    } else if (sunsRow && sunsRow.parentNode === mainContainer) {
+      rowAnchor = sunsRow;
+    } else if (singleSunCol && singleSunCol.parentNode === mainContainer) {
+      rowAnchor = singleSunCol;
+    }
+
+    if (rowAnchor && rowAnchor.parentNode === mainContainer) {
+      if (rowAnchor.nextSibling !== section) {
+        mainContainer.insertBefore(section, rowAnchor.nextSibling);
+      }
+    } else if (locSwitcher && locSwitcher.parentNode === mainContainer) {
+      mainContainer.insertBefore(section, locSwitcher);
+    } else if (section.parentNode !== mainContainer) {
+      mainContainer.appendChild(section);
+    }
   }
 
   /* --- Animated background helpers (subtle, complementary pair) ---
@@ -16846,6 +17276,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           loader.style.setProperty('opacity', '0', 'important');
           setTimeout(() => { loader.style.setProperty('display', 'none', 'important'); }, 1500);
         }
+        triggerOdometerStartupReveal();
         
         // Update visual debug overlay (To enable for future debugging, uncomment the line below)
         // try { updateDebugPanel(data); } catch(e) {}
@@ -16863,6 +17294,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         loader.style.setProperty('opacity', '0', 'important');
         setTimeout(() => { loader.style.setProperty('display', 'none', 'important'); }, 1500);
       }
+      triggerOdometerStartupReveal();
     } finally {
       setLoading(false);
     }
@@ -17297,10 +17729,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
     
     elLeft.innerHTML = `
       <div style="display: flex; align-items: baseline; justify-content: center; gap: 0; line-height: 1;">
-        <span style="font-family: 'bold', sans-serif; font-size: var(--left-time-size, 5.59vw); letter-spacing: -0.02em;">${hours}:${minutesStr}</span>
-        <span style="font-family: 'light', sans-serif; font-size: var(--left-time-size, 5.59vw); letter-spacing: -0.02em;">:</span>
-        <span style="font-family: 'mono', sans-serif; font-size: var(--left-seconds-size, 5.46vw); letter-spacing: -0.06em;">${secondsStr}</span>
-        <span style="font-family: 'medium', sans-serif; font-size: var(--left-ampm-size, 3.73vw); margin-left: -0.05vw; letter-spacing: -0.05em;">${ampm}</span>
+        <span style="font-family: 'bold', sans-serif; font-size: var(--left-time-size, 5.59vw); letter-spacing: -0.11vw;">${hours}:${minutesStr}</span>
+        <span style="font-family: 'light', sans-serif; font-size: var(--left-time-size, 5.59vw); letter-spacing: -0.11vw;">:</span>
+        <span style="font-family: 'mono', sans-serif; font-size: var(--left-seconds-size, 5.46vw); letter-spacing: -0.33vw;">${secondsStr}</span>
+        <span style="font-family: 'medium', sans-serif; font-size: var(--left-ampm-size, 3.73vw); margin-left: -0.05vw; letter-spacing: -0.19vw;">${ampm}</span>
       </div>
     `;
   }
@@ -17530,6 +17962,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (typeof applyWorldClocksConfig === 'function') applyWorldClocksConfig();
     if (typeof updateWorldClockHands === 'function') updateWorldClockHands();
     if (typeof applyScrollTopButtonConfig === 'function') applyScrollTopButtonConfig();
+    if (typeof applyOdometerConfig === 'function') applyOdometerConfig();
+    if (typeof applyOrreryConfig === 'function') applyOrreryConfig();
     document.documentElement.style.setProperty('--circle-cell-top', isMobile ? CIRCLE_CELL_TOP_MOBILE : CIRCLE_CELL_TOP_DESKTOP);
     document.documentElement.style.setProperty('--fragile-y-offset', isMobile ? FRAGILE_ELEMENTS_Y_OFFSET_MOBILE : FRAGILE_ELEMENTS_Y_OFFSET_DESKTOP);
     document.documentElement.style.setProperty('--day0-lines-opacity', isMobile ? DAY0_LINES_OPACITY_MOBILE : DAY0_LINES_OPACITY_DESKTOP);
