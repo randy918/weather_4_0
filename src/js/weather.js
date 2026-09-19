@@ -673,265 +673,268 @@ import weatherConditions from '../data/weather-conditions.json';
 
   // ==========================================================================
   // ==========================================================================
-  // --- Floating Sticky Back-to-Top Button (JCV Config & Implementation) ---
+  // --- Floating Sticky Scroll Navigation Button (JCV Config & Implementation) ---
+  // --- Merged Go-To-Top & Go-To-Bottom Single Button at Bottom Right (D & M) ---
   // ==========================================================================
-  const SCROLL_TOP_BUTTON_ENABLED = true;                    // EDITABLE: Master toggle to enable/disable back-to-top button
+  const SCROLL_NAV_BUTTON_ENABLED = true;                     // EDITABLE: Master toggle to enable/disable scroll nav button
 
-  // EDITABLE: "APPEARS WHEN" scroll distance (in px) before button appears
-  const SCROLL_TOP_APPEARS_WHEN_DESKTOP = 350;               // EDITABLE Desktop (D): Pixels scrolled down before button appears
-  const SCROLL_TOP_APPEARS_WHEN_MOBILE  = 480;               // EDITABLE Mobile (M): Pixels scrolled down before button appears (instigated 20% sooner: reduced from 600px to 480px)
-  // Compatibility aliases
-  const SCROLL_TOP_APPEARS_WHEN_PX_DESKTOP = SCROLL_TOP_APPEARS_WHEN_DESKTOP;
-  const SCROLL_TOP_APPEARS_WHEN_PX_MOBILE  = SCROLL_TOP_APPEARS_WHEN_MOBILE;
-  const SCROLL_TOP_THRESHOLD_PX_DESKTOP    = SCROLL_TOP_APPEARS_WHEN_DESKTOP;
-  const SCROLL_TOP_THRESHOLD_PX_MOBILE     = SCROLL_TOP_APPEARS_WHEN_MOBILE;
+  // EDITABLE: Distance from viewport bottom in 'vw' (JCV Y-position for Desktop & Mobile)
+  const SCROLL_NAV_BOTTOM_DESKTOP = '2.0vw';                 // EDITABLE Desktop (D): Distance from viewport bottom in vw
+  const SCROLL_NAV_BOTTOM_MOBILE  = '4.5vw';                 // EDITABLE Mobile (M): Distance from viewport bottom in vw
 
-  // EDITABLE: Distance from viewport bottom (Lowered down closer to the bottom edge)
-  const SCROLL_TOP_BOTTOM_DESKTOP = '2.0vw';                 // EDITABLE Desktop (D): Distance from viewport bottom (lowered down)
-  const SCROLL_TOP_BOTTOM_MOBILE  = '2.5vw';                 // EDITABLE Mobile (M): Distance from viewport bottom (lowered down from 5.0vw)
-  const SCROLL_TOP_RIGHT_DESKTOP  = '2.5vw';                 // EDITABLE Desktop (D): Distance from viewport right edge
-  const SCROLL_TOP_RIGHT_MOBILE   = '5.0vw';                 // EDITABLE Mobile (M): Distance from viewport right edge
+  // EDITABLE: Distance from viewport right edge in 'vw' (JCV X-position for Desktop & Mobile)
+  const SCROLL_NAV_RIGHT_DESKTOP  = '2.5vw';                 // EDITABLE Desktop (D): Distance from viewport right edge in vw
+  const SCROLL_NAV_RIGHT_MOBILE   = '5.0vw';                 // EDITABLE Mobile (M): Distance from viewport right edge in vw
+
+  // EDITABLE: Direction Flip Mode:
+  // 'threshold': Shows DOWN arrow (↓) when near top; flips to UP arrow (↑) once scrolled down past threshold px.
+  // 'midpoint': Shows DOWN arrow (↓) in top 50% of page; flips to UP arrow (↑) in bottom 50% of page.
+  const SCROLL_NAV_FLIP_MODE = 'threshold';                  // EDITABLE: 'threshold' (default) or 'midpoint'
+  const SCROLL_NAV_MIDPOINT_RATIO = 0.5;                     // EDITABLE: Page scroll ratio for midpoint mode (0.5 = 50%)
+
+  // EDITABLE: "FLIPS WHEN" scroll distance (in px) before arrow flips to UP (Go to top)
+  const SCROLL_NAV_FLIP_WHEN_DESKTOP = 350;                  // EDITABLE Desktop (D): Pixels scrolled down before arrow flips to UP
+  const SCROLL_NAV_FLIP_WHEN_MOBILE  = 280;                  // EDITABLE Mobile (M): Pixels scrolled down before arrow flips to UP (20% sooner than Desktop 350px)
+
+  // Compatibility aliases for threshold/appear constants
+  const SCROLL_TOP_APPEARS_WHEN_DESKTOP = SCROLL_NAV_FLIP_WHEN_DESKTOP;
+  const SCROLL_TOP_APPEARS_WHEN_MOBILE  = SCROLL_NAV_FLIP_WHEN_MOBILE;
+  const SCROLL_TOP_APPEARS_WHEN_PX_DESKTOP = SCROLL_NAV_FLIP_WHEN_DESKTOP;
+  const SCROLL_TOP_APPEARS_WHEN_PX_MOBILE  = SCROLL_NAV_FLIP_WHEN_MOBILE;
+  const SCROLL_TOP_THRESHOLD_PX_DESKTOP    = SCROLL_NAV_FLIP_WHEN_DESKTOP;
+  const SCROLL_TOP_THRESHOLD_PX_MOBILE     = SCROLL_NAV_FLIP_WHEN_MOBILE;
+  const SCROLL_BOTTOM_DISAPPEARS_WHEN_DESKTOP = SCROLL_NAV_FLIP_WHEN_DESKTOP;
+  const SCROLL_BOTTOM_DISAPPEARS_WHEN_MOBILE  = SCROLL_NAV_FLIP_WHEN_MOBILE;
+  const SCROLL_BOTTOM_DISAPPEARS_WHEN_PX_DESKTOP = SCROLL_NAV_FLIP_WHEN_DESKTOP;
+  const SCROLL_BOTTOM_DISAPPEARS_WHEN_PX_MOBILE  = SCROLL_NAV_FLIP_WHEN_MOBILE;
+
+  // Compatibility aliases for distance constants
+  const SCROLL_TOP_BOTTOM_DESKTOP = SCROLL_NAV_BOTTOM_DESKTOP;
+  const SCROLL_TOP_BOTTOM_MOBILE  = SCROLL_NAV_BOTTOM_MOBILE;
+  const SCROLL_TOP_RIGHT_DESKTOP  = SCROLL_NAV_RIGHT_DESKTOP;
+  const SCROLL_TOP_RIGHT_MOBILE   = SCROLL_NAV_RIGHT_MOBILE;
+  const SCROLL_BOTTOM_TOP_DESKTOP = SCROLL_NAV_BOTTOM_DESKTOP;
+  const SCROLL_BOTTOM_TOP_MOBILE  = SCROLL_NAV_BOTTOM_MOBILE;
+  const SCROLL_BOTTOM_RIGHT_DESKTOP = SCROLL_NAV_RIGHT_DESKTOP;
+  const SCROLL_BOTTOM_RIGHT_MOBILE  = SCROLL_NAV_RIGHT_MOBILE;
+  const SCROLL_TOP_BUTTON_ENABLED   = SCROLL_NAV_BUTTON_ENABLED;
+  const SCROLL_BOTTOM_BUTTON_ENABLED = SCROLL_NAV_BUTTON_ENABLED;
+  const SCROLL_NAV_BUTTONS_ENABLED = SCROLL_NAV_BUTTON_ENABLED;
 
   // EDITABLE: Dimensions & Strokes (from movie app)
-  const SCROLL_TOP_SIZE_DESKTOP         = '3.2vw';           // EDITABLE Desktop (D): Button diameter
-  const SCROLL_TOP_SIZE_MOBILE          = '11.0vw';          // EDITABLE Mobile (M): Button diameter
-  const SCROLL_TOP_ICON_SIZE_DESKTOP    = '1.3vw';           // EDITABLE Desktop (D): Up arrow icon font-size
-  const SCROLL_TOP_ICON_SIZE_MOBILE     = '4.5vw';           // EDITABLE Mobile (M): Up arrow icon font-size
-  const SCROLL_TOP_BORDER_WIDTH_DESKTOP = '0.35vw';          // EDITABLE Desktop (D): Ring border thickness
-  const SCROLL_TOP_BORDER_WIDTH_MOBILE  = '1.1vw';           // EDITABLE Mobile (M): Ring border thickness
-  const SCROLL_TOP_ARROW_STROKE_DESKTOP = '0.04vw';          // EDITABLE Desktop (D): Arrow stroke thickness
-  const SCROLL_TOP_ARROW_STROKE_MOBILE  = '0.12vw';          // EDITABLE Mobile (M): Arrow stroke thickness
+  const SCROLL_NAV_SIZE_DESKTOP         = '3.2vw';           // EDITABLE Desktop (D): Button diameter
+  const SCROLL_NAV_SIZE_MOBILE          = '11.0vw';          // EDITABLE Mobile (M): Button diameter
+  const SCROLL_NAV_ICON_SIZE_DESKTOP    = '1.3vw';           // EDITABLE Desktop (D): Arrow icon font-size
+  const SCROLL_NAV_ICON_SIZE_MOBILE     = '4.5vw';           // EDITABLE Mobile (M): Arrow icon font-size
+  const SCROLL_NAV_BORDER_WIDTH_DESKTOP = '0.35vw';          // EDITABLE Desktop (D): Ring border thickness
+  const SCROLL_NAV_BORDER_WIDTH_MOBILE  = '1.1vw';           // EDITABLE Mobile (M): Ring border thickness
+  const SCROLL_NAV_ARROW_STROKE_DESKTOP = '0.04vw';          // EDITABLE Desktop (D): Arrow stroke thickness
+  const SCROLL_NAV_ARROW_STROKE_MOBILE  = '0.12vw';          // EDITABLE Mobile (M): Arrow stroke thickness
 
   // EDITABLE: Colors (The Red from movie app)
-  const SCROLL_TOP_COLOR              = 'red';               // EDITABLE: "The red" arrow color (matches movie app)
-  const SCROLL_TOP_STROKE_COLOR       = 'red';               // EDITABLE: "The red" ring border color (matches movie app)
-  const SCROLL_TOP_HOVER_COLOR        = '#ff3333';           // EDITABLE: Hover arrow color (matches movie app)
-  const SCROLL_TOP_HOVER_STROKE_COLOR = '#ff3333';           // EDITABLE: Hover ring border color (matches movie app)
+  const SCROLL_NAV_COLOR              = 'red';               // EDITABLE: Arrow color
+  const SCROLL_NAV_STROKE_COLOR       = 'red';               // EDITABLE: Ring border color
+  const SCROLL_NAV_HOVER_COLOR        = '#ff3333';           // EDITABLE: Hover arrow color
+  const SCROLL_NAV_HOVER_STROKE_COLOR = '#ff3333';           // EDITABLE: Hover ring border color
 
-  const SCROLL_TOP_BG            = 'rgba(0, 0, 0, 0.45)';    // EDITABLE: Button background color
-  const SCROLL_TOP_HOVER_BG      = 'rgba(0, 0, 0, 0.75)';    // EDITABLE: Button background color on hover
-  const SCROLL_TOP_OPACITY       = '0.9';                    // EDITABLE: Normal resting opacity when visible
-  const SCROLL_TOP_HOVER_OPACITY = '1.0';                    // EDITABLE: Hover opacity
-  const SCROLL_TOP_HOVER_SCALE   = '1.08';                   // EDITABLE: Hover scale
-  const SCROLL_TOP_Z_INDEX       = '9000';                   // EDITABLE: z-index layer
+  const SCROLL_NAV_BG            = 'rgba(0, 0, 0, 0.45)';    // EDITABLE: Button background color
+  const SCROLL_NAV_HOVER_BG      = 'rgba(0, 0, 0, 0.75)';    // EDITABLE: Button background color on hover
+  const SCROLL_NAV_OPACITY       = '0.9';                    // EDITABLE: Normal resting opacity when visible
+  const SCROLL_NAV_HOVER_OPACITY = '1.0';                    // EDITABLE: Hover opacity
+  const SCROLL_NAV_HOVER_SCALE   = '1.08';                   // EDITABLE: Hover scale
+  const SCROLL_NAV_Z_INDEX       = '9000';                   // EDITABLE: z-index layer
 
-  // ==========================================================================
-  // --- Floating Sticky Go-To-Bottom Button (JCV Config & Implementation) ---
-  // ==========================================================================
-  const SCROLL_BOTTOM_BUTTON_ENABLED = true;                  // EDITABLE: Master toggle to enable/disable go-to-bottom button
+  function applyScrollNavConfig() {
+    const isMobile = window.innerWidth <= 767;
 
-  // EDITABLE: "DISAPPEARS WHEN" distance (in px) from bottom before button disappears
-  const SCROLL_BOTTOM_DISAPPEARS_WHEN_DESKTOP = 300;          // EDITABLE Desktop (D): Pixels from bottom before button disappears
-  const SCROLL_BOTTOM_DISAPPEARS_WHEN_MOBILE  = 400;          // EDITABLE Mobile (M): Pixels from bottom before button disappears
-  const SCROLL_BOTTOM_DISAPPEARS_WHEN_PX_DESKTOP = SCROLL_BOTTOM_DISAPPEARS_WHEN_DESKTOP;
-  const SCROLL_BOTTOM_DISAPPEARS_WHEN_PX_MOBILE  = SCROLL_BOTTOM_DISAPPEARS_WHEN_MOBILE;
+    // Y position from bottom (vw)
+    document.documentElement.style.setProperty('--scroll-nav-bottom-desktop', SCROLL_NAV_BOTTOM_DESKTOP);
+    document.documentElement.style.setProperty('--scroll-nav-bottom-mobile', SCROLL_NAV_BOTTOM_MOBILE);
+    document.documentElement.style.setProperty('--scroll-nav-bottom', isMobile ? SCROLL_NAV_BOTTOM_MOBILE : SCROLL_NAV_BOTTOM_DESKTOP);
 
-  // EDITABLE: Distance from viewport top / sticky banners (JCV Y-positionable for M & D)
-  const SCROLL_BOTTOM_TOP_DESKTOP = '2.0vw';                  // EDITABLE Desktop (D): Distance from viewport top / below sticky banners
-  const SCROLL_BOTTOM_TOP_MOBILE  = '3.0vw';                  // EDITABLE Mobile (M): Distance from viewport top / below sticky banners
-  const SCROLL_BOTTOM_RIGHT_DESKTOP = '2.5vw';                // EDITABLE Desktop (D): Distance from viewport right edge
-  const SCROLL_BOTTOM_RIGHT_MOBILE  = '5.0vw';                // EDITABLE Mobile (M): Distance from viewport right edge
+    // X position from right (vw)
+    document.documentElement.style.setProperty('--scroll-nav-right-desktop', SCROLL_NAV_RIGHT_DESKTOP);
+    document.documentElement.style.setProperty('--scroll-nav-right-mobile', SCROLL_NAV_RIGHT_MOBILE);
+    document.documentElement.style.setProperty('--scroll-nav-right', isMobile ? SCROLL_NAV_RIGHT_MOBILE : SCROLL_NAV_RIGHT_DESKTOP);
 
-  // EDITABLE: Dimensions & Strokes (from movie app / matches go-to-top button)
-  const SCROLL_BOTTOM_SIZE_DESKTOP         = '3.2vw';         // EDITABLE Desktop (D): Button diameter
-  const SCROLL_BOTTOM_SIZE_MOBILE          = '11.0vw';        // EDITABLE Mobile (M): Button diameter
-  const SCROLL_BOTTOM_ICON_SIZE_DESKTOP    = '1.3vw';         // EDITABLE Desktop (D): Down arrow icon font-size
-  const SCROLL_BOTTOM_ICON_SIZE_MOBILE     = '4.5vw';         // EDITABLE Mobile (M): Down arrow icon font-size
-  const SCROLL_BOTTOM_BORDER_WIDTH_DESKTOP = '0.35vw';        // EDITABLE Desktop (D): Ring border thickness
-  const SCROLL_BOTTOM_BORDER_WIDTH_MOBILE  = '1.1vw';         // EDITABLE Mobile (M): Ring border thickness
-  const SCROLL_BOTTOM_ARROW_STROKE_DESKTOP = '0.04vw';        // EDITABLE Desktop (D): Arrow stroke thickness
-  const SCROLL_BOTTOM_ARROW_STROKE_MOBILE  = '0.12vw';        // EDITABLE Mobile (M): Arrow stroke thickness
+    // Size / diameter (vw)
+    document.documentElement.style.setProperty('--scroll-nav-size-desktop', SCROLL_NAV_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--scroll-nav-size-mobile', SCROLL_NAV_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--scroll-nav-size', isMobile ? SCROLL_NAV_SIZE_MOBILE : SCROLL_NAV_SIZE_DESKTOP);
 
-  // EDITABLE: Colors (Red matching go-to-top button)
-  const SCROLL_BOTTOM_COLOR              = 'red';             // EDITABLE: "The red" arrow color (matches movie app)
-  const SCROLL_BOTTOM_STROKE_COLOR       = 'red';             // EDITABLE: "The red" ring border color (matches movie app)
-  const SCROLL_BOTTOM_HOVER_COLOR        = '#ff3333';         // EDITABLE: Hover arrow color (matches movie app)
-  const SCROLL_BOTTOM_HOVER_STROKE_COLOR = '#ff3333';         // EDITABLE: Hover ring border color (matches movie app)
+    // Icon size (vw)
+    document.documentElement.style.setProperty('--scroll-nav-icon-size-desktop', SCROLL_NAV_ICON_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--scroll-nav-icon-size-mobile', SCROLL_NAV_ICON_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--scroll-nav-icon-size', isMobile ? SCROLL_NAV_ICON_SIZE_MOBILE : SCROLL_NAV_ICON_SIZE_DESKTOP);
 
-  const SCROLL_BOTTOM_BG            = 'rgba(0, 0, 0, 0.45)';  // EDITABLE: Button background color
-  const SCROLL_BOTTOM_HOVER_BG      = 'rgba(0, 0, 0, 0.75)';  // EDITABLE: Button background color on hover
-  const SCROLL_BOTTOM_OPACITY       = '0.9';                  // EDITABLE: Normal resting opacity when visible
-  const SCROLL_BOTTOM_HOVER_OPACITY = '1.0';                  // EDITABLE: Hover opacity
-  const SCROLL_BOTTOM_HOVER_SCALE   = '1.08';                 // EDITABLE: Hover scale
-  const SCROLL_BOTTOM_Z_INDEX       = '9000';                 // EDITABLE: z-index layer
+    // Border width (vw)
+    document.documentElement.style.setProperty('--scroll-nav-border-width-desktop', SCROLL_NAV_BORDER_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--scroll-nav-border-width-mobile', SCROLL_NAV_BORDER_WIDTH_MOBILE);
+    document.documentElement.style.setProperty('--scroll-nav-border-width', isMobile ? SCROLL_NAV_BORDER_WIDTH_MOBILE : SCROLL_NAV_BORDER_WIDTH_DESKTOP);
 
+    // Arrow stroke width (vw)
+    document.documentElement.style.setProperty('--scroll-nav-arrow-stroke-desktop', SCROLL_NAV_ARROW_STROKE_DESKTOP);
+    document.documentElement.style.setProperty('--scroll-nav-arrow-stroke-mobile', SCROLL_NAV_ARROW_STROKE_MOBILE);
+    document.documentElement.style.setProperty('--scroll-nav-arrow-stroke-width', isMobile ? SCROLL_NAV_ARROW_STROKE_MOBILE : SCROLL_NAV_ARROW_STROKE_DESKTOP);
+
+    // Colors and visual styling
+    document.documentElement.style.setProperty('--scroll-nav-color', SCROLL_NAV_COLOR);
+    document.documentElement.style.setProperty('--scroll-nav-stroke-color', SCROLL_NAV_STROKE_COLOR);
+    document.documentElement.style.setProperty('--scroll-nav-hover-color', SCROLL_NAV_HOVER_COLOR);
+    document.documentElement.style.setProperty('--scroll-nav-hover-stroke-color', SCROLL_NAV_HOVER_STROKE_COLOR);
+
+    document.documentElement.style.setProperty('--scroll-nav-bg', SCROLL_NAV_BG);
+    document.documentElement.style.setProperty('--scroll-nav-hover-bg', SCROLL_NAV_HOVER_BG);
+    document.documentElement.style.setProperty('--scroll-nav-opacity', SCROLL_NAV_OPACITY);
+    document.documentElement.style.setProperty('--scroll-nav-hover-opacity', SCROLL_NAV_HOVER_OPACITY);
+    document.documentElement.style.setProperty('--scroll-nav-hover-scale', SCROLL_NAV_HOVER_SCALE);
+    document.documentElement.style.setProperty('--scroll-nav-z-index', SCROLL_NAV_Z_INDEX);
+
+    // Backward compatibility CSS variables for existing selectors
+    document.documentElement.style.setProperty('--scroll-top-bottom', isMobile ? SCROLL_NAV_BOTTOM_MOBILE : SCROLL_NAV_BOTTOM_DESKTOP);
+    document.documentElement.style.setProperty('--scroll-top-right', isMobile ? SCROLL_NAV_RIGHT_MOBILE : SCROLL_NAV_RIGHT_DESKTOP);
+    document.documentElement.style.setProperty('--scroll-top-size', isMobile ? SCROLL_NAV_SIZE_MOBILE : SCROLL_NAV_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--scroll-top-btn-border-width', isMobile ? SCROLL_NAV_BORDER_WIDTH_MOBILE : SCROLL_NAV_BORDER_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--scroll-top-icon-size', isMobile ? SCROLL_NAV_ICON_SIZE_MOBILE : SCROLL_NAV_ICON_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--scroll-top-arrow-stroke-width', isMobile ? SCROLL_NAV_ARROW_STROKE_MOBILE : SCROLL_NAV_ARROW_STROKE_DESKTOP);
+  }
+
+  // Compatibility aliases for callers across weather.js
   function applyScrollTopButtonConfig() {
-    const isMobile = window.innerWidth <= 767;
-    document.documentElement.style.setProperty('--scroll-top-bottom-desktop', SCROLL_TOP_BOTTOM_DESKTOP);
-    document.documentElement.style.setProperty('--scroll-top-bottom-mobile', SCROLL_TOP_BOTTOM_MOBILE);
-    document.documentElement.style.setProperty('--scroll-top-bottom', isMobile ? SCROLL_TOP_BOTTOM_MOBILE : SCROLL_TOP_BOTTOM_DESKTOP);
-
-    document.documentElement.style.setProperty('--scroll-top-right-desktop', SCROLL_TOP_RIGHT_DESKTOP);
-    document.documentElement.style.setProperty('--scroll-top-right-mobile', SCROLL_TOP_RIGHT_MOBILE);
-    document.documentElement.style.setProperty('--scroll-top-right', isMobile ? SCROLL_TOP_RIGHT_MOBILE : SCROLL_TOP_RIGHT_DESKTOP);
-
-    document.documentElement.style.setProperty('--scroll-top-size-desktop', SCROLL_TOP_SIZE_DESKTOP);
-    document.documentElement.style.setProperty('--scroll-top-size-mobile', SCROLL_TOP_SIZE_MOBILE);
-    document.documentElement.style.setProperty('--scroll-top-size', isMobile ? SCROLL_TOP_SIZE_MOBILE : SCROLL_TOP_SIZE_DESKTOP);
-
-    document.documentElement.style.setProperty('--scroll-top-icon-size-desktop', SCROLL_TOP_ICON_SIZE_DESKTOP);
-    document.documentElement.style.setProperty('--scroll-top-icon-size-mobile', SCROLL_TOP_ICON_SIZE_MOBILE);
-    document.documentElement.style.setProperty('--scroll-top-icon-size', isMobile ? SCROLL_TOP_ICON_SIZE_MOBILE : SCROLL_TOP_ICON_SIZE_DESKTOP);
-
-    document.documentElement.style.setProperty('--scroll-top-border-width-desktop', SCROLL_TOP_BORDER_WIDTH_DESKTOP);
-    document.documentElement.style.setProperty('--scroll-top-border-width-mobile', SCROLL_TOP_BORDER_WIDTH_MOBILE);
-    document.documentElement.style.setProperty('--scroll-top-btn-border-width', isMobile ? SCROLL_TOP_BORDER_WIDTH_MOBILE : SCROLL_TOP_BORDER_WIDTH_DESKTOP);
-
-    document.documentElement.style.setProperty('--scroll-top-arrow-stroke-desktop', SCROLL_TOP_ARROW_STROKE_DESKTOP);
-    document.documentElement.style.setProperty('--scroll-top-arrow-stroke-mobile', SCROLL_TOP_ARROW_STROKE_MOBILE);
-    document.documentElement.style.setProperty('--scroll-top-arrow-stroke-width', isMobile ? SCROLL_TOP_ARROW_STROKE_MOBILE : SCROLL_TOP_ARROW_STROKE_DESKTOP);
-
-    document.documentElement.style.setProperty('--scroll-top-color', SCROLL_TOP_COLOR);
-    document.documentElement.style.setProperty('--scroll-top-stroke-color', SCROLL_TOP_STROKE_COLOR);
-    document.documentElement.style.setProperty('--scroll-top-hover-color', SCROLL_TOP_HOVER_COLOR);
-    document.documentElement.style.setProperty('--scroll-top-hover-stroke-color', SCROLL_TOP_HOVER_STROKE_COLOR);
-
-    document.documentElement.style.setProperty('--scroll-top-bg', SCROLL_TOP_BG);
-    document.documentElement.style.setProperty('--scroll-top-hover-bg', SCROLL_TOP_HOVER_BG);
-    document.documentElement.style.setProperty('--scroll-top-opacity', SCROLL_TOP_OPACITY);
-    document.documentElement.style.setProperty('--scroll-top-hover-opacity', SCROLL_TOP_HOVER_OPACITY);
-    document.documentElement.style.setProperty('--scroll-top-hover-scale', SCROLL_TOP_HOVER_SCALE);
-    document.documentElement.style.setProperty('--scroll-top-z-index', SCROLL_TOP_Z_INDEX);
+    applyScrollNavConfig();
   }
-
   function applyScrollBottomButtonConfig() {
-    const isMobile = window.innerWidth <= 767;
-    document.documentElement.style.setProperty('--scroll-bottom-top-desktop', SCROLL_BOTTOM_TOP_DESKTOP);
-    document.documentElement.style.setProperty('--scroll-bottom-top-mobile', SCROLL_BOTTOM_TOP_MOBILE);
-    document.documentElement.style.setProperty('--scroll-bottom-top', isMobile ? SCROLL_BOTTOM_TOP_MOBILE : SCROLL_BOTTOM_TOP_DESKTOP);
-
-    document.documentElement.style.setProperty('--scroll-bottom-right-desktop', SCROLL_BOTTOM_RIGHT_DESKTOP);
-    document.documentElement.style.setProperty('--scroll-bottom-right-mobile', SCROLL_BOTTOM_RIGHT_MOBILE);
-    document.documentElement.style.setProperty('--scroll-bottom-right', isMobile ? SCROLL_BOTTOM_RIGHT_MOBILE : SCROLL_BOTTOM_RIGHT_DESKTOP);
-
-    document.documentElement.style.setProperty('--scroll-bottom-size-desktop', SCROLL_BOTTOM_SIZE_DESKTOP);
-    document.documentElement.style.setProperty('--scroll-bottom-size-mobile', SCROLL_BOTTOM_SIZE_MOBILE);
-    document.documentElement.style.setProperty('--scroll-bottom-size', isMobile ? SCROLL_BOTTOM_SIZE_MOBILE : SCROLL_BOTTOM_SIZE_DESKTOP);
-
-    document.documentElement.style.setProperty('--scroll-bottom-icon-size-desktop', SCROLL_BOTTOM_ICON_SIZE_DESKTOP);
-    document.documentElement.style.setProperty('--scroll-bottom-icon-size-mobile', SCROLL_BOTTOM_ICON_SIZE_MOBILE);
-    document.documentElement.style.setProperty('--scroll-bottom-icon-size', isMobile ? SCROLL_BOTTOM_ICON_SIZE_MOBILE : SCROLL_BOTTOM_ICON_SIZE_DESKTOP);
-
-    document.documentElement.style.setProperty('--scroll-bottom-border-width-desktop', SCROLL_BOTTOM_BORDER_WIDTH_DESKTOP);
-    document.documentElement.style.setProperty('--scroll-bottom-border-width-mobile', SCROLL_BOTTOM_BORDER_WIDTH_MOBILE);
-    document.documentElement.style.setProperty('--scroll-bottom-btn-border-width', isMobile ? SCROLL_BOTTOM_BORDER_WIDTH_MOBILE : SCROLL_BOTTOM_BORDER_WIDTH_DESKTOP);
-
-    document.documentElement.style.setProperty('--scroll-bottom-arrow-stroke-desktop', SCROLL_BOTTOM_ARROW_STROKE_DESKTOP);
-    document.documentElement.style.setProperty('--scroll-bottom-arrow-stroke-mobile', SCROLL_BOTTOM_ARROW_STROKE_MOBILE);
-    document.documentElement.style.setProperty('--scroll-bottom-arrow-stroke-width', isMobile ? SCROLL_BOTTOM_ARROW_STROKE_MOBILE : SCROLL_BOTTOM_ARROW_STROKE_DESKTOP);
-
-    document.documentElement.style.setProperty('--scroll-bottom-color', SCROLL_BOTTOM_COLOR);
-    document.documentElement.style.setProperty('--scroll-bottom-stroke-color', SCROLL_BOTTOM_STROKE_COLOR);
-    document.documentElement.style.setProperty('--scroll-bottom-hover-color', SCROLL_BOTTOM_HOVER_COLOR);
-    document.documentElement.style.setProperty('--scroll-bottom-hover-stroke-color', SCROLL_BOTTOM_HOVER_STROKE_COLOR);
-
-    document.documentElement.style.setProperty('--scroll-bottom-bg', SCROLL_BOTTOM_BG);
-    document.documentElement.style.setProperty('--scroll-bottom-hover-bg', SCROLL_BOTTOM_HOVER_BG);
-    document.documentElement.style.setProperty('--scroll-bottom-opacity', SCROLL_BOTTOM_OPACITY);
-    document.documentElement.style.setProperty('--scroll-bottom-hover-opacity', SCROLL_BOTTOM_HOVER_OPACITY);
-    document.documentElement.style.setProperty('--scroll-bottom-hover-scale', SCROLL_BOTTOM_HOVER_SCALE);
-    document.documentElement.style.setProperty('--scroll-bottom-z-index', SCROLL_BOTTOM_Z_INDEX);
+    applyScrollNavConfig();
   }
 
-  function initScrollToTopButton() {
-    if (!SCROLL_TOP_BUTTON_ENABLED) return;
-    if (typeof initScrollToBottomButton === 'function') {
-      initScrollToBottomButton();
+  let scrollNavInitialized = false;
+
+  function initScrollNavButton() {
+    if (!SCROLL_NAV_BUTTON_ENABLED) return;
+
+    // Clean up any cluster or duplicate buttons
+    const cluster = document.getElementById('scroll-nav-cluster');
+    if (cluster) cluster.remove();
+    const oldStandaloneBottom = document.getElementById('scroll-to-bottom-btn');
+    if (oldStandaloneBottom) oldStandaloneBottom.remove();
+
+    let btn = document.getElementById('scroll-to-top-btn');
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.id = 'scroll-to-top-btn';
+      btn.className = 'scroll-to-top-btn scroll-nav-btn is-visible mode-bottom';
+      btn.setAttribute('type', 'button');
+      btn.setAttribute('aria-label', 'Go to bottom');
+      btn.innerHTML = `<i class="fa-solid fa-arrow-down" aria-hidden="true"></i>`;
+
+      let lastNavActionTime = 0;
+      const handleNavAction = (e) => {
+        if (e) {
+          if (e.cancelable) e.preventDefault();
+          e.stopPropagation();
+        }
+        const now = Date.now();
+        if (now - lastNavActionTime < 400) return; // Prevent double-trigger from touchend + synthetic click
+        lastNavActionTime = now;
+
+        if (btn.classList.contains('mode-top')) {
+          window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+          });
+        } else {
+          const targetBottom = Math.max(
+            document.documentElement.scrollHeight || 0,
+            document.body.scrollHeight || 0
+          );
+          window.scrollTo({
+            top: targetBottom,
+            behavior: 'smooth'
+          });
+        }
+
+        // Active polling during and after smooth scroll (mobile Safari throttles scroll events during programmatic scroll)
+        [100, 250, 450, 700, 1000, 1400, 1900].forEach(ms => setTimeout(updateNavState, ms));
+      };
+
+      btn.addEventListener('click', handleNavAction);
+      btn.addEventListener('touchend', handleNavAction, { passive: false });
+
+      document.body.appendChild(btn);
     }
-    if (document.getElementById('scroll-to-top-btn')) return;
 
-    applyScrollTopButtonConfig();
+    applyScrollNavConfig();
 
-    const btn = document.createElement('button');
-    btn.id = 'scroll-to-top-btn';
-    btn.className = 'scroll-to-top-btn';
-    btn.setAttribute('type', 'button');
-    btn.setAttribute('aria-label', 'Back to top');
-    btn.innerHTML = `<i class="fa-solid fa-arrow-up" aria-hidden="true"></i>`;
+    const updateNavState = () => {
+      const currentBtn = document.getElementById('scroll-to-top-btn');
+      if (!currentBtn) return;
 
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    });
-
-    document.body.appendChild(btn);
-
-    const updateVisibility = () => {
       const isMobile = window.innerWidth <= 767;
-      const threshold = isMobile ? SCROLL_TOP_APPEARS_WHEN_MOBILE : SCROLL_TOP_APPEARS_WHEN_DESKTOP;
-      const currentScroll = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
-      if (currentScroll > threshold) {
-        btn.classList.add('is-visible');
-      } else {
-        btn.classList.remove('is-visible');
-      }
-    };
-
-    window.addEventListener('scroll', updateVisibility, { passive: true });
-    window.addEventListener('resize', () => {
-      applyScrollTopButtonConfig();
-      updateVisibility();
-    }, { passive: true });
-
-    updateVisibility();
-    [500, 1500, 3000].forEach(ms => setTimeout(updateVisibility, ms));
-  }
-
-  function initScrollToBottomButton() {
-    if (!SCROLL_BOTTOM_BUTTON_ENABLED) return;
-    if (document.getElementById('scroll-to-bottom-btn')) return;
-
-    applyScrollBottomButtonConfig();
-
-    const btn = document.createElement('button');
-    btn.id = 'scroll-to-bottom-btn';
-    btn.className = 'scroll-to-bottom-btn is-visible';
-    btn.setAttribute('type', 'button');
-    btn.setAttribute('aria-label', 'Go to bottom');
-    btn.innerHTML = `<i class="fa-solid fa-arrow-down" aria-hidden="true"></i>`;
-
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      window.scrollTo({
-        top: document.documentElement.scrollHeight || document.body.scrollHeight,
-        behavior: 'smooth'
-      });
-    });
-
-    document.body.appendChild(btn);
-
-    const updateVisibility = () => {
-      const isMobile = window.innerWidth <= 767;
-      const threshold = isMobile ? SCROLL_BOTTOM_DISAPPEARS_WHEN_MOBILE : SCROLL_BOTTOM_DISAPPEARS_WHEN_DESKTOP;
       const scrollPosition = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
-      const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-      const totalHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
-      const distanceToBottom = totalHeight - (scrollPosition + viewportHeight);
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1;
+      const totalHeight = Math.max(document.documentElement.scrollHeight || 0, document.body.scrollHeight || 0);
+      const maxScroll = Math.max(0, totalHeight - viewportHeight);
 
-      // Initially visible towards the top; only disappears when scrolled near the page bottom
-      if (distanceToBottom <= threshold && scrollPosition > 100) {
-        btn.classList.remove('is-visible');
+      let isGoToTop = false;
+      if (maxScroll > 0 && scrollPosition >= (maxScroll - 60)) {
+        // At or near the bottom of the page -> Always flip to UP arrow (Go to top)
+        isGoToTop = true;
+      } else if (scrollPosition <= 50) {
+        // At or near the top of the page -> Always flip to DOWN arrow (Go to bottom)
+        isGoToTop = false;
+      } else if (SCROLL_NAV_FLIP_MODE === 'midpoint') {
+        isGoToTop = scrollPosition >= maxScroll * SCROLL_NAV_MIDPOINT_RATIO;
       } else {
-        btn.classList.add('is-visible');
+        const mobileThreshold = Math.min(SCROLL_NAV_FLIP_WHEN_MOBILE, Math.max(120, maxScroll * 0.35));
+        const threshold = isMobile ? mobileThreshold : SCROLL_NAV_FLIP_WHEN_DESKTOP;
+        isGoToTop = scrollPosition > threshold;
       }
+
+      if (isGoToTop) {
+        if (!currentBtn.classList.contains('mode-top')) {
+          currentBtn.classList.remove('mode-bottom');
+          currentBtn.classList.add('mode-top');
+          currentBtn.setAttribute('aria-label', 'Back to top');
+          currentBtn.innerHTML = `<i class="fa-solid fa-arrow-up" aria-hidden="true"></i>`;
+        }
+      } else {
+        if (!currentBtn.classList.contains('mode-bottom')) {
+          currentBtn.classList.remove('mode-top');
+          currentBtn.classList.add('mode-bottom');
+          currentBtn.setAttribute('aria-label', 'Go to bottom');
+          currentBtn.innerHTML = `<i class="fa-solid fa-arrow-down" aria-hidden="true"></i>`;
+        }
+      }
+
+      currentBtn.classList.add('is-visible');
     };
 
-    window.addEventListener('scroll', updateVisibility, { passive: true });
-    window.addEventListener('resize', () => {
-      applyScrollBottomButtonConfig();
-      updateVisibility();
-    }, { passive: true });
+    if (!scrollNavInitialized) {
+      scrollNavInitialized = true;
+      window.addEventListener('scroll', updateNavState, { passive: true });
+      window.addEventListener('resize', () => {
+        applyScrollNavConfig();
+        updateNavState();
+      }, { passive: true });
+    }
 
-    updateVisibility();
-    [500, 1500, 3000].forEach(ms => setTimeout(updateVisibility, ms));
+    updateNavState();
+    [100, 300, 800, 1500, 2500].forEach(ms => setTimeout(updateNavState, ms));
   }
 
-  applyScrollTopButtonConfig();
-  applyScrollBottomButtonConfig();
-  initScrollToBottomButton();
+  // Compatibility aliases
+  function initScrollNavCluster() {
+    initScrollNavButton();
+  }
+  function initScrollToTopButton() {
+    initScrollNavButton();
+  }
+  function initScrollToBottomButton() {
+    initScrollNavButton();
+  }
+
+  applyScrollNavConfig();
+  initScrollNavButton();
 
   // EDITABLE: Vertical position of the barometric/humidity/wind trend arrow (scaled to dial size)
   const BAROMETRIC_TREND_TOP_POS = "calc(var(--item-current-size) * -0.28 + 0.25vw)";
@@ -4414,8 +4417,6 @@ import weatherConditions from '../data/weather-conditions.json';
     if (gradientLower) gradientLower.style.setProperty('--alert-push', '0vw');
     if (starfieldContainer) starfieldContainer.style.setProperty('--alert-push', '0vw');
     if (rainCanvas) rainCanvas.style.setProperty('--alert-push', '0vw');
-    const btnBottom = document.getElementById('scroll-to-bottom-btn');
-    if (btnBottom) btnBottom.style.setProperty('--alert-push', '0vw');
     document.documentElement.style.setProperty('--alert-push', '0vw');
     setTimeout(() => document.body.classList.add('transitions-ready'), 100);
   } else {
@@ -4447,8 +4448,6 @@ import weatherConditions from '../data/weather-conditions.json';
       if (gradientLower) gradientLower.style.setProperty('--alert-push', '0vw');
       if (starfieldContainer) starfieldContainer.style.setProperty('--alert-push', '0vw');
       if (rainCanvas) rainCanvas.style.setProperty('--alert-push', '0vw');
-      const btnBottomDom = document.getElementById('scroll-to-bottom-btn');
-      if (btnBottomDom) btnBottomDom.style.setProperty('--alert-push', '0vw');
       document.documentElement.style.setProperty('--alert-push', '0vw');
       setTimeout(() => document.body.classList.add('transitions-ready'), 100);
     });
@@ -4526,10 +4525,6 @@ import weatherConditions from '../data/weather-conditions.json';
     const rainCanvas = document.getElementById('weather-rain-canvas');
     if (rainCanvas) {
       rainCanvas.style.setProperty('--alert-push', pushValue);
-    }
-    const btnBottom = document.getElementById('scroll-to-bottom-btn');
-    if (btnBottom) {
-      btnBottom.style.setProperty('--alert-push', pushValue);
     }
     document.documentElement.style.setProperty('--alert-push', pushValue);
     updateLowerGradientPosition();
@@ -7450,7 +7445,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SOLAR_FLARE_VALUE_LETTER_SPACING_DESKTOP = '0.02em';     // EDITABLE Desktop: Bottom value letter spacing
   const SOLAR_FLARE_VALUE_LETTER_SPACING_MOBILE = '0.02em';      // EDITABLE Mobile: Bottom value letter spacing
   const SOLAR_FLARE_VALUE_OFFSET_Y_DESKTOP = '-.5vw';              // EDITABLE Desktop: Fine vertical nudge for bottom value
-  const SOLAR_FLARE_VALUE_OFFSET_Y_MOBILE = '0vw';               // EDITABLE Mobile: Fine vertical nudge for bottom value
+  const SOLAR_FLARE_VALUE_OFFSET_Y_MOBILE = '-.5vw';               // EDITABLE Mobile: Fine vertical nudge for bottom value
 
   // Overall Content Block Alignment
   const SOLAR_FLARE_CONTENT_OFFSET_Y_DESKTOP = '0vw';            // EDITABLE Desktop: Vertical nudge for entire text block inside dial
@@ -7574,7 +7569,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const RADIO_BLACKOUT_VALUE_LETTER_SPACING_DESKTOP = '-.015em';  // EDITABLE Desktop: Bottom value letter spacing
   const RADIO_BLACKOUT_VALUE_LETTER_SPACING_MOBILE = '-.03em';   // EDITABLE Mobile: Bottom value letter spacing
   const RADIO_BLACKOUT_VALUE_OFFSET_Y_DESKTOP = '-.5vw';           // EDITABLE Desktop: Fine vertical nudge for bottom value
-  const RADIO_BLACKOUT_VALUE_OFFSET_Y_MOBILE = '0vw';            // EDITABLE Mobile: Fine vertical nudge for bottom value
+  const RADIO_BLACKOUT_VALUE_OFFSET_Y_MOBILE = '-.5vw';            // EDITABLE Mobile: Fine vertical nudge for bottom value
 
   // Overall Content Block Alignment
   const RADIO_BLACKOUT_CONTENT_OFFSET_Y_DESKTOP = '0vw';         // EDITABLE Desktop: Vertical nudge for entire text block inside dial
@@ -8640,7 +8635,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1202';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1207';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
