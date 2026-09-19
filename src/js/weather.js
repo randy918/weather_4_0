@@ -7116,17 +7116,19 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SUN_ANIMATION_CROSSFADE_ENABLED = true;       // EDITABLE: Enable/disable smooth dual-buffer cross-fade between rotation frames
   const SUN_ANIMATION_CROSSFADE_MS_DESKTOP = 60;      // EDITABLE Desktop: Cross-fade transition duration in milliseconds (e.g. 50-70ms)
   const SUN_ANIMATION_CROSSFADE_MS_MOBILE = 60;       // EDITABLE Mobile: Cross-fade transition duration in milliseconds (e.g. 50-70ms)
-  const SUN_ANIMATION_LOOP_PAUSE_MS = 1200;           // EDITABLE: Pause in ms on the latest frame before repeating loop
+  const SUN_ANIMATION_LOOP_PAUSE_MS_DESKTOP = 1200;   // EDITABLE Desktop: Pause in ms on the latest frame before returning to idle/sizzle
+  const SUN_ANIMATION_LOOP_PAUSE_MS_MOBILE = 1200;    // EDITABLE Mobile: Pause in ms on the latest frame before returning to idle/sizzle
+  const SUN_ANIMATION_LOOP_PAUSE_MS = 1200;           // EDITABLE: Fallback pause in ms
   const SUN_ANIMATION_RESOLUTION = '600x600';         // EDITABLE: Resolution ('600x600' or '300x300')
 
   // Ease-In & Ease-Out Playback Dynamics (JCV)
   // Eases out of the Live frame pause (slow start accelerating to cruise speed)
   // and eases into the Live frame stop (decelerating smoothly before the pause)
   const SUN_ANIMATION_EASE_ENABLED = true;              // EDITABLE: Enable/disable ease-in and ease-out speed ramping
-  const SUN_ANIMATION_EASE_FRAMES_DESKTOP = 4;          // EDITABLE Desktop: Number of frames to ease in and ease out (e.g. 5-7)
-  const SUN_ANIMATION_EASE_FRAMES_MOBILE = 4;           // EDITABLE Mobile: Number of frames to ease in and ease out
-  const SUN_ANIMATION_EASE_MAX_DELAY_MS_DESKTOP = 200;  // EDITABLE Desktop: Delay in ms for slowest ease frame (cruising is ~83ms)
-  const SUN_ANIMATION_EASE_MAX_DELAY_MS_MOBILE = 200;   // EDITABLE Mobile: Delay in ms for slowest ease frame
+  const SUN_ANIMATION_EASE_FRAMES_DESKTOP = 6;          // EDITABLE Desktop: Number of frames to ease in and ease out (e.g. 5-7)
+  const SUN_ANIMATION_EASE_FRAMES_MOBILE = 6;           // EDITABLE Mobile: Number of frames to ease in and ease out
+  const SUN_ANIMATION_EASE_MAX_DELAY_MS_DESKTOP = 280;  // EDITABLE Desktop: Delay in ms for slowest ease frame (cruising is ~83ms)
+  const SUN_ANIMATION_EASE_MAX_DELAY_MS_MOBILE = 280;   // EDITABLE Mobile: Delay in ms for slowest ease frame
 
   // Verified 27-day historical frame sequence (55 frames sampled at 12-hour intervals up to today noon, ending with live sun)
   const SUN_ANIMATION_FRAMES = [
@@ -7184,6 +7186,18 @@ Plan ahead for significantly warmer conditions tomorrow!`
     '20262551200004_GOES19-SUVI-Fe195-600x600.jpg',
     '20262560000019_GOES19-SUVI-Fe195-600x600.jpg',
     '20262561200034_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262570000048_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262571200063_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262580000078_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262581200093_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262590000107_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262591200122_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262600000137_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262601200353_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262610000368_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262611200411_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262620000426_GOES19-SUVI-Fe195-600x600.jpg',
+    '20262621227468_GOES19-SUVI-Fe195-600x600.jpg',
     'latest.jpg'
   ];
 
@@ -8635,7 +8649,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1207';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1210';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -13794,6 +13808,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
         }
 
         if (isLastFrame) {
+          const loopPause = isMobile ? SUN_ANIMATION_LOOP_PAUSE_MS_MOBILE : SUN_ANIMATION_LOOP_PAUSE_MS_DESKTOP;
+          const pauseMs = (typeof loopPause === 'number' && loopPause > 0) ? loopPause : (SUN_ANIMATION_LOOP_PAUSE_MS || 1200);
           setTimeout(() => {
             isSunRotating = false;
             sunAnimationTimeoutId = null;
@@ -13802,7 +13818,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
             if (SUN_SIZZLE_ENABLED && typeof startSunSizzleLoop === 'function') {
               startSunSizzleLoop();
             }
-          }, dynamicFade + 50);
+          }, dynamicFade + pauseMs);
         } else {
           sunAnimationTimeoutId = setTimeout(runSunCycleStep, delay);
         }
@@ -13962,19 +13978,25 @@ Plan ahead for significantly warmer conditions tomorrow!`
       function startSunSizzleLoop() {
         if (!SUN_SIZZLE_ENABLED || isSunRotating || preloadedSizzleImages.length <= 1) return;
         if (sunSizzleTimeoutId) clearTimeout(sunSizzleTimeoutId);
-        sizzleActiveLayer = 'a';
-        if (leftSun && leftSun.img && preloadedSizzleImages[sizzleIndex]) {
-          leftSun.img.style.transitionDuration = '0ms';
-          leftSun.img.src = preloadedSizzleImages[sizzleIndex].src;
-          leftSun.img.style.zIndex = '1';
-          leftSun.img.style.opacity = '1';
-        }
-        if (leftSun && leftSun.imgB) {
-          leftSun.imgB.style.transitionDuration = '0ms';
-          leftSun.imgB.style.zIndex = '2';
-          leftSun.imgB.style.opacity = '0';
-        }
+
+        // Seamless resumption from the live sun frame without 0ms hard cuts or abrupt layer snaps
+        sizzleIndex = Math.max(0, preloadedSizzleImages.length - 1);
+        sizzleDirection = -1;
+        sizzleActiveLayer = (sunActiveLayer === 'b') ? 'b' : 'a';
+
         const isMobile = window.innerWidth <= 767;
+        const sizzleFade = isMobile ? SUN_SIZZLE_CROSSFADE_MS_MOBILE : SUN_SIZZLE_CROSSFADE_MS_DESKTOP;
+        if (leftSun && leftSun.img) leftSun.img.style.transitionDuration = `${sizzleFade}ms`;
+        if (leftSun && leftSun.imgB) leftSun.imgB.style.transitionDuration = `${sizzleFade}ms`;
+
+        // Cue up next step on the inactive buffer
+        const inactiveLayer = sizzleActiveLayer === 'a' ? (leftSun ? leftSun.imgB : null) : (leftSun ? leftSun.img : null);
+        const nextStep = getNextSizzleStep(sizzleIndex, sizzleDirection, preloadedSizzleImages.length);
+        if (inactiveLayer && preloadedSizzleImages[nextStep.idx]) {
+          inactiveLayer.src = preloadedSizzleImages[nextStep.idx].src;
+          if (inactiveLayer.decode) inactiveLayer.decode().catch(() => {});
+        }
+
         const fps = isMobile ? SUN_SIZZLE_FPS_MOBILE : SUN_SIZZLE_FPS_DESKTOP;
         const initDelay = Math.max(30, Math.round(1000 / Math.max(1, fps)));
         sunSizzleTimeoutId = setTimeout(runSunSizzleStep, initDelay);
