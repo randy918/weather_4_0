@@ -1209,8 +1209,14 @@ import weatherConditions from '../data/weather-conditions.json';
   // Initial apply
   applyGradientProperties();
 
-  // Re-apply on window resize
-  window.addEventListener('resize', applyGradientProperties);
+  // Debounced resize: gradient recalculation runs once after dragging stops, not on every frame
+  let _gradientResizeDebounceTimer = null;
+  const GRADIENT_RESIZE_DEBOUNCE_MS = 300; // EDITABLE
+  window.addEventListener('resize', () => {
+    if (_gradientResizeDebounceTimer) clearTimeout(_gradientResizeDebounceTimer);
+    _gradientResizeDebounceTimer = setTimeout(applyGradientProperties, GRADIENT_RESIZE_DEBOUNCE_MS);
+  });
+
 
   // ==========================================
   // --- EDITABLE: Night Sky Starfield Configuration (JCV) ---
@@ -2254,8 +2260,17 @@ import weatherConditions from '../data/weather-conditions.json';
   }
 
   // Window event handlers for starfield
-  window.addEventListener('resize', applyStarfieldProperties);
+  // Debounced resize for starfield: applyStarfieldProperties calls drawStarfield() (full canvas redraw),
+  // updateStarfieldMask(), and a forced reflow (void canvas.offsetWidth) to restart the CSS animation.
+  // Firing all that on every raw mousemove during resize was a major layout-thrash bottleneck.
+  let _starfieldResizeDebounceTimer = null;
+  const STARFIELD_RESIZE_DEBOUNCE_MS = 300; // EDITABLE: ms after last resize event before redrawing starfield
+  window.addEventListener('resize', () => {
+    if (_starfieldResizeDebounceTimer) clearTimeout(_starfieldResizeDebounceTimer);
+    _starfieldResizeDebounceTimer = setTimeout(applyStarfieldProperties, STARFIELD_RESIZE_DEBOUNCE_MS);
+  });
   // Note: Starfield container is position: absolute and scrolls naturally on GPU compositor matching scrolling gradient overlays
+
 
   // Periodic check (every 60s) to advance day/night opacity transition
   setInterval(() => {
@@ -4195,7 +4210,13 @@ import weatherConditions from '../data/weather-conditions.json';
       canvas.width = window.innerWidth;
       canvas.height = getRainAreaHeightPx();
     }
-    window.addEventListener('resize', resize);
+    // Debounced: canvas.width/height assignment destroys + re-allocates the GPU texture.
+    // Running raw on every resize mousemove was causing a GPU texture re-alloc every frame.
+    let _rainCanvasResizeTimer = null;
+    window.addEventListener('resize', () => {
+      if (_rainCanvasResizeTimer) clearTimeout(_rainCanvasResizeTimer);
+      _rainCanvasResizeTimer = setTimeout(resize, 300);
+    });
     resize();
     
     let activeDrops = [];
@@ -4313,7 +4334,12 @@ import weatherConditions from '../data/weather-conditions.json';
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     }
-    window.addEventListener('resize', resize);
+    // Debounced: same reason as rain canvas — GPU texture re-alloc on every frame is very expensive.
+    let _snowCanvasResizeTimer = null;
+    window.addEventListener('resize', () => {
+      if (_snowCanvasResizeTimer) clearTimeout(_snowCanvasResizeTimer);
+      _snowCanvasResizeTimer = setTimeout(resize, 300);
+    });
     resize();
     
     let activeFlakes = [];
@@ -8931,7 +8957,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_SUN_ROTATION_PERIOD_MOBILE = '180s';        // EDITABLE Mobile: Duration for 1 full rotation revolution
   const ORRERY_SUN_ROTATION_DIRECTION = 'normal';          // EDITABLE: Rotation direction ('normal' = clockwise, 'reverse' = counter-clockwise)
   const ORRERY_SUN_OPACITY = '1.0';                        // EDITABLE: Sun opacity (0.0 to 1.0)
-  const ORRERY_SUN_BLEND_MODE = 'lighten';                 // EDITABLE: Mix blend mode ('lighten' ensures dark background blends seamlessly)
+  // mix-blend-mode: lighten is hardcoded in CSS on .orrery-sun-body (not configurable via variable)
   const ORRERY_SUN_Z_INDEX = '12';                         // EDITABLE: Stacking layer index for central Sun
   const ORRERY_SUN_GLOW_BLUR_DESKTOP = '0.8vw';            // EDITABLE Desktop: Solar corona ambient glow blur
   const ORRERY_SUN_GLOW_BLUR_MOBILE = '1.2vw';             // EDITABLE Mobile: Solar corona ambient glow blur
@@ -9226,7 +9252,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--orrery-sun-width', isMobile ? ORRERY_SUN_WIDTH_MOBILE : ORRERY_SUN_WIDTH_DESKTOP);
     document.documentElement.style.setProperty('--orrery-sun-height', isMobile ? ORRERY_SUN_HEIGHT_MOBILE : ORRERY_SUN_HEIGHT_DESKTOP);
     document.documentElement.style.setProperty('--orrery-sun-opacity', ORRERY_SUN_OPACITY);
-    document.documentElement.style.setProperty('--orrery-sun-blend-mode', ORRERY_SUN_BLEND_MODE);
+    // mix-blend-mode: lighten is hardcoded in CSS — no variable needed
     document.documentElement.style.setProperty('--orrery-sun-z-index', ORRERY_SUN_Z_INDEX);
     document.documentElement.style.setProperty('--orrery-sun-glow-blur', isMobile ? ORRERY_SUN_GLOW_BLUR_MOBILE : ORRERY_SUN_GLOW_BLUR_DESKTOP);
     document.documentElement.style.setProperty('--orrery-sun-glow-color', ORRERY_SUN_GLOW_COLOR);
@@ -19011,12 +19037,28 @@ Plan ahead for significantly warmer conditions tomorrow!`
     setTimeout(() => { loader.style.setProperty('display', 'none', 'important'); }, RESIZE_LOADER_FADE_OUT_MS);
   }
 
+  // Hide the orrery while resizing — must use display:none, NOT visibility:hidden.
+  // visibility:hidden keeps all will-change compositor layers alive and composited on the GPU.
+  // display:none is the only way to actually destroy those layers and stop all repaint work.
+  function _hideOrreryDuringResize() {
+    const orrery = document.getElementById('orrery-section');
+    if (orrery) orrery.style.setProperty('display', 'none', 'important');
+  }
+
+  function _restoreOrreryAfterResize() {
+    const orrery = document.getElementById('orrery-section');
+    if (orrery) orrery.style.removeProperty('display');
+  }
+
+
   // Reposition temperature pointer and wind arrow on window resize
   window.addEventListener('resize', () => {
     const isMobile = window.innerWidth <= 767;
 
-    // Fade in the loader on the FIRST event of a resize sequence to cover mid-reflow jank
+    // Fade in the loader on the FIRST event of a resize sequence to cover mid-reflow jank,
+    // and immediately kill the orrery's GPU repaint (vw drop-shadow layers are expensive every frame)
     _showResizeLoader();
+    _hideOrreryDuringResize();
 
     // Debounce: clear any pending settle timer and restart it
     if (_resizeLoaderDebounceTimer) clearTimeout(_resizeLoaderDebounceTimer);
@@ -19042,14 +19084,17 @@ Plan ahead for significantly warmer conditions tomorrow!`
           updateFeelsLike(lastWeatherData);
           // updateWindDotsRow(lastWeatherData); // Reposition wind arrow
 
-          // All re-layouts done — fade the loader back out to reveal the settled UI
+          // Restore orrery and fade out loader now that layout is settled
+          _restoreOrreryAfterResize();
           _hideResizeLoader();
         }, RESIZE_LOADER_DOM_DELAY_MS);
       } else {
+        _restoreOrreryAfterResize();
         _hideResizeLoader();
       }
     }, RESIZE_LOADER_DEBOUNCE_MS);
   });
+
 
   // Update wind direction arrow with spin animation
   let lastWindDirection = null;

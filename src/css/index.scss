@@ -2846,6 +2846,12 @@ main {
     margin-bottom: var(--orrery-margin-bottom, 2vw);
     pointer-events: none;
     z-index: var(--orrery-z-index, 10);
+    /* Blend the entire orrery against the dark page background.
+       Without this, the stacking context created by z-index traps all child
+       mix-blend-mode operations inside the section, blending against siblings
+       rather than reaching the page background. */
+    mix-blend-mode: lighten;
+    background-color: transparent;
 }
 
 .orrery-ring-container {
@@ -2869,7 +2875,10 @@ main {
     stroke-width: var(--orrery-saturn-track-width, 0.05vw);
 }
 
-/* --- Central Sun Styling (JCV Driven, Lighten Only, Centered Rotation) --- */
+/* --- Central Sun Styling (Lighten Only, Centered Rotation) --- */
+/* mix-blend-mode is on the BODY container only, not the img.
+   Having it on both creates a nested compositing group where the img
+   blends inside an isolated context against nothing. */
 .orrery-sun-body {
     position: absolute;
     top: 50%;
@@ -2882,7 +2891,8 @@ main {
     align-items: center;
     z-index: var(--orrery-sun-z-index, 12);
     pointer-events: auto;
-    mix-blend-mode: var(--orrery-sun-blend-mode, lighten);
+    mix-blend-mode: lighten;
+    background-color: transparent;
 }
 
 .orrery-sun-img {
@@ -2893,7 +2903,7 @@ main {
     user-select: none;
     -webkit-user-drag: none;
     opacity: var(--orrery-sun-opacity, 1.0);
-    mix-blend-mode: var(--orrery-sun-blend-mode, lighten);
+    /* No mix-blend-mode here — let the parent .orrery-sun-body handle blending */
     transform-origin: 50% 50%;
     animation: var(--orrery-sun-rotation-animation, none);
     will-change: transform;
