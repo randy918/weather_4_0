@@ -2869,6 +2869,47 @@ main {
     stroke-width: var(--orrery-saturn-track-width, 0.05vw);
 }
 
+/* --- Central Sun Styling (JCV Driven, Lighten Only, Centered Rotation) --- */
+.orrery-sun-body {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: var(--orrery-sun-width, 6.0vw);
+    height: var(--orrery-sun-height, auto);
+    display: var(--orrery-sun-display, flex);
+    justify-content: center;
+    align-items: center;
+    z-index: var(--orrery-sun-z-index, 12);
+    pointer-events: auto;
+    mix-blend-mode: var(--orrery-sun-blend-mode, lighten);
+}
+
+.orrery-sun-img {
+    width: 100%;
+    height: auto;
+    max-width: none;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+    opacity: var(--orrery-sun-opacity, 1.0);
+    mix-blend-mode: var(--orrery-sun-blend-mode, lighten);
+    transform-origin: 50% 50%;
+    animation: var(--orrery-sun-rotation-animation, none);
+    will-change: transform;
+    pointer-events: none;
+}
+
+/* Centered Slow Rotation Keyframes for Sun */
+@keyframes orrery-sun-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 /* --- Saturn Orbit Arm, Body & Styling --- */
 .orrery-saturn-arm {
     position: absolute;

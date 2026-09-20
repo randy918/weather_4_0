@@ -7608,6 +7608,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // Sublabel Below Dial (Strategy 3: Live Impact)
   const SOLAR_FLARE_SUBLABEL_ENABLED = true;                     // EDITABLE: Enable/disable live impact label below dial
   const SOLAR_FLARE_SUBLABEL_MODE = 'dynamic';                   // EDITABLE: 'dynamic' (strategy 3: changes with level) or 'static' (uses static text below)
+  const SOLAR_FLARE_ARROW_MODE = 'trend';                        // EDITABLE: 'trend' (real live data trend: up/down based on recent flux history) or 'static' (uses level arrow constants below)
   const SOLAR_FLARE_SUBLABEL_TEXT_DESKTOP = 'Solar Flare';       // EDITABLE Desktop: Static fallback text
   const SOLAR_FLARE_SUBLABEL_TEXT_MOBILE = 'Solar Flare';        // EDITABLE Mobile: Static fallback text
   const SOLAR_FLARE_SUBLABEL_FONT_FAMILY = "var(--sun-label-font-family, 'light', sans-serif)"; // EDITABLE: Font family ('light', 'euro', 'bold', etc.)
@@ -7622,16 +7623,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SOLAR_FLARE_SUBLABEL_OFFSET_Y_DESKTOP = '0vw';           // EDITABLE Desktop: Fine vertical nudge
   const SOLAR_FLARE_SUBLABEL_OFFSET_Y_MOBILE = '0vw';            // EDITABLE Mobile: Fine vertical nudge
 
-  // Strategy 3: Dynamic Live Impact Sublabels per Solar Flare Level
-  const SOLAR_FLARE_IMPACT_LEVEL_A_ARROW = 'down';               // EDITABLE: Arrow direction ('up' or 'down')
+  // Strategy 3: Dynamic Live Impact Sublabels per Solar Flare Level (Static Fallback / Threshold Defaults)
+  const SOLAR_FLARE_IMPACT_LEVEL_A_ARROW = 'down';               // EDITABLE: Fallback arrow direction ('up' or 'down')
   const SOLAR_FLARE_IMPACT_LEVEL_A_TEXT = 'Quiet Sun';           // EDITABLE: Situation text (can use <br> for multi-line)
-  const SOLAR_FLARE_IMPACT_LEVEL_B_ARROW = 'down';               // EDITABLE: Arrow direction ('up' or 'down')
+  const SOLAR_FLARE_IMPACT_LEVEL_B_ARROW = 'down';               // EDITABLE: Fallback arrow direction ('up' or 'down')
   const SOLAR_FLARE_IMPACT_LEVEL_B_TEXT = 'Nominal Activity';    // EDITABLE: Situation text
-  const SOLAR_FLARE_IMPACT_LEVEL_C_ARROW = 'up';                 // EDITABLE: Arrow direction ('up' or 'down')
+  const SOLAR_FLARE_IMPACT_LEVEL_C_ARROW = 'up';                 // EDITABLE: Fallback arrow direction ('up' or 'down')
   const SOLAR_FLARE_IMPACT_LEVEL_C_TEXT = 'Low Activity';        // EDITABLE: Situation text
-  const SOLAR_FLARE_IMPACT_LEVEL_M_ARROW = 'up';                 // EDITABLE: Arrow direction ('up' or 'down')
+  const SOLAR_FLARE_IMPACT_LEVEL_M_ARROW = 'up';                 // EDITABLE: Fallback arrow direction ('up' or 'down')
   const SOLAR_FLARE_IMPACT_LEVEL_M_TEXT = 'Radio Comm<br>Advisory'; // EDITABLE: Situation text
-  const SOLAR_FLARE_IMPACT_LEVEL_X_ARROW = 'up';                 // EDITABLE: Arrow direction ('up' or 'down')
+  const SOLAR_FLARE_IMPACT_LEVEL_X_ARROW = 'up';                 // EDITABLE: Fallback arrow direction ('up' or 'down')
   const SOLAR_FLARE_IMPACT_LEVEL_X_TEXT = 'Radiation<br>Hazard'; // EDITABLE: Situation text
 
   // =========================================================================
@@ -7746,18 +7747,21 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_DESKTOP = '0vw';        // EDITABLE Desktop: Fine vertical nudge
   const RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_MOBILE = '0vw';         // EDITABLE Mobile: Fine vertical nudge
 
-  // Strategy 3: Dynamic Live Impact Sublabels per Radio Blackout Level
-  const RADIO_BLACKOUT_IMPACT_LEVEL_R0_ARROW = 'down';           // EDITABLE: Arrow direction ('up' or 'down')
+  // Dynamic Trend Arrow Control
+  const RADIO_BLACKOUT_ARROW_MODE = 'trend';                     // EDITABLE: 'trend' (real live data trend: up/down based on recent flux history) or 'static' (uses level arrow constants below)
+
+  // Strategy 3: Dynamic Live Impact Sublabels per Radio Blackout Level (Static Fallback / Threshold Defaults)
+  const RADIO_BLACKOUT_IMPACT_LEVEL_R0_ARROW = 'down';           // EDITABLE: Fallback arrow direction ('up' or 'down')
   const RADIO_BLACKOUT_IMPACT_LEVEL_R0_TEXT = 'All Bands Clear'; // EDITABLE: Situation text
-  const RADIO_BLACKOUT_IMPACT_LEVEL_R1_ARROW = 'up';             // EDITABLE: Arrow direction ('up' or 'down')
+  const RADIO_BLACKOUT_IMPACT_LEVEL_R1_ARROW = 'up';             // EDITABLE: Fallback arrow direction ('up' or 'down')
   const RADIO_BLACKOUT_IMPACT_LEVEL_R1_TEXT = 'Minor HF Noise';  // EDITABLE: Situation text
-  const RADIO_BLACKOUT_IMPACT_LEVEL_R2_ARROW = 'up';             // EDITABLE: Arrow direction ('up' or 'down')
+  const RADIO_BLACKOUT_IMPACT_LEVEL_R2_ARROW = 'up';             // EDITABLE: Fallback arrow direction ('up' or 'down')
   const RADIO_BLACKOUT_IMPACT_LEVEL_R2_TEXT = 'HF Signal Loss';  // EDITABLE: Situation text
-  const RADIO_BLACKOUT_IMPACT_LEVEL_R3_ARROW = 'up';             // EDITABLE: Arrow direction ('up' or 'down')
+  const RADIO_BLACKOUT_IMPACT_LEVEL_R3_ARROW = 'up';             // EDITABLE: Fallback arrow direction ('up' or 'down')
   const RADIO_BLACKOUT_IMPACT_LEVEL_R3_TEXT = 'Wide HF Outage';  // EDITABLE: Situation text
-  const RADIO_BLACKOUT_IMPACT_LEVEL_R4_ARROW = 'up';             // EDITABLE: Arrow direction ('up' or 'down')
+  const RADIO_BLACKOUT_IMPACT_LEVEL_R4_ARROW = 'up';             // EDITABLE: Fallback arrow direction ('up' or 'down')
   const RADIO_BLACKOUT_IMPACT_LEVEL_R4_TEXT = 'Major Day Outage';// EDITABLE: Situation text
-  const RADIO_BLACKOUT_IMPACT_LEVEL_R5_ARROW = 'up';             // EDITABLE: Arrow direction ('up' or 'down')
+  const RADIO_BLACKOUT_IMPACT_LEVEL_R5_ARROW = 'up';             // EDITABLE: Fallback arrow direction ('up' or 'down')
   const RADIO_BLACKOUT_IMPACT_LEVEL_R5_TEXT = 'Total Dayside<br>Blackout'; // EDITABLE: Situation text
 
   // --- Flanking Duplicate Timezone Dials Config (JCV) ---
@@ -8915,6 +8919,24 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_TRACK_WIDTH_MOBILE = '0.20vw';          // EDITABLE Mobile: Orbit ring track stroke width
   const ORRERY_Z_INDEX = '10';                         // EDITABLE: Stacking context layer index
 
+  // --- EDITABLE: Central Sun In Orrery Config (JCV) ---
+  const ORRERY_SUN_ENABLED = true;                         // EDITABLE: Toggle visibility of central Sun
+  const ORRERY_SUN_IMAGE_URL = 'img/p-su.png';             // EDITABLE: Sun transparent/lighten PNG asset path
+  const ORRERY_SUN_WIDTH_DESKTOP = '6.0vw';                // EDITABLE Desktop: Central Sun image width
+  const ORRERY_SUN_WIDTH_MOBILE = '9.5vw';                 // EDITABLE Mobile: Central Sun image width
+  const ORRERY_SUN_HEIGHT_DESKTOP = 'auto';                // EDITABLE Desktop: Sun height ('auto' preserves aspect ratio)
+  const ORRERY_SUN_HEIGHT_MOBILE = 'auto';                 // EDITABLE Mobile: Sun height
+  const ORRERY_SUN_ROTATION_ENABLED = true;                // EDITABLE: Toggle slow centered rotation of Sun
+  const ORRERY_SUN_ROTATION_PERIOD_DESKTOP = '180s';       // EDITABLE Desktop: Duration for 1 full rotation revolution (slow centered rotation)
+  const ORRERY_SUN_ROTATION_PERIOD_MOBILE = '180s';        // EDITABLE Mobile: Duration for 1 full rotation revolution
+  const ORRERY_SUN_ROTATION_DIRECTION = 'normal';          // EDITABLE: Rotation direction ('normal' = clockwise, 'reverse' = counter-clockwise)
+  const ORRERY_SUN_OPACITY = '1.0';                        // EDITABLE: Sun opacity (0.0 to 1.0)
+  const ORRERY_SUN_BLEND_MODE = 'lighten';                 // EDITABLE: Mix blend mode ('lighten' ensures dark background blends seamlessly)
+  const ORRERY_SUN_Z_INDEX = '12';                         // EDITABLE: Stacking layer index for central Sun
+  const ORRERY_SUN_GLOW_BLUR_DESKTOP = '0.8vw';            // EDITABLE Desktop: Solar corona ambient glow blur
+  const ORRERY_SUN_GLOW_BLUR_MOBILE = '1.2vw';             // EDITABLE Mobile: Solar corona ambient glow blur
+  const ORRERY_SUN_GLOW_COLOR = 'rgba(255, 140, 0, 0.45)'; // EDITABLE: Solar corona ambient glow color
+
   // --- EDITABLE: Saturn Planet On Orbit Ring Config (JCV) ---
   const ORRERY_SATURN_IMAGE_URL = 'img/p-sa.png';       // EDITABLE: Saturn transparent PNG asset path
   const ORRERY_SATURN_WIDTH_DESKTOP = '6.5vw';         // EDITABLE Desktop: Saturn planet width (aspect ratio maintained)
@@ -9199,6 +9221,23 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--orrery-track-width', isMobile ? ORRERY_TRACK_WIDTH_MOBILE : ORRERY_TRACK_WIDTH_DESKTOP);
     document.documentElement.style.setProperty('--orrery-z-index', ORRERY_Z_INDEX);
 
+    // Central Sun variables
+    document.documentElement.style.setProperty('--orrery-sun-display', ORRERY_SUN_ENABLED ? 'flex' : 'none');
+    document.documentElement.style.setProperty('--orrery-sun-width', isMobile ? ORRERY_SUN_WIDTH_MOBILE : ORRERY_SUN_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-sun-height', isMobile ? ORRERY_SUN_HEIGHT_MOBILE : ORRERY_SUN_HEIGHT_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-sun-opacity', ORRERY_SUN_OPACITY);
+    document.documentElement.style.setProperty('--orrery-sun-blend-mode', ORRERY_SUN_BLEND_MODE);
+    document.documentElement.style.setProperty('--orrery-sun-z-index', ORRERY_SUN_Z_INDEX);
+    document.documentElement.style.setProperty('--orrery-sun-glow-blur', isMobile ? ORRERY_SUN_GLOW_BLUR_MOBILE : ORRERY_SUN_GLOW_BLUR_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-sun-glow-color', ORRERY_SUN_GLOW_COLOR);
+    const sunPeriod = isMobile ? ORRERY_SUN_ROTATION_PERIOD_MOBILE : ORRERY_SUN_ROTATION_PERIOD_DESKTOP;
+    document.documentElement.style.setProperty('--orrery-sun-rotation-period', sunPeriod);
+    if (ORRERY_SUN_ROTATION_ENABLED) {
+      document.documentElement.style.setProperty('--orrery-sun-rotation-animation', `orrery-sun-spin ${sunPeriod} linear infinite ${ORRERY_SUN_ROTATION_DIRECTION}`);
+    } else {
+      document.documentElement.style.setProperty('--orrery-sun-rotation-animation', 'none');
+    }
+
     // Saturn Position & Alignment variables
     const saturnAngle = isMobile ? ORRERY_SATURN_ORBIT_ANGLE_MOBILE : ORRERY_SATURN_ORBIT_ANGLE_DESKTOP;
     const saturnTilt = isMobile ? ORRERY_SATURN_AXIAL_TILT_MOBILE : ORRERY_SATURN_AXIAL_TILT_DESKTOP;
@@ -9482,12 +9521,19 @@ Plan ahead for significantly warmer conditions tomorrow!`
   applyOrreryConfig();
   applyOdometerConfig();
 
+  // Debounced resize: heavy config functions (orrery, earth, sun, odometer) run ONCE
+  // after the user stops dragging — not on every raw mousemove tick.
+  let _heavyConfigDebounceTimer = null;
+  const HEAVY_CONFIG_DEBOUNCE_MS = 300; // EDITABLE: ms after last resize event before re-applying heavy configs
   window.addEventListener('resize', () => {
-    applyWorldClocksConfig();
-    applyEarthImageConfig();
-    applySunImageConfig();
-    applyOrreryConfig();
-    applyOdometerConfig();
+    if (_heavyConfigDebounceTimer) clearTimeout(_heavyConfigDebounceTimer);
+    _heavyConfigDebounceTimer = setTimeout(() => {
+      applyWorldClocksConfig();
+      applyEarthImageConfig();
+      applySunImageConfig();
+      applyOrreryConfig();
+      applyOdometerConfig();
+    }, HEAVY_CONFIG_DEBOUNCE_MS);
   });
 
   // --- EDITABLE: Location Switcher Config (Positioned above Weather Last Updated) ---
@@ -9497,7 +9543,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     // Future locations can easily be added here
   ];
 
-  const LOCATION_GROUP_MARGIN_TOP = '2vw';        // EDITABLE: Top offset pushing the Location group down below grid/earth
+  const LOCATION_GROUP_MARGIN_TOP = '8vw';        // EDITABLE: Top offset pushing the Location group down below grid/earth
   const LOCATION_GROUP_MARGIN_BOTTOM = '2vw';     // EDITABLE: Space below the Location group (above Weather Last Updated)
   const LOCATION_ITEM_MARGIN_TOP = '-2vw';       // EDITABLE: Space above each individual city entry
   const LOCATION_ITEM_MARGIN_BOTTOM = '0.5vw';    // EDITABLE: Space below each individual city entry
@@ -9515,7 +9561,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1231';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1236';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -13225,6 +13271,36 @@ Plan ahead for significantly warmer conditions tomorrow!`
   let liveSolarFlareData = null;
   let solarFlareLiveTimer = null;
 
+  function flareToNumericFlux(flareClass, flareValue) {
+    const cls = String(flareClass || 'B').toUpperCase();
+    const val = parseFloat(flareValue) || 1.0;
+    const multipliers = { A: 1e-8, B: 1e-7, C: 1e-6, M: 1e-5, X: 1e-4 };
+    return val * (multipliers[cls] || 1e-7);
+  }
+
+  function radioToNumericValue(rClass, rValue) {
+    const cls = String(rClass || 'R0').toUpperCase();
+    const val = parseFloat(rValue) || 0.0;
+    const base = { R0: 0, R1: 10, R2: 20, R3: 30, R4: 40, R5: 50 };
+    return (base[cls] || 0) + val;
+  }
+
+  let currentSolarFlareTrend = (() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('weather_trend_solar_flare'));
+      if (saved && (saved.trend === 'up' || saved.trend === 'down')) return saved.trend;
+    } catch (e) {}
+    return 'down';
+  })();
+
+  let currentRadioBlackoutTrend = (() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('weather_trend_radio_blackout'));
+      if (saved && (saved.trend === 'up' || saved.trend === 'down')) return saved.trend;
+    } catch (e) {}
+    return 'down';
+  })();
+
   function formatImpactSublabelHtml(arrowDir, text) {
     const iconClass = (arrowDir === 'down') ? 'fa-solid fa-arrow-down' : 'fa-solid fa-arrow-up';
     if (text.includes('<br>')) {
@@ -13240,16 +13316,22 @@ Plan ahead for significantly warmer conditions tomorrow!`
     return `<i class="${iconClass}" aria-hidden="true"></i> ${text}`;
   }
 
-  function getSolarFlareImpact(flareClass) {
+  function getSolarFlareImpact(flareClass, trendDir) {
     const upper = String(flareClass || 'B').toUpperCase();
+    let defaultArrow = 'down';
+    let text = 'Nominal Activity';
     switch (upper) {
-      case 'A': return { arrow: SOLAR_FLARE_IMPACT_LEVEL_A_ARROW, text: SOLAR_FLARE_IMPACT_LEVEL_A_TEXT };
-      case 'B': return { arrow: SOLAR_FLARE_IMPACT_LEVEL_B_ARROW, text: SOLAR_FLARE_IMPACT_LEVEL_B_TEXT };
-      case 'C': return { arrow: SOLAR_FLARE_IMPACT_LEVEL_C_ARROW, text: SOLAR_FLARE_IMPACT_LEVEL_C_TEXT };
-      case 'M': return { arrow: SOLAR_FLARE_IMPACT_LEVEL_M_ARROW, text: SOLAR_FLARE_IMPACT_LEVEL_M_TEXT };
-      case 'X': return { arrow: SOLAR_FLARE_IMPACT_LEVEL_X_ARROW, text: SOLAR_FLARE_IMPACT_LEVEL_X_TEXT };
-      default:  return { arrow: 'down', text: 'Nominal Activity' };
+      case 'A': defaultArrow = SOLAR_FLARE_IMPACT_LEVEL_A_ARROW; text = SOLAR_FLARE_IMPACT_LEVEL_A_TEXT; break;
+      case 'B': defaultArrow = SOLAR_FLARE_IMPACT_LEVEL_B_ARROW; text = SOLAR_FLARE_IMPACT_LEVEL_B_TEXT; break;
+      case 'C': defaultArrow = SOLAR_FLARE_IMPACT_LEVEL_C_ARROW; text = SOLAR_FLARE_IMPACT_LEVEL_C_TEXT; break;
+      case 'M': defaultArrow = SOLAR_FLARE_IMPACT_LEVEL_M_ARROW; text = SOLAR_FLARE_IMPACT_LEVEL_M_TEXT; break;
+      case 'X': defaultArrow = SOLAR_FLARE_IMPACT_LEVEL_X_ARROW; text = SOLAR_FLARE_IMPACT_LEVEL_X_TEXT; break;
+      default:  defaultArrow = 'down'; text = 'Nominal Activity'; break;
     }
+    const arrow = (SOLAR_FLARE_ARROW_MODE === 'trend')
+      ? (trendDir || currentSolarFlareTrend || defaultArrow)
+      : defaultArrow;
+    return { arrow, text };
   }
 
   function getSolarFlareLabels(flareClass) {
@@ -13349,7 +13431,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const sublabelEl = document.getElementById('solar-flare-sublabel');
       if (sublabelEl) {
         if (SOLAR_FLARE_SUBLABEL_MODE === 'dynamic') {
-          const impact = getSolarFlareImpact(flareClass);
+          const impact = getSolarFlareImpact(flareClass, currentSolarFlareTrend);
           sublabelEl.innerHTML = formatImpactSublabelHtml(impact.arrow, impact.text);
         }
         if (SOLAR_FLARE_SUBLABEL_COLOR === 'auto') {
@@ -13361,6 +13443,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   function handleSolarFlareDialClick(e) {
     if (e) e.stopPropagation();
+    const prevNumeric = activeSolarFlareState 
+      ? flareToNumericFlux(activeSolarFlareState.class, activeSolarFlareState.value)
+      : (liveSolarFlareData ? (liveSolarFlareData.flux || flareToNumericFlux(liveSolarFlareData.class, liveSolarFlareData.value)) : flareToNumericFlux(SOLAR_FLARE_CLASS_MANUAL, SOLAR_FLARE_VALUE_MANUAL));
+
     if (SOLAR_FLARE_MODE === 'live') {
       if (!SOLAR_FLARE_CLICK_CYCLES_CLASSES) {
         fetchLiveSolarFlareData();
@@ -13370,10 +13456,15 @@ Plan ahead for significantly warmer conditions tomorrow!`
       if (currentSolarFlareTestIndex === SOLAR_FLARE_TEST_LEVELS.length) {
         // Return to live feed
         activeSolarFlareState = null;
-        if (liveSolarFlareData) updateSolarFlareDial();
+        if (liveSolarFlareData) {
+          currentSolarFlareTrend = liveSolarFlareData.trend || 'down';
+          updateSolarFlareDial();
+        }
         fetchLiveSolarFlareData();
       } else {
         activeSolarFlareState = SOLAR_FLARE_TEST_LEVELS[currentSolarFlareTestIndex];
+        const nextNumeric = flareToNumericFlux(activeSolarFlareState.class, activeSolarFlareState.value);
+        currentSolarFlareTrend = (nextNumeric >= prevNumeric) ? 'up' : 'down';
         updateSolarFlareDial();
       }
       return;
@@ -13381,6 +13472,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (!SOLAR_FLARE_CLICK_CYCLES_CLASSES) return;
     currentSolarFlareTestIndex = (currentSolarFlareTestIndex + 1) % SOLAR_FLARE_TEST_LEVELS.length;
     activeSolarFlareState = SOLAR_FLARE_TEST_LEVELS[currentSolarFlareTestIndex];
+    const nextNumeric = flareToNumericFlux(activeSolarFlareState.class, activeSolarFlareState.value);
+    currentSolarFlareTrend = (nextNumeric >= prevNumeric) ? 'up' : 'down';
     updateSolarFlareDial();
   }
 
@@ -13413,9 +13506,26 @@ Plan ahead for significantly warmer conditions tomorrow!`
         cls = 'X';
         val = flux / 1e-4;
       }
+
+      // Determine live trend by comparing latest reading against recent previous readings in the time-series
+      let liveTrend = currentSolarFlareTrend || 'down';
+      for (let i = primaryReadings.length - 2; i >= 0; i--) {
+        const diff = flux - primaryReadings[i].flux;
+        if (Math.abs(diff) > 1e-10) {
+          liveTrend = diff > 0 ? 'up' : 'down';
+          break;
+        }
+      }
+      currentSolarFlareTrend = liveTrend;
+      try {
+        localStorage.setItem('weather_trend_solar_flare', JSON.stringify({ flux, trend: liveTrend, time: Date.now() }));
+      } catch (e) {}
+
       liveSolarFlareData = {
         class: cls,
-        value: parseFloat(val.toFixed(1))
+        value: parseFloat(val.toFixed(1)),
+        flux: flux,
+        trend: liveTrend
       };
       updateSolarFlareDial();
     } catch (err) {
@@ -13441,6 +13551,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const initialVal = (SOLAR_FLARE_MODE === 'live' && liveSolarFlareData)
       ? liveSolarFlareData.value
       : (activeSolarFlareState?.value || SOLAR_FLARE_VALUE_MANUAL);
+
     const labels = getSolarFlareLabels(initialClass);
     const displayVal = (typeof initialVal === 'number') ? initialVal.toFixed(1) : String(initialVal);
 
@@ -13469,7 +13580,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const sublabel = document.createElement('div');
       sublabel.className = 'world-clock-label celestial-clock-label solar-flare-sublabel';
       sublabel.id = 'solar-flare-sublabel';
-      const impact = getSolarFlareImpact(initialClass);
+      const impact = getSolarFlareImpact(initialClass, currentSolarFlareTrend);
       const innerContent = (SOLAR_FLARE_SUBLABEL_MODE === 'dynamic')
         ? formatImpactSublabelHtml(impact.arrow, impact.text)
         : (isMobile ? SOLAR_FLARE_SUBLABEL_TEXT_MOBILE : SOLAR_FLARE_SUBLABEL_TEXT_DESKTOP);
@@ -13506,17 +13617,23 @@ Plan ahead for significantly warmer conditions tomorrow!`
   let liveRadioBlackoutData = null;
   let radioBlackoutLiveTimer = null;
 
-  function getRadioBlackoutImpact(rClass) {
+  function getRadioBlackoutImpact(rClass, trendDir) {
     const upper = String(rClass || 'R0').toUpperCase();
+    let defaultArrow = 'down';
+    let text = 'All Bands Clear';
     switch (upper) {
-      case 'R0': return { arrow: RADIO_BLACKOUT_IMPACT_LEVEL_R0_ARROW, text: RADIO_BLACKOUT_IMPACT_LEVEL_R0_TEXT };
-      case 'R1': return { arrow: RADIO_BLACKOUT_IMPACT_LEVEL_R1_ARROW, text: RADIO_BLACKOUT_IMPACT_LEVEL_R1_TEXT };
-      case 'R2': return { arrow: RADIO_BLACKOUT_IMPACT_LEVEL_R2_ARROW, text: RADIO_BLACKOUT_IMPACT_LEVEL_R2_TEXT };
-      case 'R3': return { arrow: RADIO_BLACKOUT_IMPACT_LEVEL_R3_ARROW, text: RADIO_BLACKOUT_IMPACT_LEVEL_R3_TEXT };
-      case 'R4': return { arrow: RADIO_BLACKOUT_IMPACT_LEVEL_R4_ARROW, text: RADIO_BLACKOUT_IMPACT_LEVEL_R4_TEXT };
-      case 'R5': return { arrow: RADIO_BLACKOUT_IMPACT_LEVEL_R5_ARROW, text: RADIO_BLACKOUT_IMPACT_LEVEL_R5_TEXT };
-      default:   return { arrow: 'down', text: 'All Bands Clear' };
+      case 'R0': defaultArrow = RADIO_BLACKOUT_IMPACT_LEVEL_R0_ARROW; text = RADIO_BLACKOUT_IMPACT_LEVEL_R0_TEXT; break;
+      case 'R1': defaultArrow = RADIO_BLACKOUT_IMPACT_LEVEL_R1_ARROW; text = RADIO_BLACKOUT_IMPACT_LEVEL_R1_TEXT; break;
+      case 'R2': defaultArrow = RADIO_BLACKOUT_IMPACT_LEVEL_R2_ARROW; text = RADIO_BLACKOUT_IMPACT_LEVEL_R2_TEXT; break;
+      case 'R3': defaultArrow = RADIO_BLACKOUT_IMPACT_LEVEL_R3_ARROW; text = RADIO_BLACKOUT_IMPACT_LEVEL_R3_TEXT; break;
+      case 'R4': defaultArrow = RADIO_BLACKOUT_IMPACT_LEVEL_R4_ARROW; text = RADIO_BLACKOUT_IMPACT_LEVEL_R4_TEXT; break;
+      case 'R5': defaultArrow = RADIO_BLACKOUT_IMPACT_LEVEL_R5_ARROW; text = RADIO_BLACKOUT_IMPACT_LEVEL_R5_TEXT; break;
+      default:   defaultArrow = 'down'; text = 'All Bands Clear'; break;
     }
+    const arrow = (RADIO_BLACKOUT_ARROW_MODE === 'trend')
+      ? (trendDir || currentRadioBlackoutTrend || defaultArrow)
+      : defaultArrow;
+    return { arrow, text };
   }
 
   function getRadioBlackoutLabels(rClass) {
@@ -13641,7 +13758,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const sublabelEl = document.getElementById('radio-blackout-sublabel');
       if (sublabelEl) {
         if (RADIO_BLACKOUT_SUBLABEL_MODE === 'dynamic') {
-          const impact = getRadioBlackoutImpact(rClass);
+          const impact = getRadioBlackoutImpact(rClass, currentRadioBlackoutTrend);
           sublabelEl.innerHTML = formatImpactSublabelHtml(impact.arrow, impact.text);
         }
         if (RADIO_BLACKOUT_SUBLABEL_COLOR === 'auto') {
@@ -13653,6 +13770,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   function handleRadioBlackoutDialClick(e) {
     if (e) e.stopPropagation();
+    const prevNumeric = activeRadioBlackoutState
+      ? radioToNumericValue(activeRadioBlackoutState.class, activeRadioBlackoutState.value)
+      : (liveRadioBlackoutData ? (liveRadioBlackoutData.value || radioToNumericValue(liveRadioBlackoutData.class, liveRadioBlackoutData.value)) : radioToNumericValue(RADIO_BLACKOUT_CLASS_MANUAL, RADIO_BLACKOUT_VALUE_MANUAL));
+
     if (RADIO_BLACKOUT_MODE === 'live') {
       if (!RADIO_BLACKOUT_CLICK_CYCLES_CLASSES) {
         fetchLiveRadioBlackoutData();
@@ -13662,10 +13783,15 @@ Plan ahead for significantly warmer conditions tomorrow!`
       if (currentRadioBlackoutTestIndex === RADIO_BLACKOUT_TEST_LEVELS.length) {
         // Return to live feed
         activeRadioBlackoutState = null;
-        if (liveRadioBlackoutData) updateRadioBlackoutDial();
+        if (liveRadioBlackoutData) {
+          currentRadioBlackoutTrend = liveRadioBlackoutData.trend || 'down';
+          updateRadioBlackoutDial();
+        }
         fetchLiveRadioBlackoutData();
       } else {
         activeRadioBlackoutState = RADIO_BLACKOUT_TEST_LEVELS[currentRadioBlackoutTestIndex];
+        const nextNumeric = radioToNumericValue(activeRadioBlackoutState.class, activeRadioBlackoutState.value);
+        currentRadioBlackoutTrend = (nextNumeric >= prevNumeric) ? 'up' : 'down';
         updateRadioBlackoutDial();
       }
       return;
@@ -13673,6 +13799,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (!RADIO_BLACKOUT_CLICK_CYCLES_CLASSES) return;
     currentRadioBlackoutTestIndex = (currentRadioBlackoutTestIndex + 1) % RADIO_BLACKOUT_TEST_LEVELS.length;
     activeRadioBlackoutState = RADIO_BLACKOUT_TEST_LEVELS[currentRadioBlackoutTestIndex];
+    const nextNumeric = radioToNumericValue(activeRadioBlackoutState.class, activeRadioBlackoutState.value);
+    currentRadioBlackoutTrend = (nextNumeric >= prevNumeric) ? 'up' : 'down';
     updateRadioBlackoutDial();
   }
 
@@ -13711,9 +13839,25 @@ Plan ahead for significantly warmer conditions tomorrow!`
         val = 25.0 + Math.min(15.0, ((flux - 2e-3) / 1e-3) * 10.0);
       }
 
+      // Determine live trend by comparing latest reading against recent previous readings in the time-series
+      let liveTrend = currentRadioBlackoutTrend || 'down';
+      for (let i = primaryReadings.length - 2; i >= 0; i--) {
+        const diff = flux - primaryReadings[i].flux;
+        if (Math.abs(diff) > 1e-10) {
+          liveTrend = diff > 0 ? 'up' : 'down';
+          break;
+        }
+      }
+      currentRadioBlackoutTrend = liveTrend;
+      try {
+        localStorage.setItem('weather_trend_radio_blackout', JSON.stringify({ flux, trend: liveTrend, time: Date.now() }));
+      } catch (e) {}
+
       liveRadioBlackoutData = {
         class: cls,
-        value: parseFloat(val.toFixed(1))
+        value: parseFloat(val.toFixed(1)),
+        flux: flux,
+        trend: liveTrend
       };
       updateRadioBlackoutDial();
     } catch (err) {
@@ -13767,7 +13911,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const sublabel = document.createElement('div');
       sublabel.className = 'world-clock-label celestial-clock-label radio-blackout-sublabel';
       sublabel.id = 'radio-blackout-sublabel';
-      const impact = getRadioBlackoutImpact(initialClass);
+      const impact = getRadioBlackoutImpact(initialClass, currentRadioBlackoutTrend);
       const innerContent = (RADIO_BLACKOUT_SUBLABEL_MODE === 'dynamic')
         ? formatImpactSublabelHtml(impact.arrow, impact.text)
         : (isMobile ? RADIO_BLACKOUT_SUBLABEL_TEXT_MOBILE : RADIO_BLACKOUT_SUBLABEL_TEXT_DESKTOP);
@@ -15300,6 +15444,20 @@ Plan ahead for significantly warmer conditions tomorrow!`
       svg.appendChild(mercuryCircle);
       ringContainer.appendChild(svg);
 
+      // Create Central Sun
+      const sunBody = document.createElement('div');
+      sunBody.className = 'orrery-sun-body';
+      sunBody.id = 'orrery-sun-body';
+
+      const sunImg = document.createElement('img');
+      sunImg.className = 'orrery-sun-img';
+      sunImg.id = 'orrery-sun-img';
+      sunImg.src = ORRERY_SUN_IMAGE_URL || 'img/p-su.png';
+      sunImg.alt = 'Sun';
+      sunImg.draggable = false;
+
+      sunBody.appendChild(sunImg);
+      ringContainer.appendChild(sunBody);
 
       // Create Saturn orbit arm and body
       const saturnArm = document.createElement('div');
@@ -15419,6 +15577,28 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       const ringContainer = section.querySelector('.orrery-ring-container');
       if (ringContainer) {
+        let sunBody = ringContainer.querySelector('.orrery-sun-body');
+        if (!sunBody) {
+          sunBody = document.createElement('div');
+          sunBody.className = 'orrery-sun-body';
+          sunBody.id = 'orrery-sun-body';
+
+          const sunImg = document.createElement('img');
+          sunImg.className = 'orrery-sun-img';
+          sunImg.id = 'orrery-sun-img';
+          sunImg.src = ORRERY_SUN_IMAGE_URL || 'img/p-su.png';
+          sunImg.alt = 'Sun';
+          sunImg.draggable = false;
+
+          sunBody.appendChild(sunImg);
+          ringContainer.appendChild(sunBody);
+        } else {
+          const sunImg = sunBody.querySelector('.orrery-sun-img');
+          if (sunImg && ORRERY_SUN_IMAGE_URL && sunImg.getAttribute('src') !== ORRERY_SUN_IMAGE_URL) {
+            sunImg.src = ORRERY_SUN_IMAGE_URL;
+          }
+        }
+
         let saturnArm = ringContainer.querySelector('.orrery-saturn-arm');
         if (!saturnArm) {
           saturnArm = document.createElement('div');
@@ -18797,32 +18977,78 @@ Plan ahead for significantly warmer conditions tomorrow!`
     }
   });
 
+  // --- CONFIG: Resize Loader Overlay ---
+  // Fade the pulsing startup logo back over the UI at the START of a resize,
+  // then fade it out once resizing has stopped and the DOM has re-settled.
+  const RESIZE_LOADER_FADE_IN_MS  = 120;   // EDITABLE: How fast the loader fades IN when resize begins (ms)
+  const RESIZE_LOADER_DEBOUNCE_MS = 350;   // EDITABLE: How long after the last resize event before fading OUT (ms)
+  const RESIZE_LOADER_FADE_OUT_MS = 600;   // EDITABLE: How fast the loader fades OUT after resizing stops (ms)
+  const RESIZE_LOADER_DOM_DELAY_MS = 100;  // EDITABLE: Delay before re-running DOM repositioning (ms)
+
+  let _resizeLoaderDebounceTimer = null;
+  let _resizeLoaderVisible = false; // Guard: only show once per resize sequence
+
+  function _showResizeLoader() {
+    if (_resizeLoaderVisible) return; // Already showing — don't reset opacity on every mousemove
+    const loader = document.getElementById('startup-loader');
+    if (!loader) return;
+    _resizeLoaderVisible = true;
+    // Un-hide from display:none, snap to transparent, then fade to fully opaque
+    loader.style.setProperty('transition', 'none', 'important');
+    loader.style.setProperty('display', 'flex', 'important');
+    loader.style.setProperty('opacity', '0', 'important');
+    void loader.offsetWidth; // Force reflow so the browser registers opacity:0 before animating
+    loader.style.setProperty('transition', `opacity ${RESIZE_LOADER_FADE_IN_MS}ms ease-in-out`, 'important');
+    loader.style.setProperty('opacity', '1', 'important');
+  }
+
+  function _hideResizeLoader() {
+    _resizeLoaderVisible = false;
+    const loader = document.getElementById('startup-loader');
+    if (!loader) return;
+    loader.style.setProperty('transition', `opacity ${RESIZE_LOADER_FADE_OUT_MS}ms ease-in-out`, 'important');
+    loader.style.setProperty('opacity', '0', 'important');
+    setTimeout(() => { loader.style.setProperty('display', 'none', 'important'); }, RESIZE_LOADER_FADE_OUT_MS);
+  }
+
   // Reposition temperature pointer and wind arrow on window resize
   window.addEventListener('resize', () => {
     const isMobile = window.innerWidth <= 767;
-    if (typeof applyWorldClocksConfig === 'function') applyWorldClocksConfig();
-    if (typeof updateWorldClockHands === 'function') updateWorldClockHands();
-    if (typeof applyScrollTopButtonConfig === 'function') applyScrollTopButtonConfig();
-    if (typeof applyOdometerConfig === 'function') applyOdometerConfig();
-    if (typeof applyOrreryConfig === 'function') applyOrreryConfig();
-    document.documentElement.style.setProperty('--circle-cell-top', isMobile ? CIRCLE_CELL_TOP_MOBILE : CIRCLE_CELL_TOP_DESKTOP);
-    document.documentElement.style.setProperty('--fragile-y-offset', isMobile ? FRAGILE_ELEMENTS_Y_OFFSET_MOBILE : FRAGILE_ELEMENTS_Y_OFFSET_DESKTOP);
-    document.documentElement.style.setProperty('--day0-lines-opacity', isMobile ? DAY0_LINES_OPACITY_MOBILE : DAY0_LINES_OPACITY_DESKTOP);
-    document.documentElement.style.setProperty('--day0-lines-z-index', isMobile ? DAY0_LINES_Z_INDEX_MOBILE : DAY0_LINES_Z_INDEX_DESKTOP);
-    document.documentElement.style.setProperty('--hi-bar-text-z-index', isMobile ? HI_BAR_TEXT_Z_INDEX_MOBILE : HI_BAR_TEXT_Z_INDEX_DESKTOP);
-    if (lastWeatherData) {
-      // Delay to ensure DOM has settled after resize
-      setTimeout(() => {
-        updateTempPointer(lastWeatherData);
-        updateDay0TempLines(lastWeatherData);
-        updateForecastImages(lastWeatherData);
-        updateHourlyGradients(lastWeatherData);
-        updateDailySummary(lastWeatherData);
-        updateVersionDisplay();
-        updateFeelsLike(lastWeatherData);
-        // updateWindDotsRow(lastWeatherData); // Reposition wind arrow
-      }, 100);
-    }
+
+    // Fade in the loader on the FIRST event of a resize sequence to cover mid-reflow jank
+    _showResizeLoader();
+
+    // Debounce: clear any pending settle timer and restart it
+    if (_resizeLoaderDebounceTimer) clearTimeout(_resizeLoaderDebounceTimer);
+
+    _resizeLoaderDebounceTimer = setTimeout(() => {
+      // CSS variable repositioning (lightweight — runs immediately inside debounce)
+      if (typeof updateWorldClockHands === 'function') updateWorldClockHands();
+      if (typeof applyScrollTopButtonConfig === 'function') applyScrollTopButtonConfig();
+      document.documentElement.style.setProperty('--circle-cell-top', isMobile ? CIRCLE_CELL_TOP_MOBILE : CIRCLE_CELL_TOP_DESKTOP);
+      document.documentElement.style.setProperty('--fragile-y-offset', isMobile ? FRAGILE_ELEMENTS_Y_OFFSET_MOBILE : FRAGILE_ELEMENTS_Y_OFFSET_DESKTOP);
+      document.documentElement.style.setProperty('--day0-lines-opacity', isMobile ? DAY0_LINES_OPACITY_MOBILE : DAY0_LINES_OPACITY_DESKTOP);
+      document.documentElement.style.setProperty('--day0-lines-z-index', isMobile ? DAY0_LINES_Z_INDEX_MOBILE : DAY0_LINES_Z_INDEX_DESKTOP);
+      document.documentElement.style.setProperty('--hi-bar-text-z-index', isMobile ? HI_BAR_TEXT_Z_INDEX_MOBILE : HI_BAR_TEXT_Z_INDEX_DESKTOP);
+
+      if (lastWeatherData) {
+        setTimeout(() => {
+          updateTempPointer(lastWeatherData);
+          updateDay0TempLines(lastWeatherData);
+          updateForecastImages(lastWeatherData);
+          updateHourlyGradients(lastWeatherData);
+          updateDailySummary(lastWeatherData);
+          updateVersionDisplay();
+          updateFeelsLike(lastWeatherData);
+          // updateWindDotsRow(lastWeatherData); // Reposition wind arrow
+
+          // All re-layouts done — fade the loader back out to reveal the settled UI
+          _hideResizeLoader();
+        }, RESIZE_LOADER_DOM_DELAY_MS);
+      } else {
+        _hideResizeLoader();
+      }
+    }, RESIZE_LOADER_DEBOUNCE_MS);
   });
 
   // Update wind direction arrow with spin animation
