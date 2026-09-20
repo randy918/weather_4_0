@@ -8780,6 +8780,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const ELEMENTS = {
       mercury: { L0: 252.250906, L1: 149472.6746358 },
       venus:   { L0: 181.979801, L1:  58517.8156760 },
+      earth:   { L0: 100.464457, L1:  36000.7698278 }, // heliocentric, same as Sun's geocentric + 180
       mars:    { L0: 355.433000, L1:  19140.2993313 },
       jupiter: { L0:  34.351519, L1:   3034.9056606 },
       saturn:  { L0:  50.077444, L1:   1222.1137943 },
@@ -8825,7 +8826,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_RADIUS_DESKTOP = '30vw';                // EDITABLE Desktop: Planetary orbit ring radius (diameter = 2x)
   const ORRERY_RADIUS_MOBILE = '30vw';                 // EDITABLE Mobile: Planetary orbit ring radius (diameter = 2x)
   const ORRERY_TRACK_COLOR = 'rgba(255, 255, 255, 0.2)'; // EDITABLE: Orbit ring track stroke color (matches app gauges)
-  const ORRERY_TRACK_WIDTH_DESKTOP = '0.15vw';         // EDITABLE Desktop: Orbit ring track stroke width
+  const ORRERY_TRACK_WIDTH_DESKTOP = '0.05vw';         // EDITABLE Desktop: Orbit ring track stroke width
   const ORRERY_TRACK_WIDTH_MOBILE = '0.20vw';          // EDITABLE Mobile: Orbit ring track stroke width
   const ORRERY_Z_INDEX = '10';                         // EDITABLE: Stacking context layer index
 
@@ -8849,7 +8850,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_SATURN_AXIAL_TILT_MOBILE = '0deg';      // EDITABLE Mobile: Saturn ring tilt angle
   const ORRERY_SATURN_KEEP_AXIAL_TILT = true;          // EDITABLE: Keep celestial axial ring tilt fixed in space during revolution
   const ORRERY_SATURN_OPACITY = '1.0';                 // EDITABLE: Saturn opacity (0.0 to 1.0)
-  const ORRERY_SATURN_Z_INDEX = '15';                  // EDITABLE: Saturn layer index above orbit track
+  const ORRERY_SATURN_Z_INDEX = '15';                   // EDITABLE: Saturn layer index above orbit track
+  const ORRERY_SATURN_TRACK_WIDTH_DESKTOP = '0.15vw';   // EDITABLE Desktop: Saturn outermost ring stroke width (independent of inner rings)
+  const ORRERY_SATURN_TRACK_WIDTH_MOBILE  = '0.20vw';   // EDITABLE Mobile: Saturn outermost ring stroke width
   
   // --- EDITABLE: Saturn Drop Shadow & Atmosphere Glow Config (JCV) ---
   const ORRERY_SATURN_SHADOW_COLOR = 'rgba(0, 0, 0, 0.75)'; // EDITABLE: Saturn drop shadow color & opacity
@@ -8862,6 +8865,187 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_SATURN_GLOW_COLOR = 'rgba(255, 220, 150, 0.35)'; // EDITABLE: Optional atmospheric celestial glow color
   const ORRERY_SATURN_GLOW_BLUR_DESKTOP = '0vw';       // EDITABLE Desktop: Optional glow blur radius (set e.g. 0.8vw to enable aura)
   const ORRERY_SATURN_GLOW_BLUR_MOBILE = '0vw';        // EDITABLE Mobile: Optional glow blur radius
+
+  // --- EDITABLE: Jupiter Planet On Orbit Ring Config (JCV) ---
+  // Ring spacing rule: each inner ring's CIRCUMFERENCE is 1/6 less than the outer ring's.
+  // C_jupiter = C_saturn × (5/6)  →  since C = 2π·r, radius scales by the same ratio:
+  // Jupiter ring radius = Saturn radius × (5/6) = 30vw × 5/6 = 25vw
+  // (Jupiter circumference = 83.33% of Saturn circumference)
+  const ORRERY_JUPITER_RING_RADIUS_DESKTOP = '25vw';     // EDITABLE Desktop: Jupiter orbit ring radius (5/6 of Saturn 30vw)
+  const ORRERY_JUPITER_RING_RADIUS_MOBILE  = '25vw';     // EDITABLE Mobile: Jupiter orbit ring radius
+  const ORRERY_JUPITER_IMAGE_URL = 'img/p-ju.png';       // EDITABLE: Jupiter transparent PNG asset path
+  const ORRERY_JUPITER_WIDTH_DESKTOP = '4.5vw';          // EDITABLE Desktop: Jupiter planet image width
+  const ORRERY_JUPITER_WIDTH_MOBILE  = '7vw';            // EDITABLE Mobile: Jupiter planet image width
+  const ORRERY_JUPITER_HEIGHT_DESKTOP = 'auto';          // EDITABLE Desktop: Jupiter height ('auto' preserves aspect ratio)
+  const ORRERY_JUPITER_HEIGHT_MOBILE  = 'auto';          // EDITABLE Mobile: Jupiter height
+  // AUTO-CALCULATED: Jupiter's real ecliptic longitude for today → orrery clockwise CSS angle
+  // To override, replace calcPlanetOrreryAngle('jupiter') with a literal e.g. '125deg'
+  const ORRERY_JUPITER_ORBIT_ANGLE_DESKTOP = calcPlanetOrreryAngle('jupiter'); // AUTO: real ephemeris
+  const ORRERY_JUPITER_ORBIT_ANGLE_MOBILE  = calcPlanetOrreryAngle('jupiter'); // AUTO: real ephemeris
+  const ORRERY_JUPITER_RADIAL_OFFSET_DESKTOP = '0vw';    // EDITABLE Desktop: Radial offset from orbit track (+ outward, - inward)
+  const ORRERY_JUPITER_RADIAL_OFFSET_MOBILE  = '0vw';    // EDITABLE Mobile: Radial offset from orbit track
+  const ORRERY_JUPITER_ROTATION_ENABLED = false;         // EDITABLE: Toggle continuous revolution (true = orbiting, false = stationary)
+  const ORRERY_JUPITER_ORBIT_PERIOD_DESKTOP = '90s';     // EDITABLE Desktop: Duration for 1 full orbit revolution (Jupiter ~11.9yr, faster than Saturn)
+  const ORRERY_JUPITER_ORBIT_PERIOD_MOBILE  = '90s';     // EDITABLE Mobile: Duration for 1 full orbit revolution
+  const ORRERY_JUPITER_ROTATION_DIRECTION = 'normal';    // EDITABLE: Orbit direction ('normal' = clockwise, 'reverse' = counter-clockwise)
+  const ORRERY_JUPITER_AXIAL_TILT_DESKTOP = '0deg';      // EDITABLE Desktop: Image orientation tilt (e.g. '0deg' upright, '-23deg' tilted)
+  const ORRERY_JUPITER_AXIAL_TILT_MOBILE  = '0deg';      // EDITABLE Mobile: Image orientation tilt
+  const ORRERY_JUPITER_KEEP_AXIAL_TILT = true;           // EDITABLE: Keep image orientation fixed in space during revolution
+  const ORRERY_JUPITER_OPACITY = '1.0';                  // EDITABLE: Jupiter opacity (0.0 to 1.0)
+  const ORRERY_JUPITER_Z_INDEX = '14';                   // EDITABLE: Jupiter layer index
+
+  // --- EDITABLE: Jupiter Drop Shadow & Atmosphere Glow Config (JCV) ---
+  const ORRERY_JUPITER_SHADOW_COLOR = 'rgba(0, 0, 0, 0.75)'; // EDITABLE: Jupiter drop shadow color & opacity
+  const ORRERY_JUPITER_SHADOW_BLUR_DESKTOP = '0.7vw';    // EDITABLE Desktop: Jupiter drop shadow blur radius
+  const ORRERY_JUPITER_SHADOW_BLUR_MOBILE  = '1.0vw';    // EDITABLE Mobile: Jupiter drop shadow blur radius
+  const ORRERY_JUPITER_SHADOW_X_DESKTOP = '0.2vw';       // EDITABLE Desktop: Jupiter drop shadow horizontal offset
+  const ORRERY_JUPITER_SHADOW_X_MOBILE  = '0.4vw';       // EDITABLE Mobile: Jupiter drop shadow horizontal offset
+  const ORRERY_JUPITER_SHADOW_Y_DESKTOP = '0.5vw';       // EDITABLE Desktop: Jupiter drop shadow vertical offset
+  const ORRERY_JUPITER_SHADOW_Y_MOBILE  = '0.8vw';       // EDITABLE Mobile: Jupiter drop shadow vertical offset
+  const ORRERY_JUPITER_GLOW_COLOR = 'rgba(210, 180, 140, 0.30)'; // EDITABLE: Optional atmospheric glow color
+  const ORRERY_JUPITER_GLOW_BLUR_DESKTOP = '0vw';        // EDITABLE Desktop: Optional glow blur radius (set e.g. 0.8vw to enable aura)
+  const ORRERY_JUPITER_GLOW_BLUR_MOBILE  = '0vw';        // EDITABLE Mobile: Optional glow blur radius
+
+  // --- EDITABLE: Mars Planet On Orbit Ring Config (JCV) ---
+  // Ring scale: Saturn = 100% (30vw). Mars = 66.67% (2/3) of Saturn.
+  // Mars ring radius = 30vw × 66.67% = 20vw
+  const ORRERY_MARS_RING_RADIUS_DESKTOP = '20vw';        // EDITABLE Desktop: Mars orbit ring radius (66.67% of Saturn 30vw)
+  const ORRERY_MARS_RING_RADIUS_MOBILE  = '20vw';        // EDITABLE Mobile: Mars orbit ring radius
+  const ORRERY_MARS_IMAGE_URL = 'img/p-ma.png';          // EDITABLE: Mars transparent PNG asset path
+  const ORRERY_MARS_WIDTH_DESKTOP = '2.8vw';             // EDITABLE Desktop: Mars planet image width
+  const ORRERY_MARS_WIDTH_MOBILE  = '4.5vw';             // EDITABLE Mobile: Mars planet image width
+  const ORRERY_MARS_HEIGHT_DESKTOP = 'auto';             // EDITABLE Desktop: Mars height ('auto' preserves aspect ratio)
+  const ORRERY_MARS_HEIGHT_MOBILE  = 'auto';             // EDITABLE Mobile: Mars height
+  // AUTO-CALCULATED: Mars's real ecliptic longitude for today → orrery clockwise CSS angle
+  const ORRERY_MARS_ORBIT_ANGLE_DESKTOP = calcPlanetOrreryAngle('mars'); // AUTO: real ephemeris
+  const ORRERY_MARS_ORBIT_ANGLE_MOBILE  = calcPlanetOrreryAngle('mars'); // AUTO: real ephemeris
+  const ORRERY_MARS_RADIAL_OFFSET_DESKTOP = '0vw';       // EDITABLE Desktop: Radial offset from orbit track
+  const ORRERY_MARS_RADIAL_OFFSET_MOBILE  = '0vw';       // EDITABLE Mobile: Radial offset
+  const ORRERY_MARS_ROTATION_ENABLED = false;            // EDITABLE: Toggle continuous revolution
+  const ORRERY_MARS_ORBIT_PERIOD_DESKTOP = '60s';        // EDITABLE Desktop: Duration for 1 full orbit revolution (Mars ~1.88yr)
+  const ORRERY_MARS_ORBIT_PERIOD_MOBILE  = '60s';        // EDITABLE Mobile: Duration for 1 full orbit revolution
+  const ORRERY_MARS_ROTATION_DIRECTION = 'normal';       // EDITABLE: Orbit direction ('normal' = clockwise)
+  const ORRERY_MARS_AXIAL_TILT_DESKTOP = '0deg';         // EDITABLE Desktop: Image orientation tilt
+  const ORRERY_MARS_AXIAL_TILT_MOBILE  = '0deg';         // EDITABLE Mobile: Image orientation tilt
+  const ORRERY_MARS_KEEP_AXIAL_TILT = true;              // EDITABLE: Keep image orientation fixed in space during revolution
+  const ORRERY_MARS_OPACITY = '1.0';                     // EDITABLE: Mars opacity (0.0 to 1.0)
+  const ORRERY_MARS_Z_INDEX = '13';                      // EDITABLE: Mars layer index
+  const ORRERY_MARS_SHADOW_COLOR = 'rgba(0,0,0,0.75)';  // EDITABLE: Mars drop shadow color
+  const ORRERY_MARS_SHADOW_BLUR_DESKTOP = '0.6vw';       // EDITABLE Desktop: Shadow blur
+  const ORRERY_MARS_SHADOW_BLUR_MOBILE  = '0.9vw';       // EDITABLE Mobile: Shadow blur
+  const ORRERY_MARS_SHADOW_X_DESKTOP = '0.15vw';         // EDITABLE Desktop: Shadow horizontal offset
+  const ORRERY_MARS_SHADOW_X_MOBILE  = '0.3vw';          // EDITABLE Mobile: Shadow horizontal offset
+  const ORRERY_MARS_SHADOW_Y_DESKTOP = '0.4vw';          // EDITABLE Desktop: Shadow vertical offset
+  const ORRERY_MARS_SHADOW_Y_MOBILE  = '0.7vw';          // EDITABLE Mobile: Shadow vertical offset
+  const ORRERY_MARS_GLOW_COLOR = 'rgba(200,100,60,0.25)'; // EDITABLE: Optional red glow color
+  const ORRERY_MARS_GLOW_BLUR_DESKTOP = '0vw';           // EDITABLE Desktop: Optional glow blur radius
+  const ORRERY_MARS_GLOW_BLUR_MOBILE  = '0vw';           // EDITABLE Mobile: Optional glow blur radius
+
+  // --- EDITABLE: Earth Planet On Orbit Ring Config (JCV) ---
+  // Ring scale: Saturn = 100% (30vw). Earth = 50% (1/2) of Saturn.
+  // Earth ring radius = 30vw × 50% = 15vw
+  const ORRERY_EARTH_RING_RADIUS_DESKTOP = '15vw';       // EDITABLE Desktop: Earth orbit ring radius (50% of Saturn 30vw)
+  const ORRERY_EARTH_RING_RADIUS_MOBILE  = '15vw';       // EDITABLE Mobile: Earth orbit ring radius
+  const ORRERY_EARTH_IMAGE_URL = 'img/p-ea.png';         // EDITABLE: Earth transparent PNG asset path
+  const ORRERY_EARTH_WIDTH_DESKTOP = '3.2vw';            // EDITABLE Desktop: Earth planet image width
+  const ORRERY_EARTH_WIDTH_MOBILE  = '5.0vw';            // EDITABLE Mobile: Earth planet image width
+  const ORRERY_EARTH_HEIGHT_DESKTOP = 'auto';            // EDITABLE Desktop: Earth height ('auto' preserves aspect ratio)
+  const ORRERY_EARTH_HEIGHT_MOBILE  = 'auto';            // EDITABLE Mobile: Earth height
+  // AUTO-CALCULATED: Earth's real heliocentric ecliptic longitude for today → orrery angle
+  const ORRERY_EARTH_ORBIT_ANGLE_DESKTOP = calcPlanetOrreryAngle('earth'); // AUTO: real ephemeris
+  const ORRERY_EARTH_ORBIT_ANGLE_MOBILE  = calcPlanetOrreryAngle('earth'); // AUTO: real ephemeris
+  const ORRERY_EARTH_RADIAL_OFFSET_DESKTOP = '0vw';      // EDITABLE Desktop: Radial offset from orbit track
+  const ORRERY_EARTH_RADIAL_OFFSET_MOBILE  = '0vw';      // EDITABLE Mobile: Radial offset
+  const ORRERY_EARTH_ROTATION_ENABLED = false;           // EDITABLE: Toggle continuous revolution
+  const ORRERY_EARTH_ORBIT_PERIOD_DESKTOP = '40s';       // EDITABLE Desktop: Duration for 1 full orbit revolution (Earth = 1yr)
+  const ORRERY_EARTH_ORBIT_PERIOD_MOBILE  = '40s';       // EDITABLE Mobile: Duration for 1 full orbit revolution
+  const ORRERY_EARTH_ROTATION_DIRECTION = 'normal';      // EDITABLE: Orbit direction
+  const ORRERY_EARTH_AXIAL_TILT_DESKTOP = '0deg';        // EDITABLE Desktop: Image orientation tilt
+  const ORRERY_EARTH_AXIAL_TILT_MOBILE  = '0deg';        // EDITABLE Mobile: Image orientation tilt
+  const ORRERY_EARTH_KEEP_AXIAL_TILT = true;             // EDITABLE: Keep image orientation fixed in space during revolution
+  const ORRERY_EARTH_OPACITY = '1.0';                    // EDITABLE: Earth opacity
+  const ORRERY_EARTH_Z_INDEX = '12';                     // EDITABLE: Earth layer index
+  const ORRERY_EARTH_SHADOW_COLOR = 'rgba(0,0,0,0.75)'; // EDITABLE: Earth drop shadow color
+  const ORRERY_EARTH_SHADOW_BLUR_DESKTOP = '0.5vw';      // EDITABLE Desktop: Shadow blur
+  const ORRERY_EARTH_SHADOW_BLUR_MOBILE  = '0.8vw';      // EDITABLE Mobile: Shadow blur
+  const ORRERY_EARTH_SHADOW_X_DESKTOP = '0.15vw';        // EDITABLE Desktop: Shadow horizontal offset
+  const ORRERY_EARTH_SHADOW_X_MOBILE  = '0.3vw';         // EDITABLE Mobile: Shadow horizontal offset
+  const ORRERY_EARTH_SHADOW_Y_DESKTOP = '0.35vw';        // EDITABLE Desktop: Shadow vertical offset
+  const ORRERY_EARTH_SHADOW_Y_MOBILE  = '0.6vw';         // EDITABLE Mobile: Shadow vertical offset
+  const ORRERY_EARTH_GLOW_COLOR = 'rgba(60,130,200,0.25)'; // EDITABLE: Optional blue glow color
+  const ORRERY_EARTH_GLOW_BLUR_DESKTOP = '0vw';          // EDITABLE Desktop: Optional glow blur radius
+  const ORRERY_EARTH_GLOW_BLUR_MOBILE  = '0vw';          // EDITABLE Mobile: Optional glow blur radius
+
+  // --- EDITABLE: Venus Planet On Orbit Ring Config (JCV) ---
+  // Ring scale: Saturn = 100% (30vw). Venus = 33.33% (1/3) of Saturn.
+  // Venus ring radius = 30vw × 33.33% = 10vw
+  const ORRERY_VENUS_RING_RADIUS_DESKTOP = '10vw';       // EDITABLE Desktop: Venus orbit ring radius (33.33% of Saturn 30vw)
+  const ORRERY_VENUS_RING_RADIUS_MOBILE  = '10vw';       // EDITABLE Mobile: Venus orbit ring radius
+  const ORRERY_VENUS_IMAGE_URL = 'img/p-ve.png';         // EDITABLE: Venus transparent PNG asset path
+  const ORRERY_VENUS_WIDTH_DESKTOP = '2.8vw';            // EDITABLE Desktop: Venus planet image width
+  const ORRERY_VENUS_WIDTH_MOBILE  = '4.5vw';            // EDITABLE Mobile: Venus planet image width
+  const ORRERY_VENUS_HEIGHT_DESKTOP = 'auto';            // EDITABLE Desktop: Venus height ('auto' preserves aspect ratio)
+  const ORRERY_VENUS_HEIGHT_MOBILE  = 'auto';            // EDITABLE Mobile: Venus height
+  // AUTO-CALCULATED: Venus's real ecliptic longitude for today → orrery clockwise CSS angle
+  const ORRERY_VENUS_ORBIT_ANGLE_DESKTOP = calcPlanetOrreryAngle('venus'); // AUTO: real ephemeris
+  const ORRERY_VENUS_ORBIT_ANGLE_MOBILE  = calcPlanetOrreryAngle('venus'); // AUTO: real ephemeris
+  const ORRERY_VENUS_RADIAL_OFFSET_DESKTOP = '0vw';      // EDITABLE Desktop: Radial offset from orbit track
+  const ORRERY_VENUS_RADIAL_OFFSET_MOBILE  = '0vw';      // EDITABLE Mobile: Radial offset
+  const ORRERY_VENUS_ROTATION_ENABLED = false;           // EDITABLE: Toggle continuous revolution
+  const ORRERY_VENUS_ORBIT_PERIOD_DESKTOP = '30s';       // EDITABLE Desktop: Duration for 1 full orbit revolution (Venus ~0.62yr)
+  const ORRERY_VENUS_ORBIT_PERIOD_MOBILE  = '30s';       // EDITABLE Mobile: Duration for 1 full orbit revolution
+  const ORRERY_VENUS_ROTATION_DIRECTION = 'normal';      // EDITABLE: Orbit direction
+  const ORRERY_VENUS_AXIAL_TILT_DESKTOP = '0deg';        // EDITABLE Desktop: Image orientation tilt
+  const ORRERY_VENUS_AXIAL_TILT_MOBILE  = '0deg';        // EDITABLE Mobile: Image orientation tilt
+  const ORRERY_VENUS_KEEP_AXIAL_TILT = true;             // EDITABLE: Keep image orientation fixed in space during revolution
+  const ORRERY_VENUS_OPACITY = '1.0';                    // EDITABLE: Venus opacity
+  const ORRERY_VENUS_Z_INDEX = '11';                     // EDITABLE: Venus layer index
+  const ORRERY_VENUS_SHADOW_COLOR = 'rgba(0,0,0,0.75)'; // EDITABLE: Venus drop shadow color
+  const ORRERY_VENUS_SHADOW_BLUR_DESKTOP = '0.5vw';      // EDITABLE Desktop: Shadow blur
+  const ORRERY_VENUS_SHADOW_BLUR_MOBILE  = '0.8vw';      // EDITABLE Mobile: Shadow blur
+  const ORRERY_VENUS_SHADOW_X_DESKTOP = '0.12vw';        // EDITABLE Desktop: Shadow horizontal offset
+  const ORRERY_VENUS_SHADOW_X_MOBILE  = '0.25vw';        // EDITABLE Mobile: Shadow horizontal offset
+  const ORRERY_VENUS_SHADOW_Y_DESKTOP = '0.3vw';         // EDITABLE Desktop: Shadow vertical offset
+  const ORRERY_VENUS_SHADOW_Y_MOBILE  = '0.5vw';         // EDITABLE Mobile: Shadow vertical offset
+  const ORRERY_VENUS_GLOW_COLOR = 'rgba(255,240,180,0.25)'; // EDITABLE: Optional warm glow color
+  const ORRERY_VENUS_GLOW_BLUR_DESKTOP = '0vw';          // EDITABLE Desktop: Optional glow blur radius
+  const ORRERY_VENUS_GLOW_BLUR_MOBILE  = '0vw';          // EDITABLE Mobile: Optional glow blur radius
+
+  // --- EDITABLE: Mercury Planet On Orbit Ring Config (JCV) ---
+  // Ring scale: Saturn = 100% (30vw). Mercury = 16.67% (1/6) of Saturn.
+  // Mercury ring radius = 30vw × 16.67% = 5vw
+  // Center Sun gap = 5vw radius (equal to one ring-step, leaving the Sun area open)
+  const ORRERY_MERCURY_RING_RADIUS_DESKTOP = '5vw';      // EDITABLE Desktop: Mercury orbit ring radius (16.67% of Saturn 30vw)
+  const ORRERY_MERCURY_RING_RADIUS_MOBILE  = '5vw';      // EDITABLE Mobile: Mercury orbit ring radius
+  const ORRERY_MERCURY_IMAGE_URL = 'img/p-me.png';       // EDITABLE: Mercury transparent PNG asset path
+  const ORRERY_MERCURY_WIDTH_DESKTOP = '2.2vw';          // EDITABLE Desktop: Mercury planet image width
+  const ORRERY_MERCURY_WIDTH_MOBILE  = '3.5vw';          // EDITABLE Mobile: Mercury planet image width
+  const ORRERY_MERCURY_HEIGHT_DESKTOP = 'auto';          // EDITABLE Desktop: Mercury height ('auto' preserves aspect ratio)
+  const ORRERY_MERCURY_HEIGHT_MOBILE  = 'auto';          // EDITABLE Mobile: Mercury height
+  // AUTO-CALCULATED: Mercury's real ecliptic longitude for today → orrery clockwise CSS angle
+  const ORRERY_MERCURY_ORBIT_ANGLE_DESKTOP = calcPlanetOrreryAngle('mercury'); // AUTO: real ephemeris
+  const ORRERY_MERCURY_ORBIT_ANGLE_MOBILE  = calcPlanetOrreryAngle('mercury'); // AUTO: real ephemeris
+  const ORRERY_MERCURY_RADIAL_OFFSET_DESKTOP = '0vw';    // EDITABLE Desktop: Radial offset from orbit track
+  const ORRERY_MERCURY_RADIAL_OFFSET_MOBILE  = '0vw';    // EDITABLE Mobile: Radial offset
+  const ORRERY_MERCURY_ROTATION_ENABLED = false;         // EDITABLE: Toggle continuous revolution
+  const ORRERY_MERCURY_ORBIT_PERIOD_DESKTOP = '15s';     // EDITABLE Desktop: Duration for 1 full orbit revolution (Mercury ~0.24yr)
+  const ORRERY_MERCURY_ORBIT_PERIOD_MOBILE  = '15s';     // EDITABLE Mobile: Duration for 1 full orbit revolution
+  const ORRERY_MERCURY_ROTATION_DIRECTION = 'normal';    // EDITABLE: Orbit direction
+  const ORRERY_MERCURY_AXIAL_TILT_DESKTOP = '0deg';      // EDITABLE Desktop: Image orientation tilt
+  const ORRERY_MERCURY_AXIAL_TILT_MOBILE  = '0deg';      // EDITABLE Mobile: Image orientation tilt
+  const ORRERY_MERCURY_KEEP_AXIAL_TILT = true;           // EDITABLE: Keep image orientation fixed in space during revolution
+  const ORRERY_MERCURY_OPACITY = '1.0';                  // EDITABLE: Mercury opacity
+  const ORRERY_MERCURY_Z_INDEX = '10';                   // EDITABLE: Mercury layer index
+  const ORRERY_MERCURY_SHADOW_COLOR = 'rgba(0,0,0,0.75)'; // EDITABLE: Mercury drop shadow color
+  const ORRERY_MERCURY_SHADOW_BLUR_DESKTOP = '0.4vw';    // EDITABLE Desktop: Shadow blur
+  const ORRERY_MERCURY_SHADOW_BLUR_MOBILE  = '0.7vw';    // EDITABLE Mobile: Shadow blur
+  const ORRERY_MERCURY_SHADOW_X_DESKTOP = '0.1vw';       // EDITABLE Desktop: Shadow horizontal offset
+  const ORRERY_MERCURY_SHADOW_X_MOBILE  = '0.2vw';       // EDITABLE Mobile: Shadow horizontal offset
+  const ORRERY_MERCURY_SHADOW_Y_DESKTOP = '0.25vw';      // EDITABLE Desktop: Shadow vertical offset
+  const ORRERY_MERCURY_SHADOW_Y_MOBILE  = '0.4vw';       // EDITABLE Mobile: Shadow vertical offset
+  const ORRERY_MERCURY_GLOW_COLOR = 'rgba(200,180,150,0.20)'; // EDITABLE: Optional glow color
+  const ORRERY_MERCURY_GLOW_BLUR_DESKTOP = '0vw';        // EDITABLE Desktop: Optional glow blur radius
+  const ORRERY_MERCURY_GLOW_BLUR_MOBILE  = '0vw';        // EDITABLE Mobile: Optional glow blur radius
 
   function applyOrreryConfig() {
     const isMobile = window.innerWidth <= 767;
@@ -8888,6 +9072,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--orrery-saturn-height', isMobile ? ORRERY_SATURN_HEIGHT_MOBILE : ORRERY_SATURN_HEIGHT_DESKTOP);
     document.documentElement.style.setProperty('--orrery-saturn-opacity', ORRERY_SATURN_OPACITY);
     document.documentElement.style.setProperty('--orrery-saturn-z-index', ORRERY_SATURN_Z_INDEX);
+    document.documentElement.style.setProperty('--orrery-saturn-track-width', isMobile ? ORRERY_SATURN_TRACK_WIDTH_MOBILE : ORRERY_SATURN_TRACK_WIDTH_DESKTOP);
 
     // Saturn Drop Shadow variables
     document.documentElement.style.setProperty('--orrery-saturn-shadow-x', isMobile ? ORRERY_SATURN_SHADOW_X_MOBILE : ORRERY_SATURN_SHADOW_X_DESKTOP);
@@ -8917,6 +9102,182 @@ Plan ahead for significantly warmer conditions tomorrow!`
       document.documentElement.style.setProperty('--orrery-saturn-image-rotation', `rotate(calc(-1 * var(--orrery-saturn-orbit-angle, 0deg) + var(--orrery-saturn-axial-tilt, 0deg)))`);
     } else {
       document.documentElement.style.setProperty('--orrery-saturn-image-rotation', `rotate(var(--orrery-saturn-axial-tilt, 0deg))`);
+    }
+
+    // Jupiter Ring & Position variables
+    document.documentElement.style.setProperty('--orrery-jupiter-ring-radius', isMobile ? ORRERY_JUPITER_RING_RADIUS_MOBILE : ORRERY_JUPITER_RING_RADIUS_DESKTOP);
+
+    // Jupiter Position & Alignment variables
+    const jupiterAngle = isMobile ? ORRERY_JUPITER_ORBIT_ANGLE_MOBILE : ORRERY_JUPITER_ORBIT_ANGLE_DESKTOP;
+    const jupiterPeriod = isMobile ? ORRERY_JUPITER_ORBIT_PERIOD_MOBILE : ORRERY_JUPITER_ORBIT_PERIOD_DESKTOP;
+    document.documentElement.style.setProperty('--orrery-jupiter-orbit-angle', jupiterAngle);
+    document.documentElement.style.setProperty('--orrery-jupiter-orbit-period', jupiterPeriod);
+    document.documentElement.style.setProperty('--orrery-jupiter-radial-offset', isMobile ? ORRERY_JUPITER_RADIAL_OFFSET_MOBILE : ORRERY_JUPITER_RADIAL_OFFSET_DESKTOP);
+
+    // Jupiter Size & Layer variables
+    document.documentElement.style.setProperty('--orrery-jupiter-width', isMobile ? ORRERY_JUPITER_WIDTH_MOBILE : ORRERY_JUPITER_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-jupiter-height', isMobile ? ORRERY_JUPITER_HEIGHT_MOBILE : ORRERY_JUPITER_HEIGHT_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-jupiter-opacity', ORRERY_JUPITER_OPACITY);
+    document.documentElement.style.setProperty('--orrery-jupiter-z-index', ORRERY_JUPITER_Z_INDEX);
+
+    // Jupiter Drop Shadow variables
+    document.documentElement.style.setProperty('--orrery-jupiter-shadow-x', isMobile ? ORRERY_JUPITER_SHADOW_X_MOBILE : ORRERY_JUPITER_SHADOW_X_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-jupiter-shadow-y', isMobile ? ORRERY_JUPITER_SHADOW_Y_MOBILE : ORRERY_JUPITER_SHADOW_Y_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-jupiter-shadow-blur', isMobile ? ORRERY_JUPITER_SHADOW_BLUR_MOBILE : ORRERY_JUPITER_SHADOW_BLUR_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-jupiter-shadow-color', ORRERY_JUPITER_SHADOW_COLOR);
+
+    // Jupiter Optional Atmosphere Glow variables
+    document.documentElement.style.setProperty('--orrery-jupiter-glow-blur', isMobile ? ORRERY_JUPITER_GLOW_BLUR_MOBILE : ORRERY_JUPITER_GLOW_BLUR_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-jupiter-glow-color', ORRERY_JUPITER_GLOW_COLOR);
+
+    // Jupiter Rotation Animation + Orientation setup
+    if (ORRERY_JUPITER_ROTATION_ENABLED) {
+      document.documentElement.style.setProperty('--orrery-jupiter-orbit-animation', `orrery-jupiter-orbit-spin ${jupiterPeriod} linear infinite ${ORRERY_JUPITER_ROTATION_DIRECTION}`);
+      if (ORRERY_JUPITER_KEEP_AXIAL_TILT) {
+        document.documentElement.style.setProperty('--orrery-jupiter-counter-animation', `orrery-jupiter-counter-spin ${jupiterPeriod} linear infinite ${ORRERY_JUPITER_ROTATION_DIRECTION}`);
+      } else {
+        document.documentElement.style.setProperty('--orrery-jupiter-counter-animation', 'none');
+      }
+    } else {
+      document.documentElement.style.setProperty('--orrery-jupiter-orbit-animation', 'none');
+      document.documentElement.style.setProperty('--orrery-jupiter-counter-animation', 'none');
+    }
+
+    // Jupiter static image orientation
+    const jupiterTilt = isMobile ? ORRERY_JUPITER_AXIAL_TILT_MOBILE : ORRERY_JUPITER_AXIAL_TILT_DESKTOP;
+    document.documentElement.style.setProperty('--orrery-jupiter-axial-tilt', jupiterTilt);
+    if (ORRERY_JUPITER_KEEP_AXIAL_TILT) {
+      document.documentElement.style.setProperty('--orrery-jupiter-image-rotation', `rotate(calc(-1 * var(--orrery-jupiter-orbit-angle, 0deg) + var(--orrery-jupiter-axial-tilt, 0deg)))`);
+    } else {
+      document.documentElement.style.setProperty('--orrery-jupiter-image-rotation', `rotate(var(--orrery-jupiter-axial-tilt, 0deg))`);
+    }
+
+    // Mars Ring & Position variables
+    document.documentElement.style.setProperty('--orrery-mars-ring-radius', isMobile ? ORRERY_MARS_RING_RADIUS_MOBILE : ORRERY_MARS_RING_RADIUS_DESKTOP);
+    const marsAngle = isMobile ? ORRERY_MARS_ORBIT_ANGLE_MOBILE : ORRERY_MARS_ORBIT_ANGLE_DESKTOP;
+    const marsPeriod = isMobile ? ORRERY_MARS_ORBIT_PERIOD_MOBILE : ORRERY_MARS_ORBIT_PERIOD_DESKTOP;
+    const marsTilt = isMobile ? ORRERY_MARS_AXIAL_TILT_MOBILE : ORRERY_MARS_AXIAL_TILT_DESKTOP;
+    document.documentElement.style.setProperty('--orrery-mars-orbit-angle', marsAngle);
+    document.documentElement.style.setProperty('--orrery-mars-orbit-period', marsPeriod);
+    document.documentElement.style.setProperty('--orrery-mars-axial-tilt', marsTilt);
+    document.documentElement.style.setProperty('--orrery-mars-radial-offset', isMobile ? ORRERY_MARS_RADIAL_OFFSET_MOBILE : ORRERY_MARS_RADIAL_OFFSET_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-mars-width', isMobile ? ORRERY_MARS_WIDTH_MOBILE : ORRERY_MARS_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-mars-height', isMobile ? ORRERY_MARS_HEIGHT_MOBILE : ORRERY_MARS_HEIGHT_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-mars-opacity', ORRERY_MARS_OPACITY);
+    document.documentElement.style.setProperty('--orrery-mars-z-index', ORRERY_MARS_Z_INDEX);
+    document.documentElement.style.setProperty('--orrery-mars-shadow-x', isMobile ? ORRERY_MARS_SHADOW_X_MOBILE : ORRERY_MARS_SHADOW_X_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-mars-shadow-y', isMobile ? ORRERY_MARS_SHADOW_Y_MOBILE : ORRERY_MARS_SHADOW_Y_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-mars-shadow-blur', isMobile ? ORRERY_MARS_SHADOW_BLUR_MOBILE : ORRERY_MARS_SHADOW_BLUR_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-mars-shadow-color', ORRERY_MARS_SHADOW_COLOR);
+    document.documentElement.style.setProperty('--orrery-mars-glow-blur', isMobile ? ORRERY_MARS_GLOW_BLUR_MOBILE : ORRERY_MARS_GLOW_BLUR_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-mars-glow-color', ORRERY_MARS_GLOW_COLOR);
+    if (ORRERY_MARS_ROTATION_ENABLED) {
+      document.documentElement.style.setProperty('--orrery-mars-orbit-animation', `orrery-mars-orbit-spin ${marsPeriod} linear infinite ${ORRERY_MARS_ROTATION_DIRECTION}`);
+      document.documentElement.style.setProperty('--orrery-mars-counter-animation', ORRERY_MARS_KEEP_AXIAL_TILT ? `orrery-mars-counter-spin ${marsPeriod} linear infinite ${ORRERY_MARS_ROTATION_DIRECTION}` : 'none');
+    } else {
+      document.documentElement.style.setProperty('--orrery-mars-orbit-animation', 'none');
+      document.documentElement.style.setProperty('--orrery-mars-counter-animation', 'none');
+    }
+    if (ORRERY_MARS_KEEP_AXIAL_TILT) {
+      document.documentElement.style.setProperty('--orrery-mars-image-rotation', `rotate(calc(-1 * var(--orrery-mars-orbit-angle, 0deg) + var(--orrery-mars-axial-tilt, 0deg)))`);
+    } else {
+      document.documentElement.style.setProperty('--orrery-mars-image-rotation', `rotate(var(--orrery-mars-axial-tilt, 0deg))`);
+    }
+
+    // Earth Ring & Position variables
+    document.documentElement.style.setProperty('--orrery-earth-ring-radius', isMobile ? ORRERY_EARTH_RING_RADIUS_MOBILE : ORRERY_EARTH_RING_RADIUS_DESKTOP);
+    const earthAngle = isMobile ? ORRERY_EARTH_ORBIT_ANGLE_MOBILE : ORRERY_EARTH_ORBIT_ANGLE_DESKTOP;
+    const earthPeriod = isMobile ? ORRERY_EARTH_ORBIT_PERIOD_MOBILE : ORRERY_EARTH_ORBIT_PERIOD_DESKTOP;
+    const earthTilt = isMobile ? ORRERY_EARTH_AXIAL_TILT_MOBILE : ORRERY_EARTH_AXIAL_TILT_DESKTOP;
+    document.documentElement.style.setProperty('--orrery-earth-orbit-angle', earthAngle);
+    document.documentElement.style.setProperty('--orrery-earth-orbit-period', earthPeriod);
+    document.documentElement.style.setProperty('--orrery-earth-axial-tilt', earthTilt);
+    document.documentElement.style.setProperty('--orrery-earth-radial-offset', isMobile ? ORRERY_EARTH_RADIAL_OFFSET_MOBILE : ORRERY_EARTH_RADIAL_OFFSET_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-earth-width', isMobile ? ORRERY_EARTH_WIDTH_MOBILE : ORRERY_EARTH_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-earth-height', isMobile ? ORRERY_EARTH_HEIGHT_MOBILE : ORRERY_EARTH_HEIGHT_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-earth-opacity', ORRERY_EARTH_OPACITY);
+    document.documentElement.style.setProperty('--orrery-earth-z-index', ORRERY_EARTH_Z_INDEX);
+    document.documentElement.style.setProperty('--orrery-earth-shadow-x', isMobile ? ORRERY_EARTH_SHADOW_X_MOBILE : ORRERY_EARTH_SHADOW_X_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-earth-shadow-y', isMobile ? ORRERY_EARTH_SHADOW_Y_MOBILE : ORRERY_EARTH_SHADOW_Y_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-earth-shadow-blur', isMobile ? ORRERY_EARTH_SHADOW_BLUR_MOBILE : ORRERY_EARTH_SHADOW_BLUR_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-earth-shadow-color', ORRERY_EARTH_SHADOW_COLOR);
+    document.documentElement.style.setProperty('--orrery-earth-glow-blur', isMobile ? ORRERY_EARTH_GLOW_BLUR_MOBILE : ORRERY_EARTH_GLOW_BLUR_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-earth-glow-color', ORRERY_EARTH_GLOW_COLOR);
+    if (ORRERY_EARTH_ROTATION_ENABLED) {
+      document.documentElement.style.setProperty('--orrery-earth-orbit-animation', `orrery-earth-orbit-spin ${earthPeriod} linear infinite ${ORRERY_EARTH_ROTATION_DIRECTION}`);
+      document.documentElement.style.setProperty('--orrery-earth-counter-animation', ORRERY_EARTH_KEEP_AXIAL_TILT ? `orrery-earth-counter-spin ${earthPeriod} linear infinite ${ORRERY_EARTH_ROTATION_DIRECTION}` : 'none');
+    } else {
+      document.documentElement.style.setProperty('--orrery-earth-orbit-animation', 'none');
+      document.documentElement.style.setProperty('--orrery-earth-counter-animation', 'none');
+    }
+    if (ORRERY_EARTH_KEEP_AXIAL_TILT) {
+      document.documentElement.style.setProperty('--orrery-earth-image-rotation', `rotate(calc(-1 * var(--orrery-earth-orbit-angle, 0deg) + var(--orrery-earth-axial-tilt, 0deg)))`);
+    } else {
+      document.documentElement.style.setProperty('--orrery-earth-image-rotation', `rotate(var(--orrery-earth-axial-tilt, 0deg))`);
+    }
+
+    // Venus Ring & Position variables
+    document.documentElement.style.setProperty('--orrery-venus-ring-radius', isMobile ? ORRERY_VENUS_RING_RADIUS_MOBILE : ORRERY_VENUS_RING_RADIUS_DESKTOP);
+    const venusAngle = isMobile ? ORRERY_VENUS_ORBIT_ANGLE_MOBILE : ORRERY_VENUS_ORBIT_ANGLE_DESKTOP;
+    const venusPeriod = isMobile ? ORRERY_VENUS_ORBIT_PERIOD_MOBILE : ORRERY_VENUS_ORBIT_PERIOD_DESKTOP;
+    const venusTilt = isMobile ? ORRERY_VENUS_AXIAL_TILT_MOBILE : ORRERY_VENUS_AXIAL_TILT_DESKTOP;
+    document.documentElement.style.setProperty('--orrery-venus-orbit-angle', venusAngle);
+    document.documentElement.style.setProperty('--orrery-venus-orbit-period', venusPeriod);
+    document.documentElement.style.setProperty('--orrery-venus-axial-tilt', venusTilt);
+    document.documentElement.style.setProperty('--orrery-venus-radial-offset', isMobile ? ORRERY_VENUS_RADIAL_OFFSET_MOBILE : ORRERY_VENUS_RADIAL_OFFSET_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-venus-width', isMobile ? ORRERY_VENUS_WIDTH_MOBILE : ORRERY_VENUS_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-venus-height', isMobile ? ORRERY_VENUS_HEIGHT_MOBILE : ORRERY_VENUS_HEIGHT_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-venus-opacity', ORRERY_VENUS_OPACITY);
+    document.documentElement.style.setProperty('--orrery-venus-z-index', ORRERY_VENUS_Z_INDEX);
+    document.documentElement.style.setProperty('--orrery-venus-shadow-x', isMobile ? ORRERY_VENUS_SHADOW_X_MOBILE : ORRERY_VENUS_SHADOW_X_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-venus-shadow-y', isMobile ? ORRERY_VENUS_SHADOW_Y_MOBILE : ORRERY_VENUS_SHADOW_Y_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-venus-shadow-blur', isMobile ? ORRERY_VENUS_SHADOW_BLUR_MOBILE : ORRERY_VENUS_SHADOW_BLUR_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-venus-shadow-color', ORRERY_VENUS_SHADOW_COLOR);
+    document.documentElement.style.setProperty('--orrery-venus-glow-blur', isMobile ? ORRERY_VENUS_GLOW_BLUR_MOBILE : ORRERY_VENUS_GLOW_BLUR_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-venus-glow-color', ORRERY_VENUS_GLOW_COLOR);
+    if (ORRERY_VENUS_ROTATION_ENABLED) {
+      document.documentElement.style.setProperty('--orrery-venus-orbit-animation', `orrery-venus-orbit-spin ${venusPeriod} linear infinite ${ORRERY_VENUS_ROTATION_DIRECTION}`);
+      document.documentElement.style.setProperty('--orrery-venus-counter-animation', ORRERY_VENUS_KEEP_AXIAL_TILT ? `orrery-venus-counter-spin ${venusPeriod} linear infinite ${ORRERY_VENUS_ROTATION_DIRECTION}` : 'none');
+    } else {
+      document.documentElement.style.setProperty('--orrery-venus-orbit-animation', 'none');
+      document.documentElement.style.setProperty('--orrery-venus-counter-animation', 'none');
+    }
+    if (ORRERY_VENUS_KEEP_AXIAL_TILT) {
+      document.documentElement.style.setProperty('--orrery-venus-image-rotation', `rotate(calc(-1 * var(--orrery-venus-orbit-angle, 0deg) + var(--orrery-venus-axial-tilt, 0deg)))`);
+    } else {
+      document.documentElement.style.setProperty('--orrery-venus-image-rotation', `rotate(var(--orrery-venus-axial-tilt, 0deg))`);
+    }
+
+    // Mercury Ring & Position variables
+    document.documentElement.style.setProperty('--orrery-mercury-ring-radius', isMobile ? ORRERY_MERCURY_RING_RADIUS_MOBILE : ORRERY_MERCURY_RING_RADIUS_DESKTOP);
+    const mercuryAngle = isMobile ? ORRERY_MERCURY_ORBIT_ANGLE_MOBILE : ORRERY_MERCURY_ORBIT_ANGLE_DESKTOP;
+    const mercuryPeriod = isMobile ? ORRERY_MERCURY_ORBIT_PERIOD_MOBILE : ORRERY_MERCURY_ORBIT_PERIOD_DESKTOP;
+    const mercuryTilt = isMobile ? ORRERY_MERCURY_AXIAL_TILT_MOBILE : ORRERY_MERCURY_AXIAL_TILT_DESKTOP;
+    document.documentElement.style.setProperty('--orrery-mercury-orbit-angle', mercuryAngle);
+    document.documentElement.style.setProperty('--orrery-mercury-orbit-period', mercuryPeriod);
+    document.documentElement.style.setProperty('--orrery-mercury-axial-tilt', mercuryTilt);
+    document.documentElement.style.setProperty('--orrery-mercury-radial-offset', isMobile ? ORRERY_MERCURY_RADIAL_OFFSET_MOBILE : ORRERY_MERCURY_RADIAL_OFFSET_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-mercury-width', isMobile ? ORRERY_MERCURY_WIDTH_MOBILE : ORRERY_MERCURY_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-mercury-height', isMobile ? ORRERY_MERCURY_HEIGHT_MOBILE : ORRERY_MERCURY_HEIGHT_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-mercury-opacity', ORRERY_MERCURY_OPACITY);
+    document.documentElement.style.setProperty('--orrery-mercury-z-index', ORRERY_MERCURY_Z_INDEX);
+    document.documentElement.style.setProperty('--orrery-mercury-shadow-x', isMobile ? ORRERY_MERCURY_SHADOW_X_MOBILE : ORRERY_MERCURY_SHADOW_X_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-mercury-shadow-y', isMobile ? ORRERY_MERCURY_SHADOW_Y_MOBILE : ORRERY_MERCURY_SHADOW_Y_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-mercury-shadow-blur', isMobile ? ORRERY_MERCURY_SHADOW_BLUR_MOBILE : ORRERY_MERCURY_SHADOW_BLUR_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-mercury-shadow-color', ORRERY_MERCURY_SHADOW_COLOR);
+    document.documentElement.style.setProperty('--orrery-mercury-glow-blur', isMobile ? ORRERY_MERCURY_GLOW_BLUR_MOBILE : ORRERY_MERCURY_GLOW_BLUR_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-mercury-glow-color', ORRERY_MERCURY_GLOW_COLOR);
+    if (ORRERY_MERCURY_ROTATION_ENABLED) {
+      document.documentElement.style.setProperty('--orrery-mercury-orbit-animation', `orrery-mercury-orbit-spin ${mercuryPeriod} linear infinite ${ORRERY_MERCURY_ROTATION_DIRECTION}`);
+      document.documentElement.style.setProperty('--orrery-mercury-counter-animation', ORRERY_MERCURY_KEEP_AXIAL_TILT ? `orrery-mercury-counter-spin ${mercuryPeriod} linear infinite ${ORRERY_MERCURY_ROTATION_DIRECTION}` : 'none');
+    } else {
+      document.documentElement.style.setProperty('--orrery-mercury-orbit-animation', 'none');
+      document.documentElement.style.setProperty('--orrery-mercury-counter-animation', 'none');
+    }
+    if (ORRERY_MERCURY_KEEP_AXIAL_TILT) {
+      document.documentElement.style.setProperty('--orrery-mercury-image-rotation', `rotate(calc(-1 * var(--orrery-mercury-orbit-angle, 0deg) + var(--orrery-mercury-axial-tilt, 0deg)))`);
+    } else {
+      document.documentElement.style.setProperty('--orrery-mercury-image-rotation', `rotate(var(--orrery-mercury-axial-tilt, 0deg))`);
     }
 
     // Ensure DOM exists
@@ -14659,8 +15020,46 @@ Plan ahead for significantly warmer conditions tomorrow!`
       circle.setAttribute('cy', '50');
       circle.setAttribute('r', '50');
       
+
+      // Saturn  orbit track:  30/30 * 50 = 50.00   (r=50, outer ring)
+      // Jupiter orbit track:  25/30 * 50 = 41.67   (83.33% of Saturn)
+      // Mars    orbit track:  20/30 * 50 = 33.33   (66.67% of Saturn)
+      // Earth   orbit track:  15/30 * 50 = 25.00   (50%    of Saturn)
+      // Venus   orbit track:  10/30 * 50 = 16.67   (33.33% of Saturn)
+      // Mercury orbit track:   5/30 * 50 =  8.33   (16.67% of Saturn)
+      const jupiterCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      jupiterCircle.setAttribute('class', 'orrery-jupiter-track');
+      jupiterCircle.id = 'orrery-jupiter-track';
+      jupiterCircle.setAttribute('cx', '50'); jupiterCircle.setAttribute('cy', '50'); jupiterCircle.setAttribute('r', '41.67');
+
+      const marsCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      marsCircle.setAttribute('class', 'orrery-mars-track');
+      marsCircle.id = 'orrery-mars-track';
+      marsCircle.setAttribute('cx', '50'); marsCircle.setAttribute('cy', '50'); marsCircle.setAttribute('r', '33.33');
+
+      const earthCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      earthCircle.setAttribute('class', 'orrery-earth-track');
+      earthCircle.id = 'orrery-earth-track';
+      earthCircle.setAttribute('cx', '50'); earthCircle.setAttribute('cy', '50'); earthCircle.setAttribute('r', '25.00');
+
+      const venusCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      venusCircle.setAttribute('class', 'orrery-venus-track');
+      venusCircle.id = 'orrery-venus-track';
+      venusCircle.setAttribute('cx', '50'); venusCircle.setAttribute('cy', '50'); venusCircle.setAttribute('r', '16.67');
+
+      const mercuryCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      mercuryCircle.setAttribute('class', 'orrery-mercury-track');
+      mercuryCircle.id = 'orrery-mercury-track';
+      mercuryCircle.setAttribute('cx', '50'); mercuryCircle.setAttribute('cy', '50'); mercuryCircle.setAttribute('r', '8.33');
+
       svg.appendChild(circle);
+      svg.appendChild(jupiterCircle);
+      svg.appendChild(marsCircle);
+      svg.appendChild(earthCircle);
+      svg.appendChild(venusCircle);
+      svg.appendChild(mercuryCircle);
       ringContainer.appendChild(svg);
+
 
       // Create Saturn orbit arm and body
       const saturnArm = document.createElement('div');
@@ -14682,10 +15081,82 @@ Plan ahead for significantly warmer conditions tomorrow!`
       saturnArm.appendChild(saturnBody);
       ringContainer.appendChild(saturnArm);
 
+      // Create Jupiter orbit arm and body (inside Saturn)
+      const jupiterArm = document.createElement('div');
+      jupiterArm.className = 'orrery-jupiter-arm';
+      jupiterArm.id = 'orrery-jupiter-arm';
+
+      const jupiterBody = document.createElement('div');
+      jupiterBody.className = 'orrery-jupiter-body';
+      jupiterBody.id = 'orrery-jupiter-body';
+
+      const jupiterImg = document.createElement('img');
+      jupiterImg.className = 'orrery-jupiter-img';
+      jupiterImg.id = 'orrery-jupiter-img';
+      jupiterImg.src = ORRERY_JUPITER_IMAGE_URL || 'img/p-ju.png';
+      jupiterImg.alt = 'Jupiter';
+      jupiterImg.draggable = false;
+
+      jupiterBody.appendChild(jupiterImg);
+      jupiterArm.appendChild(jupiterBody);
+      ringContainer.appendChild(jupiterArm);
+
+      // Create Mars orbit arm and body
+      const marsArm = document.createElement('div');
+      marsArm.className = 'orrery-mars-arm'; marsArm.id = 'orrery-mars-arm';
+      const marsBody = document.createElement('div');
+      marsBody.className = 'orrery-mars-body'; marsBody.id = 'orrery-mars-body';
+      const marsImg = document.createElement('img');
+      marsImg.className = 'orrery-mars-img'; marsImg.id = 'orrery-mars-img';
+      marsImg.src = ORRERY_MARS_IMAGE_URL || 'img/p-ma.png'; marsImg.alt = 'Mars'; marsImg.draggable = false;
+      marsBody.appendChild(marsImg); marsArm.appendChild(marsBody); ringContainer.appendChild(marsArm);
+
+      // Create Earth orbit arm and body
+      const earthArm = document.createElement('div');
+      earthArm.className = 'orrery-earth-arm'; earthArm.id = 'orrery-earth-arm';
+      const earthBody = document.createElement('div');
+      earthBody.className = 'orrery-earth-body'; earthBody.id = 'orrery-earth-body';
+      const earthImg = document.createElement('img');
+      earthImg.className = 'orrery-earth-img'; earthImg.id = 'orrery-earth-img';
+      earthImg.src = ORRERY_EARTH_IMAGE_URL || 'img/p-ea.png'; earthImg.alt = 'Earth'; earthImg.draggable = false;
+      earthBody.appendChild(earthImg); earthArm.appendChild(earthBody); ringContainer.appendChild(earthArm);
+
+      // Create Venus orbit arm and body
+      const venusArm = document.createElement('div');
+      venusArm.className = 'orrery-venus-arm'; venusArm.id = 'orrery-venus-arm';
+      const venusBody = document.createElement('div');
+      venusBody.className = 'orrery-venus-body'; venusBody.id = 'orrery-venus-body';
+      const venusImg = document.createElement('img');
+      venusImg.className = 'orrery-venus-img'; venusImg.id = 'orrery-venus-img';
+      venusImg.src = ORRERY_VENUS_IMAGE_URL || 'img/p-ve.png'; venusImg.alt = 'Venus'; venusImg.draggable = false;
+      venusBody.appendChild(venusImg); venusArm.appendChild(venusBody); ringContainer.appendChild(venusArm);
+
+      // Create Mercury orbit arm and body
+      const mercuryArm = document.createElement('div');
+      mercuryArm.className = 'orrery-mercury-arm'; mercuryArm.id = 'orrery-mercury-arm';
+      const mercuryBody = document.createElement('div');
+      mercuryBody.className = 'orrery-mercury-body'; mercuryBody.id = 'orrery-mercury-body';
+      const mercuryImg = document.createElement('img');
+      mercuryImg.className = 'orrery-mercury-img'; mercuryImg.id = 'orrery-mercury-img';
+      mercuryImg.src = ORRERY_MERCURY_IMAGE_URL || 'img/p-me.png'; mercuryImg.alt = 'Mercury'; mercuryImg.draggable = false;
+      mercuryBody.appendChild(mercuryImg); mercuryArm.appendChild(mercuryBody); ringContainer.appendChild(mercuryArm);
+
       section.appendChild(ringContainer);
     } else {
       const circle = section.querySelector('.orrery-orbit-track');
       if (circle) circle.setAttribute('r', '50');
+
+      // Ensure Jupiter orbit track circle exists in the SVG
+      const svg = section.querySelector('.orrery-svg');
+      if (svg && !svg.querySelector('.orrery-jupiter-track')) {
+        const jupiterCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        jupiterCircle.setAttribute('class', 'orrery-jupiter-track');
+        jupiterCircle.id = 'orrery-jupiter-track';
+        jupiterCircle.setAttribute('cx', '50');
+        jupiterCircle.setAttribute('cy', '50');
+        jupiterCircle.setAttribute('r', '41.67');
+        svg.appendChild(jupiterCircle);
+      }
 
       const ringContainer = section.querySelector('.orrery-ring-container');
       if (ringContainer) {
@@ -14715,6 +15186,79 @@ Plan ahead for significantly warmer conditions tomorrow!`
             saturnImg.src = ORRERY_SATURN_IMAGE_URL;
           }
         }
+
+        // Ensure Jupiter arm exists
+        let jupiterArm = ringContainer.querySelector('.orrery-jupiter-arm');
+        if (!jupiterArm) {
+          jupiterArm = document.createElement('div');
+          jupiterArm.className = 'orrery-jupiter-arm';
+          jupiterArm.id = 'orrery-jupiter-arm';
+
+          const jupiterBody = document.createElement('div');
+          jupiterBody.className = 'orrery-jupiter-body';
+          jupiterBody.id = 'orrery-jupiter-body';
+
+          const jupiterImg = document.createElement('img');
+          jupiterImg.className = 'orrery-jupiter-img';
+          jupiterImg.id = 'orrery-jupiter-img';
+          jupiterImg.src = ORRERY_JUPITER_IMAGE_URL || 'img/p-ju.png';
+          jupiterImg.alt = 'Jupiter';
+          jupiterImg.draggable = false;
+
+          jupiterBody.appendChild(jupiterImg);
+          jupiterArm.appendChild(jupiterBody);
+          ringContainer.appendChild(jupiterArm);
+        } else {
+          const jupiterImg = jupiterArm.querySelector('.orrery-jupiter-img');
+          if (jupiterImg && ORRERY_JUPITER_IMAGE_URL && jupiterImg.getAttribute('src') !== ORRERY_JUPITER_IMAGE_URL) {
+            jupiterImg.src = ORRERY_JUPITER_IMAGE_URL;
+          }
+        }
+
+        // Helper: ensure a planet arm exists — const arrow fn is valid in strict-mode blocks
+        const ensurePlanetArm = (cls, armId, imgCls, imgId, imageUrl) => {
+          let arm = ringContainer.querySelector('.' + cls);
+          if (!arm) {
+            arm = document.createElement('div');
+            arm.className = cls; arm.id = armId;
+            const body = document.createElement('div');
+            body.className = cls.replace('-arm', '-body'); body.id = armId.replace('-arm', '-body');
+            const img = document.createElement('img');
+            img.className = imgCls; img.id = imgId;
+            img.src = imageUrl; img.alt = armId.replace('orrery-', '').replace('-arm', ''); img.draggable = false;
+            body.appendChild(img); arm.appendChild(body); ringContainer.appendChild(arm);
+          } else {
+            const img = arm.querySelector('.' + imgCls);
+            if (img && imageUrl && img.getAttribute('src') !== imageUrl) img.src = imageUrl;
+          }
+        };
+
+        ensurePlanetArm('orrery-mars-arm',    'orrery-mars-arm',    'orrery-mars-img',    'orrery-mars-img',    ORRERY_MARS_IMAGE_URL    || 'img/p-ma.png');
+        ensurePlanetArm('orrery-earth-arm',   'orrery-earth-arm',   'orrery-earth-img',   'orrery-earth-img',   ORRERY_EARTH_IMAGE_URL   || 'img/p-ea.png');
+        ensurePlanetArm('orrery-venus-arm',   'orrery-venus-arm',   'orrery-venus-img',   'orrery-venus-img',   ORRERY_VENUS_IMAGE_URL   || 'img/p-ve.png');
+        ensurePlanetArm('orrery-mercury-arm', 'orrery-mercury-arm', 'orrery-mercury-img', 'orrery-mercury-img', ORRERY_MERCURY_IMAGE_URL || 'img/p-me.png');
+
+        // Ensure inner SVG track circles exist AND have correct r values for Mars/Earth/Venus/Mercury
+        const svgEl = section.querySelector('.orrery-svg');
+        if (svgEl) {
+          const trackDefs = [
+            { cls: 'orrery-mars-track',    id: 'orrery-mars-track',    r: '33.33' },
+            { cls: 'orrery-earth-track',   id: 'orrery-earth-track',   r: '25.00' },
+            { cls: 'orrery-venus-track',   id: 'orrery-venus-track',   r: '16.67' },
+            { cls: 'orrery-mercury-track', id: 'orrery-mercury-track', r: '8.33'  },
+          ];
+          for (const td of trackDefs) {
+            let c = svgEl.querySelector('.' + td.cls);
+            if (!c) {
+              c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+              c.setAttribute('class', td.cls); c.id = td.id;
+              c.setAttribute('cx', '50'); c.setAttribute('cy', '50');
+              svgEl.appendChild(c);
+            }
+            c.setAttribute('r', td.r); // always update r in case it changed
+          }
+        }
+
       }
     }
 

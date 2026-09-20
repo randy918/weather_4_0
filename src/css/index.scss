@@ -2866,7 +2866,7 @@ main {
 .orrery-orbit-track {
     fill: none;
     stroke: var(--orrery-track-color, rgba(255, 255, 255, 0.2));
-    stroke-width: var(--orrery-track-width, 0.15vw);
+    stroke-width: var(--orrery-saturn-track-width, 0.05vw);
 }
 
 /* --- Saturn Orbit Arm, Body & Styling --- */
@@ -2931,4 +2931,302 @@ main {
     to {
         transform: rotate(calc(-1 * var(--orrery-saturn-orbit-angle, 0deg) + var(--orrery-saturn-axial-tilt, 0deg) - 360deg));
     }
+}
+
+/* --- Jupiter Orbit Ring Track (inner circle, drawn in same SVG as Saturn track) --- */
+/* The Jupiter ring track is a second SVG circle injected by JS with class orrery-jupiter-track */
+.orrery-jupiter-track {
+    fill: none;
+    stroke: var(--orrery-track-color, rgba(255, 255, 255, 0.2));
+    stroke-width: var(--orrery-track-width, 0.15vw);
+}
+
+/* --- Jupiter Orbit Arm, Body & Styling --- */
+.orrery-jupiter-arm {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform-origin: 0 0;
+    transform: rotate(var(--orrery-jupiter-orbit-angle, 0deg));
+    z-index: var(--orrery-jupiter-z-index, 14);
+    pointer-events: none;
+    animation: var(--orrery-jupiter-orbit-animation, none);
+    will-change: transform;
+}
+
+.orrery-jupiter-body {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Positions planet at the Jupiter ring radius (not Saturn's) */
+    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-jupiter-ring-radius, 25vw) + var(--orrery-jupiter-radial-offset, 0vw))));
+    pointer-events: auto;
+    will-change: transform;
+}
+
+.orrery-jupiter-img {
+    width: var(--orrery-jupiter-width, 4.5vw);
+    height: var(--orrery-jupiter-height, auto);
+    max-width: none;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: auto;
+    opacity: var(--orrery-jupiter-opacity, 1.0);
+    transform: var(--orrery-jupiter-image-rotation, rotate(0deg));
+    animation: var(--orrery-jupiter-counter-animation, none);
+    will-change: transform, filter;
+    filter: drop-shadow(var(--orrery-jupiter-shadow-x, 0.2vw) var(--orrery-jupiter-shadow-y, 0.5vw) var(--orrery-jupiter-shadow-blur, 0.7vw) var(--orrery-jupiter-shadow-color, rgba(0, 0, 0, 0.75)))
+            drop-shadow(0 0 var(--orrery-jupiter-glow-blur, 0vw) var(--orrery-jupiter-glow-color, transparent));
+    transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+/* Jupiter Continuous Orbit Revolution Keyframes */
+@keyframes orrery-jupiter-orbit-spin {
+    from { transform: rotate(var(--orrery-jupiter-orbit-angle, 0deg)); }
+    to   { transform: rotate(calc(var(--orrery-jupiter-orbit-angle, 0deg) + 360deg)); }
+}
+
+/* Counter-spin to keep Jupiter orientation fixed in space during revolution */
+@keyframes orrery-jupiter-counter-spin {
+    from { transform: rotate(calc(-1 * var(--orrery-jupiter-orbit-angle, 0deg) + var(--orrery-jupiter-axial-tilt, 0deg))); }
+    to   { transform: rotate(calc(-1 * var(--orrery-jupiter-orbit-angle, 0deg) + var(--orrery-jupiter-axial-tilt, 0deg) - 360deg)); }
+}
+
+/* ==========================================================================
+   --- Mars Orbit Ring (5/6 of Jupiter circumference = 20.83vw radius) ---
+   ========================================================================== */
+.orrery-mars-track {
+    fill: none;
+    stroke: var(--orrery-track-color, rgba(255, 255, 255, 0.2));
+    stroke-width: var(--orrery-track-width, 0.15vw);
+}
+
+.orrery-mars-arm {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 0; height: 0;
+    transform-origin: 0 0;
+    transform: rotate(var(--orrery-mars-orbit-angle, 0deg));
+    z-index: var(--orrery-mars-z-index, 13);
+    pointer-events: none;
+    animation: var(--orrery-mars-orbit-animation, none);
+    will-change: transform;
+}
+
+.orrery-mars-body {
+    position: absolute;
+    top: 0; left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-mars-ring-radius, 20vw) + var(--orrery-mars-radial-offset, 0vw))));
+    pointer-events: auto;
+    will-change: transform;
+}
+
+.orrery-mars-img {
+    width: var(--orrery-mars-width, 2.8vw);
+    height: var(--orrery-mars-height, auto);
+    max-width: none;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: auto;
+    opacity: var(--orrery-mars-opacity, 1.0);
+    transform: var(--orrery-mars-image-rotation, rotate(0deg));
+    animation: var(--orrery-mars-counter-animation, none);
+    will-change: transform, filter;
+    filter: drop-shadow(var(--orrery-mars-shadow-x, 0.15vw) var(--orrery-mars-shadow-y, 0.4vw) var(--orrery-mars-shadow-blur, 0.6vw) var(--orrery-mars-shadow-color, rgba(0, 0, 0, 0.75)))
+            drop-shadow(0 0 var(--orrery-mars-glow-blur, 0vw) var(--orrery-mars-glow-color, transparent));
+    transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+@keyframes orrery-mars-orbit-spin {
+    from { transform: rotate(var(--orrery-mars-orbit-angle, 0deg)); }
+    to   { transform: rotate(calc(var(--orrery-mars-orbit-angle, 0deg) + 360deg)); }
+}
+@keyframes orrery-mars-counter-spin {
+    from { transform: rotate(calc(-1 * var(--orrery-mars-orbit-angle, 0deg) + var(--orrery-mars-axial-tilt, 0deg))); }
+    to   { transform: rotate(calc(-1 * var(--orrery-mars-orbit-angle, 0deg) + var(--orrery-mars-axial-tilt, 0deg) - 360deg)); }
+}
+
+/* ==========================================================================
+   --- Earth Orbit Ring (5/6 of Mars circumference = 17.36vw radius) ---
+   ========================================================================== */
+.orrery-earth-track {
+    fill: none;
+    stroke: var(--orrery-track-color, rgba(255, 255, 255, 0.2));
+    stroke-width: var(--orrery-track-width, 0.15vw);
+}
+
+.orrery-earth-arm {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 0; height: 0;
+    transform-origin: 0 0;
+    transform: rotate(var(--orrery-earth-orbit-angle, 0deg));
+    z-index: var(--orrery-earth-z-index, 12);
+    pointer-events: none;
+    animation: var(--orrery-earth-orbit-animation, none);
+    will-change: transform;
+}
+
+.orrery-earth-body {
+    position: absolute;
+    top: 0; left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-earth-ring-radius, 15vw) + var(--orrery-earth-radial-offset, 0vw))));
+    pointer-events: auto;
+    will-change: transform;
+}
+
+.orrery-earth-img {
+    width: var(--orrery-earth-width, 3.2vw);
+    height: var(--orrery-earth-height, auto);
+    max-width: none;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: auto;
+    opacity: var(--orrery-earth-opacity, 1.0);
+    transform: var(--orrery-earth-image-rotation, rotate(0deg));
+    animation: var(--orrery-earth-counter-animation, none);
+    will-change: transform, filter;
+    filter: drop-shadow(var(--orrery-earth-shadow-x, 0.15vw) var(--orrery-earth-shadow-y, 0.35vw) var(--orrery-earth-shadow-blur, 0.5vw) var(--orrery-earth-shadow-color, rgba(0, 0, 0, 0.75)))
+            drop-shadow(0 0 var(--orrery-earth-glow-blur, 0vw) var(--orrery-earth-glow-color, transparent));
+    transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+@keyframes orrery-earth-orbit-spin {
+    from { transform: rotate(var(--orrery-earth-orbit-angle, 0deg)); }
+    to   { transform: rotate(calc(var(--orrery-earth-orbit-angle, 0deg) + 360deg)); }
+}
+@keyframes orrery-earth-counter-spin {
+    from { transform: rotate(calc(-1 * var(--orrery-earth-orbit-angle, 0deg) + var(--orrery-earth-axial-tilt, 0deg))); }
+    to   { transform: rotate(calc(-1 * var(--orrery-earth-orbit-angle, 0deg) + var(--orrery-earth-axial-tilt, 0deg) - 360deg)); }
+}
+
+/* ==========================================================================
+   --- Venus Orbit Ring (5/6 of Earth circumference = 14.47vw radius) ---
+   ========================================================================== */
+.orrery-venus-track {
+    fill: none;
+    stroke: var(--orrery-track-color, rgba(255, 255, 255, 0.2));
+    stroke-width: var(--orrery-track-width, 0.15vw);
+}
+
+.orrery-venus-arm {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 0; height: 0;
+    transform-origin: 0 0;
+    transform: rotate(var(--orrery-venus-orbit-angle, 0deg));
+    z-index: var(--orrery-venus-z-index, 11);
+    pointer-events: none;
+    animation: var(--orrery-venus-orbit-animation, none);
+    will-change: transform;
+}
+
+.orrery-venus-body {
+    position: absolute;
+    top: 0; left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-venus-ring-radius, 10vw) + var(--orrery-venus-radial-offset, 0vw))));
+    pointer-events: auto;
+    will-change: transform;
+}
+
+.orrery-venus-img {
+    width: var(--orrery-venus-width, 2.8vw);
+    height: var(--orrery-venus-height, auto);
+    max-width: none;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: auto;
+    opacity: var(--orrery-venus-opacity, 1.0);
+    transform: var(--orrery-venus-image-rotation, rotate(0deg));
+    animation: var(--orrery-venus-counter-animation, none);
+    will-change: transform, filter;
+    filter: drop-shadow(var(--orrery-venus-shadow-x, 0.12vw) var(--orrery-venus-shadow-y, 0.3vw) var(--orrery-venus-shadow-blur, 0.5vw) var(--orrery-venus-shadow-color, rgba(0, 0, 0, 0.75)))
+            drop-shadow(0 0 var(--orrery-venus-glow-blur, 0vw) var(--orrery-venus-glow-color, transparent));
+    transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+@keyframes orrery-venus-orbit-spin {
+    from { transform: rotate(var(--orrery-venus-orbit-angle, 0deg)); }
+    to   { transform: rotate(calc(var(--orrery-venus-orbit-angle, 0deg) + 360deg)); }
+}
+@keyframes orrery-venus-counter-spin {
+    from { transform: rotate(calc(-1 * var(--orrery-venus-orbit-angle, 0deg) + var(--orrery-venus-axial-tilt, 0deg))); }
+    to   { transform: rotate(calc(-1 * var(--orrery-venus-orbit-angle, 0deg) + var(--orrery-venus-axial-tilt, 0deg) - 360deg)); }
+}
+
+/* ==========================================================================
+   --- Mercury Orbit Ring (5/6 of Venus circumference = 12.06vw radius) ---
+   Sun center gap: ~12.06vw from center — 2× the Mercury-Venus radial spacing
+   ========================================================================== */
+.orrery-mercury-track {
+    fill: none;
+    stroke: var(--orrery-track-color, rgba(255, 255, 255, 0.2));
+    stroke-width: var(--orrery-track-width, 0.15vw);
+}
+
+.orrery-mercury-arm {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 0; height: 0;
+    transform-origin: 0 0;
+    transform: rotate(var(--orrery-mercury-orbit-angle, 0deg));
+    z-index: var(--orrery-mercury-z-index, 10);
+    pointer-events: none;
+    animation: var(--orrery-mercury-orbit-animation, none);
+    will-change: transform;
+}
+
+.orrery-mercury-body {
+    position: absolute;
+    top: 0; left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-mercury-ring-radius, 5vw) + var(--orrery-mercury-radial-offset, 0vw))));
+    pointer-events: auto;
+    will-change: transform;
+}
+
+.orrery-mercury-img {
+    width: var(--orrery-mercury-width, 2.2vw);
+    height: var(--orrery-mercury-height, auto);
+    max-width: none;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: auto;
+    opacity: var(--orrery-mercury-opacity, 1.0);
+    transform: var(--orrery-mercury-image-rotation, rotate(0deg));
+    animation: var(--orrery-mercury-counter-animation, none);
+    will-change: transform, filter;
+    filter: drop-shadow(var(--orrery-mercury-shadow-x, 0.1vw) var(--orrery-mercury-shadow-y, 0.25vw) var(--orrery-mercury-shadow-blur, 0.4vw) var(--orrery-mercury-shadow-color, rgba(0, 0, 0, 0.75)))
+            drop-shadow(0 0 var(--orrery-mercury-glow-blur, 0vw) var(--orrery-mercury-glow-color, transparent));
+    transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+@keyframes orrery-mercury-orbit-spin {
+    from { transform: rotate(var(--orrery-mercury-orbit-angle, 0deg)); }
+    to   { transform: rotate(calc(var(--orrery-mercury-orbit-angle, 0deg) + 360deg)); }
+}
+@keyframes orrery-mercury-counter-spin {
+    from { transform: rotate(calc(-1 * var(--orrery-mercury-orbit-angle, 0deg) + var(--orrery-mercury-axial-tilt, 0deg))); }
+    to   { transform: rotate(calc(-1 * var(--orrery-mercury-orbit-angle, 0deg) + var(--orrery-mercury-axial-tilt, 0deg) - 360deg)); }
 }
