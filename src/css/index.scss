@@ -2998,6 +2998,30 @@ main {
     to   { transform: rotate(calc(-1 * var(--orrery-jupiter-orbit-angle, 0deg) + var(--orrery-jupiter-axial-tilt, 0deg) - 360deg)); }
 }
 
+/* --- Jupiter Galilean Moons (Telescope Array Simulation) --- */
+.orrery-jupiter-moons-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform: var(--orrery-jupiter-image-rotation, rotate(0deg)) translateY(var(--orrery-jupiter-moons-y-offset, 0vw));
+    pointer-events: none;
+    z-index: 15;
+    display: var(--orrery-jupiter-moons-display, block);
+}
+
+.orrery-galilean-moon {
+    position: absolute;
+    top: 50%;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: auto;
+    cursor: default;
+    box-shadow: 0 0 var(--orrery-jupiter-moons-glow-blur, 0.25vw) var(--orrery-jupiter-moons-glow-color, rgba(255, 255, 220, 0.8));
+    transition: opacity 0.3s ease;
+}
+
 /* ==========================================================================
    --- Mars Orbit Ring (5/6 of Jupiter circumference = 20.83vw radius) ---
    ========================================================================== */
@@ -3113,6 +3137,79 @@ main {
     from { transform: rotate(calc(-1 * var(--orrery-earth-orbit-angle, 0deg) + var(--orrery-earth-axial-tilt, 0deg))); }
     to   { transform: rotate(calc(-1 * var(--orrery-earth-orbit-angle, 0deg) + var(--orrery-earth-axial-tilt, 0deg) - 360deg)); }
 }
+
+/* ==========================================================================
+   --- Moon Orbit Ring & Body around Earth ---
+   ========================================================================== */
+.orrery-moon-track {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: calc(var(--orrery-moon-distance, 2.4vw) * 2);
+    height: calc(var(--orrery-moon-distance, 2.4vw) * 2);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: var(--orrery-moon-track-width, 0.04vw) solid var(--orrery-moon-track-color, rgba(255, 255, 255, 0.18));
+    opacity: var(--orrery-moon-track-opacity, 0);
+    pointer-events: none;
+    display: var(--orrery-moon-track-display, block);
+    box-sizing: border-box;
+    z-index: 11;
+}
+
+.orrery-moon-arm {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform-origin: 0 0;
+    transform: rotate(var(--orrery-moon-orbit-angle, 0deg));
+    z-index: var(--orrery-moon-z-index, 14);
+    pointer-events: none;
+    animation: var(--orrery-moon-orbit-animation, none);
+    will-change: transform;
+    display: var(--orrery-moon-display, flex);
+}
+
+.orrery-moon-body {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-moon-distance, 2.4vw) + var(--orrery-moon-radial-offset, 0vw))));
+    pointer-events: auto;
+    will-change: transform;
+}
+
+.orrery-moon-img {
+    width: var(--orrery-moon-width, 0.8vw);
+    height: var(--orrery-moon-height, auto);
+    max-width: none;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: auto;
+    opacity: var(--orrery-moon-opacity, 1.0);
+    transform: var(--orrery-moon-image-rotation, rotate(0deg));
+    animation: var(--orrery-moon-counter-animation, none);
+    will-change: transform, filter;
+    filter: drop-shadow(var(--orrery-moon-shadow-x, 0.1vw) var(--orrery-moon-shadow-y, 0.2vw) var(--orrery-moon-shadow-blur, 0.3vw) var(--orrery-moon-shadow-color, rgba(0, 0, 0, 0.75)))
+            drop-shadow(0 0 var(--orrery-moon-glow-blur, 0vw) var(--orrery-moon-glow-color, transparent));
+    transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+@keyframes orrery-moon-orbit-spin {
+    from { transform: rotate(var(--orrery-moon-orbit-angle, 0deg)); }
+    to   { transform: rotate(calc(var(--orrery-moon-orbit-angle, 0deg) + 360deg)); }
+}
+@keyframes orrery-moon-counter-spin {
+    from { transform: rotate(calc(-1 * var(--orrery-moon-orbit-angle, 0deg) + var(--orrery-moon-axial-tilt, 0deg))); }
+    to   { transform: rotate(calc(-1 * var(--orrery-moon-orbit-angle, 0deg) + var(--orrery-moon-axial-tilt, 0deg) - 360deg)); }
+}
+
 
 /* ==========================================================================
    --- Venus Orbit Ring (5/6 of Earth circumference = 14.47vw radius) ---

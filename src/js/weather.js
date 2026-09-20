@@ -528,8 +528,7 @@ import weatherConditions from '../data/weather-conditions.json';
     [-96.883,33.868],[-96.8957,33.8964],[-96.8994,33.9337],[-96.9074,33.95],
     [-96.9221,33.9596],[-96.9729,33.9357],[-96.9856,33.8865],[-97.048,33.8179],
     [-97.0924,33.7332],[-97.1072,33.7211],[-97.1211,33.7172],[-97.1513,33.7226],
-    [-97.1722,33.7375],[-97.2048,33.7999],[-97.205,33.8189],[-97.1997,33.8273],3
-    
+    [-97.1722,33.7375],[-97.2048,33.7999],[-97.205,33.8189],[-97.1997,33.8273],
     [-97.1716,33.8353],[-97.1666,33.8473],[-97.1808,33.8952],[-97.2109,33.9161],
     [-97.2265,33.9146],[-97.3108,33.8725],[-97.3729,33.8195],[-97.4265,33.8194],
     [-97.4531,33.8285],[-97.4629,33.8418],[-97.4515,33.8709],[-97.451,33.8914],
@@ -8788,6 +8787,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
       neptune: { L0: 304.348665, L1:    218.4862002 },
     };
 
+    if (planet.toLowerCase() === 'moon') {
+      return calcMoonOrreryAngle();
+    }
+
     const el = ELEMENTS[planet.toLowerCase()];
     if (!el) {
       console.warn(`calcPlanetOrreryAngle: unknown planet '${planet}'. Returning 0deg.`);
@@ -8813,6 +8816,88 @@ Plan ahead for significantly warmer conditions tomorrow!`
     // when the reference (0°) is placed at the top (12 o'clock).
     const cssAngle = lon.toFixed(2);
     return `${cssAngle}deg`;
+  }
+
+  // ==========================================
+  // --- Moon Position Ephemeris: Real-Time Live Lunar Position ---
+  // ==========================================
+  //
+  // calcMoonOrreryAngle() → string e.g. '78.33deg'
+  //
+  // In the heliocentric orrery, Earth is positioned along its orbit at heliocentric
+  // longitude L_earth. The Moon orbits Earth once every ~29.53 days relative to the Sun.
+  //
+  // Geometrically & physically:
+  // - At New Moon (elongation D = 0°): The Moon is directly between Earth and the Sun
+  //   (on the inner sunward side of Earth, pointing toward the orrery center: 180° arm angle).
+  // - At First Quarter (elongation D = 90°): The Moon leads Earth prograde (90° clockwise: 90° arm angle).
+  // - At Full Moon (elongation D = 180°): The Moon is on the night side of Earth,
+  //   pointing directly outward away from the Sun (0° arm angle).
+  // - At Third Quarter (elongation D = 270°): The Moon trails behind Earth (270° arm angle).
+  //
+  // The Moon arm angle inside Earth's coordinate frame is:
+  //   angle = (180 - D + 360) % 360
+  // which exactly synchronizes with real-time astronomical lunar phases.
+  //
+  function calcMoonOrreryAngle() {
+    const now = new Date();
+    const JD  = (now.getTime() / 86400000) + 2440587.5;
+    const T   = (JD - 2451545.0) / 36525.0; // Julian centuries since J2000.0
+
+    // Moon mean elongation from Sun: D = 297.8501921 + 445267.1114034 * T (Meeus Ch. 47)
+    let D = (297.8501921 + 445267.1114034 * T) % 360;
+    if (D < 0) D += 360;
+
+    // Angle relative to Earth's radial arm:
+    // D=0° (New Moon) -> 180° (towards Sun)
+    // D=90° (First Quarter) -> 90° (ahead in orbit)
+    // D=180° (Full Moon) -> 0° (away from Sun)
+    // D=270° (Third Quarter) -> 270° (trailing in orbit)
+    let angle = (180 - D) % 360;
+    if (angle < 0) angle += 360;
+    return `${angle.toFixed(2)}deg`;
+  }
+
+  // ==========================================
+  // --- Galilean Moons of Jupiter: Real-Time Ephemeris ---
+  // ==========================================
+  // Simulates the current positions of the 4 big Galilean moons (Io, Europa, Ganymede, Callisto)
+  // as viewed edge-on through a telescope across Jupiter's equatorial plane.
+  // Uses Meeus Ch. 44 mean longitudes relative to J2000.0:
+  // - Io:       u1 = 163.8067° + 203.4889538° * d,  a1 = 5.9 R_jup
+  // - Europa:   u2 = 358.4108° + 101.3747247° * d,  a2 = 9.4 R_jup
+  // - Ganymede: u3 = 5.7129°  +  50.3176092° * d,  a3 = 15.0 R_jup
+  // - Callisto: u4 = 224.8151° +  21.5710712° * d,  a4 = 26.4 R_jup
+  // Returns array of objects with id, name, xRj (in Jupiter radii), z, isOcculted, color, sizeRel.
+  function calcGalileanMoons() {
+    const now = new Date();
+    const JD = (now.getTime() / 86400000) + 2440587.5;
+    const d = JD - 2451545.0; // days since J2000.0
+    const r2d = Math.PI / 180;
+
+    const MOON_DATA = [
+      { id: 'io',       name: 'Io',       u0: 163.8067, n: 203.4889538, a: 5.9,  color: '#ffea78', sizeRel: 0.9  },
+      { id: 'europa',   name: 'Europa',   u0: 358.4108, n: 101.3747247, a: 9.4,  color: '#f0f5fa', sizeRel: 0.8  },
+      { id: 'ganymede', name: 'Ganymede', u0: 5.7129,  n: 50.3176092,  a: 15.0, color: '#ded7c8', sizeRel: 1.15 },
+      { id: 'callisto', name: 'Callisto', u0: 224.8151, n: 21.5710712,  a: 26.4, color: '#b8b0a0', sizeRel: 1.05 },
+    ];
+
+    return MOON_DATA.map(m => {
+      const u = ((m.u0 + m.n * d) % 360 + 360) % 360;
+      const rad = u * r2d;
+      const x = m.a * Math.sin(rad); // x in Jupiter radii (+ is East/right, - is West/left)
+      const z = Math.cos(rad);       // z > 0 in front of Jupiter, z < 0 behind
+      const isBehind = z < 0 && Math.abs(x) < 1.0; // occulted behind Jupiter's disk
+      return {
+        id: m.id,
+        name: m.name,
+        xRj: x,
+        z: z,
+        isOcculted: isBehind,
+        color: m.color,
+        sizeRel: m.sizeRel
+      };
+    });
   }
 
   // ==========================================
@@ -8906,6 +8991,19 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_JUPITER_GLOW_BLUR_DESKTOP = '0vw';        // EDITABLE Desktop: Optional glow blur radius (set e.g. 0.8vw to enable aura)
   const ORRERY_JUPITER_GLOW_BLUR_MOBILE  = '0vw';        // EDITABLE Mobile: Optional glow blur radius
 
+  // --- EDITABLE: Jupiter Galilean Moons Config (Telescope Simulation) (JCV) ---
+  const ORRERY_JUPITER_MOONS_ENABLED = true;                 // EDITABLE: Toggle Galilean moons simulation (Io, Europa, Ganymede, Callisto)
+  const ORRERY_JUPITER_MOONS_SPREAD_DESKTOP = 0.12;          // EDITABLE Desktop: Distance spread factor across telescope view
+  const ORRERY_JUPITER_MOONS_SPREAD_MOBILE  = 0.12;          // EDITABLE Mobile: Distance spread factor across telescope view
+  const ORRERY_JUPITER_MOONS_SIZE_DESKTOP = '0.32vw';        // EDITABLE Desktop: Base diameter of moon dots
+  const ORRERY_JUPITER_MOONS_SIZE_MOBILE  = '0.50vw';        // EDITABLE Mobile: Base diameter of moon dots
+  const ORRERY_JUPITER_MOONS_OPACITY = '0.95';               // EDITABLE: Opacity of Galilean moon dots (0.0 to 1.0)
+  const ORRERY_JUPITER_MOONS_GLOW_BLUR_DESKTOP = '0.20vw';   // EDITABLE Desktop: Moon dot subtle starlight glow radius
+  const ORRERY_JUPITER_MOONS_GLOW_BLUR_MOBILE  = '0.35vw';   // EDITABLE Mobile: Moon dot subtle starlight glow radius
+  const ORRERY_JUPITER_MOONS_GLOW_COLOR = 'rgba(255, 255, 220, 0.85)'; // EDITABLE: Moon dot starlight glow color
+  const ORRERY_JUPITER_MOONS_Y_OFFSET_DESKTOP = '0vw';       // EDITABLE Desktop: Vertical alignment along Jupiter's equator
+  const ORRERY_JUPITER_MOONS_Y_OFFSET_MOBILE  = '0vw';       // EDITABLE Mobile: Vertical alignment along Jupiter's equator
+
   // --- EDITABLE: Mars Planet On Orbit Ring Config (JCV) ---
   // Ring scale: Saturn = 100% (30vw). Mars = 66.67% (2/3) of Saturn.
   // Mars ring radius = 30vw × 66.67% = 20vw
@@ -8975,6 +9073,50 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_EARTH_GLOW_COLOR = 'rgba(60,130,200,0.25)'; // EDITABLE: Optional blue glow color
   const ORRERY_EARTH_GLOW_BLUR_DESKTOP = '0vw';          // EDITABLE Desktop: Optional glow blur radius
   const ORRERY_EARTH_GLOW_BLUR_MOBILE  = '0vw';          // EDITABLE Mobile: Optional glow blur radius
+
+  // --- EDITABLE: Moon Orbit around Earth Config (JCV) ---
+  // Moon orbits Earth with editable distance (radius) and editable scale (default 25% of Earth size).
+  const ORRERY_MOON_ENABLED = true;                          // EDITABLE: Toggle visibility of the Moon
+  const ORRERY_MOON_IMAGE_URL = 'img/p-mo.png';              // EDITABLE: Moon transparent PNG asset path
+  // Size: 25% of Earth size (Earth is 3.2vw Desktop, 5.0vw Mobile -> Moon is 0.8vw Desktop, 1.25vw Mobile)
+  const ORRERY_MOON_SCALE_DESKTOP = 0.25;                    // EDITABLE Desktop: Scale ratio relative to Earth width (0.25 = 25%)
+  const ORRERY_MOON_SCALE_MOBILE  = 0.25;                    // EDITABLE Mobile: Scale ratio relative to Earth width (0.25 = 25%)
+  const ORRERY_MOON_WIDTH_DESKTOP = '0.8vw';                 // EDITABLE Desktop: Moon image width (25% of Earth 3.2vw)
+  const ORRERY_MOON_WIDTH_MOBILE  = '1.25vw';                // EDITABLE Mobile: Moon image width (25% of Earth 5.0vw)
+  const ORRERY_MOON_HEIGHT_DESKTOP = 'auto';                 // EDITABLE Desktop: Moon height ('auto' preserves natural aspect ratio)
+  const ORRERY_MOON_HEIGHT_MOBILE  = 'auto';                 // EDITABLE Mobile: Moon height
+  // Rotation distance (orbital radius) of Moon around Earth center:
+  const ORRERY_MOON_DISTANCE_DESKTOP = '2.4vw';              // EDITABLE Desktop: Moon orbit distance from Earth center
+  const ORRERY_MOON_DISTANCE_MOBILE  = '3.6vw';              // EDITABLE Mobile: Moon orbit distance from Earth center
+  // AUTO-CALCULATED: Moon's real-time position relative to Earth based on lunar elongation / phase
+  const ORRERY_MOON_ORBIT_ANGLE_DESKTOP = calcMoonOrreryAngle(); // AUTO: real-time live lunar position
+  const ORRERY_MOON_ORBIT_ANGLE_MOBILE  = calcMoonOrreryAngle(); // AUTO: real-time live lunar position
+  const ORRERY_MOON_RADIAL_OFFSET_DESKTOP = '0vw';           // EDITABLE Desktop: Fine radial adjustment (+ outward, - inward)
+  const ORRERY_MOON_RADIAL_OFFSET_MOBILE  = '0vw';           // EDITABLE Mobile: Fine radial adjustment
+  const ORRERY_MOON_ROTATION_ENABLED = false;                // EDITABLE: Toggle continuous revolution around Earth (true = orbiting, false = stationary at live position)
+  const ORRERY_MOON_ORBIT_PERIOD_DESKTOP = '10s';            // EDITABLE Desktop: Duration for 1 full lunar orbit revolution
+  const ORRERY_MOON_ORBIT_PERIOD_MOBILE  = '10s';            // EDITABLE Mobile: Duration for 1 full lunar orbit revolution
+  const ORRERY_MOON_ROTATION_DIRECTION = 'normal';           // EDITABLE: Orbit direction ('normal' = clockwise prograde)
+  const ORRERY_MOON_AXIAL_TILT_DESKTOP = '0deg';             // EDITABLE Desktop: Moon image orientation tilt
+  const ORRERY_MOON_AXIAL_TILT_MOBILE  = '0deg';             // EDITABLE Mobile: Moon image orientation tilt
+  const ORRERY_MOON_KEEP_AXIAL_TILT = true;                  // EDITABLE: Keep image upright / fixed orientation in space
+  const ORRERY_MOON_OPACITY = '1.0';                         // EDITABLE: Moon opacity (0.0 to 1.0)
+  const ORRERY_MOON_Z_INDEX = '14';                          // EDITABLE: Moon layer index (above Earth body)
+  const ORRERY_MOON_TRACK_ENABLED = true;                    // EDITABLE: Show faint orbital track ring around Earth
+  const ORRERY_MOON_TRACK_OPACITY = '0';                     // EDITABLE: Opacity of tracking orbital moon ring (0.0 to 1.0, set to '0' for 0% opacity)
+  const ORRERY_MOON_TRACK_WIDTH_DESKTOP = '0.04vw';          // EDITABLE Desktop: Moon orbit track stroke width
+  const ORRERY_MOON_TRACK_WIDTH_MOBILE  = '0.12vw';          // EDITABLE Mobile: Moon orbit track stroke width
+  const ORRERY_MOON_TRACK_COLOR = 'rgba(255, 255, 255, 0.18)'; // EDITABLE: Moon orbit track stroke color
+  const ORRERY_MOON_SHADOW_COLOR = 'rgba(0,0,0,0.75)';      // EDITABLE: Moon drop shadow color
+  const ORRERY_MOON_SHADOW_BLUR_DESKTOP = '0.3vw';           // EDITABLE Desktop: Shadow blur
+  const ORRERY_MOON_SHADOW_BLUR_MOBILE  = '0.5vw';           // EDITABLE Mobile: Shadow blur
+  const ORRERY_MOON_SHADOW_X_DESKTOP = '0.1vw';              // EDITABLE Desktop: Shadow horizontal offset
+  const ORRERY_MOON_SHADOW_X_MOBILE  = '0.2vw';              // EDITABLE Mobile: Shadow horizontal offset
+  const ORRERY_MOON_SHADOW_Y_DESKTOP = '0.2vw';              // EDITABLE Desktop: Shadow vertical offset
+  const ORRERY_MOON_SHADOW_Y_MOBILE  = '0.3vw';              // EDITABLE Mobile: Shadow vertical offset
+  const ORRERY_MOON_GLOW_COLOR = 'rgba(255,255,255,0.15)';   // EDITABLE: Optional subtle white lunar glow
+  const ORRERY_MOON_GLOW_BLUR_DESKTOP = '0vw';               // EDITABLE Desktop: Optional glow blur radius
+  const ORRERY_MOON_GLOW_BLUR_MOBILE  = '0vw';               // EDITABLE Mobile: Optional glow blur radius
 
   // --- EDITABLE: Venus Planet On Orbit Ring Config (JCV) ---
   // Ring scale: Saturn = 100% (30vw). Venus = 33.33% (1/3) of Saturn.
@@ -9152,6 +9294,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
       document.documentElement.style.setProperty('--orrery-jupiter-image-rotation', `rotate(var(--orrery-jupiter-axial-tilt, 0deg))`);
     }
 
+    // Jupiter Galilean Moons variables & live positioning
+    document.documentElement.style.setProperty('--orrery-jupiter-moons-display', ORRERY_JUPITER_MOONS_ENABLED ? 'block' : 'none');
+    document.documentElement.style.setProperty('--orrery-jupiter-moons-y-offset', isMobile ? ORRERY_JUPITER_MOONS_Y_OFFSET_MOBILE : ORRERY_JUPITER_MOONS_Y_OFFSET_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-jupiter-moons-glow-blur', isMobile ? ORRERY_JUPITER_MOONS_GLOW_BLUR_MOBILE : ORRERY_JUPITER_MOONS_GLOW_BLUR_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-jupiter-moons-glow-color', ORRERY_JUPITER_MOONS_GLOW_COLOR);
+    const jupBodyEl = document.getElementById('orrery-jupiter-body');
+    if (jupBodyEl) updateJupiterMoons(jupBodyEl);
+
     // Mars Ring & Position variables
     document.documentElement.style.setProperty('--orrery-mars-ring-radius', isMobile ? ORRERY_MARS_RING_RADIUS_MOBILE : ORRERY_MARS_RING_RADIUS_DESKTOP);
     const marsAngle = isMobile ? ORRERY_MARS_ORBIT_ANGLE_MOBILE : ORRERY_MARS_ORBIT_ANGLE_DESKTOP;
@@ -9214,6 +9364,44 @@ Plan ahead for significantly warmer conditions tomorrow!`
       document.documentElement.style.setProperty('--orrery-earth-image-rotation', `rotate(calc(-1 * var(--orrery-earth-orbit-angle, 0deg) + var(--orrery-earth-axial-tilt, 0deg)))`);
     } else {
       document.documentElement.style.setProperty('--orrery-earth-image-rotation', `rotate(var(--orrery-earth-axial-tilt, 0deg))`);
+    }
+
+    // Moon (Orbiting Earth) variables
+    const moonDist = isMobile ? ORRERY_MOON_DISTANCE_MOBILE : ORRERY_MOON_DISTANCE_DESKTOP;
+    const moonAngle = isMobile ? ORRERY_MOON_ORBIT_ANGLE_MOBILE : ORRERY_MOON_ORBIT_ANGLE_DESKTOP;
+    const moonPeriod = isMobile ? ORRERY_MOON_ORBIT_PERIOD_MOBILE : ORRERY_MOON_ORBIT_PERIOD_DESKTOP;
+    const moonTilt = isMobile ? ORRERY_MOON_AXIAL_TILT_MOBILE : ORRERY_MOON_AXIAL_TILT_DESKTOP;
+    document.documentElement.style.setProperty('--orrery-moon-distance', moonDist);
+    document.documentElement.style.setProperty('--orrery-moon-orbit-angle', moonAngle);
+    document.documentElement.style.setProperty('--orrery-moon-orbit-period', moonPeriod);
+    document.documentElement.style.setProperty('--orrery-moon-axial-tilt', moonTilt);
+    document.documentElement.style.setProperty('--orrery-moon-radial-offset', isMobile ? ORRERY_MOON_RADIAL_OFFSET_MOBILE : ORRERY_MOON_RADIAL_OFFSET_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-moon-width', isMobile ? ORRERY_MOON_WIDTH_MOBILE : ORRERY_MOON_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-moon-height', isMobile ? ORRERY_MOON_HEIGHT_MOBILE : ORRERY_MOON_HEIGHT_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-moon-opacity', ORRERY_MOON_OPACITY);
+    document.documentElement.style.setProperty('--orrery-moon-z-index', ORRERY_MOON_Z_INDEX);
+    document.documentElement.style.setProperty('--orrery-moon-display', ORRERY_MOON_ENABLED ? 'flex' : 'none');
+    document.documentElement.style.setProperty('--orrery-moon-track-display', (ORRERY_MOON_ENABLED && ORRERY_MOON_TRACK_ENABLED) ? 'block' : 'none');
+    document.documentElement.style.setProperty('--orrery-moon-track-width', isMobile ? ORRERY_MOON_TRACK_WIDTH_MOBILE : ORRERY_MOON_TRACK_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-moon-track-color', ORRERY_MOON_TRACK_COLOR);
+    document.documentElement.style.setProperty('--orrery-moon-track-opacity', ORRERY_MOON_TRACK_OPACITY);
+    document.documentElement.style.setProperty('--orrery-moon-shadow-x', isMobile ? ORRERY_MOON_SHADOW_X_MOBILE : ORRERY_MOON_SHADOW_X_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-moon-shadow-y', isMobile ? ORRERY_MOON_SHADOW_Y_MOBILE : ORRERY_MOON_SHADOW_Y_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-moon-shadow-blur', isMobile ? ORRERY_MOON_SHADOW_BLUR_MOBILE : ORRERY_MOON_SHADOW_BLUR_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-moon-shadow-color', ORRERY_MOON_SHADOW_COLOR);
+    document.documentElement.style.setProperty('--orrery-moon-glow-blur', isMobile ? ORRERY_MOON_GLOW_BLUR_MOBILE : ORRERY_MOON_GLOW_BLUR_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-moon-glow-color', ORRERY_MOON_GLOW_COLOR);
+    if (ORRERY_MOON_ROTATION_ENABLED) {
+      document.documentElement.style.setProperty('--orrery-moon-orbit-animation', `orrery-moon-orbit-spin ${moonPeriod} linear infinite ${ORRERY_MOON_ROTATION_DIRECTION}`);
+      document.documentElement.style.setProperty('--orrery-moon-counter-animation', ORRERY_MOON_KEEP_AXIAL_TILT ? `orrery-moon-counter-spin ${moonPeriod} linear infinite ${ORRERY_MOON_ROTATION_DIRECTION}` : 'none');
+    } else {
+      document.documentElement.style.setProperty('--orrery-moon-orbit-animation', 'none');
+      document.documentElement.style.setProperty('--orrery-moon-counter-animation', 'none');
+    }
+    if (ORRERY_MOON_KEEP_AXIAL_TILT) {
+      document.documentElement.style.setProperty('--orrery-moon-image-rotation', `rotate(calc(-1 * var(--orrery-moon-orbit-angle, 0deg) + var(--orrery-moon-axial-tilt, 0deg)))`);
+    } else {
+      document.documentElement.style.setProperty('--orrery-moon-image-rotation', `rotate(var(--orrery-moon-axial-tilt, 0deg))`);
     }
 
     // Venus Ring & Position variables
@@ -9327,7 +9515,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1228';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1231';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -14991,6 +15179,58 @@ Plan ahead for significantly warmer conditions tomorrow!`
     createSunImageIfMissing();
   }
 
+  // Helper to render and position the 4 Galilean moons across Jupiter's image like through a telescope
+  function updateJupiterMoons(jupiterBody) {
+    if (!jupiterBody) return;
+    let container = jupiterBody.querySelector('.orrery-jupiter-moons-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.className = 'orrery-jupiter-moons-container';
+      container.id = 'orrery-jupiter-moons-container';
+      jupiterBody.appendChild(container);
+    }
+
+    if (!ORRERY_JUPITER_MOONS_ENABLED) {
+      container.style.display = 'none';
+      return;
+    }
+    container.style.display = 'block';
+
+    const isMobile = window.innerWidth <= 767;
+    const spread = isMobile ? ORRERY_JUPITER_MOONS_SPREAD_MOBILE : ORRERY_JUPITER_MOONS_SPREAD_DESKTOP;
+    const jupWidthVw = parseFloat(isMobile ? ORRERY_JUPITER_WIDTH_MOBILE : ORRERY_JUPITER_WIDTH_DESKTOP) || 4.5;
+    const rJupVw = jupWidthVw / 2; // Radius of Jupiter in vw
+
+    const moons = calcGalileanMoons();
+    container.innerHTML = '';
+
+    moons.forEach(m => {
+      const moonEl = document.createElement('div');
+      moonEl.className = `orrery-galilean-moon orrery-moon-${m.id}`;
+      moonEl.id = `orrery-moon-${m.id}`;
+      moonEl.title = `${m.name} (${m.xRj > 0 ? '+' : ''}${m.xRj.toFixed(1)} Rj, ${m.z > 0 ? 'in front' : 'behind'})`;
+
+      const xOffsetVw = m.xRj * spread * rJupVw;
+      moonEl.style.left = `calc(50% + ${xOffsetVw.toFixed(3)}vw)`;
+      moonEl.style.backgroundColor = m.color;
+
+      const baseSizeVw = parseFloat(isMobile ? ORRERY_JUPITER_MOONS_SIZE_MOBILE : ORRERY_JUPITER_MOONS_SIZE_DESKTOP) || 0.32;
+      const sizeVw = (baseSizeVw * m.sizeRel).toFixed(3);
+      moonEl.style.width = `${sizeVw}vw`;
+      moonEl.style.height = `${sizeVw}vw`;
+
+      if (m.isOcculted) {
+        moonEl.style.opacity = '0';
+        moonEl.style.pointerEvents = 'none';
+      } else {
+        moonEl.style.opacity = ORRERY_JUPITER_MOONS_OPACITY;
+        moonEl.style.zIndex = m.z > 0 ? '16' : '13';
+      }
+
+      container.appendChild(moonEl);
+    });
+  }
+
   // Render and position the Orrery / Solar System planetary orbit ring section
   function createOrrerySectionIfMissing() {
     if (!ORRERY_ENABLED) {
@@ -15098,6 +15338,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       jupiterImg.draggable = false;
 
       jupiterBody.appendChild(jupiterImg);
+      updateJupiterMoons(jupiterBody);
       jupiterArm.appendChild(jupiterBody);
       ringContainer.appendChild(jupiterArm);
 
@@ -15119,7 +15360,25 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const earthImg = document.createElement('img');
       earthImg.className = 'orrery-earth-img'; earthImg.id = 'orrery-earth-img';
       earthImg.src = ORRERY_EARTH_IMAGE_URL || 'img/p-ea.png'; earthImg.alt = 'Earth'; earthImg.draggable = false;
-      earthBody.appendChild(earthImg); earthArm.appendChild(earthBody); ringContainer.appendChild(earthArm);
+      earthBody.appendChild(earthImg);
+
+      // Moon orbit track circle around Earth
+      const moonTrack = document.createElement('div');
+      moonTrack.className = 'orrery-moon-track'; moonTrack.id = 'orrery-moon-track';
+      earthBody.appendChild(moonTrack);
+
+      // Moon orbit arm, body and image
+      const moonArm = document.createElement('div');
+      moonArm.className = 'orrery-moon-arm'; moonArm.id = 'orrery-moon-arm';
+      const moonBody = document.createElement('div');
+      moonBody.className = 'orrery-moon-body'; moonBody.id = 'orrery-moon-body';
+      const moonImg = document.createElement('img');
+      moonImg.className = 'orrery-moon-img'; moonImg.id = 'orrery-moon-img';
+      moonImg.src = ORRERY_MOON_IMAGE_URL || 'img/p-mo.png'; moonImg.alt = 'Moon'; moonImg.draggable = false;
+      moonBody.appendChild(moonImg); moonArm.appendChild(moonBody);
+      earthBody.appendChild(moonArm);
+
+      earthArm.appendChild(earthBody); ringContainer.appendChild(earthArm);
 
       // Create Venus orbit arm and body
       const venusArm = document.createElement('div');
@@ -15206,6 +15465,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           jupiterImg.draggable = false;
 
           jupiterBody.appendChild(jupiterImg);
+          updateJupiterMoons(jupiterBody);
           jupiterArm.appendChild(jupiterBody);
           ringContainer.appendChild(jupiterArm);
         } else {
@@ -15213,6 +15473,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
           if (jupiterImg && ORRERY_JUPITER_IMAGE_URL && jupiterImg.getAttribute('src') !== ORRERY_JUPITER_IMAGE_URL) {
             jupiterImg.src = ORRERY_JUPITER_IMAGE_URL;
           }
+          const jupiterBody = jupiterArm.querySelector('.orrery-jupiter-body');
+          if (jupiterBody) updateJupiterMoons(jupiterBody);
         }
 
         // Helper: ensure a planet arm exists — const arrow fn is valid in strict-mode blocks
@@ -15235,6 +15497,41 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
         ensurePlanetArm('orrery-mars-arm',    'orrery-mars-arm',    'orrery-mars-img',    'orrery-mars-img',    ORRERY_MARS_IMAGE_URL    || 'img/p-ma.png');
         ensurePlanetArm('orrery-earth-arm',   'orrery-earth-arm',   'orrery-earth-img',   'orrery-earth-img',   ORRERY_EARTH_IMAGE_URL   || 'img/p-ea.png');
+
+        // Ensure Moon track and arm exist inside Earth body
+        const earthBodyEl = ringContainer.querySelector('.orrery-earth-body');
+        if (earthBodyEl) {
+          if (!earthBodyEl.querySelector('.orrery-moon-track')) {
+            const moonTrack = document.createElement('div');
+            moonTrack.className = 'orrery-moon-track';
+            moonTrack.id = 'orrery-moon-track';
+            earthBodyEl.appendChild(moonTrack);
+          }
+          let moonArm = earthBodyEl.querySelector('.orrery-moon-arm');
+          if (!moonArm) {
+            moonArm = document.createElement('div');
+            moonArm.className = 'orrery-moon-arm';
+            moonArm.id = 'orrery-moon-arm';
+            const moonBody = document.createElement('div');
+            moonBody.className = 'orrery-moon-body';
+            moonBody.id = 'orrery-moon-body';
+            const moonImg = document.createElement('img');
+            moonImg.className = 'orrery-moon-img';
+            moonImg.id = 'orrery-moon-img';
+            moonImg.src = ORRERY_MOON_IMAGE_URL || 'img/p-mo.png';
+            moonImg.alt = 'Moon';
+            moonImg.draggable = false;
+            moonBody.appendChild(moonImg);
+            moonArm.appendChild(moonBody);
+            earthBodyEl.appendChild(moonArm);
+          } else {
+            const moonImg = moonArm.querySelector('.orrery-moon-img');
+            if (moonImg && ORRERY_MOON_IMAGE_URL && moonImg.getAttribute('src') !== ORRERY_MOON_IMAGE_URL) {
+              moonImg.src = ORRERY_MOON_IMAGE_URL;
+            }
+          }
+        }
+
         ensurePlanetArm('orrery-venus-arm',   'orrery-venus-arm',   'orrery-venus-img',   'orrery-venus-img',   ORRERY_VENUS_IMAGE_URL   || 'img/p-ve.png');
         ensurePlanetArm('orrery-mercury-arm', 'orrery-mercury-arm', 'orrery-mercury-img', 'orrery-mercury-img', ORRERY_MERCURY_IMAGE_URL || 'img/p-me.png');
 
