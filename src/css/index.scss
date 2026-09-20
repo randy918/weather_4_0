@@ -2856,8 +2856,8 @@ main {
 
 .orrery-ring-container {
     position: relative;
-    width: calc(var(--orrery-radius, 30vw) * 2);
-    height: calc(var(--orrery-radius, 30vw) * 2);
+    width: calc(var(--orrery-radius, 35vw) * 2);
+    height: calc(var(--orrery-radius, 35vw) * 2);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -2872,7 +2872,7 @@ main {
 .orrery-orbit-track {
     fill: none;
     stroke: var(--orrery-track-color, rgba(255, 255, 255, 0.2));
-    stroke-width: var(--orrery-saturn-track-width, 0.05vw);
+    stroke-width: var(--orrery-saturn-track-width, 0.15vw);
 }
 
 /* --- Central Sun Styling (Lighten Only, Centered Rotation) --- */
@@ -2884,7 +2884,7 @@ main {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: var(--orrery-sun-width, 6.0vw);
+    width: var(--orrery-sun-width, 12.0vw);
     height: var(--orrery-sun-height, auto);
     display: var(--orrery-sun-display, flex);
     justify-content: center;
@@ -2942,7 +2942,7 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
-    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-radius, 30vw) + var(--orrery-saturn-radial-offset, 0vw))));
+    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-radius, 35vw) + var(--orrery-saturn-radial-offset, 0vw))));
     pointer-events: auto;
     will-change: transform;
 }
@@ -2989,7 +2989,7 @@ main {
 .orrery-jupiter-track {
     fill: none;
     stroke: var(--orrery-track-color, rgba(255, 255, 255, 0.2));
-    stroke-width: var(--orrery-track-width, 0.15vw);
+    stroke-width: var(--orrery-track-width, 0.05vw);
 }
 
 /* --- Jupiter Orbit Arm, Body & Styling --- */
@@ -3015,7 +3015,7 @@ main {
     justify-content: center;
     align-items: center;
     /* Positions planet at the Jupiter ring radius (not Saturn's) */
-    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-jupiter-ring-radius, 25vw) + var(--orrery-jupiter-radial-offset, 0vw))));
+    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-jupiter-ring-radius, 30vw) + var(--orrery-jupiter-radial-offset, 0vw))));
     pointer-events: auto;
     will-change: transform;
 }
@@ -3079,7 +3079,7 @@ main {
 .orrery-mars-track {
     fill: none;
     stroke: var(--orrery-track-color, rgba(255, 255, 255, 0.2));
-    stroke-width: var(--orrery-track-width, 0.15vw);
+    stroke-width: var(--orrery-track-width, 0.05vw);
 }
 
 .orrery-mars-arm {
@@ -3100,7 +3100,7 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
-    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-mars-ring-radius, 20vw) + var(--orrery-mars-radial-offset, 0vw))));
+    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-mars-ring-radius, 25vw) + var(--orrery-mars-radial-offset, 0vw))));
     pointer-events: auto;
     will-change: transform;
 }
@@ -3137,7 +3137,7 @@ main {
 .orrery-earth-track {
     fill: none;
     stroke: var(--orrery-track-color, rgba(255, 255, 255, 0.2));
-    stroke-width: var(--orrery-track-width, 0.15vw);
+    stroke-width: var(--orrery-track-width, 0.05vw);
 }
 
 .orrery-earth-arm {
@@ -3158,7 +3158,7 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
-    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-earth-ring-radius, 15vw) + var(--orrery-earth-radial-offset, 0vw))));
+    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-earth-ring-radius, 20vw) + var(--orrery-earth-radial-offset, 0vw))));
     pointer-events: auto;
     will-change: transform;
 }
@@ -3268,7 +3268,7 @@ main {
 .orrery-venus-track {
     fill: none;
     stroke: var(--orrery-track-color, rgba(255, 255, 255, 0.2));
-    stroke-width: var(--orrery-track-width, 0.15vw);
+    stroke-width: var(--orrery-track-width, 0.05vw);
 }
 
 .orrery-venus-arm {
@@ -3289,7 +3289,7 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
-    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-venus-ring-radius, 10vw) + var(--orrery-venus-radial-offset, 0vw))));
+    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-venus-ring-radius, 15vw) + var(--orrery-venus-radial-offset, 0vw))));
     pointer-events: auto;
     will-change: transform;
 }
@@ -3327,7 +3327,7 @@ main {
 .orrery-mercury-track {
     fill: none;
     stroke: var(--orrery-track-color, rgba(255, 255, 255, 0.2));
-    stroke-width: var(--orrery-track-width, 0.15vw);
+    stroke-width: var(--orrery-track-width, 0.05vw);
 }
 
 .orrery-mercury-arm {
@@ -3348,7 +3348,7 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
-    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-mercury-ring-radius, 5vw) + var(--orrery-mercury-radial-offset, 0vw))));
+    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-mercury-ring-radius, 10vw) + var(--orrery-mercury-radial-offset, 0vw))));
     pointer-events: auto;
     will-change: transform;
 }

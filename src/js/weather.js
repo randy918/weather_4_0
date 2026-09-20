@@ -8938,18 +8938,18 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_MARGIN_TOP_MOBILE = '4vw';              // EDITABLE Mobile: Spacing above Orrery section
   const ORRERY_MARGIN_BOTTOM_DESKTOP = '2vw';          // EDITABLE Desktop: Spacing below Orrery section
   const ORRERY_MARGIN_BOTTOM_MOBILE = '3vw';           // EDITABLE Mobile: Spacing below Orrery section
-  const ORRERY_RADIUS_DESKTOP = '30vw';                // EDITABLE Desktop: Planetary orbit ring radius (diameter = 2x)
-  const ORRERY_RADIUS_MOBILE = '30vw';                 // EDITABLE Mobile: Planetary orbit ring radius (diameter = 2x)
+  const ORRERY_RADIUS_DESKTOP = '35vw';                // EDITABLE Desktop: Planetary orbit ring radius (diameter = 2x) — Saturn orbits here
+  const ORRERY_RADIUS_MOBILE = '35vw';                 // EDITABLE Mobile: Planetary orbit ring radius (diameter = 2x) — Saturn orbits here
   const ORRERY_TRACK_COLOR = 'rgba(255, 255, 255, 0.2)'; // EDITABLE: Orbit ring track stroke color (matches app gauges)
   const ORRERY_TRACK_WIDTH_DESKTOP = '0.05vw';         // EDITABLE Desktop: Orbit ring track stroke width
-  const ORRERY_TRACK_WIDTH_MOBILE = '0.20vw';          // EDITABLE Mobile: Orbit ring track stroke width
+  const ORRERY_TRACK_WIDTH_MOBILE = '0.10vw';          // EDITABLE Mobile: Orbit ring track stroke width
   const ORRERY_Z_INDEX = '10';                         // EDITABLE: Stacking context layer index
 
   // --- EDITABLE: Central Sun In Orrery Config (JCV) ---
   const ORRERY_SUN_ENABLED = true;                         // EDITABLE: Toggle visibility of central Sun
   const ORRERY_SUN_IMAGE_URL = 'img/p-su.png';             // EDITABLE: Sun transparent/lighten PNG asset path
-  const ORRERY_SUN_WIDTH_DESKTOP = '6.0vw';                // EDITABLE Desktop: Central Sun image width
-  const ORRERY_SUN_WIDTH_MOBILE = '9.5vw';                 // EDITABLE Mobile: Central Sun image width
+  const ORRERY_SUN_WIDTH_DESKTOP = '12.0vw';               // EDITABLE Desktop: Central Sun image width (doubled from 6.0vw)
+  const ORRERY_SUN_WIDTH_MOBILE = '19.0vw';                // EDITABLE Mobile: Central Sun image width (doubled from 9.5vw)
   const ORRERY_SUN_HEIGHT_DESKTOP = 'auto';                // EDITABLE Desktop: Sun height ('auto' preserves aspect ratio)
   const ORRERY_SUN_HEIGHT_MOBILE = 'auto';                 // EDITABLE Mobile: Sun height
   const ORRERY_SUN_ROTATION_ENABLED = true;                // EDITABLE: Toggle slow centered rotation of Sun
@@ -9004,8 +9004,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // C_jupiter = C_saturn × (5/6)  →  since C = 2π·r, radius scales by the same ratio:
   // Jupiter ring radius = Saturn radius × (5/6) = 30vw × 5/6 = 25vw
   // (Jupiter circumference = 83.33% of Saturn circumference)
-  const ORRERY_JUPITER_RING_RADIUS_DESKTOP = '25vw';     // EDITABLE Desktop: Jupiter orbit ring radius (5/6 of Saturn 30vw)
-  const ORRERY_JUPITER_RING_RADIUS_MOBILE  = '25vw';     // EDITABLE Mobile: Jupiter orbit ring radius
+  const ORRERY_JUPITER_RING_RADIUS_DESKTOP = '30vw';     // EDITABLE Desktop: Jupiter orbit ring radius (shifted out one ring — was 25vw)
+  const ORRERY_JUPITER_RING_RADIUS_MOBILE  = '30vw';     // EDITABLE Mobile: Jupiter orbit ring radius
   const ORRERY_JUPITER_IMAGE_URL = 'img/p-ju.png';       // EDITABLE: Jupiter transparent PNG asset path
   const ORRERY_JUPITER_WIDTH_DESKTOP = '4.5vw';          // EDITABLE Desktop: Jupiter planet image width
   const ORRERY_JUPITER_WIDTH_MOBILE  = '7vw';            // EDITABLE Mobile: Jupiter planet image width
@@ -9055,8 +9055,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // --- EDITABLE: Mars Planet On Orbit Ring Config (JCV) ---
   // Ring scale: Saturn = 100% (30vw). Mars = 66.67% (2/3) of Saturn.
   // Mars ring radius = 30vw × 66.67% = 20vw
-  const ORRERY_MARS_RING_RADIUS_DESKTOP = '20vw';        // EDITABLE Desktop: Mars orbit ring radius (66.67% of Saturn 30vw)
-  const ORRERY_MARS_RING_RADIUS_MOBILE  = '20vw';        // EDITABLE Mobile: Mars orbit ring radius
+  const ORRERY_MARS_RING_RADIUS_DESKTOP = '25vw';        // EDITABLE Desktop: Mars orbit ring radius (shifted out one ring — was 20vw)
+  const ORRERY_MARS_RING_RADIUS_MOBILE  = '25vw';        // EDITABLE Mobile: Mars orbit ring radius
   const ORRERY_MARS_IMAGE_URL = 'img/p-ma.png';          // EDITABLE: Mars transparent PNG asset path
   const ORRERY_MARS_WIDTH_DESKTOP = '2.8vw';             // EDITABLE Desktop: Mars planet image width
   const ORRERY_MARS_WIDTH_MOBILE  = '4.5vw';             // EDITABLE Mobile: Mars planet image width
@@ -9090,8 +9090,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // --- EDITABLE: Earth Planet On Orbit Ring Config (JCV) ---
   // Ring scale: Saturn = 100% (30vw). Earth = 50% (1/2) of Saturn.
   // Earth ring radius = 30vw × 50% = 15vw
-  const ORRERY_EARTH_RING_RADIUS_DESKTOP = '15vw';       // EDITABLE Desktop: Earth orbit ring radius (50% of Saturn 30vw)
-  const ORRERY_EARTH_RING_RADIUS_MOBILE  = '15vw';       // EDITABLE Mobile: Earth orbit ring radius
+  const ORRERY_EARTH_RING_RADIUS_DESKTOP = '20vw';       // EDITABLE Desktop: Earth orbit ring radius (shifted out one ring — was 15vw)
+  const ORRERY_EARTH_RING_RADIUS_MOBILE  = '20vw';       // EDITABLE Mobile: Earth orbit ring radius
   const ORRERY_EARTH_IMAGE_URL = 'img/p-ea.png';         // EDITABLE: Earth transparent PNG asset path
   const ORRERY_EARTH_WIDTH_DESKTOP = '3.2vw';            // EDITABLE Desktop: Earth planet image width
   const ORRERY_EARTH_WIDTH_MOBILE  = '5.0vw';            // EDITABLE Mobile: Earth planet image width
@@ -9169,8 +9169,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // --- EDITABLE: Venus Planet On Orbit Ring Config (JCV) ---
   // Ring scale: Saturn = 100% (30vw). Venus = 33.33% (1/3) of Saturn.
   // Venus ring radius = 30vw × 33.33% = 10vw
-  const ORRERY_VENUS_RING_RADIUS_DESKTOP = '10vw';       // EDITABLE Desktop: Venus orbit ring radius (33.33% of Saturn 30vw)
-  const ORRERY_VENUS_RING_RADIUS_MOBILE  = '10vw';       // EDITABLE Mobile: Venus orbit ring radius
+  const ORRERY_VENUS_RING_RADIUS_DESKTOP = '15vw';       // EDITABLE Desktop: Venus orbit ring radius (shifted out one ring — was 10vw)
+  const ORRERY_VENUS_RING_RADIUS_MOBILE  = '15vw';       // EDITABLE Mobile: Venus orbit ring radius
   const ORRERY_VENUS_IMAGE_URL = 'img/p-ve.png';         // EDITABLE: Venus transparent PNG asset path
   const ORRERY_VENUS_WIDTH_DESKTOP = '2.8vw';            // EDITABLE Desktop: Venus planet image width
   const ORRERY_VENUS_WIDTH_MOBILE  = '4.5vw';            // EDITABLE Mobile: Venus planet image width
@@ -9205,8 +9205,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // Ring scale: Saturn = 100% (30vw). Mercury = 16.67% (1/6) of Saturn.
   // Mercury ring radius = 30vw × 16.67% = 5vw
   // Center Sun gap = 5vw radius (equal to one ring-step, leaving the Sun area open)
-  const ORRERY_MERCURY_RING_RADIUS_DESKTOP = '5vw';      // EDITABLE Desktop: Mercury orbit ring radius (16.67% of Saturn 30vw)
-  const ORRERY_MERCURY_RING_RADIUS_MOBILE  = '5vw';      // EDITABLE Mobile: Mercury orbit ring radius
+  const ORRERY_MERCURY_RING_RADIUS_DESKTOP = '10vw';     // EDITABLE Desktop: Mercury orbit ring radius (shifted out one ring — was 5vw)
+  const ORRERY_MERCURY_RING_RADIUS_MOBILE  = '10vw';     // EDITABLE Mobile: Mercury orbit ring radius
   const ORRERY_MERCURY_IMAGE_URL = 'img/p-me.png';       // EDITABLE: Mercury transparent PNG asset path
   const ORRERY_MERCURY_WIDTH_DESKTOP = '2.2vw';          // EDITABLE Desktop: Mercury planet image width
   const ORRERY_MERCURY_WIDTH_MOBILE  = '3.5vw';          // EDITABLE Mobile: Mercury planet image width
@@ -9587,7 +9587,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1236';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1238';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -15424,50 +15424,31 @@ Plan ahead for significantly warmer conditions tomorrow!`
       svg.setAttribute('class', 'orrery-svg');
       svg.setAttribute('viewBox', '0 0 100 100');
       
-      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      circle.setAttribute('class', 'orrery-orbit-track');
-      circle.setAttribute('cx', '50');
-      circle.setAttribute('cy', '50');
-      circle.setAttribute('r', '50');
-      
-
-      // Saturn  orbit track:  30/30 * 50 = 50.00   (r=50, outer ring)
-      // Jupiter orbit track:  25/30 * 50 = 41.67   (83.33% of Saturn)
-      // Mars    orbit track:  20/30 * 50 = 33.33   (66.67% of Saturn)
-      // Earth   orbit track:  15/30 * 50 = 25.00   (50%    of Saturn)
-      // Venus   orbit track:  10/30 * 50 = 16.67   (33.33% of Saturn)
-      // Mercury orbit track:   5/30 * 50 =  8.33   (16.67% of Saturn)
-      const jupiterCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      jupiterCircle.setAttribute('class', 'orrery-jupiter-track');
-      jupiterCircle.id = 'orrery-jupiter-track';
-      jupiterCircle.setAttribute('cx', '50'); jupiterCircle.setAttribute('cy', '50'); jupiterCircle.setAttribute('r', '41.67');
-
-      const marsCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      marsCircle.setAttribute('class', 'orrery-mars-track');
-      marsCircle.id = 'orrery-mars-track';
-      marsCircle.setAttribute('cx', '50'); marsCircle.setAttribute('cy', '50'); marsCircle.setAttribute('r', '33.33');
-
-      const earthCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      earthCircle.setAttribute('class', 'orrery-earth-track');
-      earthCircle.id = 'orrery-earth-track';
-      earthCircle.setAttribute('cx', '50'); earthCircle.setAttribute('cy', '50'); earthCircle.setAttribute('r', '25.00');
-
-      const venusCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      venusCircle.setAttribute('class', 'orrery-venus-track');
-      venusCircle.id = 'orrery-venus-track';
-      venusCircle.setAttribute('cx', '50'); venusCircle.setAttribute('cy', '50'); venusCircle.setAttribute('r', '16.67');
-
-      const mercuryCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      mercuryCircle.setAttribute('class', 'orrery-mercury-track');
-      mercuryCircle.id = 'orrery-mercury-track';
-      mercuryCircle.setAttribute('cx', '50'); mercuryCircle.setAttribute('cy', '50'); mercuryCircle.setAttribute('r', '8.33');
-
-      svg.appendChild(circle);
-      svg.appendChild(jupiterCircle);
-      svg.appendChild(marsCircle);
-      svg.appendChild(earthCircle);
-      svg.appendChild(venusCircle);
-      svg.appendChild(mercuryCircle);
+      // Ring radii with ORRERY_RADIUS = 35vw (SVG scale: (radius_vw / 35) * 50):
+      // Saturn  orbit track:  35/35 * 50 = 50.00  (r=50, outermost thick ring)
+      // Jupiter orbit track:  30/35 * 50 = 42.86
+      // Mars    orbit track:  25/35 * 50 = 35.71
+      // Earth   orbit track:  20/35 * 50 = 28.57
+      // Venus   orbit track:  15/35 * 50 = 21.43
+      // Mercury orbit track:  10/35 * 50 = 14.29
+      // (Old Mercury 5vw ring was deleted — not created)
+      const orreryTrackDefs = [
+        { cls: 'orrery-orbit-track',   id: 'orrery-saturn-track',  r: '50.00' }, // Saturn   35vw outer ring (thick)
+        { cls: 'orrery-jupiter-track', id: 'orrery-jupiter-track', r: '42.86' }, // Jupiter  30vw
+        { cls: 'orrery-mars-track',    id: 'orrery-mars-track',    r: '35.71' }, // Mars     25vw
+        { cls: 'orrery-earth-track',   id: 'orrery-earth-track',   r: '28.57' }, // Earth    20vw
+        { cls: 'orrery-venus-track',   id: 'orrery-venus-track',   r: '21.43' }, // Venus    15vw
+        { cls: 'orrery-mercury-track', id: 'orrery-mercury-track', r: '14.29' }, // Mercury  10vw
+      ];
+      orreryTrackDefs.forEach(({ cls, id, r }) => {
+        const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        c.setAttribute('class', cls);
+        c.id = id;
+        c.setAttribute('cx', '50');
+        c.setAttribute('cy', '50');
+        c.setAttribute('r', r);
+        svg.appendChild(c);
+      });
       ringContainer.appendChild(svg);
 
       // Create Central Sun
@@ -15586,19 +15567,31 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       section.appendChild(ringContainer);
     } else {
-      const circle = section.querySelector('.orrery-orbit-track');
-      if (circle) circle.setAttribute('r', '50');
-
-      // Ensure Jupiter orbit track circle exists in the SVG
+      // Sync ALL SVG track circles to the correct r values for ORRERY_RADIUS = 35vw.
+      // Scale formula: r = (planet_radius_vw / 35) * 50
+      // Saturn:  50.00  Jupiter: 42.86  Mars: 35.71  Earth: 28.57  Venus: 21.43  Mercury: 14.29
+      // Each ring is exactly 7.14 SVG units apart (5vw linear progression) → equidistant on screen.
+      // The old Mercury ring at r=8.33 (5vw) is completely deleted.
       const svg = section.querySelector('.orrery-svg');
-      if (svg && !svg.querySelector('.orrery-jupiter-track')) {
-        const jupiterCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        jupiterCircle.setAttribute('class', 'orrery-jupiter-track');
-        jupiterCircle.id = 'orrery-jupiter-track';
-        jupiterCircle.setAttribute('cx', '50');
-        jupiterCircle.setAttribute('cy', '50');
-        jupiterCircle.setAttribute('r', '41.67');
-        svg.appendChild(jupiterCircle);
+      if (svg) {
+        const trackDefs = [
+          { cls: 'orrery-orbit-track',   id: 'orrery-saturn-track',  r: '50.00' }, // Saturn   35vw outer ring (thick)
+          { cls: 'orrery-jupiter-track', id: 'orrery-jupiter-track', r: '42.86' }, // Jupiter  30vw
+          { cls: 'orrery-mars-track',    id: 'orrery-mars-track',    r: '35.71' }, // Mars     25vw
+          { cls: 'orrery-earth-track',   id: 'orrery-earth-track',   r: '28.57' }, // Earth    20vw
+          { cls: 'orrery-venus-track',   id: 'orrery-venus-track',   r: '21.43' }, // Venus    15vw
+          { cls: 'orrery-mercury-track', id: 'orrery-mercury-track', r: '14.29' }, // Mercury  10vw
+        ];
+        svg.innerHTML = ''; // Wipe all children completely so no stale or duplicate circles can linger
+        trackDefs.forEach(({ cls, id, r }) => {
+          const el = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          el.setAttribute('class', cls);
+          el.id = id;
+          el.setAttribute('cx', '50');
+          el.setAttribute('cy', '50');
+          el.setAttribute('r', r);
+          svg.appendChild(el);
+        });
       }
 
       const ringContainer = section.querySelector('.orrery-ring-container');
@@ -15740,28 +15733,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
         ensurePlanetArm('orrery-venus-arm',   'orrery-venus-arm',   'orrery-venus-img',   'orrery-venus-img',   ORRERY_VENUS_IMAGE_URL   || 'img/p-ve.png');
         ensurePlanetArm('orrery-mercury-arm', 'orrery-mercury-arm', 'orrery-mercury-img', 'orrery-mercury-img', ORRERY_MERCURY_IMAGE_URL || 'img/p-me.png');
-
-        // Ensure inner SVG track circles exist AND have correct r values for Mars/Earth/Venus/Mercury
-        const svgEl = section.querySelector('.orrery-svg');
-        if (svgEl) {
-          const trackDefs = [
-            { cls: 'orrery-mars-track',    id: 'orrery-mars-track',    r: '33.33' },
-            { cls: 'orrery-earth-track',   id: 'orrery-earth-track',   r: '25.00' },
-            { cls: 'orrery-venus-track',   id: 'orrery-venus-track',   r: '16.67' },
-            { cls: 'orrery-mercury-track', id: 'orrery-mercury-track', r: '8.33'  },
-          ];
-          for (const td of trackDefs) {
-            let c = svgEl.querySelector('.' + td.cls);
-            if (!c) {
-              c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-              c.setAttribute('class', td.cls); c.id = td.id;
-              c.setAttribute('cx', '50'); c.setAttribute('cy', '50');
-              svgEl.appendChild(c);
-            }
-            c.setAttribute('r', td.r); // always update r in case it changed
-          }
-        }
-
       }
     }
 
