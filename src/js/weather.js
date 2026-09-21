@@ -7371,16 +7371,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // Plays back recent stepped frames back-and-forth (ping-pong) to show live solar flare activity & winking white dots
   const SUN_SIZZLE_ENABLED = true;                    // EDITABLE: Enable/disable animation for left sizzling sun
   const SUN_SIZZLE_BAND = 'Fe195';                    // EDITABLE: NOAA SUVI band: 'Fe195' (coronal loops/bronze), 'Fe094' (hot solar flares/blue), 'He304' (prominence eruptions/red)
-  const SUN_SIZZLE_FETCH_LENGTH = 240;                // EDITABLE: Historical buffer to pull from NOAA (60 = ~1 hr, 120 = ~2 hrs, 240 = ~4 hrs)
-  const SUN_SIZZLE_FRAME_STEP = 3;                    // EDITABLE: Cadence step (~3-4m apart so solar flares visibly boil and wink with white dots)
-  const SUN_SIZZLE_FRAME_COUNT = 36;                  // EDITABLE: Number of recent stepped frames in loop (e.g. 24, 36, 48)
-  const SUN_SIZZLE_FPS_DESKTOP = 10;                  // EDITABLE Desktop: Sizzle playback speed in FPS (8-12 FPS allows eye to clearly track flare eruptions & winking dots)
-  const SUN_SIZZLE_FPS_MOBILE = 10;                   // EDITABLE Mobile: Sizzle playback speed in FPS
-  const SUN_SIZZLE_FPS = 10;                          // EDITABLE: Fallback / default FPS
+  const SUN_SIZZLE_FETCH_LENGTH = 720;                // EDITABLE: Historical buffer to pull from NOAA (60 = ~1 hr, 120 = ~2 hrs, 720 = ~12 hrs)
+  const SUN_SIZZLE_FRAME_STEP = 5;                    // EDITABLE: Cadence step (~3-4m apart so solar flares visibly boil and wink with white dots)
+  const SUN_SIZZLE_FRAME_COUNT = 48;                  // EDITABLE: Number of recent stepped frames in loop (e.g. 24, 36, 48, 60)
+  const SUN_SIZZLE_FPS_DESKTOP = 12;                  // EDITABLE Desktop: Sizzle playback speed in FPS (6-7 FPS gives eye time to track individual flares)
+  const SUN_SIZZLE_FPS_MOBILE = 12;                   // EDITABLE Mobile: Sizzle playback speed in FPS
+  const SUN_SIZZLE_FPS = 12;                          // EDITABLE: Fallback / default FPS
   const SUN_SIZZLE_PAUSE_END_MS = 150;                // EDITABLE: Pause in ms at turnaround ends (live frame and oldest frame) before reversing (0 for instant)
   const SUN_SIZZLE_PLAYBACK_MODE = 'pingpong';        // EDITABLE: 'pingpong' (1..36..1) or 'forward' (1..36, 1..36)
-  const SUN_SIZZLE_CROSSFADE_MS_DESKTOP = 70;         // EDITABLE Desktop: Cross-fade transition in ms between sizzle frames (eliminates flicker)
-  const SUN_SIZZLE_CROSSFADE_MS_MOBILE = 70;          // EDITABLE Mobile: Cross-fade transition in ms between sizzle frames
+  const SUN_SIZZLE_CROSSFADE_MS_DESKTOP = 50;         // EDITABLE Desktop: Cross-fade transition in ms between sizzle frames (eliminates flicker)
+  const SUN_SIZZLE_CROSSFADE_MS_MOBILE = 50;          // EDITABLE Mobile: Cross-fade transition in ms between sizzle frames
   const SUN_SIZZLE_AUTO_REFRESH_MS = 3 * 60 * 1000;   // EDITABLE: Auto-fetch fresh SUVI frames every 3 minutes
 
   // Seed list of latest stepped real-time NOAA SUVI Fe195 frames (~4m cadence spanning ~2.5 hrs for vivid flare sizzling)
@@ -7464,8 +7464,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SUN_MASK_POSITION_Y_MOBILE = '50%';           // EDITABLE Mobile: Mask center Y position
   const SUN_IMAGE_OPACITY_DESKTOP = 1.0;              // EDITABLE Desktop: Overall opacity (0.0 to 1.0)
   const SUN_IMAGE_OPACITY_MOBILE = 1.0;               // EDITABLE Mobile: Overall opacity (0.0 to 1.0)
-  const SUN_IMAGE_BLEND_MODE_DESKTOP = 'lighten';     // EDITABLE Desktop: Blend mode on dark background ('lighten', 'screen', etc.)
-  const SUN_IMAGE_BLEND_MODE_MOBILE = 'lighten';      // EDITABLE Mobile: Blend mode on dark background
+  const SUN_IMAGE_BLEND_MODE_DESKTOP = 'plus-lighter';  // EDITABLE Desktop: Blend mode on dark background ('lighten', 'screen', 'plus-lighter', etc.)
+  const SUN_IMAGE_BLEND_MODE_MOBILE = 'plus-lighter';   // EDITABLE Mobile: Blend mode on dark background ('plus-lighter' prevents brightness dips)
 
   // =========================================================================
   // --- Earth Sizing & Position Controls (JCV) ---
@@ -9642,7 +9642,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1258';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1259';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -14863,40 +14863,47 @@ Plan ahead for significantly warmer conditions tomorrow!`
         }
 
         if (SUN_ANIMATION_CROSSFADE_ENABLED && leftSun && leftSun.imgB) {
-          const incoming = (sunActiveLayer === 'a') ? leftSun.imgB : leftSun.img;
-          const outgoing = (sunActiveLayer === 'a') ? leftSun.img : leftSun.imgB;
-          const newActiveLayer = (sunActiveLayer === 'a') ? 'b' : 'a';
+          if (sunActiveLayer === 'a') {
+            leftSun.imgB.style.zIndex = '2';
+            leftSun.img.style.zIndex = '1';
+            leftSun.imgB.style.opacity = '1';
+            leftSun.img.style.opacity = '0';
+            sunActiveLayer = 'b';
+            sunFrameIndex = nextIdx;
 
-          // Ensure incoming layer has target frame loaded without redundant reload
-          if (nextImg && incoming.src !== nextImg.src) {
-            incoming.src = nextImg.src;
-          }
-
-          // Zero-Dip Asymmetric Crossfade:
-          // Place incoming layer on top (z-index: 2) and fade IN to opacity: 1.
-          // Keep outgoing layer underneath at opacity: 1.0 during the transition!
-          // Under mix-blend-mode: lighten, max(1.0 * Outgoing, t * Incoming) >= 1.0 at all times,
-          // completely preventing the 50% brightness midpoint dip and flicker.
-          incoming.style.zIndex = '2';
-          outgoing.style.zIndex = '1';
-          incoming.style.opacity = '1';
-          sunActiveLayer = newActiveLayer;
-          sunFrameIndex = nextIdx;
-
-          const cueIdx = nextIdx + 1;
-          const cueImg = (!isLastFrame && cueIdx < totalFrames) ? sunPreloadedImages[cueIdx] : null;
-
-          // Once incoming layer is 100% opaque, snap outgoing to opacity 0 behind it and cue next frame
-          setTimeout(() => {
-            if (sunActiveLayer === newActiveLayer) {
-              outgoing.style.transitionDuration = '0ms';
-              outgoing.style.opacity = '0';
-              if (cueImg && cueImg.src && outgoing.src !== cueImg.src) {
-                outgoing.src = cueImg.src;
-                if (outgoing.decode) outgoing.decode().catch(() => {});
+            if (!isLastFrame) {
+              const cueIdx = nextIdx + 1;
+              const cueImg = (cueIdx < totalFrames) ? sunPreloadedImages[cueIdx] : null;
+              if (cueImg && cueImg.src) {
+                setTimeout(() => {
+                  if (leftSun && leftSun.img && sunActiveLayer === 'b') {
+                    leftSun.img.src = cueImg.src;
+                    if (leftSun.img.decode) leftSun.img.decode().catch(() => {});
+                  }
+                }, dynamicFade + 10);
               }
             }
-          }, dynamicFade);
+          } else {
+            leftSun.img.style.zIndex = '2';
+            leftSun.imgB.style.zIndex = '1';
+            leftSun.img.style.opacity = '1';
+            leftSun.imgB.style.opacity = '0';
+            sunActiveLayer = 'a';
+            sunFrameIndex = nextIdx;
+
+            if (!isLastFrame) {
+              const cueIdx = nextIdx + 1;
+              const cueImg = (cueIdx < totalFrames) ? sunPreloadedImages[cueIdx] : null;
+              if (cueImg && cueImg.src) {
+                setTimeout(() => {
+                  if (leftSun && leftSun.imgB && sunActiveLayer === 'a') {
+                    leftSun.imgB.src = cueImg.src;
+                    if (leftSun.imgB.decode) leftSun.imgB.decode().catch(() => {});
+                  }
+                }, dynamicFade + 10);
+              }
+            }
+          }
         } else if (leftSun && leftSun.img) {
           sunFrameIndex = nextIdx;
           if (nextImg && nextImg.src) leftSun.img.src = nextImg.src;
@@ -14940,7 +14947,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
           activeImg.style.opacity = '1';
         }
         if (nextImg && sunPreloadedImages[0]) {
-          nextImg.style.transitionDuration = '0ms';
           nextImg.src = sunPreloadedImages[0].src;
           nextImg.style.zIndex = '2';
           nextImg.style.opacity = '0';
@@ -14958,7 +14964,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       window.triggerSunRotation = triggerSunRotation;
 
       // =========================================================================
-      // --- Left Sun: Sizzle Engine (Live Condition: Boiling Flare Activity) ---
+      // --- LEFT SUN SIZZLE ENGINE (Live Sizzling Solar Flare Loop) ---
       // =========================================================================
       let sunSizzleTimeoutId = null;
       let preloadedSizzleImages = [];
@@ -15023,41 +15029,45 @@ Plan ahead for significantly warmer conditions tomorrow!`
           if (leftSun.img) leftSun.img.style.transitionDuration = `${fadeDuration}ms`;
           if (leftSun.imgB) leftSun.imgB.style.transitionDuration = `${fadeDuration}ms`;
 
-          const incoming = (sizzleActiveLayer === 'a') ? leftSun.imgB : leftSun.img;
-          const outgoing = (sizzleActiveLayer === 'a') ? leftSun.img : leftSun.imgB;
-          const newActiveLayer = (sizzleActiveLayer === 'a') ? 'b' : 'a';
+          if (sizzleActiveLayer === 'a') {
+            leftSun.imgB.style.zIndex = '2';
+            leftSun.img.style.zIndex = '1';
+            leftSun.imgB.style.opacity = '1';
+            leftSun.img.style.opacity = '0';
+            sizzleActiveLayer = 'b';
+            sizzleIndex = step.idx;
+            sizzleDirection = step.dir;
 
-          // Ensure incoming layer has target frame loaded without redundant reload
-          if (nextImg && incoming.src !== nextImg.src) {
-            incoming.src = nextImg.src;
-          }
-
-          // Zero-Dip Asymmetric Crossfade:
-          // Place incoming layer on top (z-index: 2) and fade IN to opacity: 1.
-          // Keep outgoing layer underneath at opacity: 1.0 during the transition!
-          // Under mix-blend-mode: lighten, max(1.0 * Outgoing, t * Incoming) >= 1.0 at all times,
-          // completely preventing the 50% brightness midpoint dip and flicker.
-          incoming.style.zIndex = '2';
-          outgoing.style.zIndex = '1';
-          incoming.style.opacity = '1';
-          sizzleActiveLayer = newActiveLayer;
-          sizzleIndex = step.idx;
-          sizzleDirection = step.dir;
-
-          const cueStep = getNextSizzleStep(sizzleIndex, sizzleDirection, totalFrames);
-          const cueImg = preloadedSizzleImages[cueStep.idx];
-
-          // Once incoming layer is 100% opaque, snap outgoing to opacity 0 behind it and cue next frame
-          setTimeout(() => {
-            if (sizzleActiveLayer === newActiveLayer && !isSunRotating) {
-              outgoing.style.transitionDuration = '0ms';
-              outgoing.style.opacity = '0';
-              if (cueImg && cueImg.src && outgoing.src !== cueImg.src) {
-                outgoing.src = cueImg.src;
-                if (outgoing.decode) outgoing.decode().catch(() => {});
-              }
+            const cueStep = getNextSizzleStep(sizzleIndex, sizzleDirection, totalFrames);
+            const cueImg = preloadedSizzleImages[cueStep.idx];
+            if (cueImg && cueImg.src) {
+              setTimeout(() => {
+                if (leftSun && leftSun.img && sizzleActiveLayer === 'b' && !isSunRotating) {
+                  leftSun.img.src = cueImg.src;
+                  if (leftSun.img.decode) leftSun.img.decode().catch(() => {});
+                }
+              }, fadeDuration + 10);
             }
-          }, fadeDuration);
+          } else {
+            leftSun.img.style.zIndex = '2';
+            leftSun.imgB.style.zIndex = '1';
+            leftSun.img.style.opacity = '1';
+            leftSun.imgB.style.opacity = '0';
+            sizzleActiveLayer = 'a';
+            sizzleIndex = step.idx;
+            sizzleDirection = step.dir;
+
+            const cueStep = getNextSizzleStep(sizzleIndex, sizzleDirection, totalFrames);
+            const cueImg = preloadedSizzleImages[cueStep.idx];
+            if (cueImg && cueImg.src) {
+              setTimeout(() => {
+                if (leftSun && leftSun.imgB && sizzleActiveLayer === 'a' && !isSunRotating) {
+                  leftSun.imgB.src = cueImg.src;
+                  if (leftSun.imgB.decode) leftSun.imgB.decode().catch(() => {});
+                }
+              }, fadeDuration + 10);
+            }
+          }
         } else if (leftSun && leftSun.img) {
           sizzleIndex = step.idx;
           sizzleDirection = step.dir;
@@ -15085,7 +15095,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
         const inactiveLayer = sizzleActiveLayer === 'a' ? (leftSun ? leftSun.imgB : null) : (leftSun ? leftSun.img : null);
         const nextStep = getNextSizzleStep(sizzleIndex, sizzleDirection, preloadedSizzleImages.length);
         if (inactiveLayer && preloadedSizzleImages[nextStep.idx]) {
-          inactiveLayer.style.transitionDuration = '0ms';
           inactiveLayer.style.opacity = '0';
           if (inactiveLayer.src !== preloadedSizzleImages[nextStep.idx].src) {
             inactiveLayer.src = preloadedSizzleImages[nextStep.idx].src;
@@ -15172,7 +15181,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       async function refreshLiveSizzleFrames() {
         try {
           const band = SUN_SIZZLE_BAND || 'Fe195';
-          const length = Math.max(60, Math.min(300, SUN_SIZZLE_FETCH_LENGTH || 240));
+          const length = Math.max(60, Math.min(720, SUN_SIZZLE_FETCH_LENGTH || 720));
           const res = await fetch(`https://www.star.nesdis.noaa.gov/goes/SUVI_band.php?sat=G19&band=${band}&length=${length}&_t=${Date.now()}`, {
             cache: 'no-store'
           });
