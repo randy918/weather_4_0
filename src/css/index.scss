@@ -2875,10 +2875,7 @@ main {
     stroke-width: var(--orrery-saturn-track-width, 0.15vw);
 }
 
-/* --- Central Sun Styling (Lighten Only, Centered Rotation) --- */
-/* mix-blend-mode is on the BODY container only, not the img.
-   Having it on both creates a nested compositing group where the img
-   blends inside an isolated context against nothing. */
+/* --- Central Sun Styling (Lighten Only, Centered Rotation & Sizzling Duplicate Layer) --- */
 .orrery-sun-body {
     position: absolute;
     top: 50%;
@@ -2886,6 +2883,7 @@ main {
     transform: translate(-50%, -50%);
     width: var(--orrery-sun-width, 12.0vw);
     height: var(--orrery-sun-height, auto);
+    aspect-ratio: 1 / 1;
     display: var(--orrery-sun-display, flex);
     justify-content: center;
     align-items: center;
@@ -2896,27 +2894,66 @@ main {
 }
 
 .orrery-sun-img {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: auto;
+    height: 100%;
     max-width: none;
     display: block;
     user-select: none;
     -webkit-user-drag: none;
-    opacity: var(--orrery-sun-opacity, 1.0);
-    /* No mix-blend-mode here — let the parent .orrery-sun-body handle blending */
     transform-origin: 50% 50%;
-    animation: var(--orrery-sun-rotation-animation, none);
     will-change: transform;
     pointer-events: none;
 }
 
-/* Centered Slow Rotation Keyframes for Sun */
+.orrery-sun-img-primary,
+#orrery-sun-img {
+    z-index: var(--orrery-sun-primary-z-index, 1);
+    opacity: var(--orrery-sun-opacity, 1.0);
+    mix-blend-mode: var(--orrery-sun-blend-mode, lighten);
+    /* Rotation via CSS longhand — var() in animation-duration is unambiguous (no WebKit parse issues) */
+    animation-name: orrery-sun-spin;
+    animation-duration: var(--orrery-sun-rotation-period, 8s);
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: var(--orrery-sun-rotation-direction, normal);
+    animation-play-state: var(--orrery-sun-rotation-play-state, running);
+}
+
+.orrery-sun-img-sizzle,
+#orrery-sun-img-sizzle {
+    z-index: var(--orrery-sun-sizzle-z-index, 2);
+    opacity: var(--orrery-sun-sizzle-opacity, 1.0);
+    mix-blend-mode: var(--orrery-sun-sizzle-blend-mode, lighten);
+    display: var(--orrery-sun-sizzle-display, block);
+    /* Counter-rotation via CSS longhand (opposite direction sizzle layer) */
+    animation-name: orrery-sun-counter-spin;
+    animation-duration: var(--orrery-sun-sizzle-rotation-period, 6s);
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: var(--orrery-sun-sizzle-rotation-direction, normal);
+    animation-play-state: var(--orrery-sun-sizzle-rotation-play-state, running);
+}
+
+/* Centered Slow Rotation Keyframes for Sun (Clockwise) */
 @keyframes orrery-sun-spin {
-    from {
+    0% {
         transform: rotate(0deg);
     }
-    to {
+    100% {
         transform: rotate(360deg);
+    }
+}
+
+/* Centered Slow Counter-Rotation Keyframes for Sun (Opposite Direction Sizzle) */
+@keyframes orrery-sun-counter-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(-360deg);
     }
 }
 

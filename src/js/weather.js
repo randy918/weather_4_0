@@ -8952,16 +8952,28 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_SUN_WIDTH_MOBILE = '19.0vw';                // EDITABLE Mobile: Central Sun image width (doubled from 9.5vw)
   const ORRERY_SUN_HEIGHT_DESKTOP = 'auto';                // EDITABLE Desktop: Sun height ('auto' preserves aspect ratio)
   const ORRERY_SUN_HEIGHT_MOBILE = 'auto';                 // EDITABLE Mobile: Sun height
-  const ORRERY_SUN_ROTATION_ENABLED = true;                // EDITABLE: Toggle slow centered rotation of Sun
-  const ORRERY_SUN_ROTATION_PERIOD_DESKTOP = '180s';       // EDITABLE Desktop: Duration for 1 full rotation revolution (slow centered rotation)
-  const ORRERY_SUN_ROTATION_PERIOD_MOBILE = '180s';        // EDITABLE Mobile: Duration for 1 full rotation revolution
+  const ORRERY_SUN_ROTATION_ENABLED = true;                // EDITABLE: Toggle centered rotation of Sun
+  const ORRERY_SUN_ROTATION_PERIOD_DESKTOP = '8s';         // EDITABLE Desktop: Rate of rotation for primary Sun (lower = faster, e.g. '8s', '24s', '60s')
+  const ORRERY_SUN_ROTATION_PERIOD_MOBILE = '8s';          // EDITABLE Mobile: Rate of rotation for primary Sun
   const ORRERY_SUN_ROTATION_DIRECTION = 'normal';          // EDITABLE: Rotation direction ('normal' = clockwise, 'reverse' = counter-clockwise)
   const ORRERY_SUN_OPACITY = '1.0';                        // EDITABLE: Sun opacity (0.0 to 1.0)
-  // mix-blend-mode: lighten is hardcoded in CSS on .orrery-sun-body (not configurable via variable)
-  const ORRERY_SUN_Z_INDEX = '12';                         // EDITABLE: Stacking layer index for central Sun
+  const ORRERY_SUN_BLEND_MODE = 'lighten';                 // EDITABLE: Primary Sun layer blend mode
+  const ORRERY_SUN_PRIMARY_Z_INDEX = '1';                  // EDITABLE: Primary Sun relative z-index
+  const ORRERY_SUN_Z_INDEX = '12';                         // EDITABLE: Stacking layer index for central Sun container
   const ORRERY_SUN_GLOW_BLUR_DESKTOP = '0.8vw';            // EDITABLE Desktop: Solar corona ambient glow blur
   const ORRERY_SUN_GLOW_BLUR_MOBILE = '1.2vw';             // EDITABLE Mobile: Solar corona ambient glow blur
   const ORRERY_SUN_GLOW_COLOR = 'rgba(255, 140, 0, 0.45)'; // EDITABLE: Solar corona ambient glow color
+
+  // --- EDITABLE: Sizzling Sun Duplicate Z-Layer Config (JCV) ---
+  const ORRERY_SUN_SIZZLE_ENABLED = true;                         // EDITABLE: Toggle duplicate counter-rotating sizzling sun layer
+  const ORRERY_SUN_SIZZLE_ROTATION_ENABLED = true;                // EDITABLE: Toggle counter-rotation of sizzling duplicate layer
+  const ORRERY_SUN_SIZZLE_ROTATION_PERIOD_DESKTOP = '6s';         // EDITABLE Desktop: Rate of counter-rotation for duplicate sizzle Sun (lower = faster, e.g. '6s', '18s')
+  const ORRERY_SUN_SIZZLE_ROTATION_PERIOD_MOBILE = '6s';          // EDITABLE Mobile: Rate of counter-rotation for duplicate sizzle Sun
+  const ORRERY_SUN_SIZZLE_ROTATION_DIRECTION = 'normal';          // EDITABLE: Counter-rotation direction ('normal' with counter-spin = counter-clockwise)
+  const ORRERY_SUN_SIZZLE_OPACITY_DESKTOP = '1.0';                // EDITABLE Desktop: Sizzle duplicate layer opacity (0.0 to 1.0)
+  const ORRERY_SUN_SIZZLE_OPACITY_MOBILE = '1.0';                 // EDITABLE Mobile: Sizzle duplicate layer opacity
+  const ORRERY_SUN_SIZZLE_BLEND_MODE = 'lighten';                 // EDITABLE: Blend mode for duplicate sizzle layer ('lighten')
+  const ORRERY_SUN_SIZZLE_Z_INDEX = '2';                          // EDITABLE: Sizzle duplicate layer relative z-index (stacked above primary)
 
   // --- EDITABLE: Saturn Planet On Orbit Ring Config (JCV) ---
   const ORRERY_SATURN_IMAGE_URL = 'img/p-sa.png';       // EDITABLE: Saturn transparent PNG asset path
@@ -9247,21 +9259,45 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--orrery-track-width', isMobile ? ORRERY_TRACK_WIDTH_MOBILE : ORRERY_TRACK_WIDTH_DESKTOP);
     document.documentElement.style.setProperty('--orrery-z-index', ORRERY_Z_INDEX);
 
-    // Central Sun variables
+    // Central Sun variables (Primary Layer)
+    const sunPeriodDesktop = ORRERY_SUN_ROTATION_PERIOD_DESKTOP;
+    const sunPeriodMobile = ORRERY_SUN_ROTATION_PERIOD_MOBILE;
+    const sunPeriod = isMobile ? sunPeriodMobile : sunPeriodDesktop;
     document.documentElement.style.setProperty('--orrery-sun-display', ORRERY_SUN_ENABLED ? 'flex' : 'none');
     document.documentElement.style.setProperty('--orrery-sun-width', isMobile ? ORRERY_SUN_WIDTH_MOBILE : ORRERY_SUN_WIDTH_DESKTOP);
     document.documentElement.style.setProperty('--orrery-sun-height', isMobile ? ORRERY_SUN_HEIGHT_MOBILE : ORRERY_SUN_HEIGHT_DESKTOP);
     document.documentElement.style.setProperty('--orrery-sun-opacity', ORRERY_SUN_OPACITY);
-    // mix-blend-mode: lighten is hardcoded in CSS — no variable needed
+    document.documentElement.style.setProperty('--orrery-sun-blend-mode', ORRERY_SUN_BLEND_MODE);
+    document.documentElement.style.setProperty('--orrery-sun-primary-z-index', ORRERY_SUN_PRIMARY_Z_INDEX);
     document.documentElement.style.setProperty('--orrery-sun-z-index', ORRERY_SUN_Z_INDEX);
     document.documentElement.style.setProperty('--orrery-sun-glow-blur', isMobile ? ORRERY_SUN_GLOW_BLUR_MOBILE : ORRERY_SUN_GLOW_BLUR_DESKTOP);
     document.documentElement.style.setProperty('--orrery-sun-glow-color', ORRERY_SUN_GLOW_COLOR);
-    const sunPeriod = isMobile ? ORRERY_SUN_ROTATION_PERIOD_MOBILE : ORRERY_SUN_ROTATION_PERIOD_DESKTOP;
+    document.documentElement.style.setProperty('--orrery-sun-rotation-period-desktop', sunPeriodDesktop);
+    document.documentElement.style.setProperty('--orrery-sun-rotation-period-mobile', sunPeriodMobile);
     document.documentElement.style.setProperty('--orrery-sun-rotation-period', sunPeriod);
-    if (ORRERY_SUN_ROTATION_ENABLED) {
-      document.documentElement.style.setProperty('--orrery-sun-rotation-animation', `orrery-sun-spin ${sunPeriod} linear infinite ${ORRERY_SUN_ROTATION_DIRECTION}`);
-    } else {
-      document.documentElement.style.setProperty('--orrery-sun-rotation-animation', 'none');
+    document.documentElement.style.setProperty('--orrery-sun-rotation-direction', ORRERY_SUN_ROTATION_DIRECTION);
+    document.documentElement.style.setProperty('--orrery-sun-rotation-play-state', ORRERY_SUN_ROTATION_ENABLED ? 'running' : 'paused');
+    const sunImgEl = document.getElementById('orrery-sun-img');
+    if (sunImgEl && sunImgEl.style.animation) {
+      sunImgEl.style.removeProperty('animation');
+    }
+
+    // Sizzling Sun duplicate layer variables (Opposite Direction)
+    const sizzlePeriodDesktop = ORRERY_SUN_SIZZLE_ROTATION_PERIOD_DESKTOP;
+    const sizzlePeriodMobile = ORRERY_SUN_SIZZLE_ROTATION_PERIOD_MOBILE;
+    const sizzlePeriod = isMobile ? sizzlePeriodMobile : sizzlePeriodDesktop;
+    document.documentElement.style.setProperty('--orrery-sun-sizzle-display', (ORRERY_SUN_ENABLED && ORRERY_SUN_SIZZLE_ENABLED) ? 'block' : 'none');
+    document.documentElement.style.setProperty('--orrery-sun-sizzle-opacity', isMobile ? ORRERY_SUN_SIZZLE_OPACITY_MOBILE : ORRERY_SUN_SIZZLE_OPACITY_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-sun-sizzle-blend-mode', ORRERY_SUN_SIZZLE_BLEND_MODE);
+    document.documentElement.style.setProperty('--orrery-sun-sizzle-z-index', ORRERY_SUN_SIZZLE_Z_INDEX);
+    document.documentElement.style.setProperty('--orrery-sun-sizzle-rotation-period-desktop', sizzlePeriodDesktop);
+    document.documentElement.style.setProperty('--orrery-sun-sizzle-rotation-period-mobile', sizzlePeriodMobile);
+    document.documentElement.style.setProperty('--orrery-sun-sizzle-rotation-period', sizzlePeriod);
+    document.documentElement.style.setProperty('--orrery-sun-sizzle-rotation-direction', ORRERY_SUN_SIZZLE_ROTATION_DIRECTION);
+    document.documentElement.style.setProperty('--orrery-sun-sizzle-rotation-play-state', (ORRERY_SUN_SIZZLE_ROTATION_ENABLED && ORRERY_SUN_SIZZLE_ENABLED) ? 'running' : 'paused');
+    const sunSizzleEl = document.getElementById('orrery-sun-img-sizzle');
+    if (sunSizzleEl && sunSizzleEl.style.animation) {
+      sunSizzleEl.style.removeProperty('animation');
     }
 
     // Saturn Position & Alignment variables
@@ -9535,10 +9571,24 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
     // Ensure DOM exists
     createOrrerySectionIfMissing();
+    syncOrrerySunAnimations();
+  }
+
+  // Clear any legacy inline animations so stylesheet class rules drive the rotation
+  function syncOrrerySunAnimations() {
+    const sunImg = document.getElementById('orrery-sun-img');
+    if (sunImg && sunImg.style.animation) {
+      sunImg.style.removeProperty('animation');
+    }
+    const sunImgSizzle = document.getElementById('orrery-sun-img-sizzle');
+    if (sunImgSizzle && sunImgSizzle.style.animation) {
+      sunImgSizzle.style.removeProperty('animation');
+    }
   }
 
   // Expose for external access and console testing
   window.applyOrreryConfig = applyOrreryConfig;
+  window.syncOrrerySunAnimations = syncOrrerySunAnimations;
 
   // Initialize World Clocks, Earth Image, Celestial Duo, Orrery, and Odometer configurations in proper dependency order
   applyWorldClocksConfig();
@@ -9587,7 +9637,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1238';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1246';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -15457,13 +15507,21 @@ Plan ahead for significantly warmer conditions tomorrow!`
       sunBody.id = 'orrery-sun-body';
 
       const sunImg = document.createElement('img');
-      sunImg.className = 'orrery-sun-img';
+      sunImg.className = 'orrery-sun-img orrery-sun-img-primary';
       sunImg.id = 'orrery-sun-img';
       sunImg.src = ORRERY_SUN_IMAGE_URL || 'img/p-su.png';
       sunImg.alt = 'Sun';
       sunImg.draggable = false;
-
       sunBody.appendChild(sunImg);
+
+      const sunImgSizzle = document.createElement('img');
+      sunImgSizzle.className = 'orrery-sun-img orrery-sun-img-sizzle';
+      sunImgSizzle.id = 'orrery-sun-img-sizzle';
+      sunImgSizzle.src = ORRERY_SUN_IMAGE_URL || 'img/p-su.png';
+      sunImgSizzle.alt = 'Sun Sizzle';
+      sunImgSizzle.draggable = false;
+      sunBody.appendChild(sunImgSizzle);
+
       ringContainer.appendChild(sunBody);
 
       // Create Saturn orbit arm and body
@@ -15603,18 +15661,41 @@ Plan ahead for significantly warmer conditions tomorrow!`
           sunBody.id = 'orrery-sun-body';
 
           const sunImg = document.createElement('img');
-          sunImg.className = 'orrery-sun-img';
+          sunImg.className = 'orrery-sun-img orrery-sun-img-primary';
           sunImg.id = 'orrery-sun-img';
           sunImg.src = ORRERY_SUN_IMAGE_URL || 'img/p-su.png';
           sunImg.alt = 'Sun';
           sunImg.draggable = false;
-
           sunBody.appendChild(sunImg);
+
+          const sunImgSizzle = document.createElement('img');
+          sunImgSizzle.className = 'orrery-sun-img orrery-sun-img-sizzle';
+          sunImgSizzle.id = 'orrery-sun-img-sizzle';
+          sunImgSizzle.src = ORRERY_SUN_IMAGE_URL || 'img/p-su.png';
+          sunImgSizzle.alt = 'Sun Sizzle';
+          sunImgSizzle.draggable = false;
+          sunBody.appendChild(sunImgSizzle);
+
           ringContainer.appendChild(sunBody);
         } else {
-          const sunImg = sunBody.querySelector('.orrery-sun-img');
+          let sunImg = sunBody.querySelector('#orrery-sun-img') || sunBody.querySelector('.orrery-sun-img-primary');
+          if (!sunImg) {
+            sunImg = sunBody.querySelector('.orrery-sun-img');
+          }
           if (sunImg && ORRERY_SUN_IMAGE_URL && sunImg.getAttribute('src') !== ORRERY_SUN_IMAGE_URL) {
             sunImg.src = ORRERY_SUN_IMAGE_URL;
+          }
+          let sunImgSizzle = sunBody.querySelector('#orrery-sun-img-sizzle') || sunBody.querySelector('.orrery-sun-img-sizzle');
+          if (!sunImgSizzle) {
+            sunImgSizzle = document.createElement('img');
+            sunImgSizzle.className = 'orrery-sun-img orrery-sun-img-sizzle';
+            sunImgSizzle.id = 'orrery-sun-img-sizzle';
+            sunImgSizzle.src = ORRERY_SUN_IMAGE_URL || 'img/p-su.png';
+            sunImgSizzle.alt = 'Sun Sizzle';
+            sunImgSizzle.draggable = false;
+            sunBody.appendChild(sunImgSizzle);
+          } else if (ORRERY_SUN_IMAGE_URL && sunImgSizzle.getAttribute('src') !== ORRERY_SUN_IMAGE_URL) {
+            sunImgSizzle.src = ORRERY_SUN_IMAGE_URL;
           }
         }
 
@@ -15760,6 +15841,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
     } else if (section.parentNode !== mainContainer) {
       mainContainer.appendChild(section);
     }
+
+    // Immediately synchronize CSS animations on the central sun layers
+    syncOrrerySunAnimations();
   }
 
   /* --- Animated background helpers (subtle, complementary pair) ---
