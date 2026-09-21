@@ -7280,8 +7280,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SUN_ANIMATION_FPS_DESKTOP = 12;               // EDITABLE Desktop: Frames per second (playback speed)
   const SUN_ANIMATION_FPS_MOBILE = 12;                // EDITABLE Mobile: Frames per second (playback speed)
   const SUN_ANIMATION_CROSSFADE_ENABLED = true;       // EDITABLE: Enable/disable smooth dual-buffer cross-fade between rotation frames
-  const SUN_ANIMATION_CROSSFADE_MS_DESKTOP = 60;      // EDITABLE Desktop: Cross-fade transition duration in milliseconds (e.g. 50-70ms)
-  const SUN_ANIMATION_CROSSFADE_MS_MOBILE = 60;       // EDITABLE Mobile: Cross-fade transition duration in milliseconds (e.g. 50-70ms)
+  const SUN_ANIMATION_CROSSFADE_MS_DESKTOP = 70;      // EDITABLE Desktop: Cross-fade transition duration in milliseconds (e.g. 50-70ms)
+  const SUN_ANIMATION_CROSSFADE_MS_MOBILE = 70;       // EDITABLE Mobile: Cross-fade transition duration in milliseconds (e.g. 50-70ms)
   const SUN_ANIMATION_LOOP_PAUSE_MS_DESKTOP = 1200;   // EDITABLE Desktop: Pause in ms on the latest frame before returning to idle/sizzle
   const SUN_ANIMATION_LOOP_PAUSE_MS_MOBILE = 1200;    // EDITABLE Mobile: Pause in ms on the latest frame before returning to idle/sizzle
   const SUN_ANIMATION_LOOP_PAUSE_MS = 1200;           // EDITABLE: Fallback pause in ms
@@ -7379,8 +7379,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SUN_SIZZLE_FPS = 10;                          // EDITABLE: Fallback / default FPS
   const SUN_SIZZLE_PAUSE_END_MS = 150;                // EDITABLE: Pause in ms at turnaround ends (live frame and oldest frame) before reversing (0 for instant)
   const SUN_SIZZLE_PLAYBACK_MODE = 'pingpong';        // EDITABLE: 'pingpong' (1..36..1) or 'forward' (1..36, 1..36)
-  const SUN_SIZZLE_CROSSFADE_MS_DESKTOP = 35;         // EDITABLE Desktop: Cross-fade transition in ms between sizzle frames (eliminates flicker)
-  const SUN_SIZZLE_CROSSFADE_MS_MOBILE = 35;          // EDITABLE Mobile: Cross-fade transition in ms between sizzle frames
+  const SUN_SIZZLE_CROSSFADE_MS_DESKTOP = 70;         // EDITABLE Desktop: Cross-fade transition in ms between sizzle frames (eliminates flicker)
+  const SUN_SIZZLE_CROSSFADE_MS_MOBILE = 70;          // EDITABLE Mobile: Cross-fade transition in ms between sizzle frames
   const SUN_SIZZLE_AUTO_REFRESH_MS = 3 * 60 * 1000;   // EDITABLE: Auto-fetch fresh SUVI frames every 3 minutes
 
   // Seed list of latest stepped real-time NOAA SUVI Fe195 frames (~4m cadence spanning ~2.5 hrs for vivid flare sizzling)
@@ -14405,9 +14405,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
       c.style.backfaceVisibility = 'hidden';
       c.style.webkitTransform = 'translate3d(0, 0, 0)';
       c.style.transform = 'translate3d(0, 0, 0)';
-      c.style.webkitMaskImage = '-webkit-radial-gradient(white, black)';
 
-      const durVar = '--sun-animation-crossfade-duration, 60ms';
+      const durVar = '--sun-sizzle-crossfade-duration, 70ms';
 
       const im = document.createElement('img');
       im.id = imgId;
@@ -14421,6 +14420,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
       im.style.left = 'calc(50% + var(--sun-image-offset-x, 0vw))';
       im.style.transform = 'translate3d(-50%, -50%, 0)';
       im.style.webkitTransform = 'translate3d(-50%, -50%, 0)';
+      im.style.clipPath = 'circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%))';
+      im.style.WebkitClipPath = 'circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%))';
       im.style.webkitBackfaceVisibility = 'hidden';
       im.style.backfaceVisibility = 'hidden';
       im.style.willChange = 'opacity';
@@ -14443,6 +14444,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
       imB.style.left = 'calc(50% + var(--sun-image-offset-x, 0vw))';
       imB.style.transform = 'translate3d(-50%, -50%, 0)';
       imB.style.webkitTransform = 'translate3d(-50%, -50%, 0)';
+      imB.style.clipPath = 'circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%))';
+      imB.style.WebkitClipPath = 'circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%))';
       imB.style.webkitBackfaceVisibility = 'hidden';
       imB.style.backfaceVisibility = 'hidden';
       imB.style.willChange = 'opacity';
@@ -14851,8 +14854,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
         const baseFade = isMobile ? SUN_ANIMATION_CROSSFADE_MS_MOBILE : SUN_ANIMATION_CROSSFADE_MS_DESKTOP;
         const dynamicFade = SUN_ANIMATION_EASE_ENABLED
-          ? Math.min(Math.round(delay * 0.65), Math.round(baseFade * 2.0))
-          : Math.min(baseFade, Math.round(delay * 0.65));
+          ? Math.min(Math.round(delay * 0.70), Math.round(baseFade * 2.0))
+          : Math.min(baseFade, Math.round(delay * 0.70));
 
         if (leftSun) {
           if (leftSun.img) leftSun.img.style.transitionDuration = `${dynamicFade}ms`;
@@ -14860,47 +14863,40 @@ Plan ahead for significantly warmer conditions tomorrow!`
         }
 
         if (SUN_ANIMATION_CROSSFADE_ENABLED && leftSun && leftSun.imgB) {
-          if (sunActiveLayer === 'a') {
-            leftSun.imgB.style.zIndex = '2';
-            leftSun.img.style.zIndex = '1';
-            leftSun.imgB.style.opacity = '1';
-            leftSun.img.style.opacity = '0';
-            sunActiveLayer = 'b';
-            sunFrameIndex = nextIdx;
+          const incoming = (sunActiveLayer === 'a') ? leftSun.imgB : leftSun.img;
+          const outgoing = (sunActiveLayer === 'a') ? leftSun.img : leftSun.imgB;
+          const newActiveLayer = (sunActiveLayer === 'a') ? 'b' : 'a';
 
-            if (!isLastFrame) {
-              const cueIdx = nextIdx + 1;
-              const cueImg = sunPreloadedImages[cueIdx];
-              if (cueImg && cueImg.src) {
-                setTimeout(() => {
-                  if (leftSun && leftSun.img && sunActiveLayer === 'b') {
-                    leftSun.img.src = cueImg.src;
-                    if (leftSun.img.decode) leftSun.img.decode().catch(() => {});
-                  }
-                }, dynamicFade + 10);
-              }
-            }
-          } else {
-            leftSun.img.style.zIndex = '2';
-            leftSun.imgB.style.zIndex = '1';
-            leftSun.img.style.opacity = '1';
-            leftSun.imgB.style.opacity = '0';
-            sunActiveLayer = 'a';
-            sunFrameIndex = nextIdx;
-
-            if (!isLastFrame) {
-              const cueIdx = nextIdx + 1;
-              const cueImg = sunPreloadedImages[cueIdx];
-              if (cueImg && cueImg.src) {
-                setTimeout(() => {
-                  if (leftSun && leftSun.imgB && sunActiveLayer === 'a') {
-                    leftSun.imgB.src = cueImg.src;
-                    if (leftSun.imgB.decode) leftSun.imgB.decode().catch(() => {});
-                  }
-                }, dynamicFade + 10);
-              }
-            }
+          // Ensure incoming layer has target frame loaded without redundant reload
+          if (nextImg && incoming.src !== nextImg.src) {
+            incoming.src = nextImg.src;
           }
+
+          // Zero-Dip Asymmetric Crossfade:
+          // Place incoming layer on top (z-index: 2) and fade IN to opacity: 1.
+          // Keep outgoing layer underneath at opacity: 1.0 during the transition!
+          // Under mix-blend-mode: lighten, max(1.0 * Outgoing, t * Incoming) >= 1.0 at all times,
+          // completely preventing the 50% brightness midpoint dip and flicker.
+          incoming.style.zIndex = '2';
+          outgoing.style.zIndex = '1';
+          incoming.style.opacity = '1';
+          sunActiveLayer = newActiveLayer;
+          sunFrameIndex = nextIdx;
+
+          const cueIdx = nextIdx + 1;
+          const cueImg = (!isLastFrame && cueIdx < totalFrames) ? sunPreloadedImages[cueIdx] : null;
+
+          // Once incoming layer is 100% opaque, snap outgoing to opacity 0 behind it and cue next frame
+          setTimeout(() => {
+            if (sunActiveLayer === newActiveLayer) {
+              outgoing.style.transitionDuration = '0ms';
+              outgoing.style.opacity = '0';
+              if (cueImg && cueImg.src && outgoing.src !== cueImg.src) {
+                outgoing.src = cueImg.src;
+                if (outgoing.decode) outgoing.decode().catch(() => {});
+              }
+            }
+          }, dynamicFade);
         } else if (leftSun && leftSun.img) {
           sunFrameIndex = nextIdx;
           if (nextImg && nextImg.src) leftSun.img.src = nextImg.src;
@@ -14931,23 +14927,26 @@ Plan ahead for significantly warmer conditions tomorrow!`
         }
         isSunRotating = true;
         sunFrameIndex = 0;
-        sunActiveLayer = 'a';
 
         const sunLabel = document.getElementById('sun-label-left');
         if (sunLabel) sunLabel.textContent = SUN_LABEL_LEFT_ROTATING_TEXT;
 
-        if (leftSun && leftSun.img) {
-          leftSun.img.style.transitionDuration = '0ms';
-          leftSun.img.src = sunPreloadedImages[0].src;
-          leftSun.img.style.zIndex = '1';
-          leftSun.img.style.opacity = '1';
+        // Smooth dissolve from the current visible sizzle frame into the rotation frames
+        const activeImg = (sizzleActiveLayer === 'b') ? leftSun.imgB : leftSun.img;
+        const nextImg = (sizzleActiveLayer === 'b') ? leftSun.img : leftSun.imgB;
+
+        if (activeImg) {
+          activeImg.style.zIndex = '1';
+          activeImg.style.opacity = '1';
         }
-        if (leftSun && leftSun.imgB && sunPreloadedImages.length > 1) {
-          leftSun.imgB.style.transitionDuration = '0ms';
-          leftSun.imgB.src = sunPreloadedImages[1].src;
-          leftSun.imgB.style.zIndex = '2';
-          leftSun.imgB.style.opacity = '0';
+        if (nextImg && sunPreloadedImages[0]) {
+          nextImg.style.transitionDuration = '0ms';
+          nextImg.src = sunPreloadedImages[0].src;
+          nextImg.style.zIndex = '2';
+          nextImg.style.opacity = '0';
+          if (nextImg.decode) nextImg.decode().catch(() => {});
         }
+        sunActiveLayer = (sizzleActiveLayer === 'b') ? 'b' : 'a';
 
         const isMobile = window.innerWidth <= 767;
         const initFps = isMobile ? SUN_ANIMATION_FPS_MOBILE : SUN_ANIMATION_FPS_DESKTOP;
@@ -15018,53 +15017,47 @@ Plan ahead for significantly warmer conditions tomorrow!`
         if (step.isEnd && SUN_SIZZLE_PAUSE_END_MS > 0) delay += SUN_SIZZLE_PAUSE_END_MS;
 
         const sizzleFade = isMobile ? SUN_SIZZLE_CROSSFADE_MS_MOBILE : SUN_SIZZLE_CROSSFADE_MS_DESKTOP;
-        const fadeDuration = Math.min(sizzleFade, Math.round(delay * 0.65));
+        const fadeDuration = Math.min(sizzleFade, Math.round(delay * 0.70));
 
         if (leftSun && leftSun.imgB) {
           if (leftSun.img) leftSun.img.style.transitionDuration = `${fadeDuration}ms`;
           if (leftSun.imgB) leftSun.imgB.style.transitionDuration = `${fadeDuration}ms`;
 
-          if (sizzleActiveLayer === 'a') {
-            leftSun.imgB.src = nextImg.src;
-            leftSun.imgB.style.zIndex = '2';
-            leftSun.img.style.zIndex = '1';
-            leftSun.imgB.style.opacity = '1';
-            leftSun.img.style.opacity = '0';
-            sizzleActiveLayer = 'b';
-            sizzleIndex = step.idx;
-            sizzleDirection = step.dir;
+          const incoming = (sizzleActiveLayer === 'a') ? leftSun.imgB : leftSun.img;
+          const outgoing = (sizzleActiveLayer === 'a') ? leftSun.img : leftSun.imgB;
+          const newActiveLayer = (sizzleActiveLayer === 'a') ? 'b' : 'a';
 
-            const cueStep = getNextSizzleStep(sizzleIndex, sizzleDirection, totalFrames);
-            const cueImg = preloadedSizzleImages[cueStep.idx];
-            if (cueImg && cueImg.src) {
-              setTimeout(() => {
-                if (leftSun && leftSun.img && sizzleActiveLayer === 'b') {
-                  leftSun.img.src = cueImg.src;
-                  if (leftSun.img.decode) leftSun.img.decode().catch(() => {});
-                }
-              }, fadeDuration + 10);
-            }
-          } else {
-            leftSun.img.src = nextImg.src;
-            leftSun.img.style.zIndex = '2';
-            leftSun.imgB.style.zIndex = '1';
-            leftSun.img.style.opacity = '1';
-            leftSun.imgB.style.opacity = '0';
-            sizzleActiveLayer = 'a';
-            sizzleIndex = step.idx;
-            sizzleDirection = step.dir;
-
-            const cueStep = getNextSizzleStep(sizzleIndex, sizzleDirection, totalFrames);
-            const cueImg = preloadedSizzleImages[cueStep.idx];
-            if (cueImg && cueImg.src) {
-              setTimeout(() => {
-                if (leftSun && leftSun.imgB && sizzleActiveLayer === 'a') {
-                  leftSun.imgB.src = cueImg.src;
-                  if (leftSun.imgB.decode) leftSun.imgB.decode().catch(() => {});
-                }
-              }, fadeDuration + 10);
-            }
+          // Ensure incoming layer has target frame loaded without redundant reload
+          if (nextImg && incoming.src !== nextImg.src) {
+            incoming.src = nextImg.src;
           }
+
+          // Zero-Dip Asymmetric Crossfade:
+          // Place incoming layer on top (z-index: 2) and fade IN to opacity: 1.
+          // Keep outgoing layer underneath at opacity: 1.0 during the transition!
+          // Under mix-blend-mode: lighten, max(1.0 * Outgoing, t * Incoming) >= 1.0 at all times,
+          // completely preventing the 50% brightness midpoint dip and flicker.
+          incoming.style.zIndex = '2';
+          outgoing.style.zIndex = '1';
+          incoming.style.opacity = '1';
+          sizzleActiveLayer = newActiveLayer;
+          sizzleIndex = step.idx;
+          sizzleDirection = step.dir;
+
+          const cueStep = getNextSizzleStep(sizzleIndex, sizzleDirection, totalFrames);
+          const cueImg = preloadedSizzleImages[cueStep.idx];
+
+          // Once incoming layer is 100% opaque, snap outgoing to opacity 0 behind it and cue next frame
+          setTimeout(() => {
+            if (sizzleActiveLayer === newActiveLayer && !isSunRotating) {
+              outgoing.style.transitionDuration = '0ms';
+              outgoing.style.opacity = '0';
+              if (cueImg && cueImg.src && outgoing.src !== cueImg.src) {
+                outgoing.src = cueImg.src;
+                if (outgoing.decode) outgoing.decode().catch(() => {});
+              }
+            }
+          }, fadeDuration);
         } else if (leftSun && leftSun.img) {
           sizzleIndex = step.idx;
           sizzleDirection = step.dir;
@@ -15092,8 +15085,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
         const inactiveLayer = sizzleActiveLayer === 'a' ? (leftSun ? leftSun.imgB : null) : (leftSun ? leftSun.img : null);
         const nextStep = getNextSizzleStep(sizzleIndex, sizzleDirection, preloadedSizzleImages.length);
         if (inactiveLayer && preloadedSizzleImages[nextStep.idx]) {
-          inactiveLayer.src = preloadedSizzleImages[nextStep.idx].src;
-          if (inactiveLayer.decode) inactiveLayer.decode().catch(() => {});
+          inactiveLayer.style.transitionDuration = '0ms';
+          inactiveLayer.style.opacity = '0';
+          if (inactiveLayer.src !== preloadedSizzleImages[nextStep.idx].src) {
+            inactiveLayer.src = preloadedSizzleImages[nextStep.idx].src;
+            if (inactiveLayer.decode) inactiveLayer.decode().catch(() => {});
+          }
         }
 
         const fps = isMobile ? SUN_SIZZLE_FPS_MOBILE : SUN_SIZZLE_FPS_DESKTOP;
@@ -15156,7 +15153,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           });
 
           const swapWhenReady = () => {
-            if (loaded >= Math.min(8, selectedUrls.length)) {
+            if (loaded >= Math.max(2, Math.floor(selectedUrls.length * 0.9))) {
               preloadedSizzleImages = newImages;
               sizzleIndex = Math.max(0, Math.min(preloadedSizzleImages.length - 1, sizzleIndex));
             } else {

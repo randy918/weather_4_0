@@ -2610,11 +2610,11 @@ main {
     backface-visibility: hidden;
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
-    -webkit-mask-image: -webkit-radial-gradient(white, black);
 }
 
 #sun-image,
-#sun-image-b {
+#sun-image-b,
+.sun-image {
     width: var(--sun-image-inner-scale, 36.7vw);
     height: var(--sun-image-inner-scale, 36.7vw);
     position: absolute;
@@ -2622,6 +2622,8 @@ main {
     left: calc(50% + var(--sun-image-offset-x, 0vw));
     transform: translate3d(-50%, -50%, 0);
     -webkit-transform: translate3d(-50%, -50%, 0);
+    clip-path: circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%));
+    -webkit-clip-path: circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%));
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     object-fit: cover;
@@ -2633,18 +2635,13 @@ main {
 .sun-image-layer-a {
     z-index: 1;
     opacity: 1;
-    transition: opacity var(--sun-animation-crossfade-duration, 60ms) ease-in-out;
+    transition: opacity var(--sun-sizzle-crossfade-duration, var(--sun-animation-crossfade-duration, 70ms)) ease-in-out;
 }
 
 .sun-image-layer-b {
     z-index: 2;
     opacity: 0;
-    transition: opacity var(--sun-animation-crossfade-duration, 60ms) ease-in-out;
-}
-
-#sun-image-right.sun-image-layer-a,
-#sun-image-right-b.sun-image-layer-b {
-    transition: opacity var(--sun-sizzle-crossfade-duration, 35ms) ease-in-out;
+    transition: opacity var(--sun-sizzle-crossfade-duration, var(--sun-animation-crossfade-duration, 70ms)) ease-in-out;
 }
 
 .sun-label {
