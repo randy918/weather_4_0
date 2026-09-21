@@ -8934,6 +8934,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // --- EDITABLE: Orrery / Planetary Orbit Ring Config (JCV) ---
   // ==========================================
   const ORRERY_ENABLED = true;                         // EDITABLE: Toggle visibility of Orrery section
+  const ORRERY_TOP_OFFSET_DESKTOP = '2vw';             // EDITABLE Desktop: Vertical offset below cumulative top banners
+  const ORRERY_TOP_OFFSET_MOBILE = '3vw';              // EDITABLE Mobile: Vertical offset below cumulative top banners
   const ORRERY_MARGIN_TOP_DESKTOP = '3vw';             // EDITABLE Desktop: Spacing above Orrery section
   const ORRERY_MARGIN_TOP_MOBILE = '4vw';              // EDITABLE Mobile: Spacing above Orrery section
   const ORRERY_MARGIN_BOTTOM_DESKTOP = '2vw';          // EDITABLE Desktop: Spacing below Orrery section
@@ -8953,8 +8955,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_SUN_HEIGHT_DESKTOP = 'auto';                // EDITABLE Desktop: Sun height ('auto' preserves aspect ratio)
   const ORRERY_SUN_HEIGHT_MOBILE = 'auto';                 // EDITABLE Mobile: Sun height
   const ORRERY_SUN_ROTATION_ENABLED = true;                // EDITABLE: Toggle centered rotation of Sun
-  const ORRERY_SUN_ROTATION_PERIOD_DESKTOP = '8s';         // EDITABLE Desktop: Rate of rotation for primary Sun (lower = faster, e.g. '8s', '24s', '60s')
-  const ORRERY_SUN_ROTATION_PERIOD_MOBILE = '8s';          // EDITABLE Mobile: Rate of rotation for primary Sun
+  const ORRERY_SUN_ROTATION_PERIOD_DESKTOP = '60s';        // EDITABLE Desktop: Rate of rotation for primary Sun
+  const ORRERY_SUN_ROTATION_PERIOD_MOBILE = '60s';         // EDITABLE Mobile: Rate of rotation for primary Sun
   const ORRERY_SUN_ROTATION_DIRECTION = 'normal';          // EDITABLE: Rotation direction ('normal' = clockwise, 'reverse' = counter-clockwise)
   const ORRERY_SUN_OPACITY = '1.0';                        // EDITABLE: Sun opacity (0.0 to 1.0)
   const ORRERY_SUN_BLEND_MODE = 'lighten';                 // EDITABLE: Primary Sun layer blend mode
@@ -8966,10 +8968,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   // --- EDITABLE: Sizzling Sun Duplicate Z-Layer Config (JCV) ---
   const ORRERY_SUN_SIZZLE_ENABLED = true;                         // EDITABLE: Toggle duplicate counter-rotating sizzling sun layer
-  const ORRERY_SUN_SIZZLE_ROTATION_ENABLED = true;                // EDITABLE: Toggle counter-rotation of sizzling duplicate layer
-  const ORRERY_SUN_SIZZLE_ROTATION_PERIOD_DESKTOP = '6s';         // EDITABLE Desktop: Rate of counter-rotation for duplicate sizzle Sun (lower = faster, e.g. '6s', '18s')
-  const ORRERY_SUN_SIZZLE_ROTATION_PERIOD_MOBILE = '6s';          // EDITABLE Mobile: Rate of counter-rotation for duplicate sizzle Sun
-  const ORRERY_SUN_SIZZLE_ROTATION_DIRECTION = 'normal';          // EDITABLE: Counter-rotation direction ('normal' with counter-spin = counter-clockwise)
+  const ORRERY_SUN_SIZZLE_ROTATION_ENABLED = true;                // EDITABLE: Toggle rotation of sizzling duplicate layer
+  const ORRERY_SUN_SIZZLE_ROTATION_PERIOD_DESKTOP = '24s';        // EDITABLE Desktop: Rate of rotation for duplicate sizzle Sun
+  const ORRERY_SUN_SIZZLE_ROTATION_PERIOD_MOBILE = '24s';         // EDITABLE Mobile: Rate of rotation for duplicate sizzle Sun
+  const ORRERY_SUN_SIZZLE_ROTATION_DIRECTION = 'reverse';         // EDITABLE: Counter-rotation direction ('reverse' = counter-clockwise)
   const ORRERY_SUN_SIZZLE_OPACITY_DESKTOP = '1.0';                // EDITABLE Desktop: Sizzle duplicate layer opacity (0.0 to 1.0)
   const ORRERY_SUN_SIZZLE_OPACITY_MOBILE = '1.0';                 // EDITABLE Mobile: Sizzle duplicate layer opacity
   const ORRERY_SUN_SIZZLE_BLEND_MODE = 'lighten';                 // EDITABLE: Blend mode for duplicate sizzle layer ('lighten')
@@ -8987,7 +8989,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_SATURN_ORBIT_ANGLE_MOBILE  = calcPlanetOrreryAngle('saturn'); // AUTO: real ephemeris
   const ORRERY_SATURN_RADIAL_OFFSET_DESKTOP = '0vw';   // EDITABLE Desktop: Radial offset from orbit track (+ outward, - inward)
   const ORRERY_SATURN_RADIAL_OFFSET_MOBILE = '0vw';    // EDITABLE Mobile: Radial offset from orbit track
-  const ORRERY_SATURN_ROTATION_ENABLED = false;        // EDITABLE: Toggle continuous revolution around orbit ring (true = orbiting, false = stationary at orbit angle)
+  const ORRERY_SATURN_ROTATION_ENABLED = true;         // EDITABLE: Toggle continuous revolution around orbit ring (true = orbiting, false = stationary at orbit angle)
   const ORRERY_SATURN_ORBIT_PERIOD_DESKTOP = '120s';   // EDITABLE Desktop: Duration for 1 full 360-degree orbit revolution
   const ORRERY_SATURN_ORBIT_PERIOD_MOBILE = '120s';    // EDITABLE Mobile: Duration for 1 full 360-degree orbit revolution
   const ORRERY_SATURN_ROTATION_DIRECTION = 'normal';   // EDITABLE: Orbit direction ('normal' = clockwise, 'reverse' = counter-clockwise)
@@ -9029,7 +9031,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_JUPITER_ORBIT_ANGLE_MOBILE  = calcPlanetOrreryAngle('jupiter'); // AUTO: real ephemeris
   const ORRERY_JUPITER_RADIAL_OFFSET_DESKTOP = '0vw';    // EDITABLE Desktop: Radial offset from orbit track (+ outward, - inward)
   const ORRERY_JUPITER_RADIAL_OFFSET_MOBILE  = '0vw';    // EDITABLE Mobile: Radial offset from orbit track
-  const ORRERY_JUPITER_ROTATION_ENABLED = false;         // EDITABLE: Toggle continuous revolution (true = orbiting, false = stationary)
+  const ORRERY_JUPITER_ROTATION_ENABLED = true;          // EDITABLE: Toggle continuous revolution (true = orbiting, false = stationary)
   const ORRERY_JUPITER_ORBIT_PERIOD_DESKTOP = '90s';     // EDITABLE Desktop: Duration for 1 full orbit revolution (Jupiter ~11.9yr, faster than Saturn)
   const ORRERY_JUPITER_ORBIT_PERIOD_MOBILE  = '90s';     // EDITABLE Mobile: Duration for 1 full orbit revolution
   const ORRERY_JUPITER_ROTATION_DIRECTION = 'normal';    // EDITABLE: Orbit direction ('normal' = clockwise, 'reverse' = counter-clockwise)
@@ -9079,7 +9081,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_MARS_ORBIT_ANGLE_MOBILE  = calcPlanetOrreryAngle('mars'); // AUTO: real ephemeris
   const ORRERY_MARS_RADIAL_OFFSET_DESKTOP = '0vw';       // EDITABLE Desktop: Radial offset from orbit track
   const ORRERY_MARS_RADIAL_OFFSET_MOBILE  = '0vw';       // EDITABLE Mobile: Radial offset
-  const ORRERY_MARS_ROTATION_ENABLED = false;            // EDITABLE: Toggle continuous revolution
+  const ORRERY_MARS_ROTATION_ENABLED = true;             // EDITABLE: Toggle continuous revolution
   const ORRERY_MARS_ORBIT_PERIOD_DESKTOP = '60s';        // EDITABLE Desktop: Duration for 1 full orbit revolution (Mars ~1.88yr)
   const ORRERY_MARS_ORBIT_PERIOD_MOBILE  = '60s';        // EDITABLE Mobile: Duration for 1 full orbit revolution
   const ORRERY_MARS_ROTATION_DIRECTION = 'normal';       // EDITABLE: Orbit direction ('normal' = clockwise)
@@ -9114,7 +9116,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_EARTH_ORBIT_ANGLE_MOBILE  = calcPlanetOrreryAngle('earth'); // AUTO: real ephemeris
   const ORRERY_EARTH_RADIAL_OFFSET_DESKTOP = '0vw';      // EDITABLE Desktop: Radial offset from orbit track
   const ORRERY_EARTH_RADIAL_OFFSET_MOBILE  = '0vw';      // EDITABLE Mobile: Radial offset
-  const ORRERY_EARTH_ROTATION_ENABLED = false;           // EDITABLE: Toggle continuous revolution
+  const ORRERY_EARTH_ROTATION_ENABLED = true;            // EDITABLE: Toggle continuous revolution
   const ORRERY_EARTH_ORBIT_PERIOD_DESKTOP = '40s';       // EDITABLE Desktop: Duration for 1 full orbit revolution (Earth = 1yr)
   const ORRERY_EARTH_ORBIT_PERIOD_MOBILE  = '40s';       // EDITABLE Mobile: Duration for 1 full orbit revolution
   const ORRERY_EARTH_ROTATION_DIRECTION = 'normal';      // EDITABLE: Orbit direction
@@ -9153,7 +9155,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_MOON_ORBIT_ANGLE_MOBILE  = calcMoonOrreryAngle(); // AUTO: real-time live lunar position
   const ORRERY_MOON_RADIAL_OFFSET_DESKTOP = '0vw';           // EDITABLE Desktop: Fine radial adjustment (+ outward, - inward)
   const ORRERY_MOON_RADIAL_OFFSET_MOBILE  = '0vw';           // EDITABLE Mobile: Fine radial adjustment
-  const ORRERY_MOON_ROTATION_ENABLED = false;                // EDITABLE: Toggle continuous revolution around Earth (true = orbiting, false = stationary at live position)
+  const ORRERY_MOON_ROTATION_ENABLED = true;                 // EDITABLE: Toggle continuous revolution around Earth (true = orbiting, false = stationary at live position)
   const ORRERY_MOON_ORBIT_PERIOD_DESKTOP = '10s';            // EDITABLE Desktop: Duration for 1 full lunar orbit revolution
   const ORRERY_MOON_ORBIT_PERIOD_MOBILE  = '10s';            // EDITABLE Mobile: Duration for 1 full lunar orbit revolution
   const ORRERY_MOON_ROTATION_DIRECTION = 'normal';           // EDITABLE: Orbit direction ('normal' = clockwise prograde)
@@ -9193,7 +9195,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_VENUS_ORBIT_ANGLE_MOBILE  = calcPlanetOrreryAngle('venus'); // AUTO: real ephemeris
   const ORRERY_VENUS_RADIAL_OFFSET_DESKTOP = '0vw';      // EDITABLE Desktop: Radial offset from orbit track
   const ORRERY_VENUS_RADIAL_OFFSET_MOBILE  = '0vw';      // EDITABLE Mobile: Radial offset
-  const ORRERY_VENUS_ROTATION_ENABLED = false;           // EDITABLE: Toggle continuous revolution
+  const ORRERY_VENUS_ROTATION_ENABLED = true;            // EDITABLE: Toggle continuous revolution
   const ORRERY_VENUS_ORBIT_PERIOD_DESKTOP = '30s';       // EDITABLE Desktop: Duration for 1 full orbit revolution (Venus ~0.62yr)
   const ORRERY_VENUS_ORBIT_PERIOD_MOBILE  = '30s';       // EDITABLE Mobile: Duration for 1 full orbit revolution
   const ORRERY_VENUS_ROTATION_DIRECTION = 'normal';      // EDITABLE: Orbit direction
@@ -9229,7 +9231,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_MERCURY_ORBIT_ANGLE_MOBILE  = calcPlanetOrreryAngle('mercury'); // AUTO: real ephemeris
   const ORRERY_MERCURY_RADIAL_OFFSET_DESKTOP = '0vw';    // EDITABLE Desktop: Radial offset from orbit track
   const ORRERY_MERCURY_RADIAL_OFFSET_MOBILE  = '0vw';    // EDITABLE Mobile: Radial offset
-  const ORRERY_MERCURY_ROTATION_ENABLED = false;         // EDITABLE: Toggle continuous revolution
+  const ORRERY_MERCURY_ROTATION_ENABLED = true;          // EDITABLE: Toggle continuous revolution
   const ORRERY_MERCURY_ORBIT_PERIOD_DESKTOP = '15s';     // EDITABLE Desktop: Duration for 1 full orbit revolution (Mercury ~0.24yr)
   const ORRERY_MERCURY_ORBIT_PERIOD_MOBILE  = '15s';     // EDITABLE Mobile: Duration for 1 full orbit revolution
   const ORRERY_MERCURY_ROTATION_DIRECTION = 'normal';    // EDITABLE: Orbit direction
@@ -9252,6 +9254,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   function applyOrreryConfig() {
     const isMobile = window.innerWidth <= 767;
     // Base Orrery section variables
+    document.documentElement.style.setProperty('--orrery-top-offset', isMobile ? ORRERY_TOP_OFFSET_MOBILE : ORRERY_TOP_OFFSET_DESKTOP);
     document.documentElement.style.setProperty('--orrery-margin-top', isMobile ? ORRERY_MARGIN_TOP_MOBILE : ORRERY_MARGIN_TOP_DESKTOP);
     document.documentElement.style.setProperty('--orrery-margin-bottom', isMobile ? ORRERY_MARGIN_BOTTOM_MOBILE : ORRERY_MARGIN_BOTTOM_DESKTOP);
     document.documentElement.style.setProperty('--orrery-radius', isMobile ? ORRERY_RADIUS_MOBILE : ORRERY_RADIUS_DESKTOP);
@@ -9276,13 +9279,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--orrery-sun-rotation-period-mobile', sunPeriodMobile);
     document.documentElement.style.setProperty('--orrery-sun-rotation-period', sunPeriod);
     document.documentElement.style.setProperty('--orrery-sun-rotation-direction', ORRERY_SUN_ROTATION_DIRECTION);
+    document.documentElement.style.setProperty('--orrery-sun-rotation-animation-name', ORRERY_SUN_ROTATION_ENABLED ? 'orrery-sun-spin' : 'none');
     document.documentElement.style.setProperty('--orrery-sun-rotation-play-state', ORRERY_SUN_ROTATION_ENABLED ? 'running' : 'paused');
     const sunImgEl = document.getElementById('orrery-sun-img');
     if (sunImgEl && sunImgEl.style.animation) {
       sunImgEl.style.removeProperty('animation');
     }
 
-    // Sizzling Sun duplicate layer variables (Opposite Direction)
+    // Sizzling Sun duplicate layer variables (Slowly Spinning Top Layer)
     const sizzlePeriodDesktop = ORRERY_SUN_SIZZLE_ROTATION_PERIOD_DESKTOP;
     const sizzlePeriodMobile = ORRERY_SUN_SIZZLE_ROTATION_PERIOD_MOBILE;
     const sizzlePeriod = isMobile ? sizzlePeriodMobile : sizzlePeriodDesktop;
@@ -9294,6 +9298,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--orrery-sun-sizzle-rotation-period-mobile', sizzlePeriodMobile);
     document.documentElement.style.setProperty('--orrery-sun-sizzle-rotation-period', sizzlePeriod);
     document.documentElement.style.setProperty('--orrery-sun-sizzle-rotation-direction', ORRERY_SUN_SIZZLE_ROTATION_DIRECTION);
+    document.documentElement.style.setProperty('--orrery-sun-sizzle-rotation-animation-name', (ORRERY_SUN_SIZZLE_ROTATION_ENABLED && ORRERY_SUN_SIZZLE_ENABLED) ? 'orrery-sun-spin' : 'none');
     document.documentElement.style.setProperty('--orrery-sun-sizzle-rotation-play-state', (ORRERY_SUN_SIZZLE_ROTATION_ENABLED && ORRERY_SUN_SIZZLE_ENABLED) ? 'running' : 'paused');
     const sunSizzleEl = document.getElementById('orrery-sun-img-sizzle');
     if (sunSizzleEl && sunSizzleEl.style.animation) {
@@ -9637,7 +9642,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1246';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1254';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version

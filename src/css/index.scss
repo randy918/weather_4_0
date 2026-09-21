@@ -2913,9 +2913,9 @@ main {
     z-index: var(--orrery-sun-primary-z-index, 1);
     opacity: var(--orrery-sun-opacity, 1.0);
     mix-blend-mode: var(--orrery-sun-blend-mode, lighten);
-    /* Rotation via CSS longhand — var() in animation-duration is unambiguous (no WebKit parse issues) */
-    animation-name: orrery-sun-spin;
-    animation-duration: var(--orrery-sun-rotation-period, 8s);
+    /* Rotating primary sun layer */
+    animation-name: var(--orrery-sun-rotation-animation-name, orrery-sun-spin);
+    animation-duration: var(--orrery-sun-rotation-period, 60s);
     animation-timing-function: linear;
     animation-iteration-count: infinite;
     animation-direction: var(--orrery-sun-rotation-direction, normal);
@@ -2928,9 +2928,9 @@ main {
     opacity: var(--orrery-sun-sizzle-opacity, 1.0);
     mix-blend-mode: var(--orrery-sun-sizzle-blend-mode, lighten);
     display: var(--orrery-sun-sizzle-display, block);
-    /* Counter-rotation via CSS longhand (opposite direction sizzle layer) */
-    animation-name: orrery-sun-counter-spin;
-    animation-duration: var(--orrery-sun-sizzle-rotation-period, 6s);
+    /* Top duplicate layer slowly spinning over primary layer */
+    animation-name: var(--orrery-sun-sizzle-rotation-animation-name, orrery-sun-counter-spin);
+    animation-duration: var(--orrery-sun-sizzle-rotation-period, 24s);
     animation-timing-function: linear;
     animation-iteration-count: infinite;
     animation-direction: var(--orrery-sun-sizzle-rotation-direction, normal);
