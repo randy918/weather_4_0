@@ -54,7 +54,8 @@ import weatherConditions from '../data/weather-conditions.json';
 
   const SPRING_STARTS_ICON = "img/sun-wat.svg";
   const SUMMER_STARTS_ICON = "img/sun-wat.svg";
-  const FALL_STARTS_ICON = "img/wind-wat.svg";
+  const FALL_STARTS_ICON = "fa-brands fa-canadian-maple-leaf";
+  const FALL_STARTS_ICON_TRANSFORM = "rotate(45deg)"; // EDITABLE: Rotate the fall leaf to look more natural
   const WINTER_STARTS_ICON = "img/fog-wat.svg";
 
   document.documentElement.style.setProperty('--spring-starts-color', SPRING_STARTS_COLOR);
@@ -4715,25 +4716,49 @@ import weatherConditions from '../data/weather-conditions.json';
     const modalIconMarginBottom = '2vw';
     
     const isTempDrop = (alert.event || '').toUpperCase().includes('TEMPERATURE DROP ADVISORY');
-    const modalIconTransform = isTempDrop ? ` transform: ${ALERT_DROP_ICON_TRANSFORM};` : '';
+    const isFallStarts = (alert.event || '').toUpperCase().includes('FALL STARTS');
+    let modalIconTransform = '';
+    if (isTempDrop) {
+      modalIconTransform = ` transform: ${ALERT_DROP_ICON_TRANSFORM};`;
+    } else if (isFallStarts) {
+      modalIconTransform = ` transform: ${FALL_STARTS_ICON_TRANSFORM};`;
+    }
 
-    // Icon element using CSS mask to colorize the SVG to match the alert color
-    const iconElement = icon ? `
-      <div style="
-        width: ${modalIconSize}; 
-        height: ${modalIconSize}; 
-        margin: ${modalIconMarginTop} auto ${modalIconMarginBottom} auto;
-        background-color: ${color};
-        -webkit-mask-image: url('${icon}');
-        -webkit-mask-size: contain;
-        -webkit-mask-repeat: no-repeat;
-        -webkit-mask-position: center;
-        mask-image: url('${icon}');
-        mask-size: contain;
-        mask-repeat: no-repeat;
-        mask-position: center;${modalIconTransform}
-      "></div>
-    ` : '';
+    // Icon element using CSS mask to colorize the SVG to match the alert color, or FontAwesome class
+    let iconElement = '';
+    if (icon) {
+      if (icon.startsWith('fa-')) {
+        iconElement = `
+          <div style="
+            width: ${modalIconSize}; 
+            height: ${modalIconSize}; 
+            margin: ${modalIconMarginTop} auto ${modalIconMarginBottom} auto;
+            color: ${color};
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: calc(${modalIconSize} * 0.9);${modalIconTransform}
+          "><i class="${icon}"></i></div>
+        `;
+      } else {
+        iconElement = `
+          <div style="
+            width: ${modalIconSize}; 
+            height: ${modalIconSize}; 
+            margin: ${modalIconMarginTop} auto ${modalIconMarginBottom} auto;
+            background-color: ${color};
+            -webkit-mask-image: url('${icon}');
+            -webkit-mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            -webkit-mask-position: center;
+            mask-image: url('${icon}');
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;${modalIconTransform}
+          "></div>
+        `;
+      }
+    }
     
     overlay.innerHTML = `
       <div class="alert-modal-content" style="border-top: 1.5vw solid ${color};">
@@ -5443,18 +5468,30 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const svgSize = '7vw';
       const isTempDrop = eventName.includes('TEMPERATURE DROP');
       const isTempRise = !isTempDrop && eventName.includes('TEMPERATURE RISE');
+      const isFallStarts = eventName.includes('FALL STARTS');
       
       let iconTransform = '';
       if (isTempDrop) {
         iconTransform = `transform: translateY(var(--alert-temp-drop-icon-y-offset, 0vw)) ${ALERT_DROP_ICON_TRANSFORM};`;
       } else if (isTempRise) {
         iconTransform = `transform: translateY(var(--alert-temp-rise-icon-y-offset, 0vw));`;
+      } else if (isFallStarts) {
+        iconTransform = `transform: ${FALL_STARTS_ICON_TRANSFORM};`;
       }
       const bannerIconTransform = iconTransform ? ` ${iconTransform}` : '';
       
-      const svgIcon = `
-        <img src="${bannerIcon}" style="width: ${svgSize}; height: ${svgSize}; flex-shrink: 0;${bannerIconTransform}" alt="Alert">
-      `;
+      let svgIcon = '';
+      if (bannerIcon.startsWith('fa-')) {
+        svgIcon = `
+          <div style="width: ${svgSize}; height: ${svgSize}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;${bannerIconTransform}">
+            <i class="${bannerIcon}" style="font-size: calc(${svgSize} * 0.9); color: white;"></i>
+          </div>
+        `;
+      } else {
+        svgIcon = `
+          <img src="${bannerIcon}" style="width: ${svgSize}; height: ${svgSize}; flex-shrink: 0;${bannerIconTransform}" alt="Alert">
+        `;
+      }
       
       // Create the content container (sits above background)
       const bannerContent = document.createElement('div');
@@ -7815,8 +7852,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const CELESTIAL_GAUGE_ANIM_ENABLED = true;                   // EDITABLE: Enable two-stage sweeping animation on value change (like Barometer/Humidity)
   const CELESTIAL_GAUGE_STAGE1_MS = 600;                       // EDITABLE: Stage 1 duration (sweep to full if 'up', sweep to 0 if 'down') in ms
   const CELESTIAL_GAUGE_STAGE2_MS = 600;                       // EDITABLE: Stage 2 duration (settle to target offset) in ms
-  const CELESTIAL_DIAL_RESET_FLASH_ENABLED = true;             // EDITABLE: Flash dial opacity during resets (fade out to 0.15 & in to 1.0)
-  const CELESTIAL_DIAL_RESET_FLASH_MS = 500;                   // EDITABLE: Reset flash duration in ms
 
   // Flanking Dials Lateral & Vertical Centering Controls (JCV)
   // 'center' aligns the dial circle's horizontal midline with the Sun & Earth equator
@@ -9651,7 +9686,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1261';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1263';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -14425,30 +14460,38 @@ Plan ahead for significantly warmer conditions tomorrow!`
   let sunAnimationTimeoutId = null;
   let earthAnimationTimeoutId = null;
 
-  function triggerDialFlashes() {
-    if (!CELESTIAL_DIAL_RESET_FLASH_ENABLED) return;
+  function forceCelestialDialSweep(dialId) {
+    const dial = document.getElementById(dialId);
+    if (!dial || !dial._targetOffset) return;
     
-    // Target all dials (including #1 Solar Flare and #4 Radio Blackout)
-    const dials = document.querySelectorAll('.celestial-clock-dial, .world-clock-dial');
-    dials.forEach(dial => {
-      const originalTransition = dial.style.transition;
-      dial.style.transition = 'opacity 0.6s ease-in-out';
-      dial.style.opacity = '0.15';
-      
-      setTimeout(() => {
-        dial.style.opacity = '1.0';
-        setTimeout(() => {
-          dial.style.transition = originalTransition;
-          dial.style.opacity = '';
-        }, 600);
-      }, 600);
-    });
+    const circumference = 289.027; // Circumference for r=46
+    const newOffsetStr = dial._targetOffset;
+    
+    if (dial._animTimeout) {
+      clearTimeout(dial._animTimeout);
+      dial._animTimeout = null;
+    }
+    
+    // Always sweep forward to 360 (offset 0) and back to the current value
+    const cssVarName = `--${dialId.replace('-dial', '')}-stroke-offset`;
+    dial.style.setProperty(cssVarName, '0');
+    dial._animTimeout = setTimeout(() => {
+      dial.style.setProperty(cssVarName, newOffsetStr);
+      dial._animTimeout = null;
+    }, 800);
   }
 
   function triggerCelestialRotations() {
     if (typeof window.triggerSunRotation === 'function') window.triggerSunRotation();
     if (typeof window.triggerEarthRotation === 'function') window.triggerEarthRotation();
-    triggerDialFlashes();
+    
+    // Perform a dramatic sweep for the Solar Flare (#1) and Radio Blackout (#4) dials
+    if (SOLAR_FLARE_DIAL_ENABLED) {
+      forceCelestialDialSweep('solar-flare-dial');
+    }
+    if (RADIO_BLACKOUT_DIAL_ENABLED) {
+      forceCelestialDialSweep('radio-blackout-dial');
+    }
   }
   window.triggerCelestialRotations = triggerCelestialRotations;
 
