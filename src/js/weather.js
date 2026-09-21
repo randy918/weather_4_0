@@ -9642,7 +9642,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1259';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1260';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -13506,7 +13506,33 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (valueEl && valueEl.textContent !== displayVal) valueEl.textContent = displayVal;
 
     dial.style.setProperty('--solar-flare-current-color', color);
-    dial.style.setProperty('--solar-flare-stroke-offset', strokeOffset.toFixed(2));
+
+    const newOffsetStr = strokeOffset.toFixed(2);
+    
+    if (!dial.hasOwnProperty('_targetOffset')) {
+      dial._targetOffset = newOffsetStr;
+      dial.style.setProperty('--solar-flare-stroke-offset', newOffsetStr);
+    } else if (dial._targetOffset !== newOffsetStr) {
+      const prevTarget = parseFloat(dial._targetOffset);
+      const newOffset = parseFloat(newOffsetStr);
+      dial._targetOffset = newOffsetStr;
+      
+      if (dial._animTimeout) {
+        clearTimeout(dial._animTimeout);
+        dial._animTimeout = null;
+      }
+      
+      if (Math.abs(prevTarget - newOffset) > 0.1) {
+        const isHigher = newOffset < prevTarget; // smaller offset = larger circle
+        dial.style.setProperty('--solar-flare-stroke-offset', isHigher ? '0' : circumference.toFixed(2));
+        dial._animTimeout = setTimeout(() => {
+          dial.style.setProperty('--solar-flare-stroke-offset', newOffsetStr);
+          dial._animTimeout = null;
+        }, 800);
+      } else {
+        dial.style.setProperty('--solar-flare-stroke-offset', newOffsetStr);
+      }
+    }
 
     if (SOLAR_FLARE_SUBLABEL_ENABLED) {
       const sublabelEl = document.getElementById('solar-flare-sublabel');
@@ -13833,7 +13859,33 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (valueEl && valueEl.textContent !== displayVal) valueEl.textContent = displayVal;
 
     dial.style.setProperty('--radio-blackout-current-color', color);
-    dial.style.setProperty('--radio-blackout-stroke-offset', strokeOffset.toFixed(2));
+    
+    const newOffsetStr = strokeOffset.toFixed(2);
+    
+    if (!dial.hasOwnProperty('_targetOffset')) {
+      dial._targetOffset = newOffsetStr;
+      dial.style.setProperty('--radio-blackout-stroke-offset', newOffsetStr);
+    } else if (dial._targetOffset !== newOffsetStr) {
+      const prevTarget = parseFloat(dial._targetOffset);
+      const newOffset = parseFloat(newOffsetStr);
+      dial._targetOffset = newOffsetStr;
+      
+      if (dial._animTimeout) {
+        clearTimeout(dial._animTimeout);
+        dial._animTimeout = null;
+      }
+      
+      if (Math.abs(prevTarget - newOffset) > 0.1) {
+        const isHigher = newOffset < prevTarget; // smaller offset = larger circle
+        dial.style.setProperty('--radio-blackout-stroke-offset', isHigher ? '0' : circumference.toFixed(2));
+        dial._animTimeout = setTimeout(() => {
+          dial.style.setProperty('--radio-blackout-stroke-offset', newOffsetStr);
+          dial._animTimeout = null;
+        }, 800);
+      } else {
+        dial.style.setProperty('--radio-blackout-stroke-offset', newOffsetStr);
+      }
+    }
 
     if (RADIO_BLACKOUT_SUBLABEL_ENABLED) {
       const sublabelEl = document.getElementById('radio-blackout-sublabel');
@@ -15291,47 +15343,33 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }
 
       if (EARTH_ANIMATION_CROSSFADE_ENABLED && rightEarth && rightEarth.imgB) {
-        if (earthActiveLayer === 'a') {
-          rightEarth.imgB.style.zIndex = '2';
-          rightEarth.img.style.zIndex = '1';
-          rightEarth.imgB.style.opacity = '1';
-          rightEarth.img.style.opacity = '0';
-          earthActiveLayer = 'b';
-          earthFrameIndex = nextIdx;
+        const incoming = (earthActiveLayer === 'a') ? rightEarth.imgB : rightEarth.img;
+        const outgoing = (earthActiveLayer === 'a') ? rightEarth.img : rightEarth.imgB;
+        const newActiveLayer = (earthActiveLayer === 'a') ? 'b' : 'a';
 
-          if (!isLastFrame) {
-            const cueIdx = nextIdx + 1;
-            const cueImg = earthPreloadedImages[cueIdx];
-            if (cueImg && cueImg.src) {
-              setTimeout(() => {
-                if (rightEarth && rightEarth.img && earthActiveLayer === 'b') {
-                  rightEarth.img.src = cueImg.src;
-                  if (rightEarth.img.decode) rightEarth.img.decode().catch(() => {});
-                }
-              }, fadeDuration + 10);
-            }
-          }
-        } else {
-          rightEarth.img.style.zIndex = '2';
-          rightEarth.imgB.style.zIndex = '1';
-          rightEarth.img.style.opacity = '1';
-          rightEarth.imgB.style.opacity = '0';
-          earthActiveLayer = 'a';
-          earthFrameIndex = nextIdx;
-
-          if (!isLastFrame) {
-            const cueIdx = nextIdx + 1;
-            const cueImg = earthPreloadedImages[cueIdx];
-            if (cueImg && cueImg.src) {
-              setTimeout(() => {
-                if (rightEarth && rightEarth.imgB && earthActiveLayer === 'a') {
-                  rightEarth.imgB.src = cueImg.src;
-                  if (rightEarth.imgB.decode) rightEarth.imgB.decode().catch(() => {});
-                }
-              }, fadeDuration + 10);
-            }
-          }
+        if (nextImg && incoming.src !== nextImg.src) {
+          incoming.src = nextImg.src;
         }
+
+        incoming.style.zIndex = '2';
+        outgoing.style.zIndex = '1';
+        incoming.style.opacity = '1';
+        earthActiveLayer = newActiveLayer;
+        earthFrameIndex = nextIdx;
+
+        const cueIdx = nextIdx + 1;
+        const cueImg = earthPreloadedImages[cueIdx];
+
+        setTimeout(() => {
+          if (earthActiveLayer === newActiveLayer && isEarthRotating) {
+            outgoing.style.transitionDuration = '0ms';
+            outgoing.style.opacity = '0';
+            if (cueImg && cueImg.src && outgoing.src !== cueImg.src) {
+              outgoing.src = cueImg.src;
+              if (outgoing.decode) outgoing.decode().catch(() => {});
+            }
+          }
+        }, fadeDuration);
       } else if (rightEarth && rightEarth.img) {
         earthFrameIndex = nextIdx;
         if (nextImg && nextImg.src) rightEarth.img.src = nextImg.src;
@@ -15352,23 +15390,25 @@ Plan ahead for significantly warmer conditions tomorrow!`
     function triggerEarthRotation() {
       if (isEarthRotating || earthPreloadedImages.length <= 1) return;
       isEarthRotating = true;
-      earthFrameIndex = 0;
-      earthActiveLayer = 'a';
+      earthFrameIndex = -1;
 
       const earthLabel = document.getElementById('sun-label-right');
       if (earthLabel) earthLabel.textContent = SUN_LABEL_RIGHT_ROTATING_TEXT;
 
-      if (rightEarth && rightEarth.img) {
-        rightEarth.img.style.transitionDuration = '0ms';
-        rightEarth.img.src = earthPreloadedImages[0].src;
-        rightEarth.img.style.zIndex = '1';
-        rightEarth.img.style.opacity = '1';
+      const activeImg = (earthActiveLayer === 'b') ? rightEarth.imgB : rightEarth.img;
+      const nextImg = (earthActiveLayer === 'b') ? rightEarth.img : rightEarth.imgB;
+
+      if (activeImg) {
+        activeImg.style.transitionDuration = '0ms';
+        activeImg.style.zIndex = '1';
+        activeImg.style.opacity = '1';
       }
-      if (rightEarth && rightEarth.imgB && earthPreloadedImages.length > 1) {
-        rightEarth.imgB.style.transitionDuration = '0ms';
-        rightEarth.imgB.src = earthPreloadedImages[1].src;
-        rightEarth.imgB.style.zIndex = '2';
-        rightEarth.imgB.style.opacity = '0';
+      if (nextImg && earthPreloadedImages[0]) {
+        nextImg.style.transitionDuration = '0ms';
+        nextImg.src = earthPreloadedImages[0].src;
+        nextImg.style.zIndex = '2';
+        nextImg.style.opacity = '0';
+        if (nextImg.decode) nextImg.decode().catch(() => {});
       }
 
       const initDelay = Math.round(1000 / Math.max(1, earthFps));
