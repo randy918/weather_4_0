@@ -140,6 +140,9 @@ import weatherConditions from '../data/weather-conditions.json';
     document.documentElement.style.setProperty('--rain-fade-bottom', isMobile ? RAIN_FADE_BOTTOM_MOBILE : RAIN_FADE_BOTTOM_DESKTOP);
     document.documentElement.style.setProperty('--rain-opacity', isMobile ? RAIN_OPACITY_MOBILE : RAIN_OPACITY_DESKTOP);
     document.documentElement.style.setProperty('--lo-temp-shadow-top', isMobile ? LO_TEMP_SHADOW_TOP_OFFSET_MOBILE : LO_TEMP_SHADOW_TOP_OFFSET_DESKTOP);
+    document.documentElement.style.setProperty('--alert-modal-line-height', isMobile ? ALERT_MODAL_LINE_HEIGHT_MOBILE : ALERT_MODAL_LINE_HEIGHT_DESKTOP);
+    document.documentElement.style.setProperty('--alert-modal-title-line-height', isMobile ? ALERT_MODAL_TITLE_LINE_HEIGHT_MOBILE : ALERT_MODAL_TITLE_LINE_HEIGHT_DESKTOP);
+    document.documentElement.style.setProperty('--alert-modal-body-top-margin', isMobile ? ALERT_MODAL_BODY_TOP_MARGIN_MOBILE : ALERT_MODAL_BODY_TOP_MARGIN_DESKTOP);
   });
 
   // --- CONFIG: Snow Flake Animation ---
@@ -1028,38 +1031,34 @@ import weatherConditions from '../data/weather-conditions.json';
       const targetOffset = circumference * (1 - newPercent);
       const currentOffset = parseFloat(el.style.strokeDashoffset) || circumference;
 
-      if (hasChange) {
-        // Mark as animating
-        el.dataset.animating = 'true';
-        el.dataset.targetOffset = targetOffset;
+      // Always perform the sweep animation on update, even if the value didn't change
+      el.dataset.animating = 'true';
+      el.dataset.targetOffset = targetOffset;
 
-        const oldPercent = calcAboveBelowAverageProgress(prevVal, minVal, avgVal, maxVal);
-        const startOffset = circumference * (1 - oldPercent);
-        
-        const isIncrease = newVal > prevVal;
+      const oldPercent = calcAboveBelowAverageProgress(prevVal, minVal, avgVal, maxVal);
+      const startOffset = circumference * (1 - oldPercent);
+      
+      // Treat no-change (newVal == prevVal) as an increase so it sweeps forward to 360° and back
+      const isIncrease = newVal >= prevVal;
 
-        if (isIncrease) {
-          // Stage 1: Animate clockwise from old value's offset to MAX (strokeDashoffset = 0)
-          animateValue(el, startOffset, 0, 800, () => {
-            const currentTarget = parseFloat(el.dataset.targetOffset) ?? targetOffset;
-            // Stage 2: Animate counter-clockwise from MAX (0) to new targetOffset
-            animateValue(el, 0, currentTarget, 800, () => {
-              el.dataset.animating = 'false';
-            });
+      if (isIncrease) {
+        // Stage 1: Animate clockwise from old value's offset to MAX (strokeDashoffset = 0)
+        animateValue(el, startOffset, 0, 800, () => {
+          const currentTarget = parseFloat(el.dataset.targetOffset) ?? targetOffset;
+          // Stage 2: Animate counter-clockwise from MAX (0) to new targetOffset
+          animateValue(el, 0, currentTarget, 800, () => {
+            el.dataset.animating = 'false';
           });
-        } else {
-          // Stage 1: Animate counter-clockwise from old value's offset to MIN (strokeDashoffset = circumference)
-          animateValue(el, startOffset, circumference, 800, () => {
-            const currentTarget = parseFloat(el.dataset.targetOffset) ?? targetOffset;
-            // Stage 2: Animate clockwise from MIN (circumference) to new targetOffset
-            animateValue(el, circumference, currentTarget, 800, () => {
-              el.dataset.animating = 'false';
-            });
-          });
-        }
+        });
       } else {
-        // Normal update (no change or initial load): animate smoothly to target
-        animateValue(el, currentOffset, targetOffset, 800);
+        // Stage 1: Animate counter-clockwise from old value's offset to MIN (strokeDashoffset = circumference)
+        animateValue(el, startOffset, circumference, 800, () => {
+          const currentTarget = parseFloat(el.dataset.targetOffset) ?? targetOffset;
+          // Stage 2: Animate clockwise from MIN (circumference) to new targetOffset
+          animateValue(el, circumference, currentTarget, 800, () => {
+            el.dataset.animating = 'false';
+          });
+        });
       }
     });
   }
@@ -2480,9 +2479,15 @@ import weatherConditions from '../data/weather-conditions.json';
 
   // EDITABLE: Alert Banner Colors
   // Maps specific alert keywords to their background colors.
-  const ALERT_MODAL_LINE_HEIGHT = '3.025vw'; // EDITABLE: Line spacing INSIDE the modal paragraphs
-  const ALERT_MODAL_TITLE_LINE_HEIGHT = '.95'; // EDITABLE: Line spacing for the uppercase TITLE inside the modal
-  const ALERT_MODAL_BODY_TOP_MARGIN = '3.0vw'; // EDITABLE: Additional linespace above body copy of alert/warning
+  const ALERT_MODAL_LINE_HEIGHT_DESKTOP = '3.025vw'; // EDITABLE Desktop: Line spacing INSIDE the modal paragraphs
+  const ALERT_MODAL_LINE_HEIGHT_MOBILE = '1.35';     // EDITABLE Mobile: Line spacing INSIDE the modal paragraphs (unitless recommended)
+  
+  const ALERT_MODAL_TITLE_LINE_HEIGHT_DESKTOP = '0.95'; // EDITABLE Desktop: Line spacing for the uppercase TITLE inside the modal
+  const ALERT_MODAL_TITLE_LINE_HEIGHT_MOBILE = '1.05';  // EDITABLE Mobile: Line spacing for the uppercase TITLE inside the modal
+  
+  const ALERT_MODAL_BODY_TOP_MARGIN_DESKTOP = '3.0vw'; // EDITABLE Desktop: Additional linespace above body copy of alert/warning
+  const ALERT_MODAL_BODY_TOP_MARGIN_MOBILE = '4.0vw';  // EDITABLE Mobile: Additional linespace above body copy of alert/warning
+
   const ALERT_DROP_ICON_TRANSFORM = 'scaleY(-1)'; // EDITABLE: Vertical reversal transform to indicate downward temperature drop
   const ALERT_BANNER_LINE_HEIGHT = '1.1'; // EDITABLE: Line height for banner text to ensure vertical centering
 
@@ -2499,6 +2504,10 @@ import weatherConditions from '../data/weather-conditions.json';
   const ALERT_TEMP_RISE_ICON_Y_OFFSET_MOBILE = '-0.15vw';  // EDITABLE Mobile: Vertical nudge for Temperature Rise icon
 
   document.documentElement.style.setProperty('--alert-banner-line-height', ALERT_BANNER_LINE_HEIGHT);
+
+  document.documentElement.style.setProperty('--alert-modal-line-height', window.innerWidth <= 767 ? ALERT_MODAL_LINE_HEIGHT_MOBILE : ALERT_MODAL_LINE_HEIGHT_DESKTOP);
+  document.documentElement.style.setProperty('--alert-modal-title-line-height', window.innerWidth <= 767 ? ALERT_MODAL_TITLE_LINE_HEIGHT_MOBILE : ALERT_MODAL_TITLE_LINE_HEIGHT_DESKTOP);
+  document.documentElement.style.setProperty('--alert-modal-body-top-margin', window.innerWidth <= 767 ? ALERT_MODAL_BODY_TOP_MARGIN_MOBILE : ALERT_MODAL_BODY_TOP_MARGIN_DESKTOP);
 
   document.documentElement.style.setProperty('--alert-temp-drop-type-y-offset-desktop', ALERT_TEMP_DROP_TYPE_Y_OFFSET_DESKTOP);
   document.documentElement.style.setProperty('--alert-temp-drop-type-y-offset-mobile', ALERT_TEMP_DROP_TYPE_Y_OFFSET_MOBILE);
@@ -3991,11 +4000,11 @@ import weatherConditions from '../data/weather-conditions.json';
         font-size: 5vw;
         margin-bottom: 3vw;
         padding: 0 8vw; /* Keep text away from close button but evenly centered */
-        line-height: ${ALERT_MODAL_TITLE_LINE_HEIGHT}; /* EDITABLE: Pulled from config at top */
+        line-height: var(--alert-modal-title-line-height); /* EDITABLE: Pulled from config at top */
         text-align: center; /* Guarantee title is centered */
       }
       .alert-modal-body {
-        margin-top: ${ALERT_MODAL_BODY_TOP_MARGIN}; /* EDITABLE: Linespace above body copy */
+        margin-top: var(--alert-modal-body-top-margin); /* EDITABLE: Linespace above body copy */
         font-size: 2.4vw; /* EDITABLE: Text size (60% of 4vw) */
         color: #ffffff; /* EDITABLE: Pure white text */
         text-align: left; /* EDITABLE: Flush left alignment */
@@ -4003,7 +4012,7 @@ import weatherConditions from '../data/weather-conditions.json';
       }
       .alert-modal-body p {
         text-align: left; /* Explicitly force paragraphs to be flush left */
-        line-height: ${ALERT_MODAL_LINE_HEIGHT} !important; /* EDITABLE: Pulled from config at top */
+        line-height: var(--alert-modal-line-height) !important; /* EDITABLE: Pulled from config at top */
         margin-top: -1vw; /* EDITABLE: Space ABOVE each paragraph */
         margin-bottom: 3vw; /* EDITABLE: Space BELOW each paragraph */
       }
@@ -9642,7 +9651,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1260';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1261';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -13463,8 +13472,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
       X: { min: 0.80, max: 1.00 }
     };
     const range = ranges[cls] || ranges['C'];
-    // intra-class: 1.0 to 10.0 maps from range.min to range.max
-    const normalized = Math.max(0, Math.min(1.0, (val - 1.0) / 9.0));
+    
+    // Use true logarithmic scale for intra-class values (1.0 to 10.0)
+    // This perfectly aligns with the order-of-magnitude class buckets,
+    // creating a continuous logarithmic dial across all classes.
+    const normalized = Math.max(0, Math.min(1.0, Math.log10(Math.max(1.0, val))));
     return range.min + (normalized * (range.max - range.min));
   }
 
@@ -14413,9 +14425,30 @@ Plan ahead for significantly warmer conditions tomorrow!`
   let sunAnimationTimeoutId = null;
   let earthAnimationTimeoutId = null;
 
+  function triggerDialFlashes() {
+    if (!CELESTIAL_DIAL_RESET_FLASH_ENABLED) return;
+    
+    // Target all dials (including #1 Solar Flare and #4 Radio Blackout)
+    const dials = document.querySelectorAll('.celestial-clock-dial, .world-clock-dial');
+    dials.forEach(dial => {
+      const originalTransition = dial.style.transition;
+      dial.style.transition = 'opacity 0.6s ease-in-out';
+      dial.style.opacity = '0.15';
+      
+      setTimeout(() => {
+        dial.style.opacity = '1.0';
+        setTimeout(() => {
+          dial.style.transition = originalTransition;
+          dial.style.opacity = '';
+        }, 600);
+      }, 600);
+    });
+  }
+
   function triggerCelestialRotations() {
     if (typeof window.triggerSunRotation === 'function') window.triggerSunRotation();
     if (typeof window.triggerEarthRotation === 'function') window.triggerEarthRotation();
+    triggerDialFlashes();
   }
   window.triggerCelestialRotations = triggerCelestialRotations;
 
