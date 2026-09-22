@@ -10069,6 +10069,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
               <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+              <circle class="uv-peak-progress" cx="50" cy="50" r="46" fill="none" style="stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease-out, stroke 0.5s ease-out, opacity 0.5s ease;" />
               <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
             </svg>
             <div class="grid-dewpoint-text"></div>
@@ -11167,75 +11168,21 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   // Update the dewpoint dial in grid cell #5 (index 4)
   function updateDewpointDial(data) {
-    const dewpoint = data?.current?.dew_point || null;
-    const currentTemp = (data?.current?.temp !== undefined) ? data.current.temp : null;
-    const tempColor = currentTemp !== null ? tempToColor(currentTemp) : null;
-    const dewpointColor = dewpoint !== null ? tempToColor(dewpoint) : 'hsl(120, 80%, 40%)';
-    const finalColor = tempColor || dewpointColor;
-    
-    const gridDewpointProgressEls = document.querySelectorAll('.clockGridItem-4 .countdown-progress');
-    const gridDewpointTextEls = document.querySelectorAll('.clockGridItem-4 .grid-dewpoint-text');
-    const radius = 46;
-    const circumference = 2 * Math.PI * radius; // ~289.0265
-    
-    gridDewpointProgressEls.forEach(gridDewpointProgressEl => {
-      if (finalColor) {
-        gridDewpointProgressEl.style.stroke = finalColor;
-      }
-    });
-
-    if (dewpoint !== null) {
-      const getRadius = (el) => 46;
-      animateGauge(gridDewpointProgressEls, dewpoint, prevDewpoint, DEWPOINT_DIAL_MIN, DEWPOINT_DIAL_AVG, DEWPOINT_DIAL_MAX, getRadius);
-      prevDewpoint = dewpoint;
-    } else {
-      gridDewpointProgressEls.forEach(gridDewpointProgressEl => {
-        gridDewpointProgressEl.style.strokeDashoffset = circumference;
-      });
-      prevDewpoint = null;
-    }
-    
-    let trendHtml = '';
-    if (dewpoint !== null) {
-      const dewF = Math.round(dewpoint);
-      const dewTrend = getPersistentTrendDirection('weather_trend_dewpoint', dewF);
-      let iconClass = '';
-      if (dewTrend === 'up') {
-        iconClass = "fa-angle-up";
-      } else if (dewTrend === 'down') {
-        iconClass = "fa-angle-down";
-      }
-      if (iconClass) {
-        trendHtml = `<div style="position: absolute; top: ${BAROMETRIC_TREND_TOP_POS}; width: 100%; text-align: center; font-size: ${BAROMETRIC_TREND_FONT_SIZE};"><i class="fa-solid ${iconClass}"></i></div>`;
-      }
-    }
-
-    gridDewpointTextEls.forEach(gridDewpointTextEl => {
-      if (dewpoint !== null) {
-        const dewF = Math.round(dewpoint);
-        let displayStr = '';
-        const degSuffix = '°';
-        if (displayUnit === 'BOTH') {
-          const dewC = Math.round((dewF - 32) * 5 / 9);
-          displayStr = `${dewF}${formatSlash()}${dewC}${degSuffix}`;
-        } else {
-          const dewDisplay = displayUnit === 'C' ? Math.round((dewF - 32) * 5 / 9) : dewF;
-          displayStr = `${dewDisplay}${degSuffix}`;
-        }
-        gridDewpointTextEl.innerHTML = `${trendHtml}${displayStr}<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Td</span>`;
-      } else {
-        gridDewpointTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Td</span>`;
-      }
-      if (finalColor) {
-        gridDewpointTextEl.style.color = finalColor;
-      }
-    });
+    // Deprecated: Mobile dewpoint dial (.clockGridItem-4) is now a dual dial
+    // exactly like the desktop UV dial. Handled by updateUvDualDial().
   }
   
   function updateUvDualDial(data) {
-    const uvIndex = data?.current?.uvi !== undefined ? data.current.uvi : null;
-    const dailyPeakUv = data?.daily?.[0]?.uvi !== undefined ? data.daily[0].uvi : null;
-    const dewpoint = data?.current?.dew_point !== undefined ? data.current.dew_point : null;
+    const uvIndex = data?.current?.uvi !== undefined ? Number(data.current.uvi) : null;
+    let dailyPeakUv = data?.daily?.[0]?.uvi !== undefined ? Number(data.daily[0].uvi) : null;
+    
+    // Fallback if the API uses a different key for daily peak UV
+    if (dailyPeakUv === null && data?.daily?.[0]) {
+      if (data.daily[0].uv_index !== undefined) dailyPeakUv = Number(data.daily[0].uv_index);
+      else if (data.daily[0].max_uvi !== undefined) dailyPeakUv = Number(data.daily[0].max_uvi);
+    }
+    
+    const dewpoint = data?.current?.dew_point !== undefined ? Number(data.current.dew_point) : null;
     
     // Determine natural state based on day/night
     const now = Date.now() / 1000;
@@ -11246,8 +11193,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
     
     const activeState = uvDialForceState || naturalState;
     
-    const itemEl = document.querySelector('.clockGridItem-8');
-    if (itemEl) {
+    const itemEls = document.querySelectorAll('.clockGridItem-8, .clockGridItem-4');
+    itemEls.forEach(itemEl => {
        itemEl.setAttribute('data-active-state', activeState);
        if (!itemEl.hasUvClickListener) {
           itemEl.hasUvClickListener = true;
@@ -11268,12 +11215,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
              updateUvDualDial(window.lastWeatherData || data);
           });
        }
-    }
+    });
     
-    const progressEls = document.querySelectorAll('.clockGridItem-8 .countdown-progress');
-    const trackEls = document.querySelectorAll('.clockGridItem-8 .countdown-track');
-    const peakEls = document.querySelectorAll('.clockGridItem-8 .uv-peak-progress');
-    const textEls = document.querySelectorAll('.clockGridItem-8 .grid-uv-text');
+    const progressEls = document.querySelectorAll('.clockGridItem-8 .countdown-progress, .clockGridItem-4 .countdown-progress');
+    const trackEls = document.querySelectorAll('.clockGridItem-8 .countdown-track, .clockGridItem-4 .countdown-track');
+    const peakEls = document.querySelectorAll('.clockGridItem-8 .uv-peak-progress, .clockGridItem-4 .uv-peak-progress');
+    const textEls = document.querySelectorAll('.clockGridItem-8 .grid-uv-text, .clockGridItem-4 .grid-dewpoint-text');
     const radius = 46;
     const circumference = 2 * Math.PI * radius;
     
@@ -11301,9 +11248,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
          el.style.stroke = uvColor;
        });
        
-       if (dailyPeakUv !== null && dailyPeakUv > uvIndex) {
+       if (dailyPeakUv !== null && uvIndex !== null && dailyPeakUv > uvIndex) {
          const peakColor = getUvColor(dailyPeakUv);
          peakEls.forEach(el => {
+           el.style.display = 'block';
            el.style.stroke = peakColor;
            el.style.opacity = '0.5';
          });
@@ -11312,6 +11260,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
          prevUvPeakDialVal = dailyPeakUv;
        } else {
          peakEls.forEach(el => {
+           el.style.display = 'none';
            el.style.removeProperty('stroke');
            el.style.removeProperty('opacity');
            el.style.strokeDashoffset = circumference;
@@ -11340,7 +11289,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
        });
        
        // Update hidden value label (Dew Pt)
-       const labelEls = document.querySelectorAll('.label-title-8');
+       const labelEls = document.querySelectorAll('.label-title-8, .label-title-4');
        labelEls.forEach(labelEl => {
           let labelColor = 'inherit';
           if (dewpoint !== null) {
@@ -12338,51 +12287,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const dots = dotsContainer.children;
       for (let i = 0; i < dots.length; i++) {
         dots[i].style.backgroundColor = inactiveColor;
-      }
-    }
-
-    // Update the dewpoint progress and text inside grid cell #5 (0 to 100° scale)
-    const gridDewpointProgressEl = document.querySelector('.clockGridItem-4 .countdown-progress');
-    const gridDewpointTextEl = document.querySelector('.clockGridItem-4 .grid-dewpoint-text');
-    const radius = 46;
-    const circumference = 2 * Math.PI * radius; // ~289.0265
-    
-    // Get current temperature color
-    const currentTemp = (data?.current?.temp !== undefined) ? data.current.temp : null;
-    const tempColor = currentTemp !== null ? tempToColor(currentTemp) : null;
-    const finalColor = tempColor || dewpointColor;
-    
-    if (gridDewpointProgressEl) {
-      if (dewpoint !== null) {
-        const percent = Math.max(0, Math.min(1, dewpoint / 100));
-        const dashOffset = circumference * (1 - percent);
-        gridDewpointProgressEl.style.strokeDashoffset = dashOffset;
-        if (finalColor) {
-          gridDewpointProgressEl.style.stroke = finalColor;
-        }
-      } else {
-        gridDewpointProgressEl.style.strokeDashoffset = circumference;
-      }
-    }
-    
-    if (gridDewpointTextEl) {
-      if (dewpoint !== null) {
-        const dewF = Math.round(dewpoint);
-        let displayStr = '';
-        const degSuffix = '°';
-        if (displayUnit === 'BOTH') {
-          const dewC = Math.round((dewF - 32) * 5 / 9);
-          displayStr = `${dewF}${formatSlash()}${dewC}${degSuffix}`;
-        } else {
-          const dewDisplay = displayUnit === 'C' ? Math.round((dewF - 32) * 5 / 9) : dewF;
-          displayStr = `${dewDisplay}${degSuffix}`;
-        }
-        gridDewpointTextEl.innerHTML = `${displayStr}<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Td</span>`;
-      } else {
-        gridDewpointTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Td</span>`;
-      }
-      if (finalColor) {
-        gridDewpointTextEl.style.color = finalColor;
       }
     }
   }
