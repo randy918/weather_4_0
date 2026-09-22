@@ -2816,7 +2816,7 @@ import weatherConditions from '../data/weather-conditions.json';
   // Note: MUST use hsl(H, S%, L%) format for compatibility with background animations
   const TEMP_COLORS = [
     { max: -10, color: 'hsl(0, 100%, 37%)' },   // Below -10: deep red
-    { max: 0,   color: 'hsl(320, 90%, 45%)' },   // Below 0: red-purple
+    { max: 0,   color: 'hsl(315, 100%, 50%)' },  // Below 0: shocking magenta (was hsl(320, 90%, 45%))
     { max: 10,  color: 'hsl(280, 90%, 50%)' },   // 0s: purple
     { max: 20,  color: 'hsl(260, 90%, 60%)' },   // 10s: blue purple
     { max: 30,  color: 'hsl(220, 90%, 55%)' },   // 20s: blue
@@ -7647,7 +7647,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SOLAR_FLARE_COLOR_LEVEL_B = 75;                          // EDITABLE: Level B (Minor) temperature color (70s yellow-gold)
   const SOLAR_FLARE_COLOR_LEVEL_C = 95;                          // EDITABLE: Level C (Small) temperature color (90s tomato red / coral matching screenshot)
   const SOLAR_FLARE_COLOR_LEVEL_M = 105;                         // EDITABLE: Level M (Medium) temperature color (100s vibrant red)
-  const SOLAR_FLARE_COLOR_LEVEL_X = 115;                         // EDITABLE: Level X (Major) temperature color (110s deep red)
+  const SOLAR_FLARE_COLOR_LEVEL_X = -5;                          // EDITABLE: Level X (Major) temperature color (Below 0 shocking magenta)
   const SOLAR_FLARE_COLOR_OVERRIDE = null;                       // EDITABLE: Optional universal color override (e.g. null, 95, or '#f2534b')
 
   // --- Level Descriptive Labels (JCV) ---
@@ -7768,7 +7768,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const RADIO_BLACKOUT_COLOR_LEVEL_R2 = 85;                      // EDITABLE: Level R2 (Partial Fade) temperature color (80s orange, matches mockup)
   const RADIO_BLACKOUT_COLOR_LEVEL_R3 = 95;                      // EDITABLE: Level R3 (Strong Fade) temperature color (90s tomato coral/red)
   const RADIO_BLACKOUT_COLOR_LEVEL_R4 = 105;                     // EDITABLE: Level R4 (Severe Fade) temperature color (100s vibrant red)
-  const RADIO_BLACKOUT_COLOR_LEVEL_R5 = 115;                     // EDITABLE: Level R5 (Extreme Fade) temperature color (110s deep maroon red)
+  const RADIO_BLACKOUT_COLOR_LEVEL_R5 = -5;                      // EDITABLE: Level R5 (Extreme Fade) temperature color (Below 0 shocking magenta)
   const RADIO_BLACKOUT_COLOR_OVERRIDE = null;                    // EDITABLE: Optional universal color override (e.g. null, 85, or '#f60')
 
   // --- Level Descriptive Labels (JCV) ---
@@ -10452,6 +10452,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
               <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+              <circle class="uv-peak-progress" cx="50" cy="50" r="46" fill="none" style="stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease-out, stroke 0.5s ease-out, opacity 0.5s ease;" />
               <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
             </svg>
             <div class="grid-uv-text"></div>
@@ -11233,6 +11234,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   
   function updateUvDualDial(data) {
     const uvIndex = data?.current?.uvi !== undefined ? data.current.uvi : null;
+    const dailyPeakUv = data?.daily?.[0]?.uvi !== undefined ? data.daily[0].uvi : null;
     const dewpoint = data?.current?.dew_point !== undefined ? data.current.dew_point : null;
     
     // Determine natural state based on day/night
@@ -11269,17 +11271,28 @@ Plan ahead for significantly warmer conditions tomorrow!`
     }
     
     const progressEls = document.querySelectorAll('.clockGridItem-8 .countdown-progress');
+    const trackEls = document.querySelectorAll('.clockGridItem-8 .countdown-track');
+    const peakEls = document.querySelectorAll('.clockGridItem-8 .uv-peak-progress');
     const textEls = document.querySelectorAll('.clockGridItem-8 .grid-uv-text');
     const radius = 46;
     const circumference = 2 * Math.PI * radius;
     
     function getUvColor(uv) {
        if (uv === null) return '#ffffff';
-       if (uv < 3) return '#39ff14'; // Green
-       if (uv < 6) return '#ffff00'; // Yellow
-       if (uv < 8) return '#ffa500'; // Orange
-       if (uv < 11) return '#ff0000'; // Red
-       return '#ff00ff'; // Violet/Pink
+       
+       // Map the standard UV Index scale intuitively to the custom temperature color scale
+       let mappedTemp = 55; // 0-2 (Low) -> maps to 50s (Green)
+       if (uv >= 11) {
+          mappedTemp = -5;  // 11+ (Extreme) -> maps to Below 0 (Shocking Magenta)
+       } else if (uv >= 8) {
+          mappedTemp = 105; // 8-10 (Very High) -> maps to 100s (Vibrant Red)
+       } else if (uv >= 6) {
+          mappedTemp = 85;  // 6-7 (High) -> maps to 80s (Orange)
+       } else if (uv >= 3) {
+          mappedTemp = 75;  // 3-5 (Moderate) -> maps to 70s (Yellow-Gold)
+       }
+       
+       return tempToColor(mappedTemp) || '#ffffff';
     }
 
     if (activeState === 'UV') {
@@ -11287,6 +11300,24 @@ Plan ahead for significantly warmer conditions tomorrow!`
        progressEls.forEach(el => {
          el.style.stroke = uvColor;
        });
+       
+       if (dailyPeakUv !== null && dailyPeakUv > uvIndex) {
+         const peakColor = getUvColor(dailyPeakUv);
+         peakEls.forEach(el => {
+           el.style.stroke = peakColor;
+           el.style.opacity = '0.5';
+         });
+         const getRadius = () => 46;
+         animateGauge(peakEls, dailyPeakUv, prevUvPeakDialVal, 0, 5.5, 11, getRadius);
+         prevUvPeakDialVal = dailyPeakUv;
+       } else {
+         peakEls.forEach(el => {
+           el.style.removeProperty('stroke');
+           el.style.removeProperty('opacity');
+           el.style.strokeDashoffset = circumference;
+         });
+         prevUvPeakDialVal = null;
+       }
        
        if (uvIndex !== null) {
          const getRadius = () => 46;
@@ -11335,6 +11366,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
        progressEls.forEach(el => {
          if (finalColor) el.style.stroke = finalColor;
+       });
+       
+       peakEls.forEach(el => {
+         el.style.removeProperty('stroke');
+         el.style.removeProperty('opacity');
+         el.style.strokeDashoffset = circumference;
        });
        
        if (dewpoint !== null) {
@@ -19490,6 +19527,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   let prevPressure = null;
   let uvDialForceState = null;
   let prevUvDialVal = null;
+  let prevUvPeakDialVal = null;
 
   function updateWindDirectionArrow(temp, windDeg, windSpeed = 0) {
     const arrows = document.querySelectorAll('.wind-direction-display');
