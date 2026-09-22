@@ -949,8 +949,10 @@ import weatherConditions from '../data/weather-conditions.json';
   applyScrollNavConfig();
   initScrollNavButton();
 
-  // EDITABLE: Vertical position of the barometric/humidity/wind trend arrow (scaled to dial size)
+  // EDITABLE: Vertical position of the barometric/humidity trend arrow (scaled to dial size)
   const BAROMETRIC_TREND_TOP_POS = "calc(var(--item-current-size) * -0.28 + 0.25vw)";
+  // EDITABLE: Vertical position of the wind trend arrow, placed mid-y between number and ring
+  const WIND_TREND_OFFSET_Y = "calc(var(--item-current-size) * -0.15)";
   // EDITABLE: Font size of the barometric/humidity/wind trend arrow (scaled to dial size)
   const BAROMETRIC_TREND_FONT_SIZE = "calc(var(--item-current-size) * 0.1875)";
 
@@ -2399,9 +2401,9 @@ import weatherConditions from '../data/weather-conditions.json';
     console.log('✨ Triggered shooting star (downward)');
   };
 
-  // EDITABLE: Wind speed text Y-offset adjustment
-  const WIND_NUMBER_Y_OFFSET_DESKTOP = '-1vw'; // EDITABLE: Desktop vertical position of main wind number (negative moves UP)
-  const WIND_NUMBER_Y_OFFSET_MOBILE = '-2vw';    // EDITABLE: Mobile vertical position of main wind number (negative moves UP)
+  // --- EDITABLE: Wind Dial UI Vertical Centering (JCV) ---
+  const WIND_NUMBER_Y_OFFSET_DESKTOP = '-1.25vw'; // EDITABLE: Desktop vertical position of main wind number (negative moves UP)
+  const WIND_NUMBER_Y_OFFSET_MOBILE = '-2.25vw';    // EDITABLE: Mobile vertical position of main wind number (negative moves UP)
   
   document.documentElement.style.setProperty('--wind-number-y-offset-desktop', WIND_NUMBER_Y_OFFSET_DESKTOP);
   document.documentElement.style.setProperty('--wind-number-y-offset-mobile', WIND_NUMBER_Y_OFFSET_MOBILE);
@@ -2504,6 +2506,11 @@ import weatherConditions from '../data/weather-conditions.json';
   const ALERT_TEMP_RISE_ICON_Y_OFFSET_DESKTOP = '-0.15vw'; // EDITABLE Desktop: Vertical nudge for Temperature Rise icon
   const ALERT_TEMP_RISE_ICON_Y_OFFSET_MOBILE = '-0.15vw';  // EDITABLE Mobile: Vertical nudge for Temperature Rise icon
 
+  const ALERT_NICE_WEATHER_TYPE_Y_OFFSET_DESKTOP = '0.3vw'; // EDITABLE Desktop: Vertical nudge for Nice Weather text
+  const ALERT_NICE_WEATHER_TYPE_Y_OFFSET_MOBILE = '.75vw';  // EDITABLE Mobile: Vertical nudge for Nice Weather text
+  const ALERT_NICE_WEATHER_ICON_Y_OFFSET_DESKTOP = '0vw';  // EDITABLE Desktop: Vertical nudge for Nice Weather icon
+  const ALERT_NICE_WEATHER_ICON_Y_OFFSET_MOBILE = '.5vw';   // EDITABLE Mobile: Vertical nudge for Nice Weather icon
+
   document.documentElement.style.setProperty('--alert-banner-line-height', ALERT_BANNER_LINE_HEIGHT);
 
   document.documentElement.style.setProperty('--alert-modal-line-height', window.innerWidth <= 767 ? ALERT_MODAL_LINE_HEIGHT_MOBILE : ALERT_MODAL_LINE_HEIGHT_DESKTOP);
@@ -2519,6 +2526,11 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--alert-temp-rise-type-y-offset-mobile', ALERT_TEMP_RISE_TYPE_Y_OFFSET_MOBILE);
   document.documentElement.style.setProperty('--alert-temp-rise-icon-y-offset-desktop', ALERT_TEMP_RISE_ICON_Y_OFFSET_DESKTOP);
   document.documentElement.style.setProperty('--alert-temp-rise-icon-y-offset-mobile', ALERT_TEMP_RISE_ICON_Y_OFFSET_MOBILE);
+
+  document.documentElement.style.setProperty('--alert-nice-weather-type-y-offset-desktop', ALERT_NICE_WEATHER_TYPE_Y_OFFSET_DESKTOP);
+  document.documentElement.style.setProperty('--alert-nice-weather-type-y-offset-mobile', ALERT_NICE_WEATHER_TYPE_Y_OFFSET_MOBILE);
+  document.documentElement.style.setProperty('--alert-nice-weather-icon-y-offset-desktop', ALERT_NICE_WEATHER_ICON_Y_OFFSET_DESKTOP);
+  document.documentElement.style.setProperty('--alert-nice-weather-icon-y-offset-mobile', ALERT_NICE_WEATHER_ICON_Y_OFFSET_MOBILE);
 
   const ALERT_COLORS = {
     "DEFAULT": "rgba(0,0,0, 0.75)", // Default translucent red for anything else
@@ -3359,9 +3371,8 @@ import weatherConditions from '../data/weather-conditions.json';
     const isStemAboveMiddle = (normalizedDeg <= 90 || normalizedDeg >= 270);
     const positionAttr = isStemAboveMiddle ? 'bottom' : 'top';
     
-    if (iconClass) {
-      const trendPositionValue = isStemAboveMiddle ? `calc(${BAROMETRIC_TREND_TOP_POS} - 0.5vw)` : BAROMETRIC_TREND_TOP_POS;
-      trendHtml = `<div style="position: absolute; ${positionAttr}: ${trendPositionValue}; width: 100%; text-align: center; font-size: ${BAROMETRIC_TREND_FONT_SIZE};"><i class="fa-solid ${iconClass}"></i></div>`;
+    if (iconClass && windSpeed < WIND_SPEED_HIGH_THRESHOLD_MPH) {
+      trendHtml = `<div style="position: absolute; ${positionAttr}: ${WIND_TREND_OFFSET_Y}; width: 100%; text-align: center; font-size: ${BAROMETRIC_TREND_FONT_SIZE};"><i class="fa-solid ${iconClass}"></i></div>`;
     }
     
     // Calculate percentages (0-60 mph scale)
@@ -3490,9 +3501,16 @@ import weatherConditions from '../data/weather-conditions.json';
     
     const gridWindSpeedTextEls = document.querySelectorAll('.clockGridItem-2 .grid-wind-speed-text');
     gridWindSpeedTextEls.forEach(gridWindSpeedTextEl => {
-      gridWindSpeedTextEl.innerHTML = `
-        ${trendHtml}<span style="position: relative; display: inline-block;">${Math.round(windSpeed)}</span>
-      `;
+      let odometerContainer = gridWindSpeedTextEl.querySelector('.wind-odometer-container');
+      if (!odometerContainer) {
+        gridWindSpeedTextEl.innerHTML = `
+          <div class="trend-container"></div>
+          <span class="wind-odometer-container odometer-number" style="display: inline-flex; position: relative;"></span>
+        `;
+        odometerContainer = gridWindSpeedTextEl.querySelector('.wind-odometer-container');
+      }
+      gridWindSpeedTextEl.querySelector('.trend-container').innerHTML = trendHtml;
+      updateOdometer(odometerContainer, String(Math.round(windSpeed)));
       
       if (tempColor) {
         gridWindSpeedTextEl.style.color = tempColor;
@@ -3640,6 +3658,8 @@ import weatherConditions from '../data/weather-conditions.json';
         --alert-temp-drop-icon-y-offset: var(--alert-temp-drop-icon-y-offset-desktop, 0.4vw);
         --alert-temp-rise-type-y-offset: var(--alert-temp-rise-type-y-offset-desktop, 0.3vw);
         --alert-temp-rise-icon-y-offset: var(--alert-temp-rise-icon-y-offset-desktop, -0.15vw);
+        --alert-nice-weather-type-y-offset: var(--alert-nice-weather-type-y-offset-desktop, 0.3vw);
+        --alert-nice-weather-icon-y-offset: var(--alert-nice-weather-icon-y-offset-desktop, 0vw);
       }
       @media (max-width: 767px) {
         :root {
@@ -3647,6 +3667,8 @@ import weatherConditions from '../data/weather-conditions.json';
           --alert-temp-drop-icon-y-offset: var(--alert-temp-drop-icon-y-offset-mobile, 0.4vw);
           --alert-temp-rise-type-y-offset: var(--alert-temp-rise-type-y-offset-mobile, 0.3vw);
           --alert-temp-rise-icon-y-offset: var(--alert-temp-rise-icon-y-offset-mobile, -0.15vw);
+          --alert-nice-weather-type-y-offset: var(--alert-nice-weather-type-y-offset-mobile, 0.3vw);
+          --alert-nice-weather-icon-y-offset: var(--alert-nice-weather-icon-y-offset-mobile, 0vw);
         }
       }
       html, body {
@@ -5469,6 +5491,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const isTempDrop = eventName.includes('TEMPERATURE DROP');
       const isTempRise = !isTempDrop && eventName.includes('TEMPERATURE RISE');
       const isFallStarts = eventName.includes('FALL STARTS');
+      const isNiceWeather = eventName.includes('NICE WEATHER');
       
       let iconTransform = '';
       if (isTempDrop) {
@@ -5477,6 +5500,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
         iconTransform = `transform: translateY(var(--alert-temp-rise-icon-y-offset, 0vw));`;
       } else if (isFallStarts) {
         iconTransform = `transform: ${FALL_STARTS_ICON_TRANSFORM};`;
+      } else if (isNiceWeather) {
+        iconTransform = `transform: translateY(var(--alert-nice-weather-icon-y-offset, 0vw));`;
       }
       const bannerIconTransform = iconTransform ? ` ${iconTransform}` : '';
       
@@ -5506,6 +5531,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
         textWrapper.style.transform = 'translateY(var(--alert-temp-drop-type-y-offset, 0vw))';
       } else if (isTempRise) {
         textWrapper.style.transform = 'translateY(var(--alert-temp-rise-type-y-offset, 0vw))';
+      } else if (eventName.includes('NICE WEATHER')) {
+        textWrapper.style.transform = 'translateY(var(--alert-nice-weather-type-y-offset, 0vw))';
       }
 
       const text = document.createElement('div');
@@ -5963,7 +5990,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ODOMETER_FULL_STRIP_HTML = ODOMETER_CYCLE_HTML + ODOMETER_CYCLE_HTML + ODOMETER_CYCLE_HTML;
   const ODOMETER_TOTAL_SPANS = 30;
 
-  // Roll a single strip forward from current digit to target digit (e.g. 4 -> 5 -> 6)
+  // Roll a single strip from current digit to target digit using shortest path (bidirectional)
   function rollDigitStrip(strip, targetDigit, isFullSpin = false, delayMs = 0) {
     if (!strip) return;
     const isMobile = window.innerWidth <= 767;
@@ -5971,31 +5998,42 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const minDuration = isMobile ? ODOMETER_MIN_DURATION_MOBILE : ODOMETER_MIN_DURATION_DESKTOP;
     const easing = isMobile ? ODOMETER_EASING_MOBILE : ODOMETER_EASING_DESKTOP;
 
-    const currentDigit = parseInt(strip.getAttribute('data-digit') || '0', 10);
+    const currentDigitIndex = parseInt(strip.getAttribute('data-digit') || '10', 10);
+    const currentVal = currentDigitIndex % 10;
+    const targetVal = targetDigit % 10;
     let steps = 0;
+
     if (isFullSpin) {
       steps = 10;
     } else {
-      steps = (targetDigit - currentDigit + 10) % 10;
+      const upSteps = (targetVal - currentVal + 10) % 10;
+      const downSteps = (currentVal - targetVal + 10) % 10;
+      
+      // Roll in the direction of the shortest path. If tie, prefer up.
+      if (upSteps <= downSteps) {
+        steps = upSteps;
+      } else {
+        steps = -downSteps;
+      }
     }
 
     if (steps === 0) {
-      strip.setAttribute('data-target-digit', targetDigit);
+      strip.setAttribute('data-target-digit', targetVal);
       return;
     }
 
-    const durationMs = Math.max(minDuration, steps * stepDuration);
-    const targetIndex = currentDigit + steps;
+    const durationMs = Math.max(minDuration, Math.abs(steps) * stepDuration);
+    const targetIndex = currentDigitIndex + steps;
 
     setTimeout(() => {
       strip.style.transition = `transform ${durationMs / 1000}s ${easing}`;
       void strip.offsetWidth; // Force reflow to guarantee browser registers transition before setting transform!
       strip.style.transform = `translateY(-${(targetIndex / ODOMETER_TOTAL_SPANS) * 100}%)`;
-      strip.setAttribute('data-target-digit', targetDigit);
+      strip.setAttribute('data-target-digit', targetVal);
 
       setTimeout(() => {
-        // Silently normalize back to Cycle 0
-        const normalizedIndex = targetDigit % 10;
+        // Silently normalize back to Cycle 1 (the middle cycle) so it has room to roll backwards next time
+        const normalizedIndex = 10 + targetVal;
         strip.style.transition = 'none';
         strip.style.transform = `translateY(-${(normalizedIndex / ODOMETER_TOTAL_SPANS) * 100}%)`;
         strip.setAttribute('data-digit', normalizedIndex);
@@ -6029,10 +6067,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const startupDelay = isMobile ? ODOMETER_STARTUP_DELAY_MOBILE : ODOMETER_STARTUP_DELAY_DESKTOP;
 
     setTimeout(() => {
-      const container = document.getElementById('weather-feels-like');
-      if (container) {
+      const containers = document.querySelectorAll('.odometer-number');
+      containers.forEach(container => {
         rollOdometerContainer(container, false);
-      }
+      });
     }, startupDelay);
   }
 
@@ -6051,7 +6089,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   function createOdometerDigit(digit) {
     const digitEl = document.createElement('span');
     digitEl.className = 'odometer-digit';
-    digitEl.innerHTML = `<span class="odometer-strip" style="transform: translateY(0%);" data-digit="0" data-target-digit="${digit}">` +
+    const initialIndex = 10;
+    digitEl.innerHTML = `<span class="odometer-strip" style="transform: translateY(-${(initialIndex / ODOMETER_TOTAL_SPANS) * 100}%);" data-digit="${initialIndex}" data-target-digit="${digit}">` +
                         ODOMETER_FULL_STRIP_HTML +
                         `</span>`;
     return digitEl;
@@ -9686,7 +9725,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1263';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1267';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
