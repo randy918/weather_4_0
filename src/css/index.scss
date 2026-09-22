@@ -1090,9 +1090,9 @@ main {
     }
 }
 
-// 7-cell Clock Grid Container & Labels
-.clockGridContainer7 {
-    --dynamic-item-size-7: calc((100vw - var(--clock-grid-margin-left, 0vw) - var(--clock-grid-margin-right, 0vw) - 6 * var(--clock-grid-gap, 1vw)) / 7);
+// 8-cell Clock Grid Container & Labels
+.clockGridContainer8 {
+    --dynamic-item-size-8: calc((100vw - var(--clock-grid-margin-left, 0vw) - var(--clock-grid-margin-right, 0vw) - 7 * var(--clock-grid-gap, 1vw)) / 8);
 
     width: auto;
     margin-top: var(--clock-grid-margin-top, 2vw);
@@ -1100,14 +1100,14 @@ main {
     margin-left: var(--clock-grid-margin-left, 0vw);
     margin-right: var(--clock-grid-margin-right, 0vw);
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(8, 1fr);
     gap: var(--clock-grid-gap, 1vw);
     justify-items: center;
     align-items: center;
 }
 
-.clockGridLabelsContainer7 {
-    --label-item-size: calc((100vw - var(--clock-grid-margin-left, 0vw) - var(--clock-grid-margin-right, 0vw) - 6 * var(--clock-grid-gap, 1vw)) / 7);
+.clockGridLabelsContainer8 {
+    --label-item-size: calc((100vw - var(--clock-grid-margin-left, 0vw) - var(--clock-grid-margin-right, 0vw) - 7 * var(--clock-grid-gap, 1vw)) / 8);
 
     width: auto;
     margin-top: calc(var(--clock-grid-margin-bottom, 2vw) * -1 + var(--clock-grid-label-margin-top, 0.5vw)); /* Pull up under the grid */
@@ -1115,12 +1115,12 @@ main {
     margin-left: var(--clock-grid-margin-left, 0vw);
     margin-right: var(--clock-grid-margin-right, 0vw);
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(8, 1fr);
     gap: var(--clock-grid-gap, 1vw);
     justify-items: center;
     align-items: start;
     
-    .clockGridLabel7 {
+    .clockGridLabel8 {
         font-family: var(--clock-grid-label-font-family, 'bold');
         font-size: calc(var(--label-item-size) * 0.18) !important;
         letter-spacing: calc(var(--label-item-size) * 0.005) !important;
@@ -1238,8 +1238,8 @@ main {
     .clockGridContainer & {
         --item-current-size: var(--dynamic-item-size);
     }
-    .clockGridContainer7 & {
-        --item-current-size: var(--dynamic-item-size-7);
+    .clockGridContainer8 & {
+        --item-current-size: var(--dynamic-item-size-8);
     }
     .clockGridContainer4 & {
         --item-current-size: var(--dynamic-item-size-4);
@@ -1252,13 +1252,13 @@ main {
     justify-content: center;
     align-items: center;
 
-    &.clockGridItem-0, &.clockGridItem-2, &.clockGridItem-3, &.clockGridItem-4, &.clockGridItem-5, &.clockGridItem-6 {
+    &.clockGridItem-0, &.clockGridItem-2, &.clockGridItem-3, &.clockGridItem-4, &.clockGridItem-5, &.clockGridItem-6, &.clockGridItem-8 {
         .clock-timer-svg .countdown-progress {
-            stroke: var(--temp-color, var(--clock-hands-color, rgba(255, 255, 255, 0.4))) !important;
+            stroke: var(--temp-color, var(--clock-hands-color, rgba(255, 255, 255, 0.4)));
         }
     }
 
-    &.clockGridItem-2, &.clockGridItem-3, &.clockGridItem-4, &.clockGridItem-5, &.clockGridItem-6 {
+    &.clockGridItem-2, &.clockGridItem-3, &.clockGridItem-4, &.clockGridItem-5, &.clockGridItem-6, &.clockGridItem-8 {
         .clock-timer-svg {
             transform: rotate(90deg) !important;
         }
@@ -1366,7 +1366,7 @@ main {
         z-index: 1 !important;
     }
 
-    .grid-wind-speed-text, .grid-humidity-text, .grid-dewpoint-text, .grid-sun-text, .grid-moon-text {
+    .grid-wind-speed-text, .grid-humidity-text, .grid-dewpoint-text, .grid-sun-text, .grid-moon-text, .grid-uv-text {
         position: absolute !important;
         top: 50% !important;
         left: 50% !important;
@@ -1389,7 +1389,7 @@ main {
         line-height: 0.5 !important;
     }
 
-    .grid-dewpoint-text {
+    .grid-dewpoint-text, .grid-uv-text {
         transform: translate(-50%, calc(-50% + var(--item-current-size) * 0.07)) !important;
         line-height: 0.5 !important;
         font-size: var(--grid-dewpoint-font-size, calc(var(--item-current-size) * 0.35)) !important;
@@ -1728,12 +1728,12 @@ main {
         transform: translate(-50%, calc(-50% + var(--item-current-size) * 0.07 + var(--wind-number-y-offset-mobile, 0vw))) !important;
     }
     
-    .grid-dewpoint-text {
+    .grid-dewpoint-text, .grid-uv-text {
         font-size: var(--grid-dewpoint-font-size, calc(var(--item-current-size) * 0.30)) !important;
     }
     
-    .clockGridContainer7,
-    .clockGridLabelsContainer7 {
+    .clockGridContainer8,
+    .clockGridLabelsContainer8 {
         display: none !important;
     }
     .clockGridContainer4,
@@ -1844,8 +1844,8 @@ main {
         --world-clock-time-opacity: var(--world-clock-time-opacity-desktop, 0.85);
         --world-clock-time-letter-spacing: var(--world-clock-time-letter-spacing-desktop, 0.04vw);
     }
-    .clockGridContainer7,
-    .clockGridLabelsContainer7 {
+    .clockGridContainer8,
+    .clockGridLabelsContainer8 {
         display: grid !important;
     }
     .clockGridContainer4,

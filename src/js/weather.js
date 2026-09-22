@@ -433,7 +433,7 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--clock-grid-inner-label-font-size-desktop', CLOCK_GRID_INNER_LABEL_FONT_SIZE_DESKTOP);
   document.documentElement.style.setProperty('--clock-grid-inner-label-font-size-mobile', CLOCK_GRID_INNER_LABEL_FONT_SIZE_MOBILE);
 
-  const CLOCK_GRID_LABELS = ['TIME', 'PHASE', 'WIND', 'Humidity', 'Dew Pt', 'SUN', 'MOON', 'Barometer']; // EDITABLE: Labels for the 8 dials
+  const CLOCK_GRID_LABELS = ['TIME', 'PHASE', 'WIND', 'Humidity', 'Dew Pt', 'SUN', 'MOON', 'Barometer', 'UV Index']; // EDITABLE: Labels for the 8 dials
   
   document.documentElement.style.setProperty('--clock-grid-label-font-size', CLOCK_GRID_LABEL_FONT_SIZE);
   document.documentElement.style.setProperty('--clock-grid-label-font-family', CLOCK_GRID_LABEL_FONT_FAMILY);
@@ -3148,6 +3148,9 @@ import weatherConditions from '../data/weather-conditions.json';
     
     // Update dewpoint dial
     updateDewpointDial(data);
+    
+    // Update UV dual dial
+    updateUvDualDial(data);
     
     // Update sun position dots row (Disabled since replaced by dials)
     // updateSunDotsRow(data);
@@ -10365,20 +10368,20 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }
     }
 
-    // --- 7-cell grid layout & labels ---
-    const indices7 = [0, 2, 7, 3, 5, 6, 1];
-    const containerId7 = 'clock-grid-container-7';
-    let container7 = document.getElementById(containerId7);
+    // --- 8-cell grid layout & labels ---
+    const indices8 = [0, 2, 7, 3, 8, 5, 6, 1];
+    const containerId8 = 'clock-grid-container-8';
+    let container8 = document.getElementById(containerId8);
 
-    if (!container7) {
-      container7 = document.createElement('div');
-      container7.id = containerId7;
-      container7.className = 'clockGridContainer7';
+    if (!container8) {
+      container8 = document.createElement('div');
+      container8.id = containerId8;
+      container8.className = 'clockGridContainer8';
 
-      for (let j = 0; j < 7; j++) {
-        const i = indices7[j];
+      for (let j = 0; j < 8; j++) {
+        const i = indices8[j];
         const item = document.createElement('div');
-        item.className = `clockGridItem clockGridItem7 clockGridItem-${i} clockGridItem7-${j}`;
+        item.className = `clockGridItem clockGridItem8 clockGridItem-${i} clockGridItem8-${j}`;
 
         let innerHtml = '';
         if (i === 1) {
@@ -10445,6 +10448,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
             </svg>
             <div class="grid-moon-text"></div>
           `;
+        } else if (i === 8) {
+          innerHtml = `
+            <svg class="clock-timer-svg" viewBox="0 0 100 100">
+              <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+              <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+            </svg>
+            <div class="grid-uv-text"></div>
+          `;
         } else {
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
@@ -10467,28 +10478,28 @@ Plan ahead for significantly warmer conditions tomorrow!`
         }
 
         item.innerHTML = innerHtml;
-        container7.appendChild(item);
+        container8.appendChild(item);
       }
 
       const labelsContainer8 = document.getElementById('clock-grid-labels-container');
       if (labelsContainer8 && labelsContainer8.parentNode) {
-        labelsContainer8.parentNode.insertBefore(container7, labelsContainer8.nextSibling);
+        labelsContainer8.parentNode.insertBefore(container8, labelsContainer8.nextSibling);
       } else {
-        (document.querySelector('main.content') || document.body).appendChild(container7);
+        (document.querySelector('main.content') || document.body).appendChild(container8);
       }
     }
 
-    const labelsContainerId7 = 'clock-grid-labels-container-7';
-    let labelsContainer7 = document.getElementById(labelsContainerId7);
-    if (!labelsContainer7) {
-      labelsContainer7 = document.createElement('div');
-      labelsContainer7.id = labelsContainerId7;
-      labelsContainer7.className = 'clockGridLabelsContainer7';
+    const labelsContainerId8 = 'clock-grid-labels-container-8';
+    let labelsContainer8_desktop = document.getElementById(labelsContainerId8);
+    if (!labelsContainer8_desktop) {
+      labelsContainer8_desktop = document.createElement('div');
+      labelsContainer8_desktop.id = labelsContainerId8;
+      labelsContainer8_desktop.className = 'clockGridLabelsContainer8';
 
-      for (let j = 0; j < 7; j++) {
-        const i = indices7[j];
+      for (let j = 0; j < 8; j++) {
+        const i = indices8[j];
         const item = document.createElement('div');
-        item.className = `clockGridLabel clockGridLabel7 clockGridLabel7-${j}`;
+        item.className = `clockGridLabel clockGridLabel8 clockGridLabel8-${j}`;
         
         if (data && data.current && typeof data.current.temp === 'number') {
            const tempColorLocal = tempToColor(data.current.temp);
@@ -10510,17 +10521,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
               titleText = `${Math.round(rawWindGust)} mph Gusts`;
            } else {
               titleText = `${Math.round(windSpeed)} mph`;
-           }
-        }
-
-        if (i === 3 && data && data.current && typeof data.current.dew_point === 'number') {
-           const dewF = Math.round(data.current.dew_point);
-           if (displayUnit === 'BOTH') {
-              const dewC = Math.round((dewF - 32) * 5 / 9);
-              titleText = `Dew Pt ${dewF}${formatSlash()}${dewC}°`;
-           } else {
-              const dewDisplay = displayUnit === 'C' ? Math.round((dewF - 32) * 5 / 9) : dewF;
-              titleText = `Dew Pt ${dewDisplay}°`;
            }
         }
         
@@ -10598,27 +10598,28 @@ Plan ahead for significantly warmer conditions tomorrow!`
         }
 
         item.innerHTML = `
-          <span class="label-title label-title-${i}" id="clock-grid-val-7-${j}">${titleText}</span>
+          <span class="label-title label-title-${i}" id="clock-grid-val-8-${j}">${titleText}</span>
         `;
-        labelsContainer7.appendChild(item);
+        labelsContainer8_desktop.appendChild(item);
       }
 
-      container7.parentNode.insertBefore(labelsContainer7, container7.nextSibling);
+      container8.parentNode.insertBefore(labelsContainer8_desktop, container8.nextSibling);
     } else {
       if (data && data.current && typeof data.current.temp === 'number') {
         const tempColorLocal = tempToColor(data.current.temp);
         if (tempColorLocal) {
-          const labels = labelsContainer7.querySelectorAll('.clockGridLabel7');
+          const labels = labelsContainer8_desktop.querySelectorAll('.clockGridLabel8');
           labels.forEach(label => label.style.color = tempColorLocal);
         }
       }
 
-      const phaseTitle = labelsContainer7.querySelector('.label-title-1');
+      const phaseTitle = labelsContainer8_desktop.querySelector('.label-title-1');
       if (phaseTitle && data && data.daily && data.daily[0] && typeof data.daily[0].moon_phase === 'number') {
          phaseTitle.innerText = getMoonPhaseName(data.daily[0].moon_phase);
       }
+
       
-      const windTitle = labelsContainer7.querySelector('.label-title-2');
+      const windTitle = labelsContainer8_desktop.querySelector('.label-title-2');
       if (windTitle && data && data.current) {
          const windSpeed = data.current.wind_speed || 0;
          const rawWindGust = data.current.wind_gust || windSpeed;
@@ -10628,20 +10629,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
             windTitle.innerText = `${Math.round(windSpeed)} mph`;
          }
       }
-
-      const humidityTitle = labelsContainer7.querySelector('.label-title-3');
-      if (humidityTitle && data && data.current && typeof data.current.dew_point === 'number') {
-         const dewF = Math.round(data.current.dew_point);
-         if (displayUnit === 'BOTH') {
-            const dewC = Math.round((dewF - 32) * 5 / 9);
-            humidityTitle.innerHTML = `Dew Pt ${dewF}${formatSlash()}${dewC}°`;
-         } else {
-            const dewDisplay = displayUnit === 'C' ? Math.round((dewF - 32) * 5 / 9) : dewF;
-            humidityTitle.innerHTML = `Dew Pt ${dewDisplay}°`;
-         }
-      }
       
-      const sunTitle = labelsContainer7.querySelector('.label-title-5');
+      const sunTitle = labelsContainer8_desktop.querySelector('.label-title-5');
       if (sunTitle && data && data.daily && data.daily[0]) {
          const now = Date.now() / 1000;
          const sunrise = data.daily[0].sunrise;
@@ -10673,7 +10662,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
          }
       }
       
-      const moonTitle = labelsContainer7.querySelector('.label-title-6');
+      const moonTitle = labelsContainer8_desktop.querySelector('.label-title-6');
       if (moonTitle && data && data.daily && data.daily[0]) {
          const now = Date.now() / 1000;
          const moonrise = data.daily[0].moonrise;
@@ -10795,9 +10784,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
         container4_1.appendChild(item);
       }
 
-      const labelsContainer7 = document.getElementById('clock-grid-labels-container-7');
-      if (labelsContainer7 && labelsContainer7.parentNode) {
-        labelsContainer7.parentNode.insertBefore(container4_1, labelsContainer7.nextSibling);
+      const labelsContainer8_desktop_ref = document.getElementById('clock-grid-labels-container-8');
+      if (labelsContainer8_desktop_ref && labelsContainer8_desktop_ref.parentNode) {
+        labelsContainer8_desktop_ref.parentNode.insertBefore(container4_1, labelsContainer8_desktop_ref.nextSibling);
       } else {
         (document.querySelector('main.content') || document.body).appendChild(container4_1);
       }
@@ -11241,6 +11230,168 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }
     });
   }
+  
+  function updateUvDualDial(data) {
+    const uvIndex = data?.current?.uvi !== undefined ? data.current.uvi : null;
+    const dewpoint = data?.current?.dew_point !== undefined ? data.current.dew_point : null;
+    
+    // Determine natural state based on day/night
+    const now = Date.now() / 1000;
+    const sunrise = data?.daily?.[0]?.sunrise || 0;
+    const sunset = data?.daily?.[0]?.sunset || 0;
+    const isDaytime = (now >= sunrise && now < sunset);
+    const naturalState = isDaytime ? 'UV' : 'DEW';
+    
+    const activeState = uvDialForceState || naturalState;
+    
+    const itemEl = document.querySelector('.clockGridItem-8');
+    if (itemEl) {
+       itemEl.setAttribute('data-active-state', activeState);
+       if (!itemEl.hasUvClickListener) {
+          itemEl.hasUvClickListener = true;
+          itemEl.style.cursor = 'pointer';
+          itemEl.addEventListener('click', (e) => {
+             e.stopPropagation();
+             const currentState = itemEl.getAttribute('data-active-state');
+             uvDialForceState = (currentState === 'UV') ? 'DEW' : 'UV';
+             
+             if (window.uvDialForceTimer) clearTimeout(window.uvDialForceTimer);
+             window.uvDialForceTimer = setTimeout(() => {
+                uvDialForceState = null;
+                if (typeof updateUvDualDial === 'function') {
+                   updateUvDualDial(window.lastWeatherData);
+                }
+             }, 60000);
+             
+             updateUvDualDial(window.lastWeatherData || data);
+          });
+       }
+    }
+    
+    const progressEls = document.querySelectorAll('.clockGridItem-8 .countdown-progress');
+    const textEls = document.querySelectorAll('.clockGridItem-8 .grid-uv-text');
+    const radius = 46;
+    const circumference = 2 * Math.PI * radius;
+    
+    function getUvColor(uv) {
+       if (uv === null) return '#ffffff';
+       if (uv < 3) return '#39ff14'; // Green
+       if (uv < 6) return '#ffff00'; // Yellow
+       if (uv < 8) return '#ffa500'; // Orange
+       if (uv < 11) return '#ff0000'; // Red
+       return '#ff00ff'; // Violet/Pink
+    }
+
+    if (activeState === 'UV') {
+       const uvColor = getUvColor(uvIndex);
+       progressEls.forEach(el => {
+         el.style.stroke = uvColor;
+       });
+       
+       if (uvIndex !== null) {
+         const getRadius = () => 46;
+         animateGauge(progressEls, uvIndex, prevUvDialVal, 0, 5.5, 11, getRadius);
+         prevUvDialVal = uvIndex;
+       } else {
+         progressEls.forEach(el => el.style.strokeDashoffset = circumference);
+         prevUvDialVal = null;
+       }
+       
+       textEls.forEach(gridUvTextEl => {
+          if (uvIndex !== null) {
+             const uvVal = uvIndex.toFixed(1);
+             gridUvTextEl.innerHTML = `${uvVal}<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">UV</span>`;
+             gridUvTextEl.style.color = uvColor;
+          } else {
+             gridUvTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">UV</span>`;
+             gridUvTextEl.style.color = '#ffffff';
+          }
+       });
+       
+       // Update hidden value label (Dew Pt)
+       const labelEls = document.querySelectorAll('.label-title-8');
+       labelEls.forEach(labelEl => {
+          let labelColor = 'inherit';
+          if (dewpoint !== null) {
+             const dewF = Math.round(dewpoint);
+             if (displayUnit === 'BOTH') {
+                const dewC = Math.round((dewF - 32) * 5 / 9);
+                labelEl.innerHTML = `Dew Pt ${dewF}${formatSlash()}${dewC}°`;
+             } else {
+                labelEl.innerHTML = `Dew Pt ${dewF}°`;
+             }
+             labelColor = tempToColor(dewpoint) || 'inherit';
+          } else {
+             labelEl.innerHTML = `Dew Pt --`;
+          }
+          labelEl.style.color = labelColor;
+          labelEl.style.textTransform = 'none';
+       });
+    } else {
+       const currentTemp = (data?.current?.temp !== undefined) ? data.current.temp : null;
+       const tempColor = currentTemp !== null ? tempToColor(currentTemp) : null;
+       const dewpointColor = dewpoint !== null ? tempToColor(dewpoint) : 'hsl(120, 80%, 40%)';
+       const finalColor = tempColor || dewpointColor;
+
+       progressEls.forEach(el => {
+         if (finalColor) el.style.stroke = finalColor;
+       });
+       
+       if (dewpoint !== null) {
+         const getRadius = () => 46;
+         animateGauge(progressEls, dewpoint, prevUvDialVal, DEWPOINT_DIAL_MIN, DEWPOINT_DIAL_AVG, DEWPOINT_DIAL_MAX, getRadius);
+         prevUvDialVal = dewpoint;
+       } else {
+         progressEls.forEach(el => el.style.strokeDashoffset = circumference);
+         prevUvDialVal = null;
+       }
+       
+       let trendHtml = '';
+       if (dewpoint !== null) {
+         const dewF = Math.round(dewpoint);
+         const dewTrend = getPersistentTrendDirection('weather_trend_dewpoint', dewF);
+         let iconClass = '';
+         if (dewTrend === 'up') iconClass = "fa-angle-up";
+         else if (dewTrend === 'down') iconClass = "fa-angle-down";
+         if (iconClass) {
+           trendHtml = `<div style="position: absolute; top: ${BAROMETRIC_TREND_TOP_POS}; width: 100%; text-align: center; font-size: ${BAROMETRIC_TREND_FONT_SIZE};"><i class="fa-solid ${iconClass}"></i></div>`;
+         }
+       }
+       
+       textEls.forEach(gridUvTextEl => {
+          if (dewpoint !== null) {
+             const dewF = Math.round(dewpoint);
+             let displayStr = '';
+             const degSuffix = '°';
+             
+             if (displayUnit === 'BOTH') {
+                const dewC = Math.round((dewF - 32) * 5 / 9);
+                displayStr = `${dewF}${formatSlash()}${dewC}${degSuffix}`;
+             } else {
+                displayStr = `${displayUnit === 'C' ? Math.round((dewF - 32) * 5 / 9) : dewF}${degSuffix}`;
+             }
+             gridUvTextEl.innerHTML = `${trendHtml}${displayStr}<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Td</span>`;
+             if (finalColor) gridUvTextEl.style.color = finalColor;
+          } else {
+             gridUvTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Td</span>`;
+             gridUvTextEl.style.color = '#ffffff';
+          }
+       });
+       
+       // Update hidden value label (UV Index)
+       const labelEls = document.querySelectorAll('.label-title-8');
+       labelEls.forEach(labelEl => {
+          if (uvIndex !== null) {
+             labelEl.innerHTML = `UV ${uvIndex.toFixed(1)}`;
+             labelEl.style.color = getUvColor(uvIndex);
+          } else {
+             labelEl.innerHTML = `UV --`;
+             labelEl.style.color = 'inherit';
+          }
+          labelEl.style.textTransform = 'none';
+       });
+    }
+  }
 
 
 
@@ -11339,7 +11490,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
                              document.getElementById('weather-description');
 
     const firstDialRow = document.getElementById('clock-grid-container') ||
-                         document.querySelector('.clockGridContainer7') ||
+                         document.querySelector('.clockGridContainer8') ||
                          document.querySelector('.clockGridContainer4') ||
                          document.querySelector('.clockGridContainer') ||
                          document.getElementById('refresh-spacer-container');
@@ -19273,7 +19424,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
 
   // Reposition temperature pointer and wind arrow on window resize
+  let _lastResizeWindowWidth = window.innerWidth;
   window.addEventListener('resize', () => {
+    if (window.innerWidth === _lastResizeWindowWidth) {
+       return; // Ignore height-only resizes on mobile (address bar hide/show)
+    }
+    _lastResizeWindowWidth = window.innerWidth;
+
     const isMobile = window.innerWidth <= 767;
 
     // Fade in the loader on the FIRST event of a resize sequence to cover mid-reflow jank,
@@ -19331,6 +19488,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   let prevHumidity = null;
   let prevDewpoint = null;
   let prevPressure = null;
+  let uvDialForceState = null;
+  let prevUvDialVal = null;
 
   function updateWindDirectionArrow(temp, windDeg, windSpeed = 0) {
     const arrows = document.querySelectorAll('.wind-direction-display');
