@@ -7548,6 +7548,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // The Sizzle sun is your gold standard (at 0vw).
   const SUN_IMAGE_OFFSET_X_DESKTOP = '0vw';           // EDITABLE Desktop: Inner image horizontal offset (e.g. '0vw')
   const SUN_IMAGE_OFFSET_X_MOBILE = '0vw';            // EDITABLE Mobile: Inner image horizontal offset
+  const SUN_ROTATION_OFFSET_X_DESKTOP = '-1.5vw';        // EDITABLE Desktop: Shifts 27-day movie left/right without moving others
+  const SUN_ROTATION_OFFSET_X_MOBILE = '0vw';         // EDITABLE Mobile: Shifts 27-day movie left/right
 
   const SUN_MASK_RADIUS_DESKTOP = '49.5%';            // EDITABLE Desktop: Circular mask radius
   const SUN_MASK_RADIUS_MOBILE = '49.5%';             // EDITABLE Mobile: Circular mask radius
@@ -8783,6 +8785,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--sun-image-offset-x-desktop', SUN_IMAGE_OFFSET_X_DESKTOP);
     document.documentElement.style.setProperty('--sun-image-offset-x-mobile', SUN_IMAGE_OFFSET_X_MOBILE);
     document.documentElement.style.setProperty('--sun-image-offset-x', isMobile ? SUN_IMAGE_OFFSET_X_MOBILE : SUN_IMAGE_OFFSET_X_DESKTOP);
+
+    document.documentElement.style.setProperty('--sun-rotation-offset-x-desktop', SUN_ROTATION_OFFSET_X_DESKTOP);
+    document.documentElement.style.setProperty('--sun-rotation-offset-x-mobile', SUN_ROTATION_OFFSET_X_MOBILE);
+    document.documentElement.style.setProperty('--sun-rotation-offset-x', isMobile ? SUN_ROTATION_OFFSET_X_MOBILE : SUN_ROTATION_OFFSET_X_DESKTOP);
 
     document.documentElement.style.setProperty('--sun-mask-radius-desktop', SUN_MASK_RADIUS_DESKTOP);
     document.documentElement.style.setProperty('--sun-mask-radius-mobile', SUN_MASK_RADIUS_MOBILE);
@@ -15126,6 +15132,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
         if (SUN_ANIMATION_CROSSFADE_ENABLED && leftSun && leftSun.imgB) {
           if (sunActiveLayer === 'a') {
+            leftSun.imgB.style.left = 'calc(50% + var(--sun-rotation-offset-x, 0vw))'; // Enforce before fade
             leftSun.imgB.style.zIndex = '2';
             leftSun.img.style.zIndex = '1';
             leftSun.imgB.style.opacity = '1';
@@ -15146,6 +15153,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
               }
             }
           } else {
+            leftSun.img.style.left = 'calc(50% + var(--sun-rotation-offset-x, 0vw))'; // Enforce before fade
             leftSun.img.style.zIndex = '2';
             leftSun.imgB.style.zIndex = '1';
             leftSun.img.style.opacity = '1';
@@ -15212,6 +15220,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           nextImg.src = sunPreloadedImages[0].src;
           nextImg.style.zIndex = '2';
           nextImg.style.opacity = '0';
+          nextImg.style.left = 'calc(50% + var(--sun-rotation-offset-x, 0vw))';
           if (nextImg.decode) nextImg.decode().catch(() => {});
         }
         sunActiveLayer = (sizzleActiveLayer === 'b') ? 'b' : 'a';
@@ -15292,6 +15301,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           if (leftSun.imgB) leftSun.imgB.style.transitionDuration = `${fadeDuration}ms`;
 
           if (sizzleActiveLayer === 'a') {
+            leftSun.imgB.style.left = 'calc(50% + var(--sun-image-offset-x, 0vw))'; // Enforce before fade
             leftSun.imgB.style.zIndex = '2';
             leftSun.img.style.zIndex = '1';
             leftSun.imgB.style.opacity = '1';
@@ -15311,6 +15321,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
               }, fadeDuration + 10);
             }
           } else {
+            leftSun.img.style.left = 'calc(50% + var(--sun-image-offset-x, 0vw))'; // Enforce before fade
             leftSun.img.style.zIndex = '2';
             leftSun.imgB.style.zIndex = '1';
             leftSun.img.style.opacity = '1';
@@ -15355,9 +15366,18 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
         // Cue up next step on the inactive buffer
         const inactiveLayer = sizzleActiveLayer === 'a' ? (leftSun ? leftSun.imgB : null) : (leftSun ? leftSun.img : null);
+        const activeLayer = sizzleActiveLayer === 'a' ? (leftSun ? leftSun.img : null) : (leftSun ? leftSun.imgB : null);
+        
+        // USER REQUEST: Instantly hide the 27-day movie's last frame to prevent ghost image flashing during the crossfade
+        if (activeLayer) {
+          activeLayer.style.transitionDuration = '0ms';
+          activeLayer.style.opacity = '0';
+        }
+
         const nextStep = getNextSizzleStep(sizzleIndex, sizzleDirection, preloadedSizzleImages.length);
         if (inactiveLayer && preloadedSizzleImages[nextStep.idx]) {
           inactiveLayer.style.opacity = '0';
+          inactiveLayer.style.left = 'calc(50% + var(--sun-image-offset-x, 0vw))';
           if (inactiveLayer.src !== preloadedSizzleImages[nextStep.idx].src) {
             inactiveLayer.src = preloadedSizzleImages[nextStep.idx].src;
             if (inactiveLayer.decode) inactiveLayer.decode().catch(() => {});
