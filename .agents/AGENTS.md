@@ -54,3 +54,6 @@ When displaying RainViewer Doppler radar data in this workspace, follow these co
 
 10. **Commit Message Timestamps**:
    - When generating or proposing git commit messages in this workspace, always append a hyphen and the current local timestamp flush to the end of the commit summary (e.g. `-[YYYY-MM-DD HH:MM:SS]`).
+
+11. **Abbreviation Rule - Opacity**:
+   - Whenever the user uses the abbreviation "o", it means they are referring to "opacity".

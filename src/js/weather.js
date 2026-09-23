@@ -7543,8 +7543,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SUN_IMAGE_INNER_SCALE_MOBILE = 'auto';        // EDITABLE Mobile: 'auto' or custom vw string
   const SUN_IMAGE_OFFSET_Y_DESKTOP = '0vw';           // EDITABLE Desktop: Vertical position in vw (positive = DOWN, negative = UP; e.g. '0vw', '-0.5vw', '1vw')
   const SUN_IMAGE_OFFSET_Y_MOBILE = '0vw';            // EDITABLE Mobile: Vertical position in vw (positive = DOWN, negative = UP)
-  const SUN_IMAGE_OFFSET_X_DESKTOP = '0vw';           // EDITABLE Desktop: Horizontal position in vw (positive = RIGHT, negative = LEFT; e.g. '0vw', '0.5vw', '-1vw')
-  const SUN_IMAGE_OFFSET_X_MOBILE = '0vw';            // EDITABLE Mobile: Horizontal position in vw (positive = RIGHT, negative = LEFT)
+  // --- NOAA Crop Alignment ---
+  // The Live Sizzle images and 27-day Rotation images are provided by NOAA with slightly different internal centerings!
+  // The Sizzle sun is your gold standard (at 0vw).
+  const SUN_IMAGE_OFFSET_X_DESKTOP = '0vw';           // EDITABLE Desktop: Inner image horizontal offset (e.g. '0vw')
+  const SUN_IMAGE_OFFSET_X_MOBILE = '0vw';            // EDITABLE Mobile: Inner image horizontal offset
 
   const SUN_MASK_RADIUS_DESKTOP = '49.5%';            // EDITABLE Desktop: Circular mask radius
   const SUN_MASK_RADIUS_MOBILE = '49.5%';             // EDITABLE Mobile: Circular mask radius
@@ -7600,7 +7603,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const CELESTIAL_DIAL_LEFT_GAP_RIGHT_MOBILE = GAP_PACIFIC_TO_SUN_MOBILE;   // Compatibility alias
 
   // Object 2: Sun (150% size) <--> Object 3: Earth (Derived Middle Space)
-  const SUN_GAP_LEFT_DESKTOP = '-3.6vw';                     // EDITABLE Desktop: Additional gap to the left of Sun (perfected by user)
+  const SUN_GAP_LEFT_DESKTOP = '-.5vw';                     // EDITABLE Desktop: Additional gap to the left of Sun (perfected by user)
   const SUN_GAP_LEFT_MOBILE = '-3.6vw';                          // EDITABLE Mobile: Additional gap to the left of Sun
   // The gap between Sun and Earth is NOT explicitly defined; it is derived automatically
   // from the remaining space in the 95vw row between the left pair (Pacific/Sun) and right pair (Earth/UK).
