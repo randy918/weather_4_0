@@ -7461,7 +7461,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SUN_SIZZLE_BAND = 'Fe195';                    // EDITABLE: NOAA SUVI band: 'Fe195' (coronal loops/bronze), 'Fe094' (hot solar flares/blue), 'He304' (prominence eruptions/red)
   const SUN_SIZZLE_FETCH_LENGTH = 720;                // EDITABLE: Historical buffer to pull from NOAA (60 = ~1 hr, 120 = ~2 hrs, 720 = ~12 hrs)
   const SUN_SIZZLE_FRAME_STEP = 5;                    // EDITABLE: Cadence step (~3-4m apart so solar flares visibly boil and wink with white dots)
-  const SUN_SIZZLE_FRAME_COUNT = 48;                  // EDITABLE: Number of recent stepped frames in loop (e.g. 24, 36, 48, 60)
+  const SUN_SIZZLE_FRAME_COUNT = 72;                  // EDITABLE: Number of recent stepped frames in loop (e.g. 24, 36, 48, 72)
   const SUN_SIZZLE_FPS_DESKTOP = 12;                  // EDITABLE Desktop: Sizzle playback speed in FPS (6-7 FPS gives eye time to track individual flares)
   const SUN_SIZZLE_FPS_MOBILE = 12;                   // EDITABLE Mobile: Sizzle playback speed in FPS
   const SUN_SIZZLE_FPS = 12;                          // EDITABLE: Fallback / default FPS
@@ -11183,12 +11183,26 @@ Plan ahead for significantly warmer conditions tomorrow!`
   
   function updateUvDualDial(data) {
     const uvIndex = data?.current?.uvi !== undefined ? Number(data.current.uvi) : null;
-    let dailyPeakUv = data?.daily?.[0]?.uvi !== undefined ? Number(data.daily[0].uvi) : null;
     
-    // Fallback if the API uses a different key for daily peak UV
-    if (dailyPeakUv === null && data?.daily?.[0]) {
-      if (data.daily[0].uv_index !== undefined) dailyPeakUv = Number(data.daily[0].uv_index);
-      else if (data.daily[0].max_uvi !== undefined) dailyPeakUv = Number(data.daily[0].max_uvi);
+    // Track the highest UV index reached so far today, persisting across reloads and resetting at midnight
+    let dailyPeakUv = null;
+    if (uvIndex !== null) {
+      const currentDate = new Date().getDate();
+      let storedMaxUv = localStorage.getItem('maxUvReachedToday');
+      let storedMaxUvDate = localStorage.getItem('maxUvDate');
+      
+      if (storedMaxUvDate != currentDate) {
+         storedMaxUv = 0; // Reset at midnight
+         localStorage.setItem('maxUvDate', currentDate);
+      } else {
+         storedMaxUv = storedMaxUv ? Number(storedMaxUv) : 0;
+      }
+      
+      if (uvIndex > storedMaxUv) {
+         storedMaxUv = uvIndex;
+         localStorage.setItem('maxUvReachedToday', storedMaxUv);
+      }
+      dailyPeakUv = storedMaxUv;
     }
     
     const dewpoint = data?.current?.dew_point !== undefined ? Number(data.current.dew_point) : null;
@@ -11260,7 +11274,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
        if (dailyPeakUv !== null && uvIndex !== null && dailyPeakUv > uvIndex) {
          const peakColor = getUvColor(dailyPeakUv);
          peakEls.forEach(el => {
-           el.style.display = 'block';
+           el.style.display = ''; // Clear inline display so it relies on SVG defaults (fixes mobile rendering)
            el.style.stroke = peakColor;
            el.style.opacity = '0.5';
          });
@@ -13677,9 +13691,41 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const color = getSolarFlareLevelColor(flareClass);
     const fraction = calculateSolarFlareFraction(flareClass, flareValue);
 
+    // Track the highest Solar Flare fraction reached so far today, persisting across reloads and resetting at midnight
+    let dailyPeakFraction = fraction;
+    let dailyPeakColor = color;
+    const isLive = SOLAR_FLARE_MODE === 'live' && !activeSolarFlareState;
+    
+    if (isLive) {
+      const currentDate = new Date().getDate();
+      let storedMaxFlareDate = localStorage.getItem('maxFlareDate');
+      let storedMaxFlareFraction = localStorage.getItem('maxFlareFraction');
+      let storedMaxFlareColor = localStorage.getItem('maxFlareColor');
+      
+      if (storedMaxFlareDate != currentDate) {
+         storedMaxFlareFraction = fraction;
+         storedMaxFlareColor = color;
+         localStorage.setItem('maxFlareDate', currentDate);
+         localStorage.setItem('maxFlareFraction', fraction);
+         localStorage.setItem('maxFlareColor', color);
+      } else {
+         storedMaxFlareFraction = storedMaxFlareFraction ? Number(storedMaxFlareFraction) : fraction;
+         storedMaxFlareColor = storedMaxFlareColor || color;
+         if (fraction > storedMaxFlareFraction) {
+            storedMaxFlareFraction = fraction;
+            storedMaxFlareColor = color;
+            localStorage.setItem('maxFlareFraction', fraction);
+            localStorage.setItem('maxFlareColor', color);
+         }
+      }
+      dailyPeakFraction = storedMaxFlareFraction;
+      dailyPeakColor = storedMaxFlareColor;
+    }
+
     // Circumference for r=46 is 2 * PI * 46 = 289.027
     const circumference = 289.027;
     const strokeOffset = circumference * (1 - fraction);
+    const peakStrokeOffset = circumference * (1 - dailyPeakFraction);
 
     const line1El = dial.querySelector('.solar-flare-label-line1');
     const line2El = dial.querySelector('.solar-flare-label-line2');
@@ -13693,6 +13739,20 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (valueEl && valueEl.textContent !== displayVal) valueEl.textContent = displayVal;
 
     dial.style.setProperty('--solar-flare-current-color', color);
+    
+    // Apply peak styles
+    if (dailyPeakFraction > fraction) {
+      dial.style.setProperty('--solar-flare-peak-color', dailyPeakColor);
+      dial.style.setProperty('--solar-flare-peak-stroke-offset', peakStrokeOffset.toFixed(2));
+      const peakEl = dial.querySelector('.solar-flare-peak-progress');
+      if (peakEl) {
+          peakEl.style.display = ''; // Ensure it's visible
+          peakEl.style.opacity = '0.5'; // Force opacity inline to guarantee 50% transparency
+      }
+    } else {
+      const peakEl = dial.querySelector('.solar-flare-peak-progress');
+      if (peakEl) peakEl.style.display = 'none'; // Hide if current is peak or higher
+    }
 
     const newOffsetStr = strokeOffset.toFixed(2);
     
@@ -13852,6 +13912,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     dial.innerHTML = `
       <svg class="solar-flare-svg clock-timer-svg" viewBox="0 0 100 100">
         <circle class="solar-flare-track countdown-track" cx="50" cy="50" r="46" fill="none" />
+        <circle class="solar-flare-peak-progress countdown-progress" cx="50" cy="50" r="46" fill="none" />
         <circle class="solar-flare-progress countdown-progress" cx="50" cy="50" r="46" fill="none" />
       </svg>
       <div class="solar-flare-content">
