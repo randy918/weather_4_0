@@ -78,10 +78,24 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--clock-spin-duration', CLOCK_SPIN_DURATION_MS + 'ms');
 
   // --- CONFIG: Barometer and RH Gauge Animations ---
-  const GAUGE_TRANSITION_DURATION_MS = 800; // EDITABLE: Animation transition duration in milliseconds
+  const GAUGE_TRANSITION_DURATION_MS = 1000; // EDITABLE: Animation transition duration in milliseconds
+  const GAUGE_TRANSITION_EASING = 'cubic-bezier(0.85, 0, 0.15, 1)'; // EDITABLE: Very snappy ease-in ease-out for fun's sake (e.g. cubic-bezier(0.85, 0, 0.15, 1))
   const GAUGE_GROW_DURATION_MS = 600;       // EDITABLE: Time in milliseconds to stay/grow at maximum before shrinking
   document.documentElement.style.setProperty('--gauge-transition-duration', GAUGE_TRANSITION_DURATION_MS + 'ms');
+  document.documentElement.style.setProperty('--gauge-transition-easing', GAUGE_TRANSITION_EASING);
   let refreshTimerId = null;
+
+  // --- CONFIG: Barometer Future Dot ---
+  const BAROMETER_FUTURE_HOURS = 12; // EDITABLE: Hours ahead for the future prediction dot (0 to disable)
+  const BAROMETER_FUTURE_DOT_SIZE = 3.5; // EDITABLE: Radius of the future prediction dot
+
+  // --- CONFIG: Wind Future Dot ---
+  const WIND_FUTURE_HOURS = 6; // EDITABLE: Hours ahead for the future wind prediction dot (0 to disable)
+  const WIND_FUTURE_DOT_SIZE = 3.5; // EDITABLE: Radius of the future wind prediction dot
+
+  // --- CONFIG: Humidity Future Dot ---
+  const HUMIDITY_FUTURE_HOURS = 6; // EDITABLE: Hours ahead for the future humidity prediction dot (0 to disable)
+  const HUMIDITY_FUTURE_DOT_SIZE = 3.5; // EDITABLE: Radius of the future humidity prediction dot
 
   // --- CONFIG: Rain Drop Animation ---
   const RAIN_ENABLED = true;                         // Set to false to disable all canvas drawing
@@ -417,6 +431,8 @@ import weatherConditions from '../data/weather-conditions.json';
   const CLOCK_GRID_CELESTIAL_DOT_RADIUS = 6.4;  // EDITABLE: Radius of the celestial dots marking current time on the dial track (using SVG native viewBox units, e.g. 2 means 2 viewBox units out of 100)
   const CLOCK_GRID_CELESTIAL_DOT_STROKE_WIDTH = 2; // EDITABLE: Stroke width for the celestial dots (using SVG native viewBox units)
   const CLOCK_GRID_CELESTIAL_DOT_FILL = 'rgba(0,0,0,0.5)'; // EDITABLE: Fill color for the celestial dots
+  const MOON_DIAL_DOT_COLOR = 'rgba(138, 154, 171, 1.0)'; // EDITABLE: Blueish-gray color for the small disc on the moon dial when up
+  const MOON_DIAL_DOT_COLOR_DOWN = 'rgba(138, 154, 171, 0.3)'; // EDITABLE: Blueish-gray color for the small disc on the moon dial when down
   const CLOCK_GRID_WIND_SPEED_TEXT_SHADOW = '2px 2px 0px black)'; // EDITABLE: Text shadow for wind speed number (offset-x offset-y blur color)
   const CLOCK_GRID_ROW2_MARGIN_TOP = '2vw'; // EDITABLE: Margin top for the 2nd row of 4x2 dials
 
@@ -1036,94 +1052,24 @@ import weatherConditions from '../data/weather-conditions.json';
     }
   }
 
-  // Helper to animate SVG progress dials in two stages on value changes
+  // Helper to animate SVG progress dials
   function animateGauge(elements, newVal, prevVal, minVal, avgVal, maxVal, getRadiusFn) {
     if (!elements || elements.length === 0) return;
-    
-    const originalPrevVal = prevVal;
-    // Default null prevVal to minVal so it runs a clean two-stage animation from empty on load
-    if (prevVal === null) {
-      prevVal = minVal;
-    }
-    
-    const hasChange = originalPrevVal === null || prevVal !== newVal;
 
     elements.forEach(el => {
-      // If the element is currently running a two-stage animation, do not interrupt it!
-      if (el.dataset.animating === 'true') {
-        const radius = getRadiusFn(el);
-        const circumference = 2 * Math.PI * radius;
-        const newPercent = calcAboveBelowAverageProgress(newVal, minVal, avgVal, maxVal);
-        el.dataset.targetOffset = circumference * (1 - newPercent);
-        return;
-      }
-
       const radius = getRadiusFn(el);
       const circumference = 2 * Math.PI * radius;
       el.style.strokeDasharray = `${circumference}`;
-      el.style.transition = 'none'; // Disable CSS transitions to prevent conflicts
+      
+      // Ensure CSS transitions are active (removing any inline overrides)
+      el.style.transition = '';
 
       const newPercent = calcAboveBelowAverageProgress(newVal, minVal, avgVal, maxVal);
       const targetOffset = circumference * (1 - newPercent);
-      const currentOffset = parseFloat(el.style.strokeDashoffset) || circumference;
-
-      // Always perform the sweep animation on update, even if the value didn't change
-      el.dataset.animating = 'true';
-      el.dataset.targetOffset = targetOffset;
-
-      const oldPercent = calcAboveBelowAverageProgress(prevVal, minVal, avgVal, maxVal);
-      const startOffset = circumference * (1 - oldPercent);
       
-      // Treat no-change (newVal == prevVal) as an increase so it sweeps forward to 360° and back
-      const isIncrease = newVal >= prevVal;
-
-      if (isIncrease) {
-        // Stage 1: Animate clockwise from old value's offset to MAX (strokeDashoffset = 0)
-        animateValue(el, startOffset, 0, 800, () => {
-          const currentTarget = parseFloat(el.dataset.targetOffset) ?? targetOffset;
-          // Stage 2: Animate counter-clockwise from MAX (0) to new targetOffset
-          animateValue(el, 0, currentTarget, 800, () => {
-            el.dataset.animating = 'false';
-          });
-        });
-      } else {
-        // Stage 1: Animate counter-clockwise from old value's offset to MIN (strokeDashoffset = circumference)
-        animateValue(el, startOffset, circumference, 800, () => {
-          const currentTarget = parseFloat(el.dataset.targetOffset) ?? targetOffset;
-          // Stage 2: Animate clockwise from MIN (circumference) to new targetOffset
-          animateValue(el, circumference, currentTarget, 800, () => {
-            el.dataset.animating = 'false';
-          });
-        });
-      }
+      // Set the target offset; the CSS transition will handle the smooth animation locally!
+      el.style.strokeDashoffset = targetOffset;
     });
-  }
-
-  // JS animation helper using requestAnimationFrame
-  function animateValue(el, startOffset, targetOffset, duration, onComplete) {
-    const startTime = performance.now();
-    
-    function update(now) {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      
-      // Easing: easeInOutCubic
-      const eased = progress < 0.5 
-        ? 4 * progress * progress * progress 
-        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-      
-      const current = startOffset + (targetOffset - startOffset) * eased;
-      el.style.strokeDashoffset = current;
-      
-      if (progress < 1) {
-        requestAnimationFrame(update);
-      } else {
-        el.style.strokeDashoffset = targetOffset;
-        if (onComplete) onComplete();
-      }
-    }
-    
-    requestAnimationFrame(update);
   }
 
   // EDITABLE: Lower gradient overlay lowest border vertical offset (relative to 24 sky images bottom edge)
@@ -3415,10 +3361,33 @@ import weatherConditions from '../data/weather-conditions.json';
       trendHtml = `<div style="position: absolute; ${positionAttr}: ${WIND_TREND_OFFSET_Y}; width: 100%; text-align: center; font-size: ${BAROMETRIC_TREND_FONT_SIZE};"><i class="fa-solid ${iconClass}"></i></div>`;
     }
     
-    // Calculate percentages (0-60 mph scale)
     const maxWindMph = 60;
     const speedPercent = Math.min((windSpeed / maxWindMph) * 100, 100);
     const gustPercent = Math.min((windGust / maxWindMph) * 100, 100);
+    
+    // Future prediction dot for wind speed
+    const windDotContainers = document.querySelectorAll('.wind-future-dot-container');
+    const windDots = document.querySelectorAll('.wind-future-dot');
+    
+    if (WIND_FUTURE_HOURS > 0 && data?.hourly && data.hourly.length >= WIND_FUTURE_HOURS) {
+      const futureData = data.hourly[WIND_FUTURE_HOURS - 1];
+      const futureWindSpeed = futureData.wind_speed || windSpeed;
+      const futureSpeedPercent = Math.min((futureWindSpeed / maxWindMph) * 100, 100);
+      
+      const futureColor = currentTemp !== null ? tempToColor(currentTemp + 10) : '#ffffff';
+      
+      windDotContainers.forEach(container => {
+        container.style.transform = `rotate(${(futureSpeedPercent / 100) * 360}deg)`;
+        container.style.display = 'block';
+      });
+      windDots.forEach(dot => {
+        dot.setAttribute('r', WIND_FUTURE_DOT_SIZE);
+        dot.style.fill = futureColor;
+        dot.style.stroke = futureColor;
+      });
+    } else {
+      windDotContainers.forEach(container => container.style.display = 'none');
+    }
     
     // Get the base temperature color for the "data" side of the bar,
     // and derive a darker companion color (matching the animated background helpers)
@@ -3570,8 +3539,33 @@ import weatherConditions from '../data/weather-conditions.json';
   function updateBarometricGauge(data) {
     const pressureEls = document.querySelectorAll('.barometric-text');
     const pressureFills = document.querySelectorAll('.barometric-fill');
+    const pressureDotContainers = document.querySelectorAll('.barometric-future-dot-container');
+    const pressureDots = document.querySelectorAll('.barometric-future-dot');
+    
     // OpenWeather provides pressure in hPa. Typical sea level range is 950 to 1050.
     const pressure = data?.current?.pressure || 1013; 
+    const currentTemp = data?.current?.temp;
+    
+    // Calculate and position the future prediction dot
+    if (BAROMETER_FUTURE_HOURS > 0 && data?.hourly && data.hourly.length >= BAROMETER_FUTURE_HOURS) {
+      const futureData = data.hourly[BAROMETER_FUTURE_HOURS - 1];
+      const futurePressure = futureData.pressure || pressure;
+      const percent = calcAboveBelowAverageProgress(futurePressure, BAROMETER_DIAL_MIN, BAROMETER_DIAL_AVG, BAROMETER_DIAL_MAX);
+      
+      const futureColor = currentTemp !== null && currentTemp !== undefined ? tempToColor(currentTemp + 10) : '#ffffff';
+      
+      pressureDotContainers.forEach(container => {
+        container.style.transform = `rotate(${percent * 360}deg)`;
+        container.style.display = 'block';
+      });
+      pressureDots.forEach(dot => {
+        dot.setAttribute('r', BAROMETER_FUTURE_DOT_SIZE);
+        dot.style.fill = futureColor;
+        dot.style.stroke = futureColor;
+      });
+    } else {
+      pressureDotContainers.forEach(container => container.style.display = 'none');
+    }
     
     // Determine persistent trend arrow for barometer
     let trendHtml = '';
@@ -3604,7 +3598,6 @@ import weatherConditions from '../data/weather-conditions.json';
       prevPressure = pressure;
       
       // Inherit the color of the current temperature
-      const currentTemp = data?.current?.temp;
       if (currentTemp !== null && currentTemp !== undefined) {
         const color = tempToColor(currentTemp);
         if (color) {
@@ -10173,6 +10166,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
               </defs>
               <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
               <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+              <g class="wind-future-dot-container" style="transform-origin: 50px 50px; transition: transform var(--gauge-transition-duration, 1s) var(--gauge-transition-easing, ease);">
+                <circle class="wind-future-dot" cx="96" cy="50" r="3.5" fill="none" stroke-width="2" />
+              </g>
               <circle class="gust-progress" cx="50" cy="50" r="46" fill="none" stroke="url(#gust-grad-8)" />
               <circle class="gust-dot" r="1.75" />
             </svg>
@@ -10188,6 +10184,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
               <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
               <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+              <g class="humidity-future-dot-container" style="transform-origin: 50px 50px; transition: transform var(--gauge-transition-duration, 1s) var(--gauge-transition-easing, ease);">
+                <circle class="humidity-future-dot" cx="96" cy="50" r="3.5" fill="none" stroke-width="2" />
+              </g>
             </svg>
             <div class="grid-humidity-text"></div>
           `;
@@ -10208,6 +10207,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
               <svg class="barometric-gauge-svg" viewBox="0 0 100 100">
                 <circle class="barometric-track" cx="50" cy="50" r="46" fill="none" />
                 <circle class="barometric-fill" cx="50" cy="50" r="46" fill="none" />
+                <g class="barometric-future-dot-container" style="transform-origin: 50px 50px; transition: transform var(--gauge-transition-duration, 1s) var(--gauge-transition-easing, ease);">
+                  <circle class="barometric-future-dot" cx="96" cy="50" r="3.5" fill="none" stroke-width="2" />
+                </g>
                 <line class="barometric-needle" x1="50" y1="50" x2="50" y2="15" stroke-linecap="round" />
               </svg>
               <div class="barometric-text"></div>
@@ -10530,6 +10532,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
               </defs>
               <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
               <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+              <g class="wind-future-dot-container" style="transform-origin: 50px 50px; transition: transform var(--gauge-transition-duration, 1s) var(--gauge-transition-easing, ease);">
+                <circle class="wind-future-dot" cx="96" cy="50" r="3.5" fill="none" stroke-width="2" />
+              </g>
               <circle class="gust-progress" cx="50" cy="50" r="46" fill="none" stroke="url(#gust-grad-7)" />
               <circle class="gust-dot" r="1.75" />
             </svg>
@@ -10544,6 +10549,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
               <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
               <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+              <g class="humidity-future-dot-container" style="transform-origin: 50px 50px; transition: transform var(--gauge-transition-duration, 1s) var(--gauge-transition-easing, ease);">
+                <circle class="humidity-future-dot" cx="96" cy="50" r="3.5" fill="none" stroke-width="2" />
+              </g>
             </svg>
             <div class="grid-humidity-text"></div>
           `;
@@ -10553,6 +10561,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
               <svg class="barometric-gauge-svg" viewBox="0 0 100 100">
                 <circle class="barometric-track" cx="50" cy="50" r="46" fill="none" />
                 <circle class="barometric-fill" cx="50" cy="50" r="46" fill="none" />
+                <g class="barometric-future-dot-container" style="transform-origin: 50px 50px; transition: transform var(--gauge-transition-duration, 1s) var(--gauge-transition-easing, ease);">
+                  <circle class="barometric-future-dot" cx="96" cy="50" r="3.5" fill="none" stroke-width="2" />
+                </g>
+
+
                 <line class="barometric-needle" x1="50" y1="50" x2="50" y2="15" stroke-linecap="round" />
               </svg>
               <div class="barometric-text"></div>
@@ -10871,6 +10884,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
               </defs>
               <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
               <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+              <g class="wind-future-dot-container" style="transform-origin: 50px 50px; transition: transform var(--gauge-transition-duration, 1s) var(--gauge-transition-easing, ease);">
+                <circle class="wind-future-dot" cx="96" cy="50" r="3.5" fill="none" stroke-width="2" />
+              </g>
               <circle class="gust-progress" cx="50" cy="50" r="46" fill="none" stroke="url(#gust-grad-4)" />
               <circle class="gust-dot" r="1.75" />
             </svg>
@@ -10885,6 +10901,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
               <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
               <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
+              <g class="humidity-future-dot-container" style="transform-origin: 50px 50px; transition: transform var(--gauge-transition-duration, 1s) var(--gauge-transition-easing, ease);">
+                <circle class="humidity-future-dot" cx="96" cy="50" r="3.5" fill="none" stroke-width="2" />
+              </g>
             </svg>
             <div class="grid-humidity-text"></div>
           `;
@@ -11011,6 +11030,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
               <svg class="barometric-gauge-svg" viewBox="0 0 100 100">
                 <circle class="barometric-track" cx="50" cy="50" r="46" fill="none" />
                 <circle class="barometric-fill" cx="50" cy="50" r="46" fill="none" />
+                <g class="barometric-future-dot-container" style="transform-origin: 50px 50px; transition: transform var(--gauge-transition-duration, 1s) var(--gauge-transition-easing, ease);">
+                  <circle class="barometric-future-dot" cx="96" cy="50" r="3.5" fill="none" stroke-width="2" />
+                </g>
+
                 <line class="barometric-needle" x1="50" y1="50" x2="50" y2="15" stroke-linecap="round" />
               </svg>
               <div class="barometric-text"></div>
@@ -11320,6 +11343,29 @@ Plan ahead for significantly warmer conditions tomorrow!`
            gridHumidityTextEl.style.color = finalColor;
          }
        });
+
+       const humidityDotContainers = document.querySelectorAll('.clockGridItem-3 .humidity-future-dot-container');
+       const humidityDots = document.querySelectorAll('.clockGridItem-3 .humidity-future-dot');
+       
+       if (HUMIDITY_FUTURE_HOURS > 0 && data?.hourly && data.hourly.length >= HUMIDITY_FUTURE_HOURS) {
+         const futureData = data.hourly[HUMIDITY_FUTURE_HOURS - 1];
+         const futureHumidity = typeof futureData.humidity === 'number' ? futureData.humidity : humidity;
+         const percent = calcAboveBelowAverageProgress(futureHumidity, HUMIDITY_DIAL_MIN, currentHumidityAvg, HUMIDITY_DIAL_MAX);
+         
+         const futureColor = currentTemp !== null && currentTemp !== undefined ? tempToColor(currentTemp + 10) : '#ffffff';
+         
+         humidityDotContainers.forEach(container => {
+           container.style.transform = `rotate(${percent * 360}deg)`;
+           container.style.display = 'block';
+         });
+         humidityDots.forEach(dot => {
+           dot.setAttribute('r', HUMIDITY_FUTURE_DOT_SIZE);
+           dot.style.fill = futureColor;
+           dot.style.stroke = futureColor;
+         });
+       } else {
+         humidityDotContainers.forEach(container => container.style.display = 'none');
+       }
 
        labelEls.forEach(labelEl => {
           let labelColor = 'inherit';
@@ -11864,12 +11910,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
       celestialDotEl.setAttribute('cy', cy.toFixed(3));
       celestialDotEl.style.display = 'block';
       celestialDotEl.setAttribute('r', String(CLOCK_GRID_CELESTIAL_DOT_RADIUS));
-      celestialDotEl.style.fill = isUp ? (celestialColor || 'white') : '#333333';
+      celestialDotEl.style.fill = isUp ? MOON_DIAL_DOT_COLOR : MOON_DIAL_DOT_COLOR_DOWN;
       celestialDotEl.style.opacity = '1';
       celestialDotEl.style.strokeWidth = 'var(--grid-celestial-dot-stroke-width)';
-      if (celestialColor) {
-        celestialDotEl.style.stroke = isUp ? celestialColor : '#333333';
-      }
+      celestialDotEl.style.stroke = isUp ? MOON_DIAL_DOT_COLOR : MOON_DIAL_DOT_COLOR_DOWN;
     });
     
     // Calculate the next moon event (moonrise or moonset)

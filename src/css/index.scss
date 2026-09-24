@@ -381,7 +381,7 @@ $loader-logo-offset-y: 25vw;
             stroke: white; // Replaced by JS dynamically to match theme
             stroke-width: 3;
             stroke-linecap: round;
-            transition: stroke-dashoffset var(--gauge-transition-duration, 0.8s) cubic-bezier(0.25, 1, 0.5, 1), stroke 0.5s ease;
+            transition: stroke-dashoffset var(--gauge-transition-duration, 0.8s) var(--gauge-transition-easing, cubic-bezier(0.25, 1, 0.5, 1)), stroke 0.5s ease;
         }
 
         .barometric-needle {
@@ -1284,7 +1284,7 @@ main {
             stroke-dasharray: 289; /* 2 * PI * r(46) */
             stroke-dashoffset: 0; /* Default fully full */
             stroke-linecap: round;
-            transition: stroke-dashoffset var(--gauge-transition-duration, 0.8s) cubic-bezier(0.25, 1, 0.5, 1), stroke 0.5s ease;
+            transition: stroke-dashoffset var(--gauge-transition-duration, 0.8s) var(--gauge-transition-easing, cubic-bezier(0.25, 1, 0.5, 1)), stroke 0.5s ease;
         }
 
         .gust-progress {
