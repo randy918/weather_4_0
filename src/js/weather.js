@@ -3150,7 +3150,7 @@ import weatherConditions from '../data/weather-conditions.json';
     updateDewpointDial(data);
     
     // Update UV dual dial
-    updateUvDualDial(data);
+    updateUvDial(data);
     
     // Update sun position dots row (Disabled since replaced by dials)
     // updateSunDotsRow(data);
@@ -7579,7 +7579,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SUN_SIZE_SCALE_MOBILE = 2.0;                 // EDITABLE Mobile: Sun diameter multiplier
   const SUN_CORONA_SCALE_DESKTOP = SUN_SIZE_SCALE_DESKTOP;
   const SUN_CORONA_SCALE_MOBILE = SUN_SIZE_SCALE_MOBILE;
-  const EARTH_SIZE_SCALE_DESKTOP = 1.6;              // EDITABLE Desktop: Earth diameter multiplier (0.92 = ~16vw, 1.0 = ~17.4vw)
+  const EARTH_SIZE_SCALE_DESKTOP = 1.35;              // EDITABLE Desktop: Earth diameter multiplier (0.92 = ~16vw, 1.0 = ~17.4vw)
   const EARTH_SIZE_SCALE_MOBILE = 1.55;               // EDITABLE Mobile: Earth diameter multiplier
   const EARTH_GLOBE_SCALE_DESKTOP = EARTH_SIZE_SCALE_DESKTOP;
   const EARTH_GLOBE_SCALE_MOBILE = EARTH_SIZE_SCALE_MOBILE;
@@ -7598,9 +7598,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const CELESTIAL_ROW_EDGE_GAP_RIGHT_DESKTOP = '0vw';         // EDITABLE Desktop: Edge offset for #4 (UK) from 95% right boundary
   const CELESTIAL_ROW_EDGE_GAP_RIGHT_MOBILE = '0vw';          // EDITABLE Mobile: Edge offset for #4 (UK) from 95% right boundary
 
-  // Object 1: Left Dial (Pacific) <--> Object 2: Sun
-  const GAP_PACIFIC_TO_SUN_DESKTOP = '0vw';                   // EDITABLE Desktop: Spacing between 'Pacific' dial and the Sun (0vw = evenly distributed)
-  const GAP_PACIFIC_TO_SUN_MOBILE = '0vw';                    // EDITABLE Mobile: Spacing between 'Pacific' dial and the Sun
+  // Object 1: Left Dial (Pacific/Flare) <--> Object 2: Sun
+  const GAP_PACIFIC_TO_SUN_DESKTOP = '1vw';                   // EDITABLE Desktop: Spacing between Left (Flare/Pacific) dial and the Sun
+  const GAP_PACIFIC_TO_SUN_MOBILE = '2vw';                    // EDITABLE Mobile: Spacing between Left dial and the Sun
   const CELESTIAL_DIAL_LEFT_GAP_RIGHT_DESKTOP = GAP_PACIFIC_TO_SUN_DESKTOP; // Compatibility alias
   const CELESTIAL_DIAL_LEFT_GAP_RIGHT_MOBILE = GAP_PACIFIC_TO_SUN_MOBILE;   // Compatibility alias
 
@@ -11130,58 +11130,165 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // Update the humidity dial in grid cell #4 (index 3)
   function updateHumidityDial(data) {
     const humidity = data?.current?.humidity;
-    if (typeof humidity !== 'number') return;
+    const dewpoint = data?.current?.dew_point !== undefined ? Number(data.current.dew_point) : null;
     
+    // Determine natural state based on day/night or just default to HUM
+    // The user didn't specify day/night logic for HUM/DEW, but UV/DEW had it because UV is 0 at night.
+    // For Humidity/Dew Point, let's just make Humidity the default natural state.
+    const naturalState = 'HUM';
+    const activeState = humidityDialForceState || naturalState;
+    
+    const itemEls = document.querySelectorAll('.clockGridItem-3');
+    itemEls.forEach(itemEl => {
+       itemEl.setAttribute('data-active-state', activeState);
+       if (!itemEl.hasHumidityClickListener) {
+          itemEl.hasHumidityClickListener = true;
+          itemEl.style.cursor = 'pointer';
+          itemEl.addEventListener('click', (e) => {
+             e.stopPropagation();
+             const currentState = itemEl.getAttribute('data-active-state');
+             humidityDialForceState = (currentState === 'HUM') ? 'DEW' : 'HUM';
+             
+             if (window.humidityDialForceTimer) clearTimeout(window.humidityDialForceTimer);
+             window.humidityDialForceTimer = setTimeout(() => {
+                humidityDialForceState = null;
+                if (typeof updateHumidityDial === 'function') {
+                   updateHumidityDial(window.lastWeatherData);
+                }
+             }, 60000);
+             
+             updateHumidityDial(window.lastWeatherData || data);
+          });
+       }
+    });
+
     const currentTemp = data?.current?.temp || null;
     const tempColor = currentTemp !== null ? tempToColor(currentTemp) : null;
     const activeColor = getDotsColors(currentTemp).active;
-    const finalColor = tempColor || activeColor;
-    
-    let trendHtml = '';
-    const humidityRounded = Math.round(humidity);
-    const humidityTrend = getPersistentTrendDirection('weather_trend_humidity', humidityRounded);
-    let iconClass = '';
-    if (humidityTrend === 'up') {
-      iconClass = "fa-angle-up";
-    } else if (humidityTrend === 'down') {
-      iconClass = "fa-angle-down";
-    }
-    
-    if (iconClass) {
-      trendHtml = `<div style="position: absolute; top: ${BAROMETRIC_TREND_TOP_POS}; width: 100%; text-align: center; font-size: ${BAROMETRIC_TREND_FONT_SIZE};"><i class="fa-solid ${iconClass}"></i></div>`;
-    }
     
     const gridHumidityProgressEls = document.querySelectorAll('.clockGridItem-3 .countdown-progress');
     const gridHumidityTextEls = document.querySelectorAll('.clockGridItem-3 .grid-humidity-text');
+    const labelEls = document.querySelectorAll('.label-title-3'); // Assuming label 3 is used for Humidity title
     const radius = 46;
     const circumference = 2 * Math.PI * radius; // ~289.0265
-    
-    const currentHumidityAvg = getDynamicHumidityAverage(data?.current?.dt);
-    gridHumidityProgressEls.forEach(gridHumidityProgressEl => {
-      if (finalColor) {
-        gridHumidityProgressEl.style.stroke = finalColor;
-      }
-    });
-
     const getRadius = (el) => 46;
-    animateGauge(gridHumidityProgressEls, humidity, prevHumidity, HUMIDITY_DIAL_MIN, currentHumidityAvg, HUMIDITY_DIAL_MAX, getRadius);
-    prevHumidity = humidity;
-    
-    gridHumidityTextEls.forEach(gridHumidityTextEl => {
-      gridHumidityTextEl.innerHTML = `${trendHtml}${Math.round(humidity)}%<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">RH</span>`;
-      if (finalColor) {
-        gridHumidityTextEl.style.color = finalColor;
-      }
-    });
+
+    if (activeState === 'HUM') {
+       if (typeof humidity !== 'number') return;
+       const finalColor = tempColor || activeColor;
+       
+       let trendHtml = '';
+       const humidityRounded = Math.round(humidity);
+       const humidityTrend = getPersistentTrendDirection('weather_trend_humidity', humidityRounded);
+       let iconClass = '';
+       if (humidityTrend === 'up') iconClass = "fa-angle-up";
+       else if (humidityTrend === 'down') iconClass = "fa-angle-down";
+       
+       if (iconClass) {
+         trendHtml = `<div style="position: absolute; top: ${BAROMETRIC_TREND_TOP_POS}; width: 100%; text-align: center; font-size: ${BAROMETRIC_TREND_FONT_SIZE};"><i class="fa-solid ${iconClass}"></i></div>`;
+       }
+       
+       const currentHumidityAvg = getDynamicHumidityAverage(data?.current?.dt);
+       gridHumidityProgressEls.forEach(el => {
+         if (finalColor) el.style.stroke = finalColor;
+       });
+
+       animateGauge(gridHumidityProgressEls, humidity, prevHumidity, HUMIDITY_DIAL_MIN, currentHumidityAvg, HUMIDITY_DIAL_MAX, getRadius);
+       prevHumidity = humidity;
+       
+       gridHumidityTextEls.forEach(gridHumidityTextEl => {
+         gridHumidityTextEl.innerHTML = `${trendHtml}${Math.round(humidity)}%<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">RH</span>`;
+         if (finalColor) {
+           gridHumidityTextEl.style.color = finalColor;
+         }
+       });
+
+       labelEls.forEach(labelEl => {
+          let labelColor = 'inherit';
+          if (dewpoint !== null) {
+             const dewF = Math.round(dewpoint);
+             if (displayUnit === 'BOTH') {
+                const dewC = Math.round((dewF - 32) * 5 / 9);
+                labelEl.innerHTML = `Dew Pt ${dewF}${formatSlash()}${dewC}°`;
+             } else {
+                labelEl.innerHTML = `Dew Pt ${dewF}°`;
+             }
+             labelColor = tempToColor(dewpoint) || 'inherit';
+          } else {
+             labelEl.innerHTML = `Dew Pt --`;
+          }
+          labelEl.style.color = labelColor;
+          labelEl.style.textTransform = 'none';
+       });
+    } else {
+       // DEW state
+       const dewpointColor = dewpoint !== null ? tempToColor(dewpoint) : 'hsl(120, 80%, 40%)';
+       const finalColor = tempColor || dewpointColor;
+
+       gridHumidityProgressEls.forEach(el => {
+         if (finalColor) el.style.stroke = finalColor;
+       });
+       
+       if (dewpoint !== null) {
+         animateGauge(gridHumidityProgressEls, dewpoint, prevDewpoint, DEWPOINT_DIAL_MIN, DEWPOINT_DIAL_AVG, DEWPOINT_DIAL_MAX, getRadius);
+         prevDewpoint = dewpoint;
+       } else {
+         gridHumidityProgressEls.forEach(el => el.style.strokeDashoffset = circumference);
+         prevDewpoint = null;
+       }
+       
+       let trendHtml = '';
+       if (dewpoint !== null) {
+         const dewF = Math.round(dewpoint);
+         const dewTrend = getPersistentTrendDirection('weather_trend_dewpoint', dewF);
+         let iconClass = '';
+         if (dewTrend === 'up') iconClass = "fa-angle-up";
+         else if (dewTrend === 'down') iconClass = "fa-angle-down";
+         if (iconClass) {
+           trendHtml = `<div style="position: absolute; top: ${BAROMETRIC_TREND_TOP_POS}; width: 100%; text-align: center; font-size: ${BAROMETRIC_TREND_FONT_SIZE};"><i class="fa-solid ${iconClass}"></i></div>`;
+         }
+       }
+       
+       gridHumidityTextEls.forEach(gridHumidityTextEl => {
+          if (dewpoint !== null) {
+             const dewF = Math.round(dewpoint);
+             let displayStr = '';
+             const degSuffix = '°';
+             
+             if (displayUnit === 'BOTH') {
+                const dewC = Math.round((dewF - 32) * 5 / 9);
+                displayStr = `${dewF}${formatSlash()}${dewC}${degSuffix}`;
+             } else {
+                displayStr = `${displayUnit === 'C' ? Math.round((dewF - 32) * 5 / 9) : dewF}${degSuffix}`;
+             }
+             
+             gridHumidityTextEl.innerHTML = `${trendHtml}${displayStr}<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Td</span>`;
+             gridHumidityTextEl.style.color = finalColor;
+          } else {
+             gridHumidityTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Td</span>`;
+             gridHumidityTextEl.style.color = '#ffffff';
+          }
+       });
+
+       labelEls.forEach(labelEl => {
+          if (typeof humidity === 'number') {
+             labelEl.innerHTML = `${Math.round(humidity)}% RH`;
+          } else {
+             labelEl.innerHTML = `--% RH`;
+          }
+          labelEl.style.color = tempColor || 'inherit';
+          labelEl.style.textTransform = 'none';
+       });
+    }
   }
 
   // Update the dewpoint dial in grid cell #5 (index 4)
   function updateDewpointDial(data) {
     // Deprecated: Mobile dewpoint dial (.clockGridItem-4) is now a dual dial
-    // exactly like the desktop UV dial. Handled by updateUvDualDial().
+    // exactly like the desktop UV dial. Handled by updateUvDial().
   }
   
-  function updateUvDualDial(data) {
+  function updateUvDial(data) {
     const uvIndex = data?.current?.uvi !== undefined ? Number(data.current.uvi) : null;
     
     // Track the highest UV index reached so far today, persisting across reloads and resetting at midnight
@@ -11205,43 +11312,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
       dailyPeakUv = storedMaxUv;
     }
     
-    const dewpoint = data?.current?.dew_point !== undefined ? Number(data.current.dew_point) : null;
-    
-    // Determine natural state based on day/night
-    const now = Date.now() / 1000;
-    const sunrise = data?.daily?.[0]?.sunrise || 0;
-    const sunset = data?.daily?.[0]?.sunset || 0;
-    const isDaytime = (now >= sunrise && now < sunset);
-    const naturalState = isDaytime ? 'UV' : 'DEW';
-    
-    const activeState = uvDialForceState || naturalState;
-    
     const itemEls = document.querySelectorAll('.clockGridItem-8, .clockGridItem-4');
     itemEls.forEach(itemEl => {
-       itemEl.setAttribute('data-active-state', activeState);
-       if (!itemEl.hasUvClickListener) {
-          itemEl.hasUvClickListener = true;
-          itemEl.style.cursor = 'pointer';
-          itemEl.addEventListener('click', (e) => {
-             e.stopPropagation();
-             const currentState = itemEl.getAttribute('data-active-state');
-             uvDialForceState = (currentState === 'UV') ? 'DEW' : 'UV';
-             
-             if (window.uvDialForceTimer) clearTimeout(window.uvDialForceTimer);
-             window.uvDialForceTimer = setTimeout(() => {
-                uvDialForceState = null;
-                if (typeof updateUvDualDial === 'function') {
-                   updateUvDualDial(window.lastWeatherData);
-                }
-             }, 60000);
-             
-             updateUvDualDial(window.lastWeatherData || data);
-          });
-       }
+       itemEl.style.cursor = 'default';
+       itemEl.removeAttribute('data-active-state');
     });
     
     const progressEls = document.querySelectorAll('.clockGridItem-8 .countdown-progress, .clockGridItem-4 .countdown-progress');
-    const trackEls = document.querySelectorAll('.clockGridItem-8 .countdown-track, .clockGridItem-4 .countdown-track');
     const peakEls = document.querySelectorAll('.clockGridItem-8 .uv-peak-progress, .clockGridItem-4 .uv-peak-progress');
     const textEls = document.querySelectorAll('.clockGridItem-8 .grid-uv-text, .clockGridItem-4 .grid-dewpoint-text');
     const radius = 46;
@@ -11249,158 +11326,72 @@ Plan ahead for significantly warmer conditions tomorrow!`
     
     function getUvColor(uv) {
        if (uv === null) return '#ffffff';
-       
-       // Map the standard UV Index scale intuitively to the custom temperature color scale
-       let mappedTemp = 55; // 0-2 (Low) -> maps to 50s (Green)
-       if (uv >= 11) {
-          mappedTemp = -5;  // 11+ (Extreme) -> maps to Below 0 (Shocking Magenta)
-       } else if (uv >= 8) {
-          mappedTemp = 105; // 8-10 (Very High) -> maps to 100s (Vibrant Red)
-       } else if (uv >= 6) {
-          mappedTemp = 85;  // 6-7 (High) -> maps to 80s (Orange)
-       } else if (uv >= 3) {
-          mappedTemp = 75;  // 3-5 (Moderate) -> maps to 70s (Yellow-Gold)
-       }
-       
+       let mappedTemp = 55;
+       if (uv >= 11) mappedTemp = -5;
+       else if (uv >= 8) mappedTemp = 105;
+       else if (uv >= 6) mappedTemp = 85;
+       else if (uv >= 3) mappedTemp = 75;
        return tempToColor(mappedTemp) || '#ffffff';
     }
 
-    if (activeState === 'UV') {
-       const uvColor = getUvColor(uvIndex);
-       progressEls.forEach(el => {
-         el.style.stroke = uvColor;
-       });
+    const uvColor = getUvColor(uvIndex);
+    progressEls.forEach(el => el.style.stroke = uvColor);
        
-       if (dailyPeakUv !== null && uvIndex !== null && dailyPeakUv > uvIndex) {
-         const peakColor = getUvColor(dailyPeakUv);
-         peakEls.forEach(el => {
-           el.style.display = ''; // Clear inline display so it relies on SVG defaults (fixes mobile rendering)
-           el.style.stroke = peakColor;
-           el.style.opacity = '0.5';
-         });
-         const getRadius = () => 46;
-         animateGauge(peakEls, dailyPeakUv, prevUvPeakDialVal, 0, 5.5, 11, getRadius);
-         prevUvPeakDialVal = dailyPeakUv;
-       } else {
-         peakEls.forEach(el => {
-           el.style.display = 'none';
-           el.style.removeProperty('stroke');
-           el.style.removeProperty('opacity');
-           el.style.strokeDashoffset = circumference;
-         });
-         prevUvPeakDialVal = null;
-       }
-       
-       if (uvIndex !== null) {
-         const getRadius = () => 46;
-         animateGauge(progressEls, uvIndex, prevUvDialVal, 0, 5.5, 11, getRadius);
-         prevUvDialVal = uvIndex;
-       } else {
-         progressEls.forEach(el => el.style.strokeDashoffset = circumference);
-         prevUvDialVal = null;
-       }
-       
-       textEls.forEach(gridUvTextEl => {
-          if (uvIndex !== null) {
-             const uvVal = uvIndex.toFixed(1);
-             gridUvTextEl.innerHTML = `${uvVal}<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">UV</span>`;
-             gridUvTextEl.style.color = uvColor;
-          } else {
-             gridUvTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">UV</span>`;
-             gridUvTextEl.style.color = '#ffffff';
-          }
-       });
-       
-       // Update hidden value label (Dew Pt)
-       const labelEls = document.querySelectorAll('.label-title-8, .label-title-4');
-       labelEls.forEach(labelEl => {
-          let labelColor = 'inherit';
-          if (dewpoint !== null) {
-             const dewF = Math.round(dewpoint);
-             if (displayUnit === 'BOTH') {
-                const dewC = Math.round((dewF - 32) * 5 / 9);
-                labelEl.innerHTML = `Dew Pt ${dewF}${formatSlash()}${dewC}°`;
-             } else {
-                labelEl.innerHTML = `Dew Pt ${dewF}°`;
-             }
-             labelColor = tempToColor(dewpoint) || 'inherit';
-          } else {
-             labelEl.innerHTML = `Dew Pt --`;
-          }
-          labelEl.style.color = labelColor;
-          labelEl.style.textTransform = 'none';
-       });
+    if (dailyPeakUv !== null && uvIndex !== null && dailyPeakUv > uvIndex) {
+      const peakColor = getUvColor(dailyPeakUv);
+      peakEls.forEach(el => {
+        el.style.display = '';
+        el.style.stroke = peakColor;
+        el.style.opacity = '0.5';
+      });
+      const getRadius = () => 46;
+      animateGauge(peakEls, dailyPeakUv, prevUvPeakDialVal, 0, 5.5, 11, getRadius);
+      prevUvPeakDialVal = dailyPeakUv;
     } else {
-       const currentTemp = (data?.current?.temp !== undefined) ? data.current.temp : null;
-       const tempColor = currentTemp !== null ? tempToColor(currentTemp) : null;
-       const dewpointColor = dewpoint !== null ? tempToColor(dewpoint) : 'hsl(120, 80%, 40%)';
-       const finalColor = tempColor || dewpointColor;
-
-       progressEls.forEach(el => {
-         if (finalColor) el.style.stroke = finalColor;
-       });
-       
-       peakEls.forEach(el => {
-         el.style.removeProperty('stroke');
-         el.style.removeProperty('opacity');
-         el.style.strokeDashoffset = circumference;
-       });
-       
-       if (dewpoint !== null) {
-         const getRadius = () => 46;
-         animateGauge(progressEls, dewpoint, prevUvDialVal, DEWPOINT_DIAL_MIN, DEWPOINT_DIAL_AVG, DEWPOINT_DIAL_MAX, getRadius);
-         prevUvDialVal = dewpoint;
-       } else {
-         progressEls.forEach(el => el.style.strokeDashoffset = circumference);
-         prevUvDialVal = null;
-       }
-       
-       let trendHtml = '';
-       if (dewpoint !== null) {
-         const dewF = Math.round(dewpoint);
-         const dewTrend = getPersistentTrendDirection('weather_trend_dewpoint', dewF);
-         let iconClass = '';
-         if (dewTrend === 'up') iconClass = "fa-angle-up";
-         else if (dewTrend === 'down') iconClass = "fa-angle-down";
-         if (iconClass) {
-           trendHtml = `<div style="position: absolute; top: ${BAROMETRIC_TREND_TOP_POS}; width: 100%; text-align: center; font-size: ${BAROMETRIC_TREND_FONT_SIZE};"><i class="fa-solid ${iconClass}"></i></div>`;
-         }
-       }
-       
-       textEls.forEach(gridUvTextEl => {
-          if (dewpoint !== null) {
-             const dewF = Math.round(dewpoint);
-             let displayStr = '';
-             const degSuffix = '°';
-             
-             if (displayUnit === 'BOTH') {
-                const dewC = Math.round((dewF - 32) * 5 / 9);
-                displayStr = `${dewF}${formatSlash()}${dewC}${degSuffix}`;
-             } else {
-                displayStr = `${displayUnit === 'C' ? Math.round((dewF - 32) * 5 / 9) : dewF}${degSuffix}`;
-             }
-             gridUvTextEl.innerHTML = `${trendHtml}${displayStr}<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Td</span>`;
-             if (finalColor) gridUvTextEl.style.color = finalColor;
-          } else {
-             gridUvTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Td</span>`;
-             gridUvTextEl.style.color = '#ffffff';
-          }
-       });
-       
-       // Update hidden value label (UV Index)
-       const labelEls = document.querySelectorAll('.label-title-8');
-       labelEls.forEach(labelEl => {
-          if (uvIndex !== null) {
-             labelEl.innerHTML = `UV ${uvIndex.toFixed(1)}`;
-             labelEl.style.color = getUvColor(uvIndex);
-          } else {
-             labelEl.innerHTML = `UV --`;
-             labelEl.style.color = 'inherit';
-          }
-          labelEl.style.textTransform = 'none';
-       });
+      peakEls.forEach(el => {
+        el.style.display = 'none';
+        el.style.removeProperty('stroke');
+        el.style.removeProperty('opacity');
+        el.style.strokeDashoffset = circumference;
+      });
+      prevUvPeakDialVal = null;
     }
+       
+    if (uvIndex !== null) {
+      const getRadius = () => 46;
+      animateGauge(progressEls, uvIndex, prevUvDialVal, 0, 5.5, 11, getRadius);
+      prevUvDialVal = uvIndex;
+    } else {
+      progressEls.forEach(el => el.style.strokeDashoffset = circumference);
+      prevUvDialVal = null;
+    }
+       
+    textEls.forEach(gridUvTextEl => {
+       if (uvIndex !== null) {
+          const uvVal = uvIndex.toFixed(1);
+          gridUvTextEl.innerHTML = `${uvVal}<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">UV</span>`;
+          gridUvTextEl.style.color = uvColor;
+       } else {
+          gridUvTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">UV</span>`;
+          gridUvTextEl.style.color = '#ffffff';
+       }
+    });
+       
+    const labelEls = document.querySelectorAll('.label-title-8, .label-title-4');
+    labelEls.forEach(labelEl => {
+       labelEl.innerHTML = `UV Index`;
+       labelEl.style.color = uvColor;
+       labelEl.style.textTransform = 'uppercase';
+    });
   }
+
+
+
+
+
+
+
+  
 
 
 
@@ -19513,7 +19504,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   let prevHumidity = null;
   let prevDewpoint = null;
   let prevPressure = null;
-  let uvDialForceState = null;
+  let humidityDialForceState = null;
   let prevUvDialVal = null;
   let prevUvPeakDialVal = null;
 
