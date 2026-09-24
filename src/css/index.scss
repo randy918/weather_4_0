@@ -1258,6 +1258,13 @@ main {
         }
     }
 
+    &.clockGridItem-0 {
+        .clock-timer-svg .countdown-progress,
+        .clock-timer-svg .countdown-track {
+            transition: stroke-dashoffset 1s linear, stroke-dasharray 1s linear, stroke 0.5s ease !important;
+        }
+    }
+
     &.clockGridItem-2, &.clockGridItem-3, &.clockGridItem-4, &.clockGridItem-5, &.clockGridItem-6, &.clockGridItem-8 {
         .clock-timer-svg {
             transform: rotate(90deg) !important;
@@ -2443,6 +2450,7 @@ main {
     letter-spacing: var(--solar-flare-sublabel-letter-spacing, 0.04vw);
     color: var(--solar-flare-sublabel-color, var(--temp-color, rgba(255, 255, 255, 0.70)));
     text-align: center;
+    display: block;
     width: 100%;
     max-width: var(--solar-flare-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
     white-space: normal;
@@ -2559,6 +2567,7 @@ main {
     letter-spacing: var(--radio-blackout-sublabel-letter-spacing, 0.04vw);
     color: var(--radio-blackout-sublabel-color, var(--temp-color, rgba(255, 255, 255, 0.70)));
     text-align: center;
+    display: block;
     width: 100%;
     max-width: var(--radio-blackout-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
     white-space: normal;

@@ -432,11 +432,13 @@ import weatherConditions from '../data/weather-conditions.json';
   const CLOCK_GRID_DEWPOINT_Y_OFFSET = '0.7vw';   // EDITABLE: Vertical offset of the dewpoint number inside cell #5 (e.g. '0vw', '0.7vw')
   const CLOCK_GRID_SUN_Y_OFFSET = '0.7vw';        // EDITABLE: Vertical offset of the sun dial day-length number inside cell #6 (e.g. '0vw', '0.7vw')
   const CLOCK_GRID_MOON_Y_OFFSET = '0.7vw';       // EDITABLE: Vertical offset of the moon dial moon-up number inside cell #7 (e.g. '0vw', '0.7vw')
-  const CLOCK_GRID_CELESTIAL_DOT_RADIUS = 6.4;  // EDITABLE: Radius of the celestial dots marking current time on the dial track (using SVG native viewBox units, e.g. 2 means 2 viewBox units out of 100)
+  const CLOCK_GRID_SUN_DOT_RADIUS = 5.18;       // EDITABLE: Radius of the sun dot marking current time on the dial track (20% smaller than moon)
+  const CLOCK_GRID_MOON_DOT_RADIUS = 6.4;       // EDITABLE: Radius of the moon dot marking current time on the dial track
   const CLOCK_GRID_CELESTIAL_DOT_STROKE_WIDTH = 2; // EDITABLE: Stroke width for the celestial dots (using SVG native viewBox units)
+  const CLOCK_GRID_SUN_DOT_STROKE_WIDTH_DOWN = 2; // EDITABLE: Stroke width for the sun dot specifically when the sun is down
   const CLOCK_GRID_CELESTIAL_DOT_FILL = 'rgba(0,0,0,0.5)'; // EDITABLE: Fill color for the celestial dots
   const MOON_DIAL_DOT_COLOR = 'rgba(138, 154, 171, 1.0)'; // EDITABLE: Blueish-gray color for the small disc on the moon dial when up
-  const MOON_DIAL_DOT_COLOR_DOWN = 'rgba(138, 154, 171, 0.3)'; // EDITABLE: Blueish-gray color for the small disc on the moon dial when down
+  const MOON_DIAL_DOT_COLOR_DOWN = 'rgba(0, 0, 0, 1.0)'; // EDITABLE: Black color for the small disc on the moon dial when down
   const CLOCK_GRID_WIND_SPEED_TEXT_SHADOW = '2px 2px 0px black)'; // EDITABLE: Text shadow for wind speed number (offset-x offset-y blur color)
   const CLOCK_GRID_ROW2_MARGIN_TOP = '2vw'; // EDITABLE: Margin top for the 2nd row of 4x2 dials
 
@@ -495,8 +497,10 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--grid-dewpoint-y-offset', CLOCK_GRID_DEWPOINT_Y_OFFSET);
   document.documentElement.style.setProperty('--grid-sun-y-offset', CLOCK_GRID_SUN_Y_OFFSET);
   document.documentElement.style.setProperty('--grid-moon-y-offset', CLOCK_GRID_MOON_Y_OFFSET);
-  document.documentElement.style.setProperty('--grid-celestial-dot-radius', CLOCK_GRID_CELESTIAL_DOT_RADIUS);
+  document.documentElement.style.setProperty('--grid-sun-dot-radius', CLOCK_GRID_SUN_DOT_RADIUS);
+  document.documentElement.style.setProperty('--grid-moon-dot-radius', CLOCK_GRID_MOON_DOT_RADIUS);
   document.documentElement.style.setProperty('--grid-celestial-dot-stroke-width', CLOCK_GRID_CELESTIAL_DOT_STROKE_WIDTH);
+  document.documentElement.style.setProperty('--grid-sun-dot-stroke-width-down', CLOCK_GRID_SUN_DOT_STROKE_WIDTH_DOWN);
   document.documentElement.style.setProperty('--grid-celestial-dot-fill', CLOCK_GRID_CELESTIAL_DOT_FILL);
   document.documentElement.style.setProperty('--grid-wind-speed-text-shadow', CLOCK_GRID_WIND_SPEED_TEXT_SHADOW);
   document.documentElement.style.setProperty('--clock-grid-row2-margin-top', CLOCK_GRID_ROW2_MARGIN_TOP);
@@ -7571,9 +7575,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // Plays back recent stepped frames back-and-forth (ping-pong) to show live solar flare activity & winking white dots
   const SUN_SIZZLE_ENABLED = true;                    // EDITABLE: Enable/disable animation for left sizzling sun
   const SUN_SIZZLE_BAND = 'Fe195';                    // EDITABLE: NOAA SUVI band: 'Fe195' (coronal loops/bronze), 'Fe094' (hot solar flares/blue), 'He304' (prominence eruptions/red)
-  const SUN_SIZZLE_FETCH_LENGTH = 720;                // EDITABLE: Historical buffer to pull from NOAA (60 = ~1 hr, 120 = ~2 hrs, 720 = ~12 hrs)
-  const SUN_SIZZLE_FRAME_STEP = 5;                    // EDITABLE: Cadence step (~3-4m apart so solar flares visibly boil and wink with white dots)
-  const SUN_SIZZLE_FRAME_COUNT = 72;                  // EDITABLE: Number of recent stepped frames in loop (e.g. 24, 36, 48, 72)
+  const SUN_SIZZLE_FETCH_LENGTH_DESKTOP = 720;          // EDITABLE Desktop: Historical buffer to pull from NOAA (60 = ~1 hr, 120 = ~2 hrs, 720 = ~12 hrs)
+  const SUN_SIZZLE_FETCH_LENGTH_MOBILE = 720;           // EDITABLE Mobile: Historical buffer to pull from NOAA
+  const SUN_SIZZLE_FRAME_STEP_DESKTOP = 5;              // EDITABLE Desktop: Cadence step (~3-4m apart so solar flares visibly boil)
+  const SUN_SIZZLE_FRAME_STEP_MOBILE = 5;               // EDITABLE Mobile: Cadence step (Increase this if mobile browser drops frames to cover more time)
+  const SUN_SIZZLE_FRAME_COUNT_DESKTOP = 72;            // EDITABLE Desktop: Number of recent stepped frames in loop (e.g. 24, 36, 48, 72)
+  const SUN_SIZZLE_FRAME_COUNT_MOBILE = 72;             // EDITABLE Mobile: Number of recent stepped frames in loop
   const SUN_SIZZLE_FPS_DESKTOP = 12;                  // EDITABLE Desktop: Sizzle playback speed in FPS (6-7 FPS gives eye time to track individual flares)
   const SUN_SIZZLE_FPS_MOBILE = 12;                   // EDITABLE Mobile: Sizzle playback speed in FPS
   const SUN_SIZZLE_FPS = 12;                          // EDITABLE: Fallback / default FPS
@@ -7845,12 +7852,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SOLAR_FLARE_SUBLABEL_FONT_FAMILY = "var(--sun-label-font-family, 'light', sans-serif)"; // EDITABLE: Font family ('light', 'euro', 'bold', etc.)
   const SOLAR_FLARE_SUBLABEL_FONT_SIZE_DESKTOP = '1.35vw';        // EDITABLE Desktop: Sublabel font size
   const SOLAR_FLARE_SUBLABEL_FONT_SIZE_MOBILE = '2.6vw';         // EDITABLE Mobile: Sublabel font size
-  const SOLAR_FLARE_SUBLABEL_LINE_HEIGHT = 1.15;                 // EDITABLE: Sublabel line height for multi-line
+  const SOLAR_FLARE_SUBLABEL_LINE_HEIGHT_DESKTOP = 1.05;         // EDITABLE Desktop: Sublabel line height for multi-line
+  const SOLAR_FLARE_SUBLABEL_LINE_HEIGHT_MOBILE = 1.05;          // EDITABLE Mobile: Sublabel line height for multi-line
   const SOLAR_FLARE_SUBLABEL_LETTER_SPACING_DESKTOP = '0.04vw';  // EDITABLE Desktop: Sublabel letter spacing
   const SOLAR_FLARE_SUBLABEL_LETTER_SPACING_MOBILE = '0.04vw';   // EDITABLE Mobile: Sublabel letter spacing
   const SOLAR_FLARE_SUBLABEL_COLOR = 'auto';                     // EDITABLE: 'auto' (matches dial color) or custom CSS color (e.g. 'rgba(255, 255, 255, 0.70)')
-  const SOLAR_FLARE_SUBLABEL_MARGIN_TOP_DESKTOP = '0.8vw';       // EDITABLE Desktop: Margin top below dial circle
-  const SOLAR_FLARE_SUBLABEL_MARGIN_TOP_MOBILE = '1.5vw';        // EDITABLE Mobile: Margin top below dial circle
+  const SOLAR_FLARE_SUBLABEL_MARGIN_TOP_DESKTOP = '0.6vw';       // EDITABLE Desktop: Margin top below dial circle
+  const SOLAR_FLARE_SUBLABEL_MARGIN_TOP_MOBILE = '1.2vw';        // EDITABLE Mobile: Margin top below dial circle
   const SOLAR_FLARE_SUBLABEL_OFFSET_Y_DESKTOP = '0vw';           // EDITABLE Desktop: Fine vertical nudge
   const SOLAR_FLARE_SUBLABEL_OFFSET_Y_MOBILE = '0vw';            // EDITABLE Mobile: Fine vertical nudge
 
@@ -7969,12 +7977,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const RADIO_BLACKOUT_SUBLABEL_FONT_FAMILY = "var(--sun-label-font-family, 'light', sans-serif)"; // EDITABLE: Font family ('light', 'euro', 'bold', etc.)
   const RADIO_BLACKOUT_SUBLABEL_FONT_SIZE_DESKTOP = '1.35vw';     // EDITABLE Desktop: Sublabel font size
   const RADIO_BLACKOUT_SUBLABEL_FONT_SIZE_MOBILE = '2.6vw';      // EDITABLE Mobile: Sublabel font size
-  const RADIO_BLACKOUT_SUBLABEL_LINE_HEIGHT = 1.15;              // EDITABLE: Sublabel line height for multi-line
+  const RADIO_BLACKOUT_SUBLABEL_LINE_HEIGHT_DESKTOP = 1.05;      // EDITABLE Desktop: Sublabel line height for multi-line
+  const RADIO_BLACKOUT_SUBLABEL_LINE_HEIGHT_MOBILE = 1.05;       // EDITABLE Mobile: Sublabel line height for multi-line
   const RADIO_BLACKOUT_SUBLABEL_LETTER_SPACING_DESKTOP = '0.04vw';// EDITABLE Desktop: Sublabel letter spacing
   const RADIO_BLACKOUT_SUBLABEL_LETTER_SPACING_MOBILE = '0.04vw'; // EDITABLE Mobile: Sublabel letter spacing
   const RADIO_BLACKOUT_SUBLABEL_COLOR = 'auto';                  // EDITABLE: 'auto' (matches dial color) or custom CSS color (e.g. 'rgba(255, 255, 255, 0.70)')
-  const RADIO_BLACKOUT_SUBLABEL_MARGIN_TOP_DESKTOP = '0.8vw';    // EDITABLE Desktop: Margin top below dial circle
-  const RADIO_BLACKOUT_SUBLABEL_MARGIN_TOP_MOBILE = '1.5vw';     // EDITABLE Mobile: Margin top below dial circle
+  const RADIO_BLACKOUT_SUBLABEL_MARGIN_TOP_DESKTOP = '0.6vw';    // EDITABLE Desktop: Margin top below dial circle
+  const RADIO_BLACKOUT_SUBLABEL_MARGIN_TOP_MOBILE = '1.2vw';     // EDITABLE Mobile: Margin top below dial circle
   const RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_DESKTOP = '0vw';        // EDITABLE Desktop: Fine vertical nudge
   const RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_MOBILE = '0vw';         // EDITABLE Mobile: Fine vertical nudge
 
@@ -8773,7 +8782,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--solar-flare-sublabel-font-size-desktop', SOLAR_FLARE_SUBLABEL_FONT_SIZE_DESKTOP);
     document.documentElement.style.setProperty('--solar-flare-sublabel-font-size-mobile', SOLAR_FLARE_SUBLABEL_FONT_SIZE_MOBILE);
     document.documentElement.style.setProperty('--solar-flare-sublabel-font-size', isMobile ? SOLAR_FLARE_SUBLABEL_FONT_SIZE_MOBILE : SOLAR_FLARE_SUBLABEL_FONT_SIZE_DESKTOP);
-    document.documentElement.style.setProperty('--solar-flare-sublabel-line-height', String(SOLAR_FLARE_SUBLABEL_LINE_HEIGHT));
+    document.documentElement.style.setProperty('--solar-flare-sublabel-line-height-desktop', String(SOLAR_FLARE_SUBLABEL_LINE_HEIGHT_DESKTOP));
+    document.documentElement.style.setProperty('--solar-flare-sublabel-line-height-mobile', String(SOLAR_FLARE_SUBLABEL_LINE_HEIGHT_MOBILE));
+    document.documentElement.style.setProperty('--solar-flare-sublabel-line-height', String(isMobile ? SOLAR_FLARE_SUBLABEL_LINE_HEIGHT_MOBILE : SOLAR_FLARE_SUBLABEL_LINE_HEIGHT_DESKTOP));
     document.documentElement.style.setProperty('--solar-flare-sublabel-letter-spacing-desktop', SOLAR_FLARE_SUBLABEL_LETTER_SPACING_DESKTOP);
     document.documentElement.style.setProperty('--solar-flare-sublabel-letter-spacing-mobile', SOLAR_FLARE_SUBLABEL_LETTER_SPACING_MOBILE);
     document.documentElement.style.setProperty('--solar-flare-sublabel-letter-spacing', isMobile ? SOLAR_FLARE_SUBLABEL_LETTER_SPACING_MOBILE : SOLAR_FLARE_SUBLABEL_LETTER_SPACING_DESKTOP);
@@ -8866,7 +8877,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--radio-blackout-sublabel-font-size-desktop', RADIO_BLACKOUT_SUBLABEL_FONT_SIZE_DESKTOP);
     document.documentElement.style.setProperty('--radio-blackout-sublabel-font-size-mobile', RADIO_BLACKOUT_SUBLABEL_FONT_SIZE_MOBILE);
     document.documentElement.style.setProperty('--radio-blackout-sublabel-font-size', isMobile ? RADIO_BLACKOUT_SUBLABEL_FONT_SIZE_MOBILE : RADIO_BLACKOUT_SUBLABEL_FONT_SIZE_DESKTOP);
-    document.documentElement.style.setProperty('--radio-blackout-sublabel-line-height', String(RADIO_BLACKOUT_SUBLABEL_LINE_HEIGHT));
+    document.documentElement.style.setProperty('--radio-blackout-sublabel-line-height-desktop', String(RADIO_BLACKOUT_SUBLABEL_LINE_HEIGHT_DESKTOP));
+    document.documentElement.style.setProperty('--radio-blackout-sublabel-line-height-mobile', String(RADIO_BLACKOUT_SUBLABEL_LINE_HEIGHT_MOBILE));
+    document.documentElement.style.setProperty('--radio-blackout-sublabel-line-height', String(isMobile ? RADIO_BLACKOUT_SUBLABEL_LINE_HEIGHT_MOBILE : RADIO_BLACKOUT_SUBLABEL_LINE_HEIGHT_DESKTOP));
     document.documentElement.style.setProperty('--radio-blackout-sublabel-letter-spacing-desktop', RADIO_BLACKOUT_SUBLABEL_LETTER_SPACING_DESKTOP);
     document.documentElement.style.setProperty('--radio-blackout-sublabel-letter-spacing-mobile', RADIO_BLACKOUT_SUBLABEL_LETTER_SPACING_MOBILE);
     document.documentElement.style.setProperty('--radio-blackout-sublabel-letter-spacing', isMobile ? RADIO_BLACKOUT_SUBLABEL_LETTER_SPACING_MOBILE : RADIO_BLACKOUT_SUBLABEL_LETTER_SPACING_DESKTOP);
@@ -8985,9 +8998,15 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--sun-sizzle-fps-desktop', String(SUN_SIZZLE_FPS_DESKTOP));
     document.documentElement.style.setProperty('--sun-sizzle-fps-mobile', String(SUN_SIZZLE_FPS_MOBILE));
     document.documentElement.style.setProperty('--sun-sizzle-fps', String(isMobile ? SUN_SIZZLE_FPS_MOBILE : SUN_SIZZLE_FPS_DESKTOP));
-    document.documentElement.style.setProperty('--sun-sizzle-frame-count', String(SUN_SIZZLE_FRAME_COUNT));
-    document.documentElement.style.setProperty('--sun-sizzle-frame-step', String(SUN_SIZZLE_FRAME_STEP));
-    document.documentElement.style.setProperty('--sun-sizzle-fetch-length', String(SUN_SIZZLE_FETCH_LENGTH));
+    document.documentElement.style.setProperty('--sun-sizzle-frame-count-desktop', String(SUN_SIZZLE_FRAME_COUNT_DESKTOP));
+    document.documentElement.style.setProperty('--sun-sizzle-frame-count-mobile', String(SUN_SIZZLE_FRAME_COUNT_MOBILE));
+    document.documentElement.style.setProperty('--sun-sizzle-frame-count', String(isMobile ? SUN_SIZZLE_FRAME_COUNT_MOBILE : SUN_SIZZLE_FRAME_COUNT_DESKTOP));
+    document.documentElement.style.setProperty('--sun-sizzle-frame-step-desktop', String(SUN_SIZZLE_FRAME_STEP_DESKTOP));
+    document.documentElement.style.setProperty('--sun-sizzle-frame-step-mobile', String(SUN_SIZZLE_FRAME_STEP_MOBILE));
+    document.documentElement.style.setProperty('--sun-sizzle-frame-step', String(isMobile ? SUN_SIZZLE_FRAME_STEP_MOBILE : SUN_SIZZLE_FRAME_STEP_DESKTOP));
+    document.documentElement.style.setProperty('--sun-sizzle-fetch-length-desktop', String(SUN_SIZZLE_FETCH_LENGTH_DESKTOP));
+    document.documentElement.style.setProperty('--sun-sizzle-fetch-length-mobile', String(SUN_SIZZLE_FETCH_LENGTH_MOBILE));
+    document.documentElement.style.setProperty('--sun-sizzle-fetch-length', String(isMobile ? SUN_SIZZLE_FETCH_LENGTH_MOBILE : SUN_SIZZLE_FETCH_LENGTH_DESKTOP));
   }
 
   // ==========================================
@@ -9852,7 +9871,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1272';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1273';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -11065,6 +11084,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
               <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
+              <circle class="uv-peak-progress" cx="50" cy="50" r="46" fill="none" style="stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease-out, stroke 0.5s ease-out, opacity 0.5s ease;" />
               <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
             </svg>
             <div class="grid-dewpoint-text"></div>
@@ -11576,7 +11596,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     labelEls.forEach(labelEl => {
        const peakStr = dailyPeakUv !== null ? dailyPeakUv.toFixed(1) : '0.0';
        labelEl.innerHTML = `Peak UV ${peakStr}`;
-       labelEl.style.color = uvColor;
+       labelEl.style.color = getUvColor(dailyPeakUv);
        labelEl.style.textTransform = 'none';
        labelEl.style.letterSpacing = 'var(--clock-grid-uv-label-letter-spacing)';
     });
@@ -11609,6 +11629,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   const DAILY_SUMMARY_LINE_HEIGHT_DESKTOP = '1';         // EDITABLE Desktop: Line height / leading
   const DAILY_SUMMARY_LINE_HEIGHT_MOBILE = '1.2';        // EDITABLE Mobile: Line height / leading
+
+  const DAILY_SUMMARY_MIN_HEIGHT_DESKTOP = '7.2vw';      // EDITABLE Desktop: Locks container height so the message length doesn't push/pull the clock dials up into the dopplers
+  const DAILY_SUMMARY_MIN_HEIGHT_MOBILE = '0vw';         // EDITABLE Mobile: Lock container height (0vw = natural flow)
 
   const DAILY_SUMMARY_MARGIN_TOP_DESKTOP = '2.2vw';       // EDITABLE Desktop: Space ABOVE summary line (match DERIVED_DESC_MARGIN_BOTTOM_DESKTOP)
   const DAILY_SUMMARY_MARGIN_TOP_MOBILE = '3.0vw';        // EDITABLE Mobile: Space ABOVE summary line (match DERIVED_DESC_MARGIN_BOTTOM_MOBILE)
@@ -11675,6 +11698,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
     el.style.letterSpacing = letterSpacing;
     el.style.lineHeight = lineHeight;
     el.style.margin = `${marginTop} auto ${marginBottom}`;
+    el.style.minHeight = isMobile ? DAILY_SUMMARY_MIN_HEIGHT_MOBILE : DAILY_SUMMARY_MIN_HEIGHT_DESKTOP;
+    el.style.display = 'flex';
+    el.style.flexDirection = 'column';
+    el.style.justifyContent = 'center';
 
     // Apply font-family override for 100-109 temperature range
     const tempVal = data?.current?.temp ?? lastWeatherData?.current?.temp;
@@ -11706,7 +11733,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
     if (summaryText) {
       el.textContent = summaryText;
-      el.style.display = 'block';
+      el.style.display = 'flex';
 
       // Calculate layout push dynamically (including margins)
       const marginTopVal = parseFloat(isMobile ? DAILY_SUMMARY_MARGIN_TOP_MOBILE : DAILY_SUMMARY_MARGIN_TOP_DESKTOP) || 0;
@@ -11804,15 +11831,19 @@ Plan ahead for significantly warmer conditions tomorrow!`
     lastSunIsUp = isUp;
 
     celestialDotEls.forEach(celestialDotEl => {
+      const celestialColorDown = currentTemp !== null ? (tempToColor(currentTemp - 10) || tempColor) : null;
       celestialDotEl.setAttribute('cx', cx.toFixed(3));
       celestialDotEl.setAttribute('cy', cy.toFixed(3));
       celestialDotEl.style.display = 'block';
-      celestialDotEl.setAttribute('r', String(CLOCK_GRID_CELESTIAL_DOT_RADIUS));
-      celestialDotEl.style.fill = isUp ? (celestialColor || 'white') : '#333333';
+      celestialDotEl.setAttribute('r', String(CLOCK_GRID_SUN_DOT_RADIUS));
+      
+      const upColor = celestialColor || 'white';
+      const downColor = celestialColorDown || '#333333';
+      celestialDotEl.style.fill = isUp ? upColor : '#000000';
       celestialDotEl.style.opacity = '1';
-      celestialDotEl.style.strokeWidth = 'var(--grid-celestial-dot-stroke-width)';
-      if (celestialColor) {
-        celestialDotEl.style.stroke = isUp ? celestialColor : '#333333';
+      celestialDotEl.style.strokeWidth = isUp ? 'var(--grid-celestial-dot-stroke-width)' : 'var(--grid-sun-dot-stroke-width-down)';
+      if (celestialColor || celestialColorDown) {
+        celestialDotEl.style.stroke = isUp ? upColor : downColor;
       }
     });
     
@@ -11936,15 +11967,46 @@ Plan ahead for significantly warmer conditions tomorrow!`
     }
     lastMoonIsUp = isUp;
 
+    const moonPhase = data?.daily?.[0]?.moon_phase;
+    let imgIndexStr = '01'; // Default
+    if (typeof moonPhase === 'number') {
+      let rawIndex = Math.round(moonPhase * 30);
+      let imgIndex = ((rawIndex + 0) % 30) + 1; // 0 is MOON_IMAGE_OFFSET
+      if (imgIndex < 1) imgIndex += 30;
+      if (imgIndex > 30) imgIndex -= 30;
+      imgIndexStr = imgIndex.toString().padStart(2, '0');
+    }
+
     celestialDotEls.forEach(celestialDotEl => {
       celestialDotEl.setAttribute('cx', cx.toFixed(3));
       celestialDotEl.setAttribute('cy', cy.toFixed(3));
       celestialDotEl.style.display = 'block';
-      celestialDotEl.setAttribute('r', String(CLOCK_GRID_CELESTIAL_DOT_RADIUS));
-      celestialDotEl.style.fill = isUp ? MOON_DIAL_DOT_COLOR : MOON_DIAL_DOT_COLOR_DOWN;
+      celestialDotEl.setAttribute('r', String(CLOCK_GRID_MOON_DOT_RADIUS));
+      
+      // Black background for the moon
+      celestialDotEl.style.fill = 'black'; 
       celestialDotEl.style.opacity = '1';
       celestialDotEl.style.strokeWidth = 'var(--grid-celestial-dot-stroke-width)';
       celestialDotEl.style.stroke = isUp ? MOON_DIAL_DOT_COLOR : MOON_DIAL_DOT_COLOR_DOWN;
+      
+      // Inject or update the moon phase PNG
+      let moonImgEl = celestialDotEl.parentNode.querySelector('.celestial-moon-image');
+      if (!moonImgEl) {
+        moonImgEl = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        moonImgEl.setAttribute('class', 'celestial-moon-image');
+        celestialDotEl.parentNode.appendChild(moonImgEl);
+      }
+      
+      const r = CLOCK_GRID_MOON_DOT_RADIUS;
+      const imgSize = r * 2;
+      moonImgEl.setAttribute('x', (cx - r).toFixed(3));
+      moonImgEl.setAttribute('y', (cy - r).toFixed(3));
+      moonImgEl.setAttribute('width', String(imgSize));
+      moonImgEl.setAttribute('height', String(imgSize));
+      moonImgEl.setAttribute('href', `img/2moon${imgIndexStr}.png`);
+      moonImgEl.setAttribute('transform', `rotate(-90 ${cx.toFixed(3)} ${cy.toFixed(3)})`);
+      moonImgEl.style.display = 'block';
+      moonImgEl.style.opacity = isUp ? '1' : '0.7';
     });
     
     // Calculate the next moon event (moonrise or moonset)
@@ -13776,9 +13838,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (words.length > 1) {
       const first = words[0];
       const rest = words.slice(1).join(' ');
-      return `<span style="white-space: nowrap;"><i class="${iconClass}" aria-hidden="true"></i> ${first}</span> ${rest}`;
+      return `<span style="white-space: nowrap;"><i class="${iconClass}" aria-hidden="true"></i> ${first}</span><br><span>${rest}</span>`;
     }
-    return `<i class="${iconClass}" aria-hidden="true"></i> ${text}`;
+    return `<span style="white-space: nowrap;"><i class="${iconClass}" aria-hidden="true"></i> ${text}</span>`;
   }
 
   function getSolarFlareImpact(flareClass, trendDir) {
@@ -13880,6 +13942,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
     // Track the highest Solar Flare fraction reached so far today, persisting across reloads and resetting at midnight
     let dailyPeakFraction = fraction;
     let dailyPeakColor = color;
+    let dailyPeakClass = flareClass;
+    let dailyPeakValue = flareValue;
     const isLive = SOLAR_FLARE_MODE === 'live' && !activeSolarFlareState;
     
     if (isLive) {
@@ -13887,25 +13951,41 @@ Plan ahead for significantly warmer conditions tomorrow!`
       let storedMaxFlareDate = localStorage.getItem('maxFlareDate');
       let storedMaxFlareFraction = localStorage.getItem('maxFlareFraction');
       let storedMaxFlareColor = localStorage.getItem('maxFlareColor');
-      
+      let storedMaxFlareClass = localStorage.getItem('maxFlareClass');
+      let storedMaxFlareValue = localStorage.getItem('maxFlareValue');
+      if (!storedMaxFlareClass) {
+         storedMaxFlareDate = null; // force reset of legacy data
+      }
       if (storedMaxFlareDate != currentDate) {
          storedMaxFlareFraction = fraction;
          storedMaxFlareColor = color;
+         storedMaxFlareClass = flareClass;
+         storedMaxFlareValue = flareValue;
          localStorage.setItem('maxFlareDate', currentDate);
          localStorage.setItem('maxFlareFraction', fraction);
          localStorage.setItem('maxFlareColor', color);
+         localStorage.setItem('maxFlareClass', flareClass);
+         localStorage.setItem('maxFlareValue', flareValue);
       } else {
          storedMaxFlareFraction = storedMaxFlareFraction ? Number(storedMaxFlareFraction) : fraction;
          storedMaxFlareColor = storedMaxFlareColor || color;
+         storedMaxFlareClass = storedMaxFlareClass || flareClass;
+         storedMaxFlareValue = storedMaxFlareValue || flareValue;
          if (fraction > storedMaxFlareFraction) {
             storedMaxFlareFraction = fraction;
             storedMaxFlareColor = color;
+            storedMaxFlareClass = flareClass;
+            storedMaxFlareValue = flareValue;
             localStorage.setItem('maxFlareFraction', fraction);
             localStorage.setItem('maxFlareColor', color);
+            localStorage.setItem('maxFlareClass', flareClass);
+            localStorage.setItem('maxFlareValue', flareValue);
          }
       }
       dailyPeakFraction = storedMaxFlareFraction;
       dailyPeakColor = storedMaxFlareColor;
+      dailyPeakClass = storedMaxFlareClass;
+      dailyPeakValue = storedMaxFlareValue;
     }
 
     // Circumference for r=46 is 2 * PI * 46 = 289.027
@@ -13918,6 +13998,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const classEl = dial.querySelector('.solar-flare-class');
     const valueEl = dial.querySelector('.solar-flare-value');
 
+
     if (line1El && line1El.textContent !== labels.line1) line1El.textContent = labels.line1;
     if (line2El && line2El.textContent !== labels.line2) line2El.textContent = labels.line2;
     if (classEl && classEl.textContent !== flareClass) classEl.textContent = flareClass;
@@ -13928,12 +14009,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
     
     // Apply peak styles
     if (dailyPeakFraction > fraction) {
-      dial.style.setProperty('--solar-flare-peak-color', dailyPeakColor);
+      dial.style.setProperty('--solar-flare-peak-color', color);
       dial.style.setProperty('--solar-flare-peak-stroke-offset', peakStrokeOffset.toFixed(2));
       const peakEl = dial.querySelector('.solar-flare-peak-progress');
       if (peakEl) {
           peakEl.style.display = ''; // Ensure it's visible
-          peakEl.style.opacity = '0.5'; // Force opacity inline to guarantee 50% transparency
+          peakEl.style.opacity = '0.3'; // Force opacity inline to guarantee 30% transparency
       }
     } else {
       const peakEl = dial.querySelector('.solar-flare-peak-progress');
@@ -13972,7 +14053,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
       if (sublabelEl) {
         if (SOLAR_FLARE_SUBLABEL_MODE === 'dynamic') {
           const impact = getSolarFlareImpact(flareClass, currentSolarFlareTrend);
-          sublabelEl.innerHTML = formatImpactSublabelHtml(impact.arrow, impact.text);
+          let baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
+          const peakValDisplay = (typeof dailyPeakValue === 'number' || !isNaN(parseFloat(dailyPeakValue))) ? parseFloat(dailyPeakValue).toFixed(1) : String(dailyPeakValue);
+          const line2Text = `Peak ${dailyPeakClass}${peakValDisplay}`;
+          sublabelEl.innerHTML = `${baseHtml}<br><span>${line2Text}</span>`;
         }
         if (SOLAR_FLARE_SUBLABEL_COLOR === 'auto') {
           sublabelEl.style.color = color;
@@ -14092,8 +14176,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
       ? liveSolarFlareData.value
       : (activeSolarFlareState?.value || SOLAR_FLARE_VALUE_MANUAL);
 
-    const labels = getSolarFlareLabels(initialClass);
     const displayVal = (typeof initialVal === 'number') ? initialVal.toFixed(1) : String(initialVal);
+    
+    const labels = getSolarFlareLabels(initialClass);
 
     dial.innerHTML = `
       <svg class="solar-flare-svg clock-timer-svg" viewBox="0 0 100 100">
@@ -14122,9 +14207,15 @@ Plan ahead for significantly warmer conditions tomorrow!`
       sublabel.className = 'world-clock-label celestial-clock-label solar-flare-sublabel';
       sublabel.id = 'solar-flare-sublabel';
       const impact = getSolarFlareImpact(initialClass, currentSolarFlareTrend);
-      const innerContent = (SOLAR_FLARE_SUBLABEL_MODE === 'dynamic')
-        ? formatImpactSublabelHtml(impact.arrow, impact.text)
-        : (isMobile ? SOLAR_FLARE_SUBLABEL_TEXT_MOBILE : SOLAR_FLARE_SUBLABEL_TEXT_DESKTOP);
+      let innerContent = '';
+      if (SOLAR_FLARE_SUBLABEL_MODE === 'dynamic') {
+        const baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
+        // Using initial values as peak if none exists yet, will be updated immediately in requestAnimationFrame
+        const peakValDisplay = (typeof initialVal === 'number' || !isNaN(parseFloat(initialVal))) ? parseFloat(initialVal).toFixed(1) : String(initialVal);
+        innerContent = `${baseHtml}<br><span>Peak ${initialClass}${peakValDisplay}</span>`;
+      } else {
+        innerContent = (isMobile ? SOLAR_FLARE_SUBLABEL_TEXT_MOBILE : SOLAR_FLARE_SUBLABEL_TEXT_DESKTOP);
+      }
       sublabel.innerHTML = innerContent;
       if (SOLAR_FLARE_SUBLABEL_COLOR === 'auto') {
         sublabel.style.color = getSolarFlareLevelColor(initialClass);
@@ -15640,11 +15731,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
         const uniqueUrls = Array.from(new Set(urls)).sort();
         if (uniqueUrls.length === 0) return;
 
-        const steppedUrls = SUN_SIZZLE_FRAME_STEP > 1
-          ? uniqueUrls.filter((_, idx) => (uniqueUrls.length - 1 - idx) % SUN_SIZZLE_FRAME_STEP === 0)
+        const isMobile = window.innerWidth <= 767;
+        const frameStep = isMobile ? SUN_SIZZLE_FRAME_STEP_MOBILE : SUN_SIZZLE_FRAME_STEP_DESKTOP;
+        const steppedUrls = frameStep > 1
+          ? uniqueUrls.filter((_, idx) => (uniqueUrls.length - 1 - idx) % frameStep === 0)
           : uniqueUrls;
 
-        const frameLimit = Math.max(2, Math.min(steppedUrls.length, SUN_SIZZLE_FRAME_COUNT));
+        const maxCount = isMobile ? SUN_SIZZLE_FRAME_COUNT_MOBILE : SUN_SIZZLE_FRAME_COUNT_DESKTOP;
+        const frameLimit = Math.max(2, Math.min(steppedUrls.length, maxCount));
         const selectedUrls = steppedUrls.slice(-frameLimit).map(u => {
           if (SUN_ANIMATION_RESOLUTION === '300x300') {
             return u.replace('600x600', '300x300');
@@ -15709,8 +15803,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
       // Auto-fetch freshest live frames from NOAA STAR SUVI Fe195
       async function refreshLiveSizzleFrames() {
         try {
+          const isMobile = window.innerWidth <= 767;
           const band = SUN_SIZZLE_BAND || 'Fe195';
-          const length = Math.max(60, Math.min(720, SUN_SIZZLE_FETCH_LENGTH || 720));
+          const fetchLen = isMobile ? SUN_SIZZLE_FETCH_LENGTH_MOBILE : SUN_SIZZLE_FETCH_LENGTH_DESKTOP;
+          const length = Math.max(60, Math.min(720, fetchLen || 720));
           const res = await fetch(`https://www.star.nesdis.noaa.gov/goes/SUVI_band.php?sat=G19&band=${band}&length=${length}&_t=${Date.now()}`, {
             cache: 'no-store'
           });
