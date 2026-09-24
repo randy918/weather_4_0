@@ -97,6 +97,10 @@ import weatherConditions from '../data/weather-conditions.json';
   const HUMIDITY_FUTURE_HOURS = 6; // EDITABLE: Hours ahead for the future humidity prediction dot (0 to disable)
   const HUMIDITY_FUTURE_DOT_SIZE = 3.5; // EDITABLE: Radius of the future humidity prediction dot
 
+  // --- CONFIG: Dew Point Future Dot ---
+  const DEWPOINT_FUTURE_HOURS = 6; // EDITABLE: Hours ahead for the future dew point prediction dot (0 to disable)
+  const DEWPOINT_FUTURE_DOT_SIZE = 3.5; // EDITABLE: Radius of the future dew point prediction dot
+
   // --- CONFIG: Rain Drop Animation ---
   const RAIN_ENABLED = true;                         // Set to false to disable all canvas drawing
   const RAIN_DROP_WIDTH = 2;                         // Thickness of raindrop in pixels
@@ -11433,6 +11437,33 @@ Plan ahead for significantly warmer conditions tomorrow!`
              gridHumidityTextEl.style.color = '#ffffff';
           }
        });
+       
+       const humidityDotContainers = document.querySelectorAll('.clockGridItem-3 .humidity-future-dot-container');
+       const humidityDots = document.querySelectorAll('.clockGridItem-3 .humidity-future-dot');
+       
+       if (DEWPOINT_FUTURE_HOURS > 0 && data?.hourly && data.hourly.length >= DEWPOINT_FUTURE_HOURS) {
+         const futureData = data.hourly[DEWPOINT_FUTURE_HOURS - 1];
+         if (typeof futureData.dew_point === 'number') {
+           const futureDewpoint = futureData.dew_point;
+           const percent = calcAboveBelowAverageProgress(futureDewpoint, DEWPOINT_DIAL_MIN, DEWPOINT_DIAL_AVG, DEWPOINT_DIAL_MAX);
+           
+           const futureColor = currentTemp !== null && currentTemp !== undefined ? tempToColor(currentTemp + 10) : '#ffffff';
+           
+           humidityDotContainers.forEach(container => {
+             container.style.transform = `rotate(${percent * 360}deg)`;
+             container.style.display = 'block';
+           });
+           humidityDots.forEach(dot => {
+             dot.setAttribute('r', DEWPOINT_FUTURE_DOT_SIZE);
+             dot.style.fill = futureColor;
+             dot.style.stroke = futureColor;
+           });
+         } else {
+           humidityDotContainers.forEach(container => container.style.display = 'none');
+         }
+       } else {
+         humidityDotContainers.forEach(container => container.style.display = 'none');
+       }
 
        labelEls.forEach(labelEl => {
           if (typeof humidity === 'number') {
