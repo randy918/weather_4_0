@@ -2888,7 +2888,7 @@ main {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) scale(var(--orrery-sun-scale, 1.0));
     width: var(--orrery-sun-width, 12.0vw);
     height: var(--orrery-sun-height, auto);
     aspect-ratio: 1 / 1;

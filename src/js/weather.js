@@ -58,10 +58,19 @@ import weatherConditions from '../data/weather-conditions.json';
   const FALL_STARTS_ICON_TRANSFORM = "rotate(45deg)"; // EDITABLE: Rotate the fall leaf to look more natural
   const WINTER_STARTS_ICON = "img/fog-wat.svg";
 
+  // --- CONFIG: Daylight Saving Time Starts/Ends Test / Preview & Styling (JCV) ---
+  const TEST_SHOW_DST_COUNTDOWN_PREVIEW = false; // EDITABLE: Set to true to force-show a countdown for DST changes for testing
+  const DST_BEGINS_COLOR = "rgba(241, 196, 15, 0.85)";  // Yellow/gold
+  const DST_ENDS_COLOR = "rgba(155, 89, 182, 0.85)";    // Purple
+  const DST_BEGINS_ICON = "fa-solid fa-clock";
+  const DST_ENDS_ICON = "fa-solid fa-clock";
+
   document.documentElement.style.setProperty('--spring-starts-color', SPRING_STARTS_COLOR);
   document.documentElement.style.setProperty('--summer-starts-color', SUMMER_STARTS_COLOR);
   document.documentElement.style.setProperty('--fall-starts-color', FALL_STARTS_COLOR);
   document.documentElement.style.setProperty('--winter-starts-color', WINTER_STARTS_COLOR);
+  document.documentElement.style.setProperty('--dst-begins-color', DST_BEGINS_COLOR);
+  document.documentElement.style.setProperty('--dst-ends-color', DST_ENDS_COLOR);
 
   // --- CONFIG: Clock Hands Spin Animation ---
   const CLOCK_SPIN_DURATION_MS = 1200; // EDITABLE: Reset animation spin duration in milliseconds
@@ -144,6 +153,10 @@ import weatherConditions from '../data/weather-conditions.json';
     document.documentElement.style.setProperty('--alert-modal-line-height', isMobile ? ALERT_MODAL_LINE_HEIGHT_MOBILE : ALERT_MODAL_LINE_HEIGHT_DESKTOP);
     document.documentElement.style.setProperty('--alert-modal-title-line-height', isMobile ? ALERT_MODAL_TITLE_LINE_HEIGHT_MOBILE : ALERT_MODAL_TITLE_LINE_HEIGHT_DESKTOP);
     document.documentElement.style.setProperty('--alert-modal-body-top-margin', isMobile ? ALERT_MODAL_BODY_TOP_MARGIN_MOBILE : ALERT_MODAL_BODY_TOP_MARGIN_DESKTOP);
+    document.documentElement.style.setProperty('--sunmoon-event-label-size', isMobile ? SUNMOON_EVENT_LABEL_SIZE_MOBILE : SUNMOON_EVENT_LABEL_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--sunmoon-event-label-y', isMobile ? SUNMOON_EVENT_LABEL_Y_OFFSET_MOBILE : SUNMOON_EVENT_LABEL_Y_OFFSET_DESKTOP);
+    document.documentElement.style.setProperty('--sunmoon-time-y', isMobile ? SUNMOON_TIME_Y_OFFSET_MOBILE : SUNMOON_TIME_Y_OFFSET_DESKTOP);
+    document.documentElement.style.setProperty('--clock-grid-uv-label-letter-spacing', isMobile ? CLOCK_GRID_UV_LABEL_LETTER_SPACING_MOBILE : CLOCK_GRID_UV_LABEL_LETTER_SPACING_DESKTOP);
   });
 
   // --- CONFIG: Snow Flake Animation ---
@@ -423,6 +436,9 @@ import weatherConditions from '../data/weather-conditions.json';
   const CLOCK_GRID_LABEL_MARGIN_TOP = '0.5vw';    // EDITABLE: Space between dial and its label
   const CLOCK_GRID_LABEL_LETTER_SPACING = '-0.05vw'; // EDITABLE: Letter spacing (kerning) for the labels
   
+  const CLOCK_GRID_UV_LABEL_LETTER_SPACING_DESKTOP = '-0.05vw'; // EDITABLE Desktop: Letter spacing for Peak UV label
+  const CLOCK_GRID_UV_LABEL_LETTER_SPACING_MOBILE = '-0.1vw';   // EDITABLE Mobile: Letter spacing for Peak UV label
+  
   // EDITABLE: Styling for the inner unit text below the number (e.g. "RH", "Td", "Day", "Moon", "hPa") inside the dials
   const CLOCK_GRID_INNER_LABEL_FONT_SIZE_DESKTOP = '2.2vw'; // EDITABLE: Desktop size of the inner label
   const CLOCK_GRID_INNER_LABEL_FONT_SIZE_MOBILE = '4vw'; // EDITABLE: Mobile size of the inner label
@@ -439,6 +455,7 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--clock-grid-label-font-family', CLOCK_GRID_LABEL_FONT_FAMILY);
   document.documentElement.style.setProperty('--clock-grid-label-margin-top', CLOCK_GRID_LABEL_MARGIN_TOP);
   document.documentElement.style.setProperty('--clock-grid-label-letter-spacing', CLOCK_GRID_LABEL_LETTER_SPACING);
+  document.documentElement.style.setProperty('--clock-grid-uv-label-letter-spacing', window.innerWidth <= 767 ? CLOCK_GRID_UV_LABEL_LETTER_SPACING_MOBILE : CLOCK_GRID_UV_LABEL_LETTER_SPACING_DESKTOP);
 
   document.documentElement.style.setProperty('--clock-grid-size', CLOCK_GRID_SIZE);
   document.documentElement.style.setProperty('--clock-grid-gap', CLOCK_GRID_GAP);
@@ -662,12 +679,28 @@ import weatherConditions from '../data/weather-conditions.json';
   // EDITABLE: Side-scrolling speed for weather images (in seconds)
   const WEATHER_IMAGE_SCROLL_SPEED_S = 240;
 
-  // EDITABLE: Sun and Moon dial inner label vertical offsets (in vw)
+  // EDITABLE: Sun and Moon dial inner event label (e.g., "Sunrise", "Sunset") configuration
   // Positive values move the label DOWN, negative values move it UP
-  const SUNMOON_TOP_LABEL_Y_OFFSET = '.65vw';
-  const SUNMOON_BOTTOM_LABEL_Y_OFFSET = '-1.65vw';
-  document.documentElement.style.setProperty('--sunmoon-top-label-y', SUNMOON_TOP_LABEL_Y_OFFSET);
-  document.documentElement.style.setProperty('--sunmoon-bottom-label-y', SUNMOON_BOTTOM_LABEL_Y_OFFSET);
+  const SUNMOON_EVENT_LABEL_SIZE_DESKTOP = '1.3vw';
+  const SUNMOON_EVENT_LABEL_SIZE_MOBILE = '2.5vw';
+  const SUNMOON_EVENT_LABEL_Y_OFFSET_DESKTOP = '0vw';
+  const SUNMOON_EVENT_LABEL_Y_OFFSET_MOBILE = '-.5vw';
+  
+  // EDITABLE: Sun and Moon dial inner time text vertical offset
+  const SUNMOON_TIME_Y_OFFSET_DESKTOP = '1.75vw';
+  const SUNMOON_TIME_Y_OFFSET_MOBILE = '3vw';
+
+  document.documentElement.style.setProperty('--sunmoon-event-label-size-desktop', SUNMOON_EVENT_LABEL_SIZE_DESKTOP);
+  document.documentElement.style.setProperty('--sunmoon-event-label-size-mobile', SUNMOON_EVENT_LABEL_SIZE_MOBILE);
+  document.documentElement.style.setProperty('--sunmoon-event-label-size', window.innerWidth <= 767 ? SUNMOON_EVENT_LABEL_SIZE_MOBILE : SUNMOON_EVENT_LABEL_SIZE_DESKTOP);
+  
+  document.documentElement.style.setProperty('--sunmoon-event-label-y-desktop', SUNMOON_EVENT_LABEL_Y_OFFSET_DESKTOP);
+  document.documentElement.style.setProperty('--sunmoon-event-label-y-mobile', SUNMOON_EVENT_LABEL_Y_OFFSET_MOBILE);
+  document.documentElement.style.setProperty('--sunmoon-event-label-y', window.innerWidth <= 767 ? SUNMOON_EVENT_LABEL_Y_OFFSET_MOBILE : SUNMOON_EVENT_LABEL_Y_OFFSET_DESKTOP);
+
+  document.documentElement.style.setProperty('--sunmoon-time-y-desktop', SUNMOON_TIME_Y_OFFSET_DESKTOP);
+  document.documentElement.style.setProperty('--sunmoon-time-y-mobile', SUNMOON_TIME_Y_OFFSET_MOBILE);
+  document.documentElement.style.setProperty('--sunmoon-time-y', window.innerWidth <= 767 ? SUNMOON_TIME_Y_OFFSET_MOBILE : SUNMOON_TIME_Y_OFFSET_DESKTOP);
 
   // EDITABLE: Adjust the vertical position of the "fragile" top-row elements as a set.
   // This moves the Moon Phase, Wind Arrow, and Weather Description Image together.
@@ -2557,6 +2590,8 @@ import weatherConditions from '../data/weather-conditions.json';
     "FALL STARTS": "var(--fall-starts-color)",
     "WINTER STARTS": "var(--winter-starts-color)",
     "METEOR SHOWER": "var(--meteor-shower-banner-color)",
+    "DST BEGINS": "var(--dst-begins-color)",
+    "DST ENDS": "var(--dst-ends-color)",
   };
 
   // EDITABLE: Alert Banner Icons
@@ -2586,6 +2621,8 @@ import weatherConditions from '../data/weather-conditions.json';
     "FALL STARTS": FALL_STARTS_ICON,
     "WINTER STARTS": WINTER_STARTS_ICON,
     "METEOR SHOWER": METEOR_SHOWER_BANNER_ICON,
+    "DST BEGINS": DST_BEGINS_ICON,
+    "DST ENDS": DST_ENDS_ICON,
   };
 
   // Dynamic temperature range based on actual week's data
@@ -5073,6 +5110,84 @@ import weatherConditions from '../data/weather-conditions.json';
 Prepare for the seasonal transition!`
           });
         }
+      }
+    }
+
+    // --- Daylight Saving Time Countdown ---
+    const dstTestPreviewActive = (() => {
+      try {
+        return new URLSearchParams(window.location.search).has('testDST') || TEST_SHOW_DST_COUNTDOWN_PREVIEW;
+      } catch(e) {
+        return TEST_SHOW_DST_COUNTDOWN_PREVIEW;
+      }
+    })();
+
+    // Helper to get 2nd Sunday in March and 1st Sunday in November
+    const getDSTEvents = (year) => {
+      // US DST Begins: 2nd Sunday in March at 2:00 AM local
+      const marchFirst = new Date(year, 2, 1);
+      const marchOffset = (7 - marchFirst.getDay()) % 7;
+      const dstStartDay = 1 + marchOffset + 7;
+      const dstStartMs = new Date(year, 2, dstStartDay, 2, 0, 0).getTime();
+
+      // US DST Ends: 1st Sunday in November at 2:00 AM local
+      const novFirst = new Date(year, 10, 1);
+      const novOffset = (7 - novFirst.getDay()) % 7;
+      const dstEndDay = 1 + novOffset;
+      const dstEndMs = new Date(year, 10, dstEndDay, 2, 0, 0).getTime();
+
+      return {
+        "BEGINS": dstStartMs,
+        "ENDS": dstEndMs
+      };
+    };
+
+    const dstEvents = getDSTEvents(nowYear);
+
+    for (let [eventType, eventTimeMs] of Object.entries(dstEvents)) {
+      let diffMs = eventTimeMs - nowMs;
+
+      if (dstTestPreviewActive && eventType === 'BEGINS') {
+        eventTimeMs = nowMs + 19 * 60 * 60 * 1000 + 120000; // 19 hours and 2 minutes
+        diffMs = eventTimeMs - nowMs;
+      }
+
+      // Active during the 24 hours countdown BEFORE the exact start of the DST change
+      if (diffMs > 0 && diffMs <= 24 * 60 * 60 * 1000) {
+        const diffMinutes = Math.ceil(diffMs / 60000);
+        let countdownStr = "";
+        
+        if (diffMinutes >= 60) {
+          const hours = Math.floor(diffMinutes / 60);
+          countdownStr = `in ${hours} hour${hours > 1 ? 's' : ''}`;
+        } else {
+          countdownStr = `in ${diffMinutes} minute${diffMinutes > 1 ? 's' : ''}`;
+        }
+
+        const localTime = new Date(eventTimeMs);
+        const localTimeStr = localTime.toLocaleDateString('en-US', {
+          weekday: 'long',
+          month: 'long',
+          day: 'numeric'
+        }) + " at " + localTime.toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        });
+
+        alerts.push({
+          event: `DST ${eventType}`,
+          countdown: countdownStr,
+          sender_name: "Daylight Saving Time Countdown",
+          start: Math.floor(nowMs / 1000),
+          end: Math.floor(eventTimeMs / 1000),
+          description: `Daylight Saving Time ${eventType.toLowerCase()} soon:
+          
+• Exact Local Time: ${localTimeStr}
+• Time Remaining: ${countdownStr}
+
+Remember to adjust your clocks!`
+        });
       }
     }
 
@@ -9049,6 +9164,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_SUN_WIDTH_MOBILE = '19.0vw';                // EDITABLE Mobile: Central Sun image width (doubled from 9.5vw)
   const ORRERY_SUN_HEIGHT_DESKTOP = 'auto';                // EDITABLE Desktop: Sun height ('auto' preserves aspect ratio)
   const ORRERY_SUN_HEIGHT_MOBILE = 'auto';                 // EDITABLE Mobile: Sun height
+  const ORRERY_SUN_SCALE_DESKTOP = '0.75';                  // EDITABLE Desktop: Central Sun scale (e.g. 0.5 for half size)
+  const ORRERY_SUN_SCALE_MOBILE = '0.75';                   // EDITABLE Mobile: Central Sun scale (e.g. 0.5 for half size)
   const ORRERY_SUN_ROTATION_ENABLED = true;                // EDITABLE: Toggle centered rotation of Sun
   const ORRERY_SUN_ROTATION_PERIOD_DESKTOP = '30s';        // EDITABLE Desktop: Rate of rotation for primary Sun (twirl speed)
   const ORRERY_SUN_ROTATION_PERIOD_MOBILE = '30s';         // EDITABLE Mobile: Rate of rotation for primary Sun
@@ -9364,6 +9481,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--orrery-sun-display', ORRERY_SUN_ENABLED ? 'flex' : 'none');
     document.documentElement.style.setProperty('--orrery-sun-width', isMobile ? ORRERY_SUN_WIDTH_MOBILE : ORRERY_SUN_WIDTH_DESKTOP);
     document.documentElement.style.setProperty('--orrery-sun-height', isMobile ? ORRERY_SUN_HEIGHT_MOBILE : ORRERY_SUN_HEIGHT_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-sun-scale', isMobile ? ORRERY_SUN_SCALE_MOBILE : ORRERY_SUN_SCALE_DESKTOP);
     document.documentElement.style.setProperty('--orrery-sun-opacity', ORRERY_SUN_OPACITY);
     document.documentElement.style.setProperty('--orrery-sun-blend-mode', ORRERY_SUN_BLEND_MODE);
     document.documentElement.style.setProperty('--orrery-sun-primary-z-index', ORRERY_SUN_PRIMARY_Z_INDEX);
@@ -9737,7 +9855,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1268';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1272';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -11379,9 +11497,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
        
     const labelEls = document.querySelectorAll('.label-title-8, .label-title-4');
     labelEls.forEach(labelEl => {
-       labelEl.innerHTML = `UV Index`;
+       const peakStr = dailyPeakUv !== null ? dailyPeakUv.toFixed(1) : '0.0';
+       labelEl.innerHTML = `Peak UV ${peakStr}`;
        labelEl.style.color = uvColor;
-       labelEl.style.textTransform = 'uppercase';
+       labelEl.style.textTransform = 'none';
+       labelEl.style.letterSpacing = 'var(--clock-grid-uv-label-letter-spacing)';
     });
   }
 
@@ -11559,7 +11679,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         gridSunProgressEl.style.strokeDashoffset = circumference; // hide progress
       });
       gridSunTextEls.forEach(gridSunTextEl => {
-        gridSunTextEl.innerHTML = `<span style="display: inline-block; transform: translateY(var(--sunmoon-top-label-y, 0vw)); font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Sun</span><br>--<br><span style="display: inline-block; transform: translateY(var(--sunmoon-bottom-label-y, 0vw)); font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Day</span>`;
+        gridSunTextEl.innerHTML = `<span style="display: inline-block; transform: translateY(var(--sunmoon-time-y, 0vw));">--</span><br><span style="display: inline-block; transform: translateY(var(--sunmoon-event-label-y, 0vw)); font-size: var(--sunmoon-event-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Sun</span>`;
       });
       return;
     }
@@ -11646,7 +11766,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const formattedTime = `${hours}:${minutesStr}<span style="font-size: 0.67em; font-family: 'medium', sans-serif;">${ampm}</span>`;
     
     gridSunTextEls.forEach(gridSunTextEl => {
-      gridSunTextEl.innerHTML = `<span style="display: inline-block; transform: translateY(var(--sunmoon-top-label-y, 0vw)); font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Sun</span><br>${formattedTime}<br><span style="display: inline-block; transform: translateY(var(--sunmoon-bottom-label-y, 0vw)); font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">${nextEventLabel}</span>`;
+      gridSunTextEl.innerHTML = `<span style="display: inline-block; transform: translateY(var(--sunmoon-time-y, 0vw));">${formattedTime}</span><br><span style="display: inline-block; transform: translateY(var(--sunmoon-event-label-y, 0vw)); font-size: var(--sunmoon-event-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Sun${nextEventLabel.toLowerCase()}</span>`;
       if (tempColor) {
         gridSunTextEl.style.color = tempColor;
       }
@@ -11673,7 +11793,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         gridMoonProgressEl.style.strokeDashoffset = circumference; // hide progress
       });
       gridMoonTextEls.forEach(gridMoonTextEl => {
-        gridMoonTextEl.innerHTML = `<span style="display: inline-block; transform: translateY(var(--sunmoon-top-label-y, 0vw)); font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Moon</span><br>--<br><span style="display: inline-block; transform: translateY(var(--sunmoon-bottom-label-y, 0vw)); font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Moon</span>`;
+        gridMoonTextEl.innerHTML = `<span style="display: inline-block; transform: translateY(var(--sunmoon-time-y, 0vw));">--</span><br><span style="display: inline-block; transform: translateY(var(--sunmoon-event-label-y, 0vw)); font-size: var(--sunmoon-event-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Moon</span>`;
       });
       return;
     }
@@ -11792,7 +11912,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const formattedTime = `${hours}:${minutesStr}<span style="font-size: 0.67em; font-family: 'medium', sans-serif;">${ampm}</span>`;
     
     gridMoonTextEls.forEach(gridMoonTextEl => {
-      gridMoonTextEl.innerHTML = `<span style="display: inline-block; transform: translateY(var(--sunmoon-top-label-y, 0vw)); font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Moon</span><br>${formattedTime}<br><span style="display: inline-block; transform: translateY(var(--sunmoon-bottom-label-y, 0vw)); font-size: var(--clock-inner-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">${nextEventLabel}</span>`;
+      gridMoonTextEl.innerHTML = `<span style="display: inline-block; transform: translateY(var(--sunmoon-time-y, 0vw));">${formattedTime}</span><br><span style="display: inline-block; transform: translateY(var(--sunmoon-event-label-y, 0vw)); font-size: var(--sunmoon-event-label-size); font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Moon${nextEventLabel.toLowerCase()}</span>`;
       if (tempColor) {
         gridMoonTextEl.style.color = tempColor;
       }
