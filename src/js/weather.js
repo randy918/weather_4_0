@@ -913,10 +913,13 @@ import weatherConditions from '../data/weather-conditions.json';
             behavior: 'smooth'
           });
         } else {
-          const targetBottom = Math.max(
+          const totalHeight = Math.max(
             document.documentElement.scrollHeight || 0,
             document.body.scrollHeight || 0
           );
+          const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+          const targetBottom = Math.max(0, totalHeight - viewportHeight);
+          
           window.scrollTo({
             top: targetBottom,
             behavior: 'smooth'
@@ -7489,7 +7492,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SUN_ANIMATION_LOOP_PAUSE_MS_DESKTOP = 1200;   // EDITABLE Desktop: Pause in ms on the latest frame before returning to idle/sizzle
   const SUN_ANIMATION_LOOP_PAUSE_MS_MOBILE = 1200;    // EDITABLE Mobile: Pause in ms on the latest frame before returning to idle/sizzle
   const SUN_ANIMATION_LOOP_PAUSE_MS = 1200;           // EDITABLE: Fallback pause in ms
-  const SUN_ANIMATION_RESOLUTION = '600x600';         // EDITABLE: Resolution ('600x600' or '300x300')
+  const SUN_ANIMATION_RESOLUTION_DESKTOP = '600x600'; // EDITABLE Desktop: Resolution
+  const SUN_ANIMATION_RESOLUTION_MOBILE = '600x600';  // EDITABLE Mobile: Resolution
 
   // Ease-In & Ease-Out Playback Dynamics (JCV)
   // Eases out of the Live frame pause (slow start accelerating to cruise speed)
@@ -9871,7 +9875,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1273';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1279';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -15375,11 +15379,15 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const activeFrameNames = SUN_ANIMATION_FRAMES.slice(-targetCount);
       const frameUrls = activeFrameNames.map(name => {
         let fn = name;
-        if (SUN_ANIMATION_RESOLUTION === '300x300' && fn.includes('600x600')) {
+        const isMobile = window.innerWidth <= 767;
+        const resSetting = isMobile ? SUN_ANIMATION_RESOLUTION_MOBILE : SUN_ANIMATION_RESOLUTION_DESKTOP;
+        if (resSetting === '300x300' && fn.includes('600x600')) {
           fn = fn.replace('600x600', '300x300');
+        } else if (resSetting === '600x600' && fn.includes('300x300')) {
+          fn = fn.replace('300x300', '600x600');
         }
         if (fn === 'latest.jpg') {
-          const resFile = SUN_ANIMATION_RESOLUTION === '300x300' ? '300x300.jpg' : '600x600.jpg';
+          const resFile = resSetting === '300x300' ? '300x300.jpg' : '600x600.jpg';
           return `${SUN_IMAGE_BASE_URL}${resFile}?t=${Date.now()}`;
         }
         return SUN_IMAGE_BASE_URL + fn;
@@ -15739,8 +15747,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
         const maxCount = isMobile ? SUN_SIZZLE_FRAME_COUNT_MOBILE : SUN_SIZZLE_FRAME_COUNT_DESKTOP;
         const frameLimit = Math.max(2, Math.min(steppedUrls.length, maxCount));
+        const resSetting = isMobile ? SUN_ANIMATION_RESOLUTION_MOBILE : SUN_ANIMATION_RESOLUTION_DESKTOP;
         const selectedUrls = steppedUrls.slice(-frameLimit).map(u => {
-          if (SUN_ANIMATION_RESOLUTION === '300x300') {
+          if (resSetting === '300x300') {
             return u.replace('600x600', '300x300');
           }
           return u;
