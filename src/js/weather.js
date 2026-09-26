@@ -4303,7 +4303,7 @@ import weatherConditions from '../data/weather-conditions.json';
     return {
       x: Math.random() * canvas.width,
       y: startY,
-      speed: RAIN_DROP_SPEED,
+      speed: RAIN_DROP_SPEED * (0.8 + Math.random() * 0.4),
       angleRad: angleRad,
       
       update() {
@@ -4386,8 +4386,14 @@ import weatherConditions from '../data/weather-conditions.json';
         }
 
         if (time - lastSpawnTime >= currentRainSpawnIntervalMs) {
-          activeDrops.push(createDrop(canvas, 0));
-          lastSpawnTime = time;
+          let dropsToSpawn = Math.floor((time - lastSpawnTime) / currentRainSpawnIntervalMs);
+          dropsToSpawn = Math.min(dropsToSpawn, 30); // Cap max drops per frame to prevent lag spikes
+          for (let i = 0; i < dropsToSpawn; i++) {
+            // Randomize starting Y to stagger drops and break up horizontal banding
+            activeDrops.push(createDrop(canvas, -(Math.random() * 80)));
+          }
+          // Carry over the remainder time
+          lastSpawnTime = time - ((time - lastSpawnTime) % currentRainSpawnIntervalMs);
         }
         
         activeDrops = activeDrops.filter(drop => {
@@ -4517,8 +4523,14 @@ import weatherConditions from '../data/weather-conditions.json';
         
         const time = currentTime || performance.now();
         if (time - lastSpawnTime >= currentSnowSpawnIntervalMs) {
-          activeFlakes.push(createFlake(canvas, startY));
-          lastSpawnTime = time;
+          let flakesToSpawn = Math.floor((time - lastSpawnTime) / currentSnowSpawnIntervalMs);
+          flakesToSpawn = Math.min(flakesToSpawn, 30); // Cap max flakes per frame
+          for (let i = 0; i < flakesToSpawn; i++) {
+            // Randomize starting Y to stagger flakes and break up horizontal banding
+            activeFlakes.push(createFlake(canvas, startY - (Math.random() * 80)));
+          }
+          // Carry over the remainder time
+          lastSpawnTime = time - ((time - lastSpawnTime) % currentSnowSpawnIntervalMs);
         }
         
         // Cache dial coordinates to prevent layout thrashing (forced reflows)
@@ -8378,7 +8390,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const EARTH_MASK_POSITION_Y_MOBILE = '45.5%';     // EDITABLE Mobile: Center of the Earth globe in the NOAA frame (45.5%)
   const EARTH_MASK_RADIUS = EARTH_MASK_RADIUS_DESKTOP;
   const EARTH_MASK_POSITION_Y = EARTH_MASK_POSITION_Y_DESKTOP;
-  const EARTH_IMAGE_URL = 'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/678x678.jpg';
+  const EARTH_IMAGE_URL = 'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/1808x1808.jpg';
 
   // Note: EARTH_IMAGE_INNER_SCALE, EARTH_IMAGE_OFFSET_Y, and EARTH_IMAGE_OFFSET_X
   // are all configured above under the Celestial Row Config section (JCV)
@@ -8391,7 +8403,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // --- Dynamic Earth Animation Controls (JCV) ---
   const EARTH_ANIMATION_ENABLED = true;             // EDITABLE: Enable/disable animation
   const EARTH_ANIMATION_MODE = 'daynight';          // EDITABLE SWITCH: 'weather' (Mode A: 2-4h live cloud flow) or 'daynight' (Mode B: 24h day/night cycle)
-  const EARTH_ANIMATION_RESOLUTION = '678x678';     // EDITABLE: Resolution: '339x339' (lightweight ~128KB) or '678x678' (~450KB)
+  const EARTH_ANIMATION_RESOLUTION = '1808x1808';     // EDITABLE: Resolution: '678x678' (lightweight) or '1808x1808' (high-res)
 
   // Mode A: "Living Weather" (Recent 2-4 Hours Storm & Cloud Flow)
   const EARTH_WEATHER_FETCH_LENGTH = 24;            // EDITABLE: NOAA buffer (24 = 4 hours of 10-minute satellite captures)
@@ -8418,24 +8430,24 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   // Seed list of real-time NOAA GOES-19 GeoColor Full Disk frames for instant readiness
   const EARTH_FRAMES_SEED = [
-    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262571720_GOES19-ABI-FD-GEOCOLOR-678x678.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262571740_GOES19-ABI-FD-GEOCOLOR-678x678.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262571800_GOES19-ABI-FD-GEOCOLOR-678x678.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262571820_GOES19-ABI-FD-GEOCOLOR-678x678.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262571840_GOES19-ABI-FD-GEOCOLOR-678x678.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262571900_GOES19-ABI-FD-GEOCOLOR-678x678.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262571920_GOES19-ABI-FD-GEOCOLOR-678x678.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262571940_GOES19-ABI-FD-GEOCOLOR-678x678.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262572000_GOES19-ABI-FD-GEOCOLOR-678x678.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262572020_GOES19-ABI-FD-GEOCOLOR-678x678.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262572040_GOES19-ABI-FD-GEOCOLOR-678x678.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262572100_GOES19-ABI-FD-GEOCOLOR-678x678.jpg',
-    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/678x678.jpg'
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262571720_GOES19-ABI-FD-GEOCOLOR-1808x1808.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262571740_GOES19-ABI-FD-GEOCOLOR-1808x1808.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262571800_GOES19-ABI-FD-GEOCOLOR-1808x1808.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262571820_GOES19-ABI-FD-GEOCOLOR-1808x1808.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262571840_GOES19-ABI-FD-GEOCOLOR-1808x1808.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262571900_GOES19-ABI-FD-GEOCOLOR-1808x1808.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262571920_GOES19-ABI-FD-GEOCOLOR-1808x1808.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262571940_GOES19-ABI-FD-GEOCOLOR-1808x1808.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262572000_GOES19-ABI-FD-GEOCOLOR-1808x1808.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262572020_GOES19-ABI-FD-GEOCOLOR-1808x1808.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262572040_GOES19-ABI-FD-GEOCOLOR-1808x1808.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/20262572100_GOES19-ABI-FD-GEOCOLOR-1808x1808.jpg',
+    'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/1808x1808.jpg'
   ];
 
   // Subpixel Anti-Aliasing & Soft-Meld Blur (JCV)
-  const EARTH_IMAGE_BLUR_DESKTOP = '0.8px';        // EDITABLE Desktop: Subpixel blur
-  const EARTH_IMAGE_BLUR_MOBILE = '0.5px';         // EDITABLE Mobile: Subpixel blur on mobile
+  const EARTH_IMAGE_BLUR_DESKTOP = '0px';          // EDITABLE Desktop: Subpixel blur
+  const EARTH_IMAGE_BLUR_MOBILE = '0px';           // EDITABLE Mobile: Subpixel blur on mobile
 
   function isAutoCelestialDimension(val) {
     if (!val) return true;
@@ -9946,7 +9958,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1283';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1288';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -15922,7 +15934,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const earthFrameStep = Math.max(1, Math.round(isDayNight ? EARTH_DAYNIGHT_FRAME_STEP : EARTH_WEATHER_FRAME_STEP));
     const earthFrameCount = isDayNight ? EARTH_DAYNIGHT_FRAME_COUNT : EARTH_WEATHER_FRAME_COUNT;
     const earthFps = isDayNight ? EARTH_DAYNIGHT_FPS : EARTH_WEATHER_FPS;
-    const earthResSize = EARTH_ANIMATION_RESOLUTION === '339x339' ? '339x339' : '678x678';
+    const earthResSize = EARTH_ANIMATION_RESOLUTION === '678x678' ? '678x678' : '1808x1808';
 
     function setupEarthPreload(rawUrls) {
       const uniqueUrls = Array.from(new Set(rawUrls)).sort();
