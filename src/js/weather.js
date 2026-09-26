@@ -9958,7 +9958,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1288';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1289';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -15377,7 +15377,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (CELESTIAL_ROTATION_ON_CLICK) {
       leftCol.style.cursor = 'pointer';
       leftCol.setAttribute('role', 'button');
-      leftCol.setAttribute('title', 'Click or tap to rotate Sun');
       leftCol.addEventListener('click', (e) => {
         e.stopPropagation();
         if (typeof window.triggerSunRotation === 'function') window.triggerSunRotation();
@@ -15385,7 +15384,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       rightCol.style.cursor = 'pointer';
       rightCol.setAttribute('role', 'button');
-      rightCol.setAttribute('title', 'Click or tap to rotate Earth');
       rightCol.addEventListener('click', (e) => {
         e.stopPropagation();
         if (typeof window.triggerEarthRotation === 'function') window.triggerEarthRotation();
