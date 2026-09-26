@@ -766,6 +766,13 @@ import weatherConditions from '../data/weather-conditions.json';
   const SCROLL_NAV_FLIP_WHEN_DESKTOP = 350;                  // EDITABLE Desktop (D): Pixels scrolled down before arrow flips to UP
   const SCROLL_NAV_FLIP_WHEN_MOBILE  = 280;                  // EDITABLE Mobile (M): Pixels scrolled down before arrow flips to UP (20% sooner than Desktop 350px)
 
+  // EDITABLE: Scroll Target Element & Offsets for DOWN Arrow (JCV Desktop & Mobile)
+  // When the DOWN arrow is clicked, the page scrolls directly so the five timezone clocks align with the top of the window.
+  const SCROLL_NAV_DOWN_TARGET_ID       = 'world-clocks-row-wrapper'; // EDITABLE: Target element ID for DOWN arrow navigation
+  const SCROLL_NAV_DOWN_OFFSET_DESKTOP  = '0vw';                      // EDITABLE Desktop (D): Space between top of window and clocks (e.g. '0vw' flush at top, '1vw' pushed down, '-1vw' higher)
+  const SCROLL_NAV_DOWN_OFFSET_MOBILE   = '0vw';                      // EDITABLE Mobile (M): Space between top of window and clocks (e.g. '0vw' flush at top, '2vw' pushed down, '-2vw' higher)
+  const SCROLL_NAV_UP_TARGET_Y          = 0;                          // EDITABLE: Target scroll position for UP arrow (0 = top of page)
+
   // Compatibility aliases for threshold/appear constants
   const SCROLL_TOP_APPEARS_WHEN_DESKTOP = SCROLL_NAV_FLIP_WHEN_DESKTOP;
   const SCROLL_TOP_APPEARS_WHEN_MOBILE  = SCROLL_NAV_FLIP_WHEN_MOBILE;
@@ -814,6 +821,26 @@ import weatherConditions from '../data/weather-conditions.json';
   const SCROLL_NAV_HOVER_SCALE   = '1.08';                   // EDITABLE: Hover scale
   const SCROLL_NAV_Z_INDEX       = '9000';                   // EDITABLE: z-index layer
 
+  // Helper to parse offset values in vw, vh, px, or raw numbers
+  function parseScrollNavOffset(offsetVal) {
+    if (typeof offsetVal === 'number') return offsetVal;
+    if (typeof offsetVal === 'string') {
+      const trimmed = offsetVal.trim();
+      if (trimmed.endsWith('vw')) {
+        return (parseFloat(trimmed) || 0) * (window.innerWidth / 100);
+      }
+      if (trimmed.endsWith('vh')) {
+        return (parseFloat(trimmed) || 0) * (window.innerHeight / 100);
+      }
+      if (trimmed.endsWith('px')) {
+        return parseFloat(trimmed) || 0;
+      }
+      const num = parseFloat(trimmed);
+      return isNaN(num) ? 0 : num;
+    }
+    return 0;
+  }
+
   function applyScrollNavConfig() {
     const isMobile = window.innerWidth <= 767;
 
@@ -860,6 +887,11 @@ import weatherConditions from '../data/weather-conditions.json';
     document.documentElement.style.setProperty('--scroll-nav-hover-scale', SCROLL_NAV_HOVER_SCALE);
     document.documentElement.style.setProperty('--scroll-nav-z-index', SCROLL_NAV_Z_INDEX);
 
+    // DOWN navigation scroll destination top offset
+    document.documentElement.style.setProperty('--scroll-nav-down-offset-desktop', String(SCROLL_NAV_DOWN_OFFSET_DESKTOP));
+    document.documentElement.style.setProperty('--scroll-nav-down-offset-mobile', String(SCROLL_NAV_DOWN_OFFSET_MOBILE));
+    document.documentElement.style.setProperty('--scroll-nav-down-offset', String(isMobile ? SCROLL_NAV_DOWN_OFFSET_MOBILE : SCROLL_NAV_DOWN_OFFSET_DESKTOP));
+
     // Backward compatibility CSS variables for existing selectors
     document.documentElement.style.setProperty('--scroll-top-bottom', isMobile ? SCROLL_NAV_BOTTOM_MOBILE : SCROLL_NAV_BOTTOM_DESKTOP);
     document.documentElement.style.setProperty('--scroll-top-right', isMobile ? SCROLL_NAV_RIGHT_MOBILE : SCROLL_NAV_RIGHT_DESKTOP);
@@ -894,7 +926,7 @@ import weatherConditions from '../data/weather-conditions.json';
       btn.id = 'scroll-to-top-btn';
       btn.className = 'scroll-to-top-btn scroll-nav-btn is-visible mode-bottom';
       btn.setAttribute('type', 'button');
-      btn.setAttribute('aria-label', 'Go to bottom');
+      btn.setAttribute('aria-label', 'Scroll to timezone clocks');
       btn.innerHTML = `<i class="fa-solid fa-arrow-down" aria-hidden="true"></i>`;
 
       let lastNavActionTime = 0;
@@ -909,21 +941,47 @@ import weatherConditions from '../data/weather-conditions.json';
 
         if (btn.classList.contains('mode-top')) {
           window.scrollTo({
-            top: 0,
+            top: SCROLL_NAV_UP_TARGET_Y,
             behavior: 'smooth'
           });
         } else {
-          const totalHeight = Math.max(
-            document.documentElement.scrollHeight || 0,
-            document.body.scrollHeight || 0
-          );
-          const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
-          const targetBottom = Math.max(0, totalHeight - viewportHeight);
-          
-          window.scrollTo({
-            top: targetBottom,
-            behavior: 'smooth'
-          });
+          // DOWN arrow pressed: Scroll so the five timezone clocks are at the top of the window
+          const targetElement = document.getElementById(SCROLL_NAV_DOWN_TARGET_ID) || document.getElementById('world-clocks-row-wrapper');
+          const isMobile = window.innerWidth <= 767;
+          const offsetRaw = isMobile ? SCROLL_NAV_DOWN_OFFSET_MOBILE : SCROLL_NAV_DOWN_OFFSET_DESKTOP;
+          const offsetPx = parseScrollNavOffset(offsetRaw);
+
+          if (targetElement) {
+            const currentScroll = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+            const rect = targetElement.getBoundingClientRect();
+            // rect.top is the distance from top of viewport to the target element's top edge.
+            // Subtracting offsetPx places the element's top edge offsetPx below window top (0 = flush with top of window).
+            const totalHeight = Math.max(
+              document.documentElement.scrollHeight || 0,
+              document.body.scrollHeight || 0
+            );
+            const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+            const maxScroll = Math.max(0, totalHeight - viewportHeight);
+            const targetY = Math.max(0, Math.min(currentScroll + rect.top - offsetPx, maxScroll));
+
+            window.scrollTo({
+              top: targetY,
+              behavior: 'smooth'
+            });
+          } else {
+            // Fallback to bottom if timezone clocks row is not present
+            const totalHeight = Math.max(
+              document.documentElement.scrollHeight || 0,
+              document.body.scrollHeight || 0
+            );
+            const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+            const targetBottom = Math.max(0, totalHeight - viewportHeight);
+            
+            window.scrollTo({
+              top: targetBottom,
+              behavior: 'smooth'
+            });
+          }
         }
 
         // Active polling during and after smooth scroll (mobile Safari throttles scroll events during programmatic scroll)
@@ -948,15 +1006,27 @@ import weatherConditions from '../data/weather-conditions.json';
       const totalHeight = Math.max(document.documentElement.scrollHeight || 0, document.body.scrollHeight || 0);
       const maxScroll = Math.max(0, totalHeight - viewportHeight);
 
+      // Check timezone clocks position for accurate flip state
+      const targetElement = document.getElementById(SCROLL_NAV_DOWN_TARGET_ID) || document.getElementById('world-clocks-row-wrapper');
+      let targetClockY = 0;
+      if (targetElement) {
+        const rect = targetElement.getBoundingClientRect();
+        targetClockY = Math.max(0, scrollPosition + rect.top);
+      }
+
       let isGoToTop = false;
       if (maxScroll > 0 && scrollPosition >= (maxScroll - 60)) {
         // At or near the bottom of the page -> Always flip to UP arrow (Go to top)
         isGoToTop = true;
       } else if (scrollPosition <= 50) {
-        // At or near the top of the page -> Always flip to DOWN arrow (Go to bottom)
+        // At or near the top of the page -> Always flip to DOWN arrow
         isGoToTop = false;
+      } else if (targetClockY > 0 && scrollPosition >= (targetClockY - 40)) {
+        // At or past the five timezone clocks -> Always flip to UP arrow (Go to top)
+        isGoToTop = true;
       } else if (SCROLL_NAV_FLIP_MODE === 'midpoint') {
-        isGoToTop = scrollPosition >= maxScroll * SCROLL_NAV_MIDPOINT_RATIO;
+        const midpointBase = targetClockY > 0 ? targetClockY : maxScroll;
+        isGoToTop = scrollPosition >= midpointBase * SCROLL_NAV_MIDPOINT_RATIO;
       } else {
         const mobileThreshold = Math.min(SCROLL_NAV_FLIP_WHEN_MOBILE, Math.max(120, maxScroll * 0.35));
         const threshold = isMobile ? mobileThreshold : SCROLL_NAV_FLIP_WHEN_DESKTOP;
@@ -974,7 +1044,7 @@ import weatherConditions from '../data/weather-conditions.json';
         if (!currentBtn.classList.contains('mode-bottom')) {
           currentBtn.classList.remove('mode-top');
           currentBtn.classList.add('mode-bottom');
-          currentBtn.setAttribute('aria-label', 'Go to bottom');
+          currentBtn.setAttribute('aria-label', 'Scroll to timezone clocks');
           currentBtn.innerHTML = `<i class="fa-solid fa-arrow-down" aria-hidden="true"></i>`;
         }
       }
@@ -2392,7 +2462,7 @@ import weatherConditions from '../data/weather-conditions.json';
   };
 
   // --- EDITABLE: Wind Dial UI Vertical Centering (JCV) ---
-  const WIND_NUMBER_Y_OFFSET_DESKTOP = '-1.25vw'; // EDITABLE: Desktop vertical position of main wind number (negative moves UP)
+  const WIND_NUMBER_Y_OFFSET_DESKTOP = '-.5vw'; // EDITABLE: Desktop vertical position of main wind number (negative moves UP)
   const WIND_NUMBER_Y_OFFSET_MOBILE = '-2.25vw';    // EDITABLE: Mobile vertical position of main wind number (negative moves UP)
   
   document.documentElement.style.setProperty('--wind-number-y-offset-desktop', WIND_NUMBER_Y_OFFSET_DESKTOP);
@@ -9875,7 +9945,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1279';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1281';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
