@@ -2480,7 +2480,8 @@ import weatherConditions from '../data/weather-conditions.json';
   const RAIN_BANNER_FONT_SIZE_HOUR = '2.6vw'; // Font size for hour text (line 1)
   const RAIN_BANNER_FONT_SIZE_PERCENT = '4vw'; // Font size for percent text (line 2)
   const RAIN_BANNER_MIN_OPACITY = 0.3; // Minimum opacity for cells with rain
-  const RAIN_BANNER_MAX_OPACITY = 0.95; // Maximum opacity for cells with rain
+  const RAIN_BANNER_MAX_OPACITY = 0.95; // Maximum opacity for cells with rainnpm run dev
+  
 
   // EDITABLE: Minimum height for the 8-day forecast temperature bars
   const MIN_TEMP_BAR_HEIGHT_VW = 6.5; // The height for the lowest temp of the week
@@ -9945,7 +9946,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1281';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1283';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
