@@ -102,7 +102,7 @@ import weatherConditions from '../data/weather-conditions.json';
   const DEWPOINT_FUTURE_DOT_SIZE = 3.5; // EDITABLE: Radius of the future dew point prediction dot
 
   // --- CONFIG: Rain Drop Animation ---
-  const RAIN_ENABLED = true;                         // Set to false to disable all canvas drawing
+  const RAIN_ENABLED = false;                        // Set to false to disable all canvas drawing
   const RAIN_DROP_WIDTH = 2;                         // Thickness of raindrop in pixels
   const RAIN_DROP_TAIL_LENGTH_VW = 12.0;             // Length of fading tail in vw units
   const RAIN_DROP_SPEED = 15;                        // Droplet speed in pixels per frame
@@ -178,7 +178,7 @@ import weatherConditions from '../data/weather-conditions.json';
   });
 
   // --- CONFIG: Snow Flake Animation ---
-  const SNOW_ENABLED = true;                         // Set to false to disable all canvas drawing
+  const SNOW_ENABLED = false;                        // Set to false to disable all canvas drawing
   const SNOW_DIAL_MASK_PERCENT = 95;                 // EDITABLE: Percentage of dial radius to mask/block snow (e.g., 100 for full size, 99 for slight buffer, 2 for a tiny center dot)
   const SNOW_FLAKE_RADIUS_MIN_DESKTOP = 1.0;         // Minimum snowflake radius in pixels (Desktop)
   const SNOW_FLAKE_RADIUS_MIN_MOBILE = 0.6;          // Minimum snowflake radius in pixels (Mobile)
@@ -9958,7 +9958,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1289';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1291';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
