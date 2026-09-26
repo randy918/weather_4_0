@@ -2481,7 +2481,7 @@ import weatherConditions from '../data/weather-conditions.json';
   const RAIN_BANNER_FONT_SIZE_PERCENT = '4vw'; // Font size for percent text (line 2)
   const RAIN_BANNER_MIN_OPACITY = 0.3; // Minimum opacity for cells with rain
   const RAIN_BANNER_MAX_OPACITY = 0.95; // Maximum opacity for cells with rainnpm run dev
-  
+
 
   // EDITABLE: Minimum height for the 8-day forecast temperature bars
   const MIN_TEMP_BAR_HEIGHT_VW = 6.5; // The height for the lowest temp of the week
