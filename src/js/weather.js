@@ -162,19 +162,19 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--rain-opacity', window.innerWidth <= 767 ? RAIN_OPACITY_MOBILE : RAIN_OPACITY_DESKTOP);
 
   // --- CONFIG: Spaceship Video Animation (JCV) ---
-  const SPACESHIP_WIDTH_DESKTOP = '7vw';          // EDITABLE Desktop: Width of the spaceship video
+  const SPACESHIP_WIDTH_DESKTOP = '10vw';          // EDITABLE Desktop: Width of the spaceship video
   const SPACESHIP_WIDTH_MOBILE = '10vw';           // EDITABLE Mobile: Width of the spaceship video
   
-  const SPACESHIP_BOTTOM_DESKTOP = '0vw';          // EDITABLE Desktop: Bottom offset of the spaceship video
+  const SPACESHIP_BOTTOM_DESKTOP = '4vw';          // EDITABLE Desktop: Bottom offset of the spaceship video
   const SPACESHIP_BOTTOM_MOBILE = '4vw';           // EDITABLE Mobile: Bottom offset of the spaceship video
   
-  const SPACESHIP_LEFT_DESKTOP = '0vw';            // EDITABLE Desktop: Left offset of the spaceship video
+  const SPACESHIP_LEFT_DESKTOP = '8vw';            // EDITABLE Desktop: Left offset of the spaceship video
   const SPACESHIP_LEFT_MOBILE = '8vw';             // EDITABLE Mobile: Left offset of the spaceship video
 
   const SPACESHIP_RISE_MIN_DISTANCE_DESKTOP = 10;       // EDITABLE Desktop: Min rise distance (vw)
-  const SPACESHIP_RISE_MAX_DISTANCE_DESKTOP = 35;       // EDITABLE Desktop: Max rise distance (vw)
+  const SPACESHIP_RISE_MAX_DISTANCE_DESKTOP = 75;       // EDITABLE Desktop: Max rise distance (vw)
   const SPACESHIP_RISE_MIN_DISTANCE_MOBILE = 15;        // EDITABLE Mobile: Min rise distance (vw)
-  const SPACESHIP_RISE_MAX_DISTANCE_MOBILE = 45;        // EDITABLE Mobile: Max rise distance (vw)
+  const SPACESHIP_RISE_MAX_DISTANCE_MOBILE = 65;        // EDITABLE Mobile: Max rise distance (vw)
 
   const SPACESHIP_RISE_MIN_DURATION_MS = 4000;          // EDITABLE: Min time to rise up
   const SPACESHIP_RISE_MAX_DURATION_MS = 8000;          // EDITABLE: Max time to rise up
