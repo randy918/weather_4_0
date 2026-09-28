@@ -3432,3 +3432,27 @@ main {
     from { transform: rotate(calc(-1 * var(--orrery-mercury-orbit-angle, 0deg) + var(--orrery-mercury-axial-tilt, 0deg))); }
     to   { transform: rotate(calc(-1 * var(--orrery-mercury-orbit-angle, 0deg) + var(--orrery-mercury-axial-tilt, 0deg) - 360deg)); }
 }
+
+/* ==========================================================================
+   --- Spaceship Video ---
+   ========================================================================== */
+.spaceship-video {
+    position: absolute;
+    bottom: var(--spaceship-bottom, 0vw);
+    left: var(--spaceship-left, 0vw);
+    width: var(--spaceship-width, 15vw);
+    z-index: 9999;
+    pointer-events: none; // Allows clicks to pass through
+    object-fit: contain;
+    mix-blend-mode: screen; // Force black background to become transparent (iOS fallback)
+    will-change: transform; // Hint for iOS hardware acceleration
+    transform: translateY(0);
+    // Slow land down and smooth finish
+    transition: transform var(--spaceship-land-duration, 4s) cubic-bezier(0.6, 0.0, 0.4, 1.0);
+    
+    &.rising {
+        transform: translateY(calc(-1 * var(--spaceship-rise-distance, 20vw)));
+        // Slow lift off and smooth deceleration near top
+        transition: transform var(--spaceship-rise-duration, 4s) cubic-bezier(0.6, 0.0, 0.4, 1.0);
+    }
+}

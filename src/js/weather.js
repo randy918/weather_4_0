@@ -161,6 +161,78 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--rain-opacity-mobile', RAIN_OPACITY_MOBILE);
   document.documentElement.style.setProperty('--rain-opacity', window.innerWidth <= 767 ? RAIN_OPACITY_MOBILE : RAIN_OPACITY_DESKTOP);
 
+  // --- CONFIG: Spaceship Video Animation (JCV) ---
+  const SPACESHIP_WIDTH_DESKTOP = '7vw';          // EDITABLE Desktop: Width of the spaceship video
+  const SPACESHIP_WIDTH_MOBILE = '10vw';           // EDITABLE Mobile: Width of the spaceship video
+  
+  const SPACESHIP_BOTTOM_DESKTOP = '0vw';          // EDITABLE Desktop: Bottom offset of the spaceship video
+  const SPACESHIP_BOTTOM_MOBILE = '4vw';           // EDITABLE Mobile: Bottom offset of the spaceship video
+  
+  const SPACESHIP_LEFT_DESKTOP = '0vw';            // EDITABLE Desktop: Left offset of the spaceship video
+  const SPACESHIP_LEFT_MOBILE = '8vw';             // EDITABLE Mobile: Left offset of the spaceship video
+
+  const SPACESHIP_RISE_MIN_DISTANCE_DESKTOP = 10;       // EDITABLE Desktop: Min rise distance (vw)
+  const SPACESHIP_RISE_MAX_DISTANCE_DESKTOP = 35;       // EDITABLE Desktop: Max rise distance (vw)
+  const SPACESHIP_RISE_MIN_DISTANCE_MOBILE = 15;        // EDITABLE Mobile: Min rise distance (vw)
+  const SPACESHIP_RISE_MAX_DISTANCE_MOBILE = 45;        // EDITABLE Mobile: Max rise distance (vw)
+
+  const SPACESHIP_RISE_MIN_DURATION_MS = 4000;          // EDITABLE: Min time to rise up
+  const SPACESHIP_RISE_MAX_DURATION_MS = 8000;          // EDITABLE: Max time to rise up
+  const SPACESHIP_LAND_MIN_DURATION_MS = 4000;          // EDITABLE: Min time to land
+  const SPACESHIP_LAND_MAX_DURATION_MS = 8000;          // EDITABLE: Max time to land
+  const SPACESHIP_HOVER_MIN_DURATION_MS = 2000;         // EDITABLE: Min time to stay in air
+  const SPACESHIP_HOVER_MAX_DURATION_MS = 5000;         // EDITABLE: Max time to stay in air
+
+  function triggerSpaceshipRiseAnimation() {
+    const video = document.getElementById('spaceship-video');
+    if (!video) return;
+
+    // Prevent re-triggering if already animating
+    if (video.classList.contains('rising') || video.classList.contains('landing')) return;
+    
+    const isMobile = window.innerWidth <= 767;
+    const minDist = isMobile ? SPACESHIP_RISE_MIN_DISTANCE_MOBILE : SPACESHIP_RISE_MIN_DISTANCE_DESKTOP;
+    const maxDist = isMobile ? SPACESHIP_RISE_MAX_DISTANCE_MOBILE : SPACESHIP_RISE_MAX_DISTANCE_DESKTOP;
+    
+    // Calculate random parameters
+    const riseDist = Math.random() * (maxDist - minDist) + minDist;
+    const riseDur = Math.random() * (SPACESHIP_RISE_MAX_DURATION_MS - SPACESHIP_RISE_MIN_DURATION_MS) + SPACESHIP_RISE_MIN_DURATION_MS;
+    const landDur = Math.random() * (SPACESHIP_LAND_MAX_DURATION_MS - SPACESHIP_LAND_MIN_DURATION_MS) + SPACESHIP_LAND_MIN_DURATION_MS;
+    const hoverDur = Math.random() * (SPACESHIP_HOVER_MAX_DURATION_MS - SPACESHIP_HOVER_MIN_DURATION_MS) + SPACESHIP_HOVER_MIN_DURATION_MS;
+
+    // Inject JS CSS Variables for this specific animation loop
+    document.documentElement.style.setProperty('--spaceship-rise-distance', riseDist + 'vw');
+    document.documentElement.style.setProperty('--spaceship-rise-duration', riseDur + 'ms');
+    document.documentElement.style.setProperty('--spaceship-land-duration', landDur + 'ms');
+
+    // Trigger rise
+    video.classList.remove('landing');
+    video.classList.add('rising');
+    
+    // Hover logic then land
+    setTimeout(() => {
+      video.classList.remove('rising');
+      video.classList.add('landing');
+      
+      // Cleanup landing class after touchdown
+      setTimeout(() => {
+        video.classList.remove('landing');
+      }, landDur);
+    }, riseDur + hoverDur);
+  }
+
+  document.documentElement.style.setProperty('--spaceship-width-desktop', SPACESHIP_WIDTH_DESKTOP);
+  document.documentElement.style.setProperty('--spaceship-width-mobile', SPACESHIP_WIDTH_MOBILE);
+  document.documentElement.style.setProperty('--spaceship-width', window.innerWidth <= 767 ? SPACESHIP_WIDTH_MOBILE : SPACESHIP_WIDTH_DESKTOP);
+
+  document.documentElement.style.setProperty('--spaceship-bottom-desktop', SPACESHIP_BOTTOM_DESKTOP);
+  document.documentElement.style.setProperty('--spaceship-bottom-mobile', SPACESHIP_BOTTOM_MOBILE);
+  document.documentElement.style.setProperty('--spaceship-bottom', window.innerWidth <= 767 ? SPACESHIP_BOTTOM_MOBILE : SPACESHIP_BOTTOM_DESKTOP);
+
+  document.documentElement.style.setProperty('--spaceship-left-desktop', SPACESHIP_LEFT_DESKTOP);
+  document.documentElement.style.setProperty('--spaceship-left-mobile', SPACESHIP_LEFT_MOBILE);
+  document.documentElement.style.setProperty('--spaceship-left', window.innerWidth <= 767 ? SPACESHIP_LEFT_MOBILE : SPACESHIP_LEFT_DESKTOP);
+
   window.addEventListener('resize', () => {
     const isMobile = window.innerWidth <= 767;
     document.documentElement.style.setProperty('--rain-area-height', isMobile ? RAIN_AREA_HEIGHT_MOBILE : RAIN_AREA_HEIGHT_DESKTOP);
@@ -175,6 +247,9 @@ import weatherConditions from '../data/weather-conditions.json';
     document.documentElement.style.setProperty('--sunmoon-event-label-y', isMobile ? SUNMOON_EVENT_LABEL_Y_OFFSET_MOBILE : SUNMOON_EVENT_LABEL_Y_OFFSET_DESKTOP);
     document.documentElement.style.setProperty('--sunmoon-time-y', isMobile ? SUNMOON_TIME_Y_OFFSET_MOBILE : SUNMOON_TIME_Y_OFFSET_DESKTOP);
     document.documentElement.style.setProperty('--clock-grid-uv-label-letter-spacing', isMobile ? CLOCK_GRID_UV_LABEL_LETTER_SPACING_MOBILE : CLOCK_GRID_UV_LABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--spaceship-width', isMobile ? SPACESHIP_WIDTH_MOBILE : SPACESHIP_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--spaceship-bottom', isMobile ? SPACESHIP_BOTTOM_MOBILE : SPACESHIP_BOTTOM_DESKTOP);
+    document.documentElement.style.setProperty('--spaceship-left', isMobile ? SPACESHIP_LEFT_MOBILE : SPACESHIP_LEFT_DESKTOP);
   });
 
   // --- CONFIG: Snow Flake Animation ---
@@ -6702,6 +6777,19 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
 
   // --- Weather Description Config ---
+  // Original movies app shadow settings (kept in case you want to switch back):
+  // const TEXT_LINE_SHADOW_DESKTOP = '0 0.6em 0.5em rgba(0,0,0,0.85)';
+  // const TEXT_LINE_SHADOW_MOBILE  = '0 0.7em 0.5em rgba(0,0,0,0.85)';
+  
+  // More apparent shadows (stronger opacity and tighter blur, with a subtle spread):
+  // const TEXT_LINE_SHADOW_DESKTOP = '0 0.6em 0.4em rgba(0,0,0,1), 0 0.4em 1em rgba(0,0,0,0.6)';
+  // const TEXT_LINE_SHADOW_MOBILE  = '0 0.7em 0.4em rgba(0,0,0,1), 0 0.5em 1em rgba(0,0,0,0.6)';
+
+  // Inner gradient shadow to mask darkness strictly to the text shape
+  // Adjusted to match the softer, gradual roll-off of the original movies app drop shadow
+  const TEXT_LINE_SHADOW_INNER_DESKTOP = 'linear-gradient(180deg, rgba(0,0,0,0.60) 0%, rgba(0,0,0,0) 55%)';
+  const TEXT_LINE_SHADOW_INNER_MOBILE = 'linear-gradient(180deg, rgba(0,0,0,0.60) 0%, rgba(0,0,0,0) 60%)';
+
   // Line 3: The API description (e.g., "Overcast clouds.")
   const DESC_MARGIN_TOP_DESKTOP = '-1vw';     // EDITABLE Desktop: Space ABOVE the 3rd line
   const DESC_MARGIN_TOP_MOBILE = '-1vw';      // EDITABLE Mobile: Space ABOVE the 3rd line
@@ -6721,6 +6809,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const descMarginBottom = isMobile ? DESC_MARGIN_BOTTOM_MOBILE : DESC_MARGIN_BOTTOM_DESKTOP;
     const derivedDescMarginTop = isMobile ? DERIVED_DESC_MARGIN_TOP_MOBILE : DERIVED_DESC_MARGIN_TOP_DESKTOP;
     const derivedDescMarginBottom = isMobile ? DERIVED_DESC_MARGIN_BOTTOM_MOBILE : DERIVED_DESC_MARGIN_BOTTOM_DESKTOP;
+    const shadowValue = isMobile ? TEXT_LINE_SHADOW_INNER_MOBILE : TEXT_LINE_SHADOW_INNER_DESKTOP;
 
     const id = 'weather-description';
     let el = document.getElementById(id);
@@ -6733,13 +6822,15 @@ Plan ahead for significantly warmer conditions tomorrow!`
       el.style.display = 'block'; // Ensure block display for transform
       el.style.fontFamily = "'light', sans-serif";
       el.style.fontWeight = 'normal';
+      el.style.position = 'relative'; // Required for z-index stacking
+      el.style.zIndex = '50'; // Higher than duplicate to cast shadow downwards
       el.style.fontSize = '5vw';
       el.style.whiteSpace = 'nowrap'; // Force single line for shrink-to-fit
       el.style.lineHeight = '1';
       el.style.margin = `${descMarginTop} auto ${descMarginBottom}`;
       el.style.color = 'inherit';
       el.style.opacity = '1';
-      el.style.textShadow = '0 2px 6px rgba(0, 0, 0, 0.0), 0 4px 12px rgba(0, 0, 0, 0.0)';
+      el.style.textShadow = 'none'; // Removed drop shadow to prevent dark blobs on background
       el.style.letterSpacing = '-.225vw';
       
       const feelsLike = document.getElementById('weather-feels-like');
@@ -6770,14 +6861,22 @@ Plan ahead for significantly warmer conditions tomorrow!`
       dupEl.style.whiteSpace = 'nowrap'; 
       dupEl.style.lineHeight = '1.2';
 
-      // Center horizontally natively
       dupEl.style.margin = '0 auto'; 
       dupEl.style.marginTop = derivedDescMarginTop; 
       dupEl.style.marginBottom = derivedDescMarginBottom; 
       
       dupEl.style.color = 'inherit';
       dupEl.style.opacity = '1';
-      dupEl.style.textShadow = '0 2px 6px rgba(0, 0, 0, 0.0), 0 4px 12px rgba(0, 0, 0, 0.0)';
+      dupEl.style.position = 'relative'; // Required for z-index stacking
+      dupEl.style.zIndex = '49'; // Lower than main description so shadow casts onto it
+      
+      // Apply inner shadow gradient to restrict darkness purely to the text
+      dupEl.style.backgroundColor = 'currentcolor';
+      dupEl.style.backgroundImage = shadowValue;
+      dupEl.style.webkitBackgroundClip = 'text';
+      dupEl.style.backgroundClip = 'text';
+      dupEl.style.webkitTextFillColor = 'transparent';
+      dupEl.style.textShadow = 'none';
       dupEl.style.letterSpacing = '-.225vw';
       dupEl.style.display = 'block'; // Ensure block display for transform centering
       
@@ -9958,7 +10057,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1291';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1298';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -11820,7 +11919,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
     if (summaryText) {
       el.textContent = summaryText;
-      el.style.display = 'flex';
+      el.style.display = 'block'; // Changed from flex to block to allow text wrapping for tokenization
+
+      const isMobile = window.innerWidth <= 767;
+      const shadowValue = isMobile ? TEXT_LINE_SHADOW_INNER_MOBILE : TEXT_LINE_SHADOW_INNER_DESKTOP;
+      applyTextLineShadows(el, shadowValue);
 
       // Calculate layout push dynamically (including margins)
       const marginTopVal = parseFloat(isMobile ? DAILY_SUMMARY_MARGIN_TOP_MOBILE : DAILY_SUMMARY_MARGIN_TOP_DESKTOP) || 0;
@@ -13586,6 +13689,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     stopAutoRefresh();
     getLocalWeather();
     triggerClockHandsSpinAnimation();
+    triggerSpaceshipRiseAnimation();
     if (CELESTIAL_ROTATION_ON_REFRESH && typeof window.triggerCelestialRotations === 'function') {
       window.triggerCelestialRotations();
     }
@@ -19159,6 +19263,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         console.info('Aligned timeout fired — running fetch now.');
         getLocalWeather();
         triggerClockHandsSpinAnimation();
+    triggerSpaceshipRiseAnimation();
         if (CELESTIAL_ROTATION_ON_REFRESH && typeof window.triggerCelestialRotations === 'function') {
           window.triggerCelestialRotations();
         }
@@ -19166,6 +19271,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         refreshTimerId = setInterval(() => {
           getLocalWeather();
           triggerClockHandsSpinAnimation();
+    triggerSpaceshipRiseAnimation();
           if (CELESTIAL_ROTATION_ON_REFRESH && typeof window.triggerCelestialRotations === 'function') {
             window.triggerCelestialRotations();
           }
@@ -19183,6 +19289,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           if (alignedTimeoutId) { clearTimeout(alignedTimeoutId); alignedTimeoutId = null; }
           getLocalWeather();
           triggerClockHandsSpinAnimation();
+    triggerSpaceshipRiseAnimation();
           if (CELESTIAL_ROTATION_ON_REFRESH && typeof window.triggerCelestialRotations === 'function') {
             window.triggerCelestialRotations();
           }
@@ -19190,6 +19297,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
             refreshTimerId = setInterval(() => {
               getLocalWeather();
               triggerClockHandsSpinAnimation();
+    triggerSpaceshipRiseAnimation();
               if (CELESTIAL_ROTATION_ON_REFRESH && typeof window.triggerCelestialRotations === 'function') {
                 window.triggerCelestialRotations();
               }
@@ -19208,6 +19316,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       refreshTimerId = setInterval(() => {
         getLocalWeather();
         triggerClockHandsSpinAnimation();
+    triggerSpaceshipRiseAnimation();
         if (CELESTIAL_ROTATION_ON_REFRESH && typeof window.triggerCelestialRotations === 'function') {
           window.triggerCelestialRotations();
         }
@@ -20074,3 +20183,98 @@ Plan ahead for significantly warmer conditions tomorrow!`
       Last Error: ${lastError}
     `;
   }
+// Helper: Apply line-by-line shadow (from movies app)
+function applyTextLineShadows(el, shadowValue) {
+  if (!el) return;
+  
+  if (el.dataset.originalHtml === undefined) {
+    el.dataset.originalHtml = el.innerHTML;
+  }
+  const originalHtml = el.dataset.originalHtml;
+  if (!originalHtml) return;
+
+  if (el.clientHeight <= 0 && el.offsetHeight <= 0) {
+    if (el.textContent.trim().length > 0) {
+      requestAnimationFrame(() => applyTextLineShadows(el, shadowValue));
+    }
+    return;
+  }
+
+  el.innerHTML = originalHtml;
+  
+  const tokens = [];
+  function tokenize(node) {
+    const children = Array.from(node.childNodes);
+    for (let child of children) {
+      if (child.nodeType === Node.TEXT_NODE) {
+        const parts = child.textContent.match(/(\s+|\S+)/g) || [];
+        const fragment = document.createDocumentFragment();
+        for (let p of parts) {
+          const span = document.createElement('span');
+          span.textContent = p;
+          fragment.appendChild(span);
+          tokens.push({ span, isSpace: /\s+/.test(p) });
+        }
+        node.replaceChild(fragment, child);
+      } else if (child.nodeType === Node.ELEMENT_NODE) {
+        const span = document.createElement('span');
+        node.replaceChild(span, child);
+        span.appendChild(child);
+        tokens.push({ span, isSpace: false });
+      }
+    }
+  }
+
+  tokenize(el);
+
+  const lines = [];
+  let currentLine = [];
+  let lastTop = null;
+
+  for (let token of tokens) {
+    if (token.isSpace && currentLine.length === 0) continue; 
+    
+    const top = token.span.getBoundingClientRect().top;
+    if (lastTop === null) lastTop = top;
+
+    if (!token.isSpace && Math.abs(top - lastTop) > 3) {
+      lines.push(currentLine);
+      currentLine = [token];
+      lastTop = top;
+    } else {
+      currentLine.push(token);
+    }
+  }
+  if (currentLine.length > 0) lines.push(currentLine);
+
+  if (lines.length > 0) {
+    lines.forEach(line => {
+      while (line.length > 0 && line[0].isSpace) {
+        line.shift();
+      }
+    });
+  }
+
+  el.innerHTML = '';
+  lines.forEach((line, index) => {
+    const lineSpan = document.createElement('span');
+    lineSpan.style.display = 'inline-block';
+    lineSpan.style.position = 'relative';
+    lineSpan.style.zIndex = (50 - index).toString();
+    
+    if (index > 0) {
+      lineSpan.style.backgroundColor = 'currentcolor';
+      lineSpan.style.backgroundImage = shadowValue;
+      lineSpan.style.webkitBackgroundClip = 'text';
+      lineSpan.style.backgroundClip = 'text';
+      lineSpan.style.webkitTextFillColor = 'transparent';
+    }
+    
+    line.forEach(token => {
+      while (token.span.firstChild) {
+        lineSpan.appendChild(token.span.firstChild);
+      }
+    });
+    el.appendChild(lineSpan);
+  });
+}
