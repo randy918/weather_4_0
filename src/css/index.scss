@@ -3444,7 +3444,7 @@ main {
     z-index: 9999;
     pointer-events: none; // Allows clicks to pass through
     object-fit: contain;
-    mix-blend-mode: screen; // Force black background to become transparent (iOS fallback)
+    mix-blend-mode: screen; // Restored for iOS black background fallback
     will-change: transform; // Hint for iOS hardware acceleration
     transform: translateY(0);
     // Slow land down and smooth finish
@@ -3455,4 +3455,17 @@ main {
         // Slow lift off and smooth deceleration near top
         transition: transform var(--spaceship-rise-duration, 4s) cubic-bezier(0.6, 0.0, 0.4, 1.0);
     }
+}
+.orrery-planet-label {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: var(--orrery-planet-label-margin-top, 1vw);
+  font-size: var(--orrery-planet-label-font-size, 1vw);
+  font-family: var(--feature-font, sans-serif);
+  white-space: nowrap;
+  pointer-events: none;
+  text-shadow: 0 0.1vw 0.2vw rgba(0, 0, 0, 0.8), 0 0 0.4vw rgba(0, 0, 0, 0.8);
+  /* The counter-rotation is handled by the parent body */
 }

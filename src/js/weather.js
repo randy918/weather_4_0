@@ -7955,7 +7955,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // OR assign a custom CSS color string (e.g. 'hsl(30, 100%, 50%)', '#f2534b')
   const SOLAR_FLARE_COLOR_LEVEL_A = 55;                          // EDITABLE: Level A (Micro/Background) temperature color (50s green/aqua)
   const SOLAR_FLARE_COLOR_LEVEL_B = 75;                          // EDITABLE: Level B (Minor) temperature color (70s yellow-gold)
-  const SOLAR_FLARE_COLOR_LEVEL_C = 95;                          // EDITABLE: Level C (Small) temperature color (90s tomato red / coral matching screenshot)
+  const SOLAR_FLARE_COLOR_LEVEL_C = 85;                          // EDITABLE: Level C (Small) temperature color (80s orange, matching mockup)
   const SOLAR_FLARE_COLOR_LEVEL_M = 105;                         // EDITABLE: Level M (Medium) temperature color (100s vibrant red)
   const SOLAR_FLARE_COLOR_LEVEL_X = -5;                          // EDITABLE: Level X (Major) temperature color (Below 0 shocking magenta)
   const SOLAR_FLARE_COLOR_OVERRIDE = null;                       // EDITABLE: Optional universal color override (e.g. null, 95, or '#f2534b')
@@ -9261,6 +9261,47 @@ Plan ahead for significantly warmer conditions tomorrow!`
   }
 
   // ==========================================
+  // --- Calculate Distance to Earth (Millions of Miles) ---
+  // ==========================================
+  function calcPlanetDistanceToEarth(planet) {
+    // Semi-major axes in AU
+    const a = {
+      mercury: 0.387098,
+      venus: 0.723332,
+      earth: 1.000000,
+      mars: 1.523679,
+      jupiter: 5.2044,
+      saturn: 9.5826,
+      uranus: 19.2184,
+      neptune: 30.11
+    };
+    if (planet.toLowerCase() === 'earth') return 0;
+    
+    // Get heliocentric longitudes (parsing out 'deg')
+    const pAngleStr = calcPlanetOrreryAngle(planet);
+    const eAngleStr = calcPlanetOrreryAngle('earth');
+    const pAngle = parseFloat(pAngleStr);
+    const eAngle = parseFloat(eAngleStr);
+    
+    // Difference in angle in radians
+    const dTheta = (pAngle - eAngle) * Math.PI / 180;
+    
+    const r_p = a[planet.toLowerCase()];
+    const r_e = a['earth'];
+    
+    if (!r_p) return 0;
+
+    // Law of cosines: D^2 = R_p^2 + R_e^2 - 2*R_p*R_e*cos(dTheta)
+    const distAU = Math.sqrt(r_p * r_p + r_e * r_e - 2 * r_p * r_e * Math.cos(dTheta));
+    
+    // Convert AU to millions of miles (1 AU ≈ 92.9558 million miles)
+    const distM = distAU * 92.9558;
+    
+    // Return rounded integer for the label
+    return Math.round(distM);
+  }
+
+  // ==========================================
   // --- Moon Position Ephemeris: Real-Time Live Lunar Position ---
   // ==========================================
   //
@@ -9358,6 +9399,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_TRACK_WIDTH_DESKTOP = '0.05vw';         // EDITABLE Desktop: Orbit ring track stroke width
   const ORRERY_TRACK_WIDTH_MOBILE = '0.10vw';          // EDITABLE Mobile: Orbit ring track stroke width
   const ORRERY_Z_INDEX = '10';                         // EDITABLE: Stacking context layer index
+
+  // --- EDITABLE: Planet Distance Labels Config (JCV) ---
+  const ORRERY_PLANET_LABELS_ENABLED = true;                   // EDITABLE: Toggle visibility of planet distance labels
+  const ORRERY_PLANET_LABEL_FONT_SIZE_DESKTOP = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.088)'; // EDITABLE Desktop: Label font size
+  const ORRERY_PLANET_LABEL_FONT_SIZE_MOBILE = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.088)';  // EDITABLE Mobile: Label font size
+  const ORRERY_PLANET_LABEL_MARGIN_TOP_DESKTOP = '0.5vw';        // EDITABLE Desktop: Label margin top
+  const ORRERY_PLANET_LABEL_MARGIN_TOP_MOBILE = '0.75vw';       // EDITABLE Mobile: Label margin top
 
   // --- EDITABLE: Central Sun In Orrery Config (JCV) ---
   const ORRERY_SUN_ENABLED = true;                         // EDITABLE: Toggle visibility of central Sun
@@ -9675,6 +9723,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--orrery-track-color', ORRERY_TRACK_COLOR);
     document.documentElement.style.setProperty('--orrery-track-width', isMobile ? ORRERY_TRACK_WIDTH_MOBILE : ORRERY_TRACK_WIDTH_DESKTOP);
     document.documentElement.style.setProperty('--orrery-z-index', ORRERY_Z_INDEX);
+
+    document.documentElement.style.setProperty('--orrery-planet-label-font-size', isMobile ? ORRERY_PLANET_LABEL_FONT_SIZE_MOBILE : ORRERY_PLANET_LABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--orrery-planet-label-margin-top', isMobile ? ORRERY_PLANET_LABEL_MARGIN_TOP_MOBILE : ORRERY_PLANET_LABEL_MARGIN_TOP_DESKTOP);
 
     // Central Sun variables (Primary Layer)
     const sunPeriodDesktop = ORRERY_SUN_ROTATION_PERIOD_DESKTOP;
@@ -10057,7 +10108,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1298';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1301';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -13845,8 +13896,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }
       
       const newStr = `${month} ${day} ${dayOfWeek}`;
-      const color = getCurrentTextColor();
-      
+      const color = getCurrentTextColor();3
+           
       const el = document.getElementById('simple-month');
       if (el) {
         el.style.color = color;
@@ -13856,7 +13907,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       lastSimpleMonthStr = newStr;
       
       if (el) {
-        el.innerHTML = `<span style="font-family: 'light', sans-serif; font-weight: normal; color: inherit; letter-spacing: -0.31vw; margin-right: 0.94vw;">${month}</span><span style="font-family: 'bold', sans-serif; font-weight: normal; color: inherit; letter-spacing: -0.31vw; margin-right: 0.94vw;">${day}</span><span style="font-family: 'light', sans-serif; font-weight: normal; color: inherit; letter-spacing: -0.31vw;">${dayOfWeek}</span>`;
+        el.innerHTML = `<div style="transform: scaleX(0.90); transform-origin: center; display: flex; align-items: baseline;"><span style="font-family: 'light', sans-serif; font-weight: normal; color: inherit; letter-spacing: -0.31vw; margin-right: 0.94vw;">${month}</span><span style="font-family: 'bold', sans-serif; font-weight: normal; color: inherit; letter-spacing: -0.31vw; margin-right: 0.94vw;">${day}</span><span style="font-family: 'light', sans-serif; font-weight: normal; color: inherit; letter-spacing: -0.31vw;">${dayOfWeek}</span></div>`;
       }
       // Left circle date update removed as it now displays the current digital time with seconds instead.
     } catch (e) { /* noop */ }
@@ -14138,7 +14189,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const isLive = SOLAR_FLARE_MODE === 'live' && !activeSolarFlareState;
     
     if (isLive) {
-      const currentDate = new Date().getDate();
+      const currentDate = new Date().toDateString();
       let storedMaxFlareDate = localStorage.getItem('maxFlareDate');
       let storedMaxFlareFraction = localStorage.getItem('maxFlareFraction');
       let storedMaxFlareColor = localStorage.getItem('maxFlareColor');
@@ -14200,7 +14251,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     
     // Apply peak styles
     if (dailyPeakFraction > fraction) {
-      dial.style.setProperty('--solar-flare-peak-color', color);
+      dial.style.setProperty('--solar-flare-peak-color', dailyPeakColor);
       dial.style.setProperty('--solar-flare-peak-stroke-offset', peakStrokeOffset.toFixed(2));
       const peakEl = dial.querySelector('.solar-flare-peak-progress');
       if (peakEl) {
@@ -16342,6 +16393,44 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       ringContainer.appendChild(sunBody);
 
+      // Helper function for planet labels
+      function addPlanetLabel(body, shortName, distM, planetId) {
+        if (!ORRERY_PLANET_LABELS_ENABLED) return;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'orrery-label-wrapper';
+        wrapper.style.position = 'absolute';
+        wrapper.style.top = '50%';
+        wrapper.style.left = '50%';
+        wrapper.style.width = '0';
+        wrapper.style.height = '0';
+        // Force 0 axial tilt on the wrapper so text stays horizontal
+        wrapper.style.setProperty(`--orrery-${planetId}-axial-tilt`, '0deg');
+        wrapper.style.transform = `rotate(calc(-1 * var(--orrery-${planetId}-orbit-angle, 0deg)))`;
+        wrapper.style.animation = `var(--orrery-${planetId}-counter-animation, none)`;
+
+        const label = document.createElement('div');
+        label.className = 'orrery-planet-label';
+        
+        let tempForColor = 60;
+        if (distM < 50) tempForColor = 60;
+        else if (distM >= 50 && distM < 100) tempForColor = 70;
+        else if (distM >= 100 && distM < 500) tempForColor = 80;
+        else if (distM >= 500 && distM < 1000) tempForColor = 90;
+        else tempForColor = 100;
+        
+        const color = typeof tempToColor === 'function' ? tempToColor(tempForColor) : '#FFF';
+        label.style.color = color;
+        label.textContent = `${shortName} ${distM}M`;
+        // Move label directly below the planet image in upright screen space
+        // Saturn is much wider than it is tall because of its rings, so we divide its width by 4 instead of 2 for a tighter fit.
+        const widthDivisor = planetId === 'saturn' ? 4 : 2;
+        label.style.transform = `translate(-50%, calc(var(--orrery-${planetId}-width, 4vw) / ${widthDivisor} + var(--orrery-planet-label-margin-top, 0.5vw)))`;
+        
+        wrapper.appendChild(label);
+        body.appendChild(wrapper);
+      }
+
       // Create Saturn orbit arm and body
       const saturnArm = document.createElement('div');
       saturnArm.className = 'orrery-saturn-arm';
@@ -16359,6 +16448,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       saturnImg.draggable = false;
 
       saturnBody.appendChild(saturnImg);
+      addPlanetLabel(saturnBody, 'Sa', calcPlanetDistanceToEarth('saturn'), 'saturn');
       saturnArm.appendChild(saturnBody);
       ringContainer.appendChild(saturnArm);
 
@@ -16379,6 +16469,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       jupiterImg.draggable = false;
 
       jupiterBody.appendChild(jupiterImg);
+      addPlanetLabel(jupiterBody, 'Ju', calcPlanetDistanceToEarth('jupiter'), 'jupiter');
       updateJupiterMoons(jupiterBody);
       jupiterArm.appendChild(jupiterBody);
       ringContainer.appendChild(jupiterArm);
@@ -16391,7 +16482,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const marsImg = document.createElement('img');
       marsImg.className = 'orrery-mars-img'; marsImg.id = 'orrery-mars-img';
       marsImg.src = ORRERY_MARS_IMAGE_URL || 'img/p-ma.png'; marsImg.alt = 'Mars'; marsImg.draggable = false;
-      marsBody.appendChild(marsImg); marsArm.appendChild(marsBody); ringContainer.appendChild(marsArm);
+      marsBody.appendChild(marsImg);
+      addPlanetLabel(marsBody, 'Ma', calcPlanetDistanceToEarth('mars'), 'mars');
+      marsArm.appendChild(marsBody); ringContainer.appendChild(marsArm);
 
       // Create Earth orbit arm and body
       const earthArm = document.createElement('div');
@@ -16402,6 +16495,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       earthImg.className = 'orrery-earth-img'; earthImg.id = 'orrery-earth-img';
       earthImg.src = ORRERY_EARTH_IMAGE_URL || 'img/p-ea.png'; earthImg.alt = 'Earth'; earthImg.draggable = false;
       earthBody.appendChild(earthImg);
+      // Earth has no label as requested
 
       // Moon orbit track circle around Earth
       const moonTrack = document.createElement('div');
@@ -16429,7 +16523,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const venusImg = document.createElement('img');
       venusImg.className = 'orrery-venus-img'; venusImg.id = 'orrery-venus-img';
       venusImg.src = ORRERY_VENUS_IMAGE_URL || 'img/p-ve.png'; venusImg.alt = 'Venus'; venusImg.draggable = false;
-      venusBody.appendChild(venusImg); venusArm.appendChild(venusBody); ringContainer.appendChild(venusArm);
+      venusBody.appendChild(venusImg);
+      addPlanetLabel(venusBody, 'Ve', calcPlanetDistanceToEarth('venus'), 'venus');
+      venusArm.appendChild(venusBody); ringContainer.appendChild(venusArm);
 
       // Create Mercury orbit arm and body
       const mercuryArm = document.createElement('div');
@@ -16439,7 +16535,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const mercuryImg = document.createElement('img');
       mercuryImg.className = 'orrery-mercury-img'; mercuryImg.id = 'orrery-mercury-img';
       mercuryImg.src = ORRERY_MERCURY_IMAGE_URL || 'img/p-me.png'; mercuryImg.alt = 'Mercury'; mercuryImg.draggable = false;
-      mercuryBody.appendChild(mercuryImg); mercuryArm.appendChild(mercuryBody); ringContainer.appendChild(mercuryArm);
+      mercuryBody.appendChild(mercuryImg);
+      addPlanetLabel(mercuryBody, 'Me', calcPlanetDistanceToEarth('mercury'), 'mercury');
+      mercuryArm.appendChild(mercuryBody); ringContainer.appendChild(mercuryArm);
 
       section.appendChild(ringContainer);
     } else {
