@@ -182,13 +182,15 @@ import weatherConditions from '../data/weather-conditions.json';
   const SPACESHIP_LAND_MAX_DURATION_MS = 8000;          // EDITABLE: Max time to land
   const SPACESHIP_HOVER_MIN_DURATION_MS = 2000;         // EDITABLE: Min time to stay in air
   const SPACESHIP_HOVER_MAX_DURATION_MS = 5000;         // EDITABLE: Max time to stay in air
+  const SPACESHIP_FLOAT_MIN_DURATION_MS = 10000;        // EDITABLE: Min time to float right
+  const SPACESHIP_FLOAT_MAX_DURATION_MS = 20000;        // EDITABLE: Max time to float right
 
   function triggerSpaceshipRiseAnimation() {
     const video = document.getElementById('spaceship-video');
     if (!video) return;
 
     // Prevent re-triggering if already animating
-    if (video.classList.contains('rising') || video.classList.contains('landing')) return;
+    if (video.classList.contains('rising') || video.classList.contains('landing') || video.classList.contains('floating-right') || video.classList.contains('returning-from-below')) return;
     
     const isMobile = window.innerWidth <= 767;
     const minDist = isMobile ? SPACESHIP_RISE_MIN_DISTANCE_MOBILE : SPACESHIP_RISE_MIN_DISTANCE_DESKTOP;
@@ -207,17 +209,51 @@ import weatherConditions from '../data/weather-conditions.json';
 
     // Trigger rise
     video.classList.remove('landing');
+    video.classList.remove('floating-right');
+    video.classList.remove('returning-from-below');
     video.classList.add('rising');
     
-    // Hover logic then land
+    // Hover logic then land or float right
     setTimeout(() => {
-      video.classList.remove('rising');
-      video.classList.add('landing');
-      
-      // Cleanup landing class after touchdown
-      setTimeout(() => {
-        video.classList.remove('landing');
-      }, landDur);
+      // 40% chance to float right instead of landing
+      if (Math.random() < 0.40) {
+        const floatDur = Math.random() * (SPACESHIP_FLOAT_MAX_DURATION_MS - SPACESHIP_FLOAT_MIN_DURATION_MS) + SPACESHIP_FLOAT_MIN_DURATION_MS;
+        document.documentElement.style.setProperty('--spaceship-float-duration', floatDur + 'ms');
+        
+        video.classList.remove('rising');
+        video.classList.add('floating-right');
+        
+        setTimeout(() => {
+          // Off screen right now. Teleport below left.
+          video.classList.remove('floating-right');
+          video.classList.add('returning-from-below');
+          
+          // Wait a couple frames for teleport to apply without transition
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              // Now trigger landing transition back to original position
+              const returnDur = Math.random() * (SPACESHIP_LAND_MAX_DURATION_MS - SPACESHIP_LAND_MIN_DURATION_MS) + SPACESHIP_LAND_MIN_DURATION_MS;
+              document.documentElement.style.setProperty('--spaceship-land-duration', returnDur + 'ms');
+              
+              video.classList.remove('returning-from-below');
+              video.classList.add('landing');
+              
+              setTimeout(() => {
+                video.classList.remove('landing');
+              }, returnDur);
+            });
+          });
+        }, floatDur);
+      } else {
+        // Normal land logic
+        video.classList.remove('rising');
+        video.classList.add('landing');
+        
+        // Cleanup landing class after touchdown
+        setTimeout(() => {
+          video.classList.remove('landing');
+        }, landDur);
+      }
     }, riseDur + hoverDur);
   }
 
@@ -435,6 +471,8 @@ import weatherConditions from '../data/weather-conditions.json';
   const FORECAST_GRADIENT_MID_POINT = FORECAST_GRADIENT_MID_POINT_DESKTOP; // Fallback alias
 
   const FORECAST_GRADIENT_BLEND_MODE = 'normal';                    // EDITABLE: 8-day blend mode ('normal', 'screen', 'overlay', 'soft-light')
+  const FORECAST_GRADIENT_GROUP_OPACITY_DESKTOP = 0.6;              // EDITABLE Desktop: 8-day overall group opacity (1.0 = 100%)
+  const FORECAST_GRADIENT_GROUP_OPACITY_MOBILE = 0.8;               // EDITABLE Mobile: 8-day overall group opacity (1.0 = 100%)
 
   document.documentElement.style.setProperty('--forecast-gradient-height-desktop', FORECAST_GRADIENT_HEIGHT_DESKTOP);
   document.documentElement.style.setProperty('--forecast-gradient-height-mobile', FORECAST_GRADIENT_HEIGHT_MOBILE);
@@ -449,6 +487,8 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--forecast-gradient-opacity-bottom-desktop', FORECAST_GRADIENT_OPACITY_BOTTOM_DESKTOP);
   document.documentElement.style.setProperty('--forecast-gradient-opacity-bottom-mobile', FORECAST_GRADIENT_OPACITY_BOTTOM_MOBILE);
   document.documentElement.style.setProperty('--forecast-gradient-blend-mode', FORECAST_GRADIENT_BLEND_MODE);
+  document.documentElement.style.setProperty('--forecast-gradient-group-opacity-desktop', FORECAST_GRADIENT_GROUP_OPACITY_DESKTOP);
+  document.documentElement.style.setProperty('--forecast-gradient-group-opacity-mobile', FORECAST_GRADIENT_GROUP_OPACITY_MOBILE);
 
   // =========================================================================
   // --- CONFIG: 24-HOUR GRID - Temp Reflection Gradient Tinges (JCV) ---
@@ -473,6 +513,8 @@ import weatherConditions from '../data/weather-conditions.json';
   const HOURLY_GRADIENT_MID_POINT = HOURLY_GRADIENT_MID_POINT_DESKTOP; // Fallback alias
 
   const HOURLY_GRADIENT_BLEND_MODE = 'normal';                      // EDITABLE: 24-hour blend mode ('normal', 'screen', 'overlay', 'soft-light')
+  const HOURLY_GRADIENT_GROUP_OPACITY_DESKTOP = 0.6;                // EDITABLE Desktop: 24-hour overall group opacity (1.0 = 100%)
+  const HOURLY_GRADIENT_GROUP_OPACITY_MOBILE = 0.6;                 // EDITABLE Mobile: 24-hour overall group opacity (1.0 = 100%)
 
   document.documentElement.style.setProperty('--hourly-gradient-height-desktop', HOURLY_GRADIENT_HEIGHT_DESKTOP);
   document.documentElement.style.setProperty('--hourly-gradient-height-mobile', HOURLY_GRADIENT_HEIGHT_MOBILE);
@@ -487,6 +529,8 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--hourly-gradient-opacity-bottom-desktop', HOURLY_GRADIENT_OPACITY_BOTTOM_DESKTOP);
   document.documentElement.style.setProperty('--hourly-gradient-opacity-bottom-mobile', HOURLY_GRADIENT_OPACITY_BOTTOM_MOBILE);
   document.documentElement.style.setProperty('--hourly-gradient-blend-mode', HOURLY_GRADIENT_BLEND_MODE);
+  document.documentElement.style.setProperty('--hourly-gradient-group-opacity-desktop', HOURLY_GRADIENT_GROUP_OPACITY_DESKTOP);
+  document.documentElement.style.setProperty('--hourly-gradient-group-opacity-mobile', HOURLY_GRADIENT_GROUP_OPACITY_MOBILE);
 
   // --- CONFIG: Clock Grid (8 Countdown Circles Row) ---
   const CLOCK_GRID_SIZE = '11vw';         // EDITABLE: Width and height of each circle widget
@@ -9215,7 +9259,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   //   Replace a hardcoded angle constant with calcPlanetOrreryAngle('jupiter')
   //   Supported keys: 'mercury','venus','mars','jupiter','saturn','uranus','neptune'
   //
-  function calcPlanetOrreryAngle(planet) {
+  function calcPlanetOrreryAngle(planet, dateOverride = null) {
     // Mean longitude elements: L = L0 + L1 * T  (degrees)
     // Source: Meeus "Astronomical Algorithms" Table 31.a (VSOP87 abbreviated)
     const ELEMENTS = {
@@ -9240,7 +9284,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     }
 
     // Julian Date for today (noon UTC)
-    const now    = new Date();
+    const now    = dateOverride || new Date();
     const JD     = (now.getTime() / 86400000) + 2440587.5;
     // Julian centuries since J2000.0
     const T      = (JD - 2451545.0) / 36525.0;
@@ -9263,7 +9307,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- Calculate Distance to Earth (Millions of Miles) ---
   // ==========================================
-  function calcPlanetDistanceToEarth(planet) {
+  function calcPlanetDistanceToEarth(planet, dateOverride = null, returnUnrounded = false) {
     // Semi-major axes in AU
     const a = {
       mercury: 0.387098,
@@ -9278,8 +9322,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (planet.toLowerCase() === 'earth') return 0;
     
     // Get heliocentric longitudes (parsing out 'deg')
-    const pAngleStr = calcPlanetOrreryAngle(planet);
-    const eAngleStr = calcPlanetOrreryAngle('earth');
+    const pAngleStr = calcPlanetOrreryAngle(planet, dateOverride);
+    const eAngleStr = calcPlanetOrreryAngle('earth', dateOverride);
     const pAngle = parseFloat(pAngleStr);
     const eAngle = parseFloat(eAngleStr);
     
@@ -9298,7 +9342,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const distM = distAU * 92.9558;
     
     // Return rounded integer for the label
-    return Math.round(distM);
+    return returnUnrounded ? distM : Math.round(distM);
   }
 
   // ==========================================
@@ -9402,8 +9446,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   // --- EDITABLE: Planet Distance Labels Config (JCV) ---
   const ORRERY_PLANET_LABELS_ENABLED = true;                   // EDITABLE: Toggle visibility of planet distance labels
-  const ORRERY_PLANET_LABEL_FONT_SIZE_DESKTOP = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.088)'; // EDITABLE Desktop: Label font size
-  const ORRERY_PLANET_LABEL_FONT_SIZE_MOBILE = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.088)';  // EDITABLE Mobile: Label font size
+  const ORRERY_PLANET_LABEL_FONT_SIZE_DESKTOP = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.11)'; // EDITABLE Desktop: Label font size
+  const ORRERY_PLANET_LABEL_FONT_SIZE_MOBILE = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.11)';  // EDITABLE Mobile: Label font size
   const ORRERY_PLANET_LABEL_MARGIN_TOP_DESKTOP = '0.5vw';        // EDITABLE Desktop: Label margin top
   const ORRERY_PLANET_LABEL_MARGIN_TOP_MOBILE = '0.75vw';       // EDITABLE Mobile: Label margin top
 
@@ -10108,7 +10152,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1301';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1302';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -16421,7 +16465,18 @@ Plan ahead for significantly warmer conditions tomorrow!`
         
         const color = typeof tempToColor === 'function' ? tempToColor(tempForColor) : '#FFF';
         label.style.color = color;
-        label.textContent = `${shortName} ${distM}M`;
+        
+        // Predict trend
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const distNowExact = calcPlanetDistanceToEarth(planetId, null, true);
+        const distTomorrowExact = calcPlanetDistanceToEarth(planetId, tomorrow, true);
+        
+        let arrowClass = 'fa-arrows-up-down';
+        if (distTomorrowExact > distNowExact) arrowClass = 'fa-arrow-up';
+        else if (distTomorrowExact < distNowExact) arrowClass = 'fa-arrow-down';
+
+        label.innerHTML = `&nbsp;&nbsp;${shortName} ${distM}M&nbsp;&nbsp;<i class="fa-solid ${arrowClass}" style="font-size: 0.8em; opacity: 0.7;"></i>`;
         // Move label directly below the planet image in upright screen space
         // Saturn is much wider than it is tall because of its rings, so we divide its width by 4 instead of 2 for a tighter fit.
         const widthDivisor = planetId === 'saturn' ? 4 : 2;

@@ -634,6 +634,11 @@ main {
 .hourly-gradients-container {
     pointer-events: none;
     z-index: 5;
+    opacity: var(--hourly-gradient-group-opacity-desktop, var(--hourly-gradient-group-opacity, 1));
+
+    @media (max-width: 767px) {
+        opacity: var(--hourly-gradient-group-opacity-mobile, var(--hourly-gradient-group-opacity, 1));
+    }
 }
 
 .hourly-image,
@@ -933,6 +938,11 @@ main {
 .forecast-gradients-container {
     pointer-events: none;
     z-index: 5;
+    opacity: var(--forecast-gradient-group-opacity-desktop, var(--forecast-gradient-group-opacity, 1));
+
+    @media (max-width: 767px) {
+        opacity: var(--forecast-gradient-group-opacity-mobile, var(--forecast-gradient-group-opacity, 1));
+    }
 }
 
 .forecast-image-cell,
@@ -3446,14 +3456,28 @@ main {
     object-fit: contain;
     mix-blend-mode: screen; // Restored for iOS black background fallback
     will-change: transform; // Hint for iOS hardware acceleration
-    transform: translateY(0);
+    transform: translate(0, 0);
     // Slow land down and smooth finish
     transition: transform var(--spaceship-land-duration, 4s) cubic-bezier(0.6, 0.0, 0.4, 1.0);
     
     &.rising {
-        transform: translateY(calc(-1 * var(--spaceship-rise-distance, 20vw)));
+        transform: translate(0, calc(-1 * var(--spaceship-rise-distance, 20vw)));
         // Slow lift off and smooth deceleration near top
         transition: transform var(--spaceship-rise-duration, 4s) cubic-bezier(0.6, 0.0, 0.4, 1.0);
+    }
+    
+    &.floating-right {
+        // Move off-screen to the right while maintaining altitude
+        transform: translate(120vw, calc(-1 * var(--spaceship-rise-distance, 20vw)));
+        // Float slowly, easing in as it accelerates away
+        transition: transform var(--spaceship-float-duration, 10s) cubic-bezier(0.4, 0.0, 1.0, 1.0);
+    }
+    
+    &.returning-from-below {
+        // Teleport completely off-screen straight below its base position
+        transform: translate(0, 30vw);
+        // Instant teleport, no transition so it's not seen moving there
+        transition: none;
     }
 }
 .orrery-planet-label {
@@ -3463,7 +3487,7 @@ main {
   transform: translateX(-50%);
   margin-top: var(--orrery-planet-label-margin-top, 1vw);
   font-size: var(--orrery-planet-label-font-size, 1vw);
-  font-family: var(--feature-font, sans-serif);
+  font-family: 'medium', sans-serif;
   white-space: nowrap;
   pointer-events: none;
   text-shadow: 0 0.1vw 0.2vw rgba(0, 0, 0, 0.8), 0 0 0.4vw rgba(0, 0, 0, 0.8);
