@@ -7679,7 +7679,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const CELESTIAL_ROTATE_ON_INITIAL_LOAD = false;     // EDITABLE: false = static live on page load until clicked or refreshed; true = 1 round on load
 
   // Left Circle: Sun Live (GOES-19 SUVI Fe195 Å) 27-Day Rotation Controls (JCV)
-  const SUN_ANIMATION_ENABLED = true;                 // EDITABLE: Enable/disable time-span rotation animation
+  const SUN_ANIMATION_ENABLED = false;                 // EDITABLE: Enable/disable time-span rotation animation
   const SUN_ANIMATION_DAYS = 27;                      // EDITABLE: Number of data days in time span (27 = full solar synodic rotation)
   const SUN_ANIMATION_FPS = 12;                       // EDITABLE: Default frames per second (e.g. 12 = ~4.5s for 54-frame rotation cycle)
   const SUN_ANIMATION_FPS_DESKTOP = 12;               // EDITABLE Desktop: Frames per second (playback speed)
@@ -7777,15 +7777,15 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // Plays back recent stepped frames back-and-forth (ping-pong) to show live solar flare activity & winking white dots
   const SUN_SIZZLE_ENABLED = true;                    // EDITABLE: Enable/disable animation for left sizzling sun
   const SUN_SIZZLE_BAND = 'Fe195';                    // EDITABLE: NOAA SUVI band: 'Fe195' (coronal loops/bronze), 'Fe094' (hot solar flares/blue), 'He304' (prominence eruptions/red)
-  const SUN_SIZZLE_FETCH_LENGTH_DESKTOP = 720;          // EDITABLE Desktop: Historical buffer to pull from NOAA (60 = ~1 hr, 120 = ~2 hrs, 720 = ~12 hrs)
+  const SUN_SIZZLE_FETCH_LENGTH_DESKTOP = 720;          // EDITABLE Desktop: Historical buffer to pull from NOAA (60 = ~1 hr, 120 = ~2 hrs, 720 = ~24 hrs)
   const SUN_SIZZLE_FETCH_LENGTH_MOBILE = 720;           // EDITABLE Mobile: Historical buffer to pull from NOAA
   const SUN_SIZZLE_FRAME_STEP_DESKTOP = 5;              // EDITABLE Desktop: Cadence step (~3-4m apart so solar flares visibly boil)
   const SUN_SIZZLE_FRAME_STEP_MOBILE = 5;               // EDITABLE Mobile: Cadence step (Increase this if mobile browser drops frames to cover more time)
-  const SUN_SIZZLE_FRAME_COUNT_DESKTOP = 72;            // EDITABLE Desktop: Number of recent stepped frames in loop (e.g. 24, 36, 48, 72)
-  const SUN_SIZZLE_FRAME_COUNT_MOBILE = 72;             // EDITABLE Mobile: Number of recent stepped frames in loop
-  const SUN_SIZZLE_FPS_DESKTOP = 12;                  // EDITABLE Desktop: Sizzle playback speed in FPS (6-7 FPS gives eye time to track individual flares)
-  const SUN_SIZZLE_FPS_MOBILE = 12;                   // EDITABLE Mobile: Sizzle playback speed in FPS
-  const SUN_SIZZLE_FPS = 12;                          // EDITABLE: Fallback / default FPS
+  const SUN_SIZZLE_FRAME_COUNT_DESKTOP = 144;            // EDITABLE Desktop: Number of recent stepped frames in loop (e.g. 24, 36, 48, 72, 144)
+  const SUN_SIZZLE_FRAME_COUNT_MOBILE = 144;             // EDITABLE Mobile: Number of recent stepped frames in loop
+  const SUN_SIZZLE_FPS_DESKTOP = 16;                  // EDITABLE Desktop: Sizzle playback speed in FPS (6-7 FPS gives eye time to track individual flares)
+  const SUN_SIZZLE_FPS_MOBILE = 16;                   // EDITABLE Mobile: Sizzle playback speed in FPS
+  const SUN_SIZZLE_FPS = 16;                          // EDITABLE: Fallback / default FPS
   const SUN_SIZZLE_PAUSE_END_MS = 150;                // EDITABLE: Pause in ms at turnaround ends (live frame and oldest frame) before reversing (0 for instant)
   const SUN_SIZZLE_PLAYBACK_MODE = 'pingpong';        // EDITABLE: 'pingpong' (1..36..1) or 'forward' (1..36, 1..36)
   const SUN_SIZZLE_CROSSFADE_MS_DESKTOP = 50;         // EDITABLE Desktop: Cross-fade transition in ms between sizzle frames (eliminates flicker)
@@ -15675,7 +15675,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     let sunFrameIndex = 0;
     let sunActiveLayer = 'a';
 
-    if (SUN_ANIMATION_ENABLED && Array.isArray(SUN_ANIMATION_FRAMES) && SUN_ANIMATION_FRAMES.length > 0) {
+    if (Array.isArray(SUN_ANIMATION_FRAMES) && SUN_ANIMATION_FRAMES.length > 0) {
       const framesPerDay = SUN_ANIMATION_FRAMES.length > 27 ? 2 : 1;
       const targetCount = Math.max(1, Math.min(SUN_ANIMATION_FRAMES.length, Math.round(SUN_ANIMATION_DAYS * framesPerDay + 1)));
       const activeFrameNames = SUN_ANIMATION_FRAMES.slice(-targetCount);
@@ -15856,6 +15856,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }
 
       function triggerSunRotation() {
+        if (!SUN_ANIMATION_ENABLED) return;
         if (isSunRotating || sunPreloadedImages.length <= 1) return;
         if (sunSizzleTimeoutId) {
           clearTimeout(sunSizzleTimeoutId);
