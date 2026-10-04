@@ -1288,7 +1288,7 @@ import weatherConditions from '../data/weather-conditions.json';
   const GRADIENT_BOTTOM_DESKTOP = '85.5vw';              // EDITABLE Desktop: 8-day forecast background gradient lower edge position
   const GRADIENT_BOTTOM_MOBILE = '125.5vw';              // EDITABLE Mobile: 8-day forecast background gradient lower edge position
   
-  const GRADIENT_LOWER_BOTTOM_DESKTOP = '1514vw';         // EDITABLE Desktop: 24-hour forecast background gradient lower edge fallback position
+  const GRADIENT_LOWER_BOTTOM_DESKTOP = '154vw';         // EDITABLE Desktop: 24-hour forecast background gradient lower edge fallback position
   const GRADIENT_LOWER_BOTTOM_MOBILE = '196vw';          // EDITABLE Mobile: 24-hour forecast background gradient lower edge fallback position
 
   // EDITABLE: Lower gradient overlay lowest border vertical offset (relative to 24 sky images bottom edge)
@@ -1329,14 +1329,14 @@ import weatherConditions from '../data/weather-conditions.json';
     const offsetStr = isPhone ? GRADIENT_LOWER_BORDER_OFFSET_MOBILE : GRADIENT_LOWER_BORDER_OFFSET_DESKTOP;
     const offsetVal = parseFloat(offsetStr) || 0;
     
-    // Rely on the configured static position (and CSS transforms for alerts)
-    // rather than brittle DOM measurements at startup
-    const fallbackTop = parseFloat(config.lowerTop || (isPhone ? 158 : 116));
-    const lowerTopVwNum = fallbackTop + offsetVal;
-    const lowerTopVw = `${lowerTopVwNum.toFixed(2)}vw`;
-    
+    const lowerBottomVal = parseFloat(config.lowerBottom || (isPhone ? 196 : 154));
     const lowerHeightVal = parseFloat(config.lowerHeight) || 38;
-    const lowerBottomVw = `${(lowerTopVwNum + lowerHeightVal).toFixed(2)}vw`;
+    
+    const lowerBottomVwNum = lowerBottomVal + offsetVal;
+    const lowerTopVwNum = lowerBottomVwNum - lowerHeightVal;
+    
+    const lowerTopVw = `${lowerTopVwNum.toFixed(2)}vw`;
+    const lowerBottomVw = `${lowerBottomVwNum.toFixed(2)}vw`;
 
     if (lastCalculatedLowerTop !== lowerTopVw) {
       lastCalculatedLowerTop = lowerTopVw;
