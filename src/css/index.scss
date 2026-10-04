@@ -141,7 +141,8 @@ html {
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%);
     pointer-events: none; // Don't interfere with clicks
     z-index: 0; // Behind other UI elements but over the background
-    transition: top 1000ms ease;
+    transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw) + var(--daily-summary-push, 0px)));
+    transition: transform 1000ms ease;
 }
 
 //>  ████████████████████████████████████  STARTUP LOADER
@@ -3034,7 +3035,7 @@ main {
         transform: rotate(var(--orrery-saturn-orbit-angle, 0deg));
     }
     to {
-        transform: rotate(calc(var(--orrery-saturn-orbit-angle, 0deg) + 360deg));
+        transform: rotate(calc(var(--orrery-saturn-orbit-angle, 0deg) - 360deg));
     }
 }
 
@@ -3044,7 +3045,7 @@ main {
         transform: rotate(calc(-1 * var(--orrery-saturn-orbit-angle, 0deg) + var(--orrery-saturn-axial-tilt, 0deg)));
     }
     to {
-        transform: rotate(calc(-1 * var(--orrery-saturn-orbit-angle, 0deg) + var(--orrery-saturn-axial-tilt, 0deg) - 360deg));
+        transform: rotate(calc(-1 * var(--orrery-saturn-orbit-angle, 0deg) + var(--orrery-saturn-axial-tilt, 0deg) + 360deg));
     }
 }
 
@@ -3104,13 +3105,13 @@ main {
 /* Jupiter Continuous Orbit Revolution Keyframes */
 @keyframes orrery-jupiter-orbit-spin {
     from { transform: rotate(var(--orrery-jupiter-orbit-angle, 0deg)); }
-    to   { transform: rotate(calc(var(--orrery-jupiter-orbit-angle, 0deg) + 360deg)); }
+    to   { transform: rotate(calc(var(--orrery-jupiter-orbit-angle, 0deg) - 360deg)); }
 }
 
 /* Counter-spin to keep Jupiter orientation fixed in space during revolution */
 @keyframes orrery-jupiter-counter-spin {
     from { transform: rotate(calc(-1 * var(--orrery-jupiter-orbit-angle, 0deg) + var(--orrery-jupiter-axial-tilt, 0deg))); }
-    to   { transform: rotate(calc(-1 * var(--orrery-jupiter-orbit-angle, 0deg) + var(--orrery-jupiter-axial-tilt, 0deg) - 360deg)); }
+    to   { transform: rotate(calc(-1 * var(--orrery-jupiter-orbit-angle, 0deg) + var(--orrery-jupiter-axial-tilt, 0deg) + 360deg)); }
 }
 
 /* --- Jupiter Galilean Moons (Telescope Array Simulation) --- */
@@ -3188,11 +3189,11 @@ main {
 
 @keyframes orrery-mars-orbit-spin {
     from { transform: rotate(var(--orrery-mars-orbit-angle, 0deg)); }
-    to   { transform: rotate(calc(var(--orrery-mars-orbit-angle, 0deg) + 360deg)); }
+    to   { transform: rotate(calc(var(--orrery-mars-orbit-angle, 0deg) - 360deg)); }
 }
 @keyframes orrery-mars-counter-spin {
     from { transform: rotate(calc(-1 * var(--orrery-mars-orbit-angle, 0deg) + var(--orrery-mars-axial-tilt, 0deg))); }
-    to   { transform: rotate(calc(-1 * var(--orrery-mars-orbit-angle, 0deg) + var(--orrery-mars-axial-tilt, 0deg) - 360deg)); }
+    to   { transform: rotate(calc(-1 * var(--orrery-mars-orbit-angle, 0deg) + var(--orrery-mars-axial-tilt, 0deg) + 360deg)); }
 }
 
 /* ==========================================================================
@@ -3246,11 +3247,11 @@ main {
 
 @keyframes orrery-earth-orbit-spin {
     from { transform: rotate(var(--orrery-earth-orbit-angle, 0deg)); }
-    to   { transform: rotate(calc(var(--orrery-earth-orbit-angle, 0deg) + 360deg)); }
+    to   { transform: rotate(calc(var(--orrery-earth-orbit-angle, 0deg) - 360deg)); }
 }
 @keyframes orrery-earth-counter-spin {
     from { transform: rotate(calc(-1 * var(--orrery-earth-orbit-angle, 0deg) + var(--orrery-earth-axial-tilt, 0deg))); }
-    to   { transform: rotate(calc(-1 * var(--orrery-earth-orbit-angle, 0deg) + var(--orrery-earth-axial-tilt, 0deg) - 360deg)); }
+    to   { transform: rotate(calc(-1 * var(--orrery-earth-orbit-angle, 0deg) + var(--orrery-earth-axial-tilt, 0deg) + 360deg)); }
 }
 
 /* ==========================================================================
@@ -3318,11 +3319,11 @@ main {
 
 @keyframes orrery-moon-orbit-spin {
     from { transform: rotate(var(--orrery-moon-orbit-angle, 0deg)); }
-    to   { transform: rotate(calc(var(--orrery-moon-orbit-angle, 0deg) + 360deg)); }
+    to   { transform: rotate(calc(var(--orrery-moon-orbit-angle, 0deg) - 360deg)); }
 }
 @keyframes orrery-moon-counter-spin {
     from { transform: rotate(calc(-1 * var(--orrery-moon-orbit-angle, 0deg) + var(--orrery-moon-axial-tilt, 0deg))); }
-    to   { transform: rotate(calc(-1 * var(--orrery-moon-orbit-angle, 0deg) + var(--orrery-moon-axial-tilt, 0deg) - 360deg)); }
+    to   { transform: rotate(calc(-1 * var(--orrery-moon-orbit-angle, 0deg) + var(--orrery-moon-axial-tilt, 0deg) + 360deg)); }
 }
 
 
@@ -3377,11 +3378,11 @@ main {
 
 @keyframes orrery-venus-orbit-spin {
     from { transform: rotate(var(--orrery-venus-orbit-angle, 0deg)); }
-    to   { transform: rotate(calc(var(--orrery-venus-orbit-angle, 0deg) + 360deg)); }
+    to   { transform: rotate(calc(var(--orrery-venus-orbit-angle, 0deg) - 360deg)); }
 }
 @keyframes orrery-venus-counter-spin {
     from { transform: rotate(calc(-1 * var(--orrery-venus-orbit-angle, 0deg) + var(--orrery-venus-axial-tilt, 0deg))); }
-    to   { transform: rotate(calc(-1 * var(--orrery-venus-orbit-angle, 0deg) + var(--orrery-venus-axial-tilt, 0deg) - 360deg)); }
+    to   { transform: rotate(calc(-1 * var(--orrery-venus-orbit-angle, 0deg) + var(--orrery-venus-axial-tilt, 0deg) + 360deg)); }
 }
 
 /* ==========================================================================
@@ -3436,11 +3437,11 @@ main {
 
 @keyframes orrery-mercury-orbit-spin {
     from { transform: rotate(var(--orrery-mercury-orbit-angle, 0deg)); }
-    to   { transform: rotate(calc(var(--orrery-mercury-orbit-angle, 0deg) + 360deg)); }
+    to   { transform: rotate(calc(var(--orrery-mercury-orbit-angle, 0deg) - 360deg)); }
 }
 @keyframes orrery-mercury-counter-spin {
     from { transform: rotate(calc(-1 * var(--orrery-mercury-orbit-angle, 0deg) + var(--orrery-mercury-axial-tilt, 0deg))); }
-    to   { transform: rotate(calc(-1 * var(--orrery-mercury-orbit-angle, 0deg) + var(--orrery-mercury-axial-tilt, 0deg) - 360deg)); }
+    to   { transform: rotate(calc(-1 * var(--orrery-mercury-orbit-angle, 0deg) + var(--orrery-mercury-axial-tilt, 0deg) + 360deg)); }
 }
 
 /* ==========================================================================

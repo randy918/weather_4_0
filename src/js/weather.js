@@ -1309,43 +1309,15 @@ import weatherConditions from '../data/weather-conditions.json';
     const config = isPhone ? GRADIENT_PHONE : GRADIENT_NON_PHONE;
     const offsetStr = isPhone ? GRADIENT_LOWER_BORDER_OFFSET_MOBILE : GRADIENT_LOWER_BORDER_OFFSET_DESKTOP;
     const offsetVal = parseFloat(offsetStr) || 0;
-    const lowerHeightVal = parseFloat(config.lowerHeight) || 38;
-    const pxPerVw = window.innerWidth / 100;
-
-    const imagesContainer = document.querySelector('.hourly-images-container');
-
-    // Account for any active alert / rain banner height transitions
-    const alertsContainer = document.getElementById('alerts-container');
-    const rainBanner = document.getElementById('rain-forecast-banner');
-
-    let pendingDeltaPx = 0;
-    if (alertsContainer && alertsContainer.style.height) {
-      const targetAlertsPx = (parseFloat(alertsContainer.style.height) || 0) * pxPerVw;
-      const currentAlertsPx = alertsContainer.getBoundingClientRect().height;
-      pendingDeltaPx += (targetAlertsPx - currentAlertsPx);
-    }
-    if (rainBanner && rainBanner.style.height) {
-      const targetRainPx = (parseFloat(rainBanner.style.height) || 0) * pxPerVw;
-      const currentRainPx = rainBanner ? rainBanner.getBoundingClientRect().height : 0;
-      pendingDeltaPx += (targetRainPx - currentRainPx);
-    }
-
-    let lowerBottomVwNum;
-
-    if (imagesContainer && imagesContainer.getBoundingClientRect().bottom > 0) {
-      const rect = imagesContainer.getBoundingClientRect();
-      const scrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
-      const measuredBottomPx = rect.bottom + scrollY + pendingDeltaPx;
-      lowerBottomVwNum = (measuredBottomPx / pxPerVw) + offsetVal;
-    } else {
-      // Fallback before 24 sky images render
-      const fallbackTop = parseFloat(config.lowerTop || (isPhone ? 158 : 116));
-      lowerBottomVwNum = fallbackTop + lowerHeightVal + offsetVal;
-    }
-
-    const lowerTopVwNum = lowerBottomVwNum - lowerHeightVal;
+    
+    // Rely on the configured static position (and CSS transforms for alerts)
+    // rather than brittle DOM measurements at startup
+    const fallbackTop = parseFloat(config.lowerTop || (isPhone ? 158 : 116));
+    const lowerTopVwNum = fallbackTop + offsetVal;
     const lowerTopVw = `${lowerTopVwNum.toFixed(2)}vw`;
-    const lowerBottomVw = `${lowerBottomVwNum.toFixed(2)}vw`;
+    
+    const lowerHeightVal = parseFloat(config.lowerHeight) || 38;
+    const lowerBottomVw = `${(lowerTopVwNum + lowerHeightVal).toFixed(2)}vw`;
 
     if (lastCalculatedLowerTop !== lowerTopVw) {
       lastCalculatedLowerTop = lowerTopVw;
@@ -9294,12 +9266,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (lon < 0) lon += 360;
 
     // Orrery CSS convention: clockwise from 12 o'clock = ecliptic longitude
-    // (0° ecliptic = Vernal Equinox = 12 o'clock = 0deg CSS rotation)
-    // Ecliptic runs counterclockwise in astronomy, but the orrery arm rotates
-    // clockwise in CSS — so we simply pass the longitude directly as a clockwise
-    // angle because the orrery is viewed from above the north pole where prograde
-    // (counterclockwise orbits) map identically to increasing clockwise CSS degrees
-    // when the reference (0°) is placed at the top (12 o'clock).
+    // By doing 360 - lon, we reverse the mapping so that increasing longitude
+    // results in counter-clockwise movement on the screen.
+    lon = (360 - lon) % 360;
     const cssAngle = lon.toFixed(2);
     return `${cssAngle}deg`;
   }
@@ -9382,6 +9351,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
     // D=270° (Third Quarter) -> 270° (trailing in orbit)
     let angle = (180 - D) % 360;
     if (angle < 0) angle += 360;
+    
+    // Reverse for counter-clockwise display
+    angle = (360 - angle) % 360;
     return `${angle.toFixed(2)}deg`;
   }
 
@@ -10152,7 +10124,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1302';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1305';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
