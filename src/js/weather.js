@@ -1288,7 +1288,7 @@ import weatherConditions from '../data/weather-conditions.json';
   const GRADIENT_BOTTOM_DESKTOP = '85.5vw';              // EDITABLE Desktop: 8-day forecast background gradient lower edge position
   const GRADIENT_BOTTOM_MOBILE = '125.5vw';              // EDITABLE Mobile: 8-day forecast background gradient lower edge position
   
-  const GRADIENT_LOWER_BOTTOM_DESKTOP = '154vw';         // EDITABLE Desktop: 24-hour forecast background gradient lower edge fallback position
+  const GRADIENT_LOWER_BOTTOM_DESKTOP = '151vw';         // EDITABLE Desktop: 24-hour forecast background gradient lower edge fallback position
   const GRADIENT_LOWER_BOTTOM_MOBILE = '196vw';          // EDITABLE Mobile: 24-hour forecast background gradient lower edge fallback position
 
   // EDITABLE: Lower gradient overlay lowest border vertical offset (relative to 24 sky images bottom edge)
@@ -10144,7 +10144,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1308';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1311';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -16139,11 +16139,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
           });
 
           const swapWhenReady = () => {
-            if (loaded >= Math.max(2, Math.floor(selectedUrls.length * 0.9))) {
+            // Mobile browsers (like Safari) strictly throttle concurrent background image loading.
+            // Waiting for 90% of 144 images can freeze the swap indefinitely, trapping mobile in the 7-frame seed loop.
+            // We now hot-swap as soon as at least 3 frames are ready.
+            if (loaded >= Math.min(3, selectedUrls.length)) {
               preloadedSizzleImages = newImages;
               sizzleIndex = Math.max(0, Math.min(preloadedSizzleImages.length - 1, sizzleIndex));
             } else {
-              setTimeout(swapWhenReady, 100);
+              setTimeout(swapWhenReady, 250);
             }
           };
           swapWhenReady();
