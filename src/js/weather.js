@@ -7869,8 +7869,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // The Sizzle sun is your gold standard (at 0vw).
   const SUN_IMAGE_OFFSET_X_DESKTOP = '0vw';           // EDITABLE Desktop: Inner image horizontal offset (e.g. '0vw')
   const SUN_IMAGE_OFFSET_X_MOBILE = '0vw';            // EDITABLE Mobile: Inner image horizontal offset
-  const SUN_ROTATION_OFFSET_X_DESKTOP = '0vw';        // EDITABLE Desktop: Shifts 27-day movie left/right without moving others
-  const SUN_ROTATION_OFFSET_X_MOBILE = '0vw';         // EDITABLE Mobile: Shifts 27-day movie left/right
+  const SUN_ROTATION_OFFSET_X_DESKTOP = '2vw';       // EDITABLE Desktop: Shifts 27-day movie left/right without moving others
+  const SUN_ROTATION_OFFSET_X_MOBILE = '-1.5vw';        // EDITABLE Mobile: Shifts 27-day movie left/right
 
   const SUN_MASK_RADIUS_DESKTOP = '49.5%';            // EDITABLE Desktop: Circular mask radius
   const SUN_MASK_RADIUS_MOBILE = '49.5%';             // EDITABLE Mobile: Circular mask radius
@@ -10124,7 +10124,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1306';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1308';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -15766,12 +15766,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         if (targetBuffer) {
             targetBuffer.src = nextImg.src;
             
-            // Align frames dynamically: use live offset for the last frame so it matches the underlying sizzle perfectly
-            const defaultOffsetX = isMobile ? SUN_ROTATION_OFFSET_X_MOBILE : SUN_ROTATION_OFFSET_X_DESKTOP;
-            const liveOffsetX = isMobile ? SUN_IMAGE_OFFSET_X_MOBILE : SUN_IMAGE_OFFSET_X_DESKTOP;
-            const isLastFrame = nextIdx === totalFrames - 1;
-            const currentOffsetX = (isLastFrame || nextImg.src.includes('latest.jpg')) ? liveOffsetX : defaultOffsetX;
-            targetBuffer.style.left = `calc(50% + ${currentOffsetX})`;
+            // The position is fully controlled by var(--sun-rotation-offset-x) defined in buildSunCircle
             
             const doSwap = () => {
                 if (!isSunRotating) return;
@@ -15791,6 +15786,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
                 
                 sunFrameIndex = nextIdx;
 
+                const isLastFrame = nextIdx === totalFrames - 1;
                 if (isLastFrame) {
                   const loopPause = isMobile ? SUN_ANIMATION_LOOP_PAUSE_MS_MOBILE : SUN_ANIMATION_LOOP_PAUSE_MS_DESKTOP;
                   const pauseMs = (typeof loopPause === 'number' && loopPause > 0) ? loopPause : (SUN_ANIMATION_LOOP_PAUSE_MS || 1200);
@@ -15801,6 +15797,35 @@ Plan ahead for significantly warmer conditions tomorrow!`
                     if (sunLabel) sunLabel.textContent = SUN_LABEL_LEFT_DEFAULT_TEXT;
                     if (leftSun && leftSun.imgRot) leftSun.imgRot.style.opacity = '0';
                     if (leftSun && leftSun.imgRotB) leftSun.imgRotB.style.opacity = '0';
+                    
+                    // Sync the Sizzle loop to its most recent frame so it matches the 27-day 'latest' frame
+                    if (currentSizzleUrls && currentSizzleUrls.length > 0) {
+                        sizzleIndex = currentSizzleUrls.length - 1;
+                        sizzleDirection = -1;
+                        const syncSrc = currentSizzleUrls[sizzleIndex];
+                        if (leftSun && leftSun.img && sizzleActiveLayer === 'a') {
+                            leftSun.img.src = syncSrc;
+                            if (leftSun.img.decode) leftSun.img.decode().catch(()=>{});
+                        }
+                        if (leftSun && leftSun.imgB && sizzleActiveLayer === 'b') {
+                            leftSun.imgB.src = syncSrc;
+                            if (leftSun.imgB.decode) leftSun.imgB.decode().catch(()=>{});
+                        }
+                        
+                        // Also sync the INACTIVE layer so the first crossfade doesn't jump to an old stale frame
+                        const step = getNextSizzleStep(sizzleIndex, sizzleDirection, currentSizzleUrls.length);
+                        const nextSrc = currentSizzleUrls[step.idx];
+                        if (nextSrc) {
+                            if (leftSun && leftSun.imgB && sizzleActiveLayer === 'a') {
+                                leftSun.imgB.src = nextSrc;
+                                if (leftSun.imgB.decode) leftSun.imgB.decode().catch(()=>{});
+                            }
+                            if (leftSun && leftSun.img && sizzleActiveLayer === 'b') {
+                                leftSun.img.src = nextSrc;
+                                if (leftSun.img.decode) leftSun.img.decode().catch(()=>{});
+                            }
+                        }
+                    }
                     
                     if (leftSun && leftSun.img) {
                         leftSun.img.style.transition = 'none';
@@ -15856,10 +15881,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
         if (leftSun && leftSun.imgRot && sunPreloadedImages[0]) {
           leftSun.imgRot.src = sunPreloadedImages[0].src;
           const isMobile = window.innerWidth <= 767;
-          const defaultOffsetX = isMobile ? SUN_ROTATION_OFFSET_X_MOBILE : SUN_ROTATION_OFFSET_X_DESKTOP;
-          const liveOffsetX = isMobile ? SUN_IMAGE_OFFSET_X_MOBILE : SUN_IMAGE_OFFSET_X_DESKTOP;
-          const currentOffsetX = sunPreloadedImages[0].src.includes('latest.jpg') ? liveOffsetX : defaultOffsetX;
-          leftSun.imgRot.style.left = `calc(50% + ${currentOffsetX})`;
           
           const startPlayback = () => {
               leftSun.imgRot.style.zIndex = '4';
