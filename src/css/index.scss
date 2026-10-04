@@ -3459,7 +3459,10 @@ main {
     z-index: 9999;
     pointer-events: none; // Allows clicks to pass through
     object-fit: contain;
-    mix-blend-mode: screen; // Restored for iOS black background fallback
+    mix-blend-mode: screen; // Default to screen for iOS black background fallback
+    @media (min-width: 768px) {
+        mix-blend-mode: normal; // Desktop uses WebM alpha channel perfectly
+    }
     will-change: transform; // Hint for iOS hardware acceleration
     transform: translate(0, 0);
     // Slow land down and smooth finish
@@ -3471,11 +3474,11 @@ main {
         transition: transform var(--spaceship-rise-duration, 4s) cubic-bezier(0.6, 0.0, 0.4, 1.0);
     }
     
-    &.floating-right {
-        // Move off-screen to the right while maintaining altitude
-        transform: translate(120vw, calc(-1 * var(--spaceship-rise-distance, 20vw)));
-        // Float slowly, easing in as it accelerates away
-        transition: transform var(--spaceship-float-duration, 10s) cubic-bezier(0.4, 0.0, 1.0, 1.0);
+    &.floating-away {
+        // Move randomly off-screen based on JS variables (Left, Right, or Top)
+        transform: translate(var(--spaceship-float-x, 120vw), calc(-1 * var(--spaceship-rise-distance, 20vw) + var(--spaceship-float-y, 0vw))) rotate(var(--spaceship-float-rotate, 0deg));
+        // Float slowly, using ease-in-out for a softer, more organic drift
+        transition: transform var(--spaceship-float-duration, 10s) cubic-bezier(0.42, 0.0, 0.58, 1.0);
     }
     
     &.returning-from-below {

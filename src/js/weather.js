@@ -209,23 +209,55 @@ import weatherConditions from '../data/weather-conditions.json';
 
     // Trigger rise
     video.classList.remove('landing');
-    video.classList.remove('floating-right');
+    video.classList.remove('floating-away');
     video.classList.remove('returning-from-below');
     video.classList.add('rising');
     
     // Hover logic then land or float right
     setTimeout(() => {
-      // 40% chance to float right instead of landing
+      // 40% chance to float away instead of landing
       if (Math.random() < 0.40) {
-        const floatDur = Math.random() * (SPACESHIP_FLOAT_MAX_DURATION_MS - SPACESHIP_FLOAT_MIN_DURATION_MS) + SPACESHIP_FLOAT_MIN_DURATION_MS;
+        const floatDur = (Math.random() * (SPACESHIP_FLOAT_MAX_DURATION_MS - SPACESHIP_FLOAT_MIN_DURATION_MS) + SPACESHIP_FLOAT_MIN_DURATION_MS) * 1.5; // 50% longer for the longer away trips
+        
+        // Randomize float away destination (Increased distances so it doesn't stop/disappear if user follows it)
+        let destX, destY;
+        const dir = Math.random();
+        if (dir < 0.33) {
+           // Float off Right with vertical drift
+           destX = 250; // vw
+           destY = (Math.random() - 0.5) * 120; // +/- 60vw
+        } else if (dir < 0.66) {
+           // Float off Left with vertical drift
+           destX = -250; // vw
+           destY = (Math.random() - 0.5) * 120; // +/- 60vw
+        } else {
+           // Float off Top with horizontal drift
+           destX = (Math.random() - 0.5) * 180; // random horizontal drift +/- 90vw
+           destY = -250; // vw
+        }
+        
+        // Occasional slight tilt (keep it mostly straight 0deg, but 30% chance for a slight 2-8 deg tilt)
+        let tilt = 0;
+        if (Math.random() < 0.30) {
+           tilt = (Math.random() > 0.5 ? 1 : -1) * (Math.random() * 6 + 2);
+        }
+        
+        document.documentElement.style.setProperty('--spaceship-float-x', destX + 'vw');
+        document.documentElement.style.setProperty('--spaceship-float-y', destY + 'vw');
+        document.documentElement.style.setProperty('--spaceship-float-rotate', tilt + 'deg');
         document.documentElement.style.setProperty('--spaceship-float-duration', floatDur + 'ms');
-        
         video.classList.remove('rising');
-        video.classList.add('floating-right');
+        video.classList.add('floating-away');
         
-        setTimeout(() => {
+        let floatCheckInterval;
+        let fallbackTimeout;
+        
+        const cleanupFloat = () => {
+          clearInterval(floatCheckInterval);
+          clearTimeout(fallbackTimeout);
+          
           // Off screen right now. Teleport below left.
-          video.classList.remove('floating-right');
+          video.classList.remove('floating-away');
           video.classList.add('returning-from-below');
           
           // Wait a couple frames for teleport to apply without transition
@@ -243,7 +275,25 @@ import weatherConditions from '../data/weather-conditions.json';
               }, returnDur);
             });
           });
-        }, floatDur);
+        };
+
+        // Fallback in case it somehow never goes off screen
+        fallbackTimeout = setTimeout(cleanupFloat, floatDur);
+        
+        // Check every 250ms if the pixel box is entirely off camera
+        floatCheckInterval = setInterval(() => {
+          const rect = video.getBoundingClientRect();
+          const isOffScreen = (
+            rect.bottom < 0 ||
+            rect.top > window.innerHeight ||
+            rect.right < 0 ||
+            rect.left > window.innerWidth
+          );
+          
+          if (isOffScreen) {
+            cleanupFloat();
+          }
+        }, 250);
       } else {
         // Normal land logic
         video.classList.remove('rising');
@@ -10144,7 +10194,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1311';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1312';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version

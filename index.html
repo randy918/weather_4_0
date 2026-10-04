@@ -5,7 +5,7 @@
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Weather 1311</title>
+  <title>Weather 1312</title>
   
 <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
 <link rel="icon" type="image/png" sizes="96x96" href="./favicon-96x96.png" />
@@ -173,11 +173,13 @@
     <!-- EDITABLE: Height spacer underneath the lower rain inches row -->
     <div id="rain-spacer" style="height: 2vw; width: 100%;"></div>
 
-    <!-- Video Spaceship -->
-    <video id="spaceship-video" class="spaceship-video" autoplay loop muted playsinline>
-      <source src="img/9-27-26-1918-spaceship.mp4" type='video/mp4; codecs="hvc1"'>
-      <source src="img/9-27-26-1918-spaceship.webm" type="video/webm">
-    </video>
+    <!-- Video Spaceship Wrapper to prevent document expansion when flying offscreen -->
+    <div id="spaceship-wrapper" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 9999;">
+      <video id="spaceship-video" class="spaceship-video" autoplay loop muted playsinline>
+        <source src="img/9-27-26-1918-spaceship.mp4" type='video/mp4; codecs="hvc1"'>
+        <source src="img/9-27-26-1918-spaceship.webm" type="video/webm">
+      </video>
+    </div>
 
     <script type="module" src="./src/js/index.js"></script>
   </main>
