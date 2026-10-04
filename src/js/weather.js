@@ -456,6 +456,9 @@ import weatherConditions from '../data/weather-conditions.json';
   const FORECAST_GRADIENT_HEIGHT_DESKTOP = '45%';                   // EDITABLE Desktop: 8-day height of gradient flush to top (e.g. '45%', '50%')
   const FORECAST_GRADIENT_HEIGHT_MOBILE = '45%';                    // EDITABLE Mobile: 8-day height of gradient flush to top
   const FORECAST_GRADIENT_HEIGHT = FORECAST_GRADIENT_HEIGHT_DESKTOP; // Fallback alias
+  
+  const FORECAST_GRADIENT_OFFSET_Y_DESKTOP = '0vw';                 // EDITABLE Desktop: 8-day vertical shift of gradient row (positive = down, negative = up)
+  const FORECAST_GRADIENT_OFFSET_Y_MOBILE = '0vw';                  // EDITABLE Mobile: 8-day vertical shift of gradient row
 
   const FORECAST_GRADIENT_OPACITY_TOP_DESKTOP = 1.0;                // EDITABLE Desktop: 8-day top opacity (1.0 = 100%)
   const FORECAST_GRADIENT_OPACITY_TOP_MOBILE = 1.0;                 // EDITABLE Mobile: 8-day top opacity (1.0 = 100%)
@@ -477,6 +480,8 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--forecast-gradient-height-desktop', FORECAST_GRADIENT_HEIGHT_DESKTOP);
   document.documentElement.style.setProperty('--forecast-gradient-height-mobile', FORECAST_GRADIENT_HEIGHT_MOBILE);
   document.documentElement.style.setProperty('--forecast-gradient-height', FORECAST_GRADIENT_HEIGHT);
+  document.documentElement.style.setProperty('--forecast-gradient-offset-y-desktop', FORECAST_GRADIENT_OFFSET_Y_DESKTOP);
+  document.documentElement.style.setProperty('--forecast-gradient-offset-y-mobile', FORECAST_GRADIENT_OFFSET_Y_MOBILE);
   document.documentElement.style.setProperty('--forecast-gradient-mid-point-desktop', FORECAST_GRADIENT_MID_POINT_DESKTOP);
   document.documentElement.style.setProperty('--forecast-gradient-mid-point-mobile', FORECAST_GRADIENT_MID_POINT_MOBILE);
   document.documentElement.style.setProperty('--forecast-gradient-mid-point', FORECAST_GRADIENT_MID_POINT);
@@ -498,6 +503,9 @@ import weatherConditions from '../data/weather-conditions.json';
   const HOURLY_GRADIENT_HEIGHT_DESKTOP = '45%';                     // EDITABLE Desktop: 24-hour height of gradient flush to top (e.g. '45%', '50%')
   const HOURLY_GRADIENT_HEIGHT_MOBILE = '45%';                      // EDITABLE Mobile: 24-hour height of gradient flush to top
   const HOURLY_GRADIENT_HEIGHT = HOURLY_GRADIENT_HEIGHT_DESKTOP;   // Fallback alias
+  
+  const HOURLY_GRADIENT_OFFSET_Y_DESKTOP = '0vw';                   // EDITABLE Desktop: 24-hour vertical shift of gradient row (positive = down, negative = up)
+  const HOURLY_GRADIENT_OFFSET_Y_MOBILE = '0vw';                    // EDITABLE Mobile: 24-hour vertical shift of gradient row
 
   const HOURLY_GRADIENT_OPACITY_TOP_DESKTOP = 1;                  // EDITABLE Desktop: 24-hour top opacity (1.0 = 100%)
   const HOURLY_GRADIENT_OPACITY_TOP_MOBILE = 1;                   // EDITABLE Mobile: 24-hour top opacity (1.0 = 100%)
@@ -519,6 +527,8 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--hourly-gradient-height-desktop', HOURLY_GRADIENT_HEIGHT_DESKTOP);
   document.documentElement.style.setProperty('--hourly-gradient-height-mobile', HOURLY_GRADIENT_HEIGHT_MOBILE);
   document.documentElement.style.setProperty('--hourly-gradient-height', HOURLY_GRADIENT_HEIGHT);
+  document.documentElement.style.setProperty('--hourly-gradient-offset-y-desktop', HOURLY_GRADIENT_OFFSET_Y_DESKTOP);
+  document.documentElement.style.setProperty('--hourly-gradient-offset-y-mobile', HOURLY_GRADIENT_OFFSET_Y_MOBILE);
   document.documentElement.style.setProperty('--hourly-gradient-mid-point-desktop', HOURLY_GRADIENT_MID_POINT_DESKTOP);
   document.documentElement.style.setProperty('--hourly-gradient-mid-point-mobile', HOURLY_GRADIENT_MID_POINT_MOBILE);
   document.documentElement.style.setProperty('--hourly-gradient-mid-point', HOURLY_GRADIENT_MID_POINT);
@@ -1272,17 +1282,26 @@ import weatherConditions from '../data/weather-conditions.json';
     });
   }
 
+  // ==========================================
+  // --- EDITABLE: Background Scrolling Gradients (JCV) ---
+  // ==========================================
+  const GRADIENT_BOTTOM_DESKTOP = '85.5vw';              // EDITABLE Desktop: 8-day forecast background gradient lower edge position
+  const GRADIENT_BOTTOM_MOBILE = '125.5vw';              // EDITABLE Mobile: 8-day forecast background gradient lower edge position
+  
+  const GRADIENT_LOWER_BOTTOM_DESKTOP = '1514vw';         // EDITABLE Desktop: 24-hour forecast background gradient lower edge fallback position
+  const GRADIENT_LOWER_BOTTOM_MOBILE = '196vw';          // EDITABLE Mobile: 24-hour forecast background gradient lower edge fallback position
+
   // EDITABLE: Lower gradient overlay lowest border vertical offset (relative to 24 sky images bottom edge)
   const GRADIENT_LOWER_BORDER_OFFSET_DESKTOP = '-4vw'; // EDITABLE Desktop: Adjust lowest border position (positive moves DOWN, negative moves UP)
   const GRADIENT_LOWER_BORDER_OFFSET_MOBILE = '-4vw';  // EDITABLE Mobile: Adjust lowest border position (positive moves DOWN, negative moves UP)
 
   // EDITABLE: Scrolling Gradient Overlay configuration (Non-phone version: iPad, desktop)
   const GRADIENT_NON_PHONE = {
-    top: '40.5vw',
+    bottom: GRADIENT_BOTTOM_DESKTOP,
     height: '45vw',
     midpoint: '70%',
     midOpacity: '0.65',
-    lowerTop: '116vw', // Fallback top before 24 sky images render
+    lowerBottom: GRADIENT_LOWER_BOTTOM_DESKTOP, // Fallback bottom before 24 sky images render
     lowerHeight: '38vw',
     lowerMidpoint: '90%',
     lowerMidOpacity: '0.65',
@@ -1291,11 +1310,11 @@ import weatherConditions from '../data/weather-conditions.json';
 
   // EDITABLE: Scrolling Gradient Overlay configuration (Phone version only)
   const GRADIENT_PHONE = {
-    top: '80.5vw',
+    bottom: GRADIENT_BOTTOM_MOBILE,
     height: '45vw',
     midpoint: '70%',
     midOpacity: '0.65',
-    lowerTop: '158vw', // Fallback top before 24 sky images render
+    lowerBottom: GRADIENT_LOWER_BOTTOM_MOBILE, // Fallback bottom before 24 sky images render
     lowerHeight: '38vw',
     lowerMidpoint: '90%',
     lowerMidOpacity: '0.65',
@@ -1347,7 +1366,7 @@ import weatherConditions from '../data/weather-conditions.json';
     const isPhone = window.innerWidth < 768;
     const config = isPhone ? GRADIENT_PHONE : GRADIENT_NON_PHONE;
     
-    document.documentElement.style.setProperty('--gradient-top', config.top);
+    document.documentElement.style.setProperty('--gradient-bottom', config.bottom);
     document.documentElement.style.setProperty('--gradient-height', config.height);
     document.documentElement.style.setProperty('--gradient-midpoint', config.midpoint);
     document.documentElement.style.setProperty('--gradient-mid-opacity', config.midOpacity);
@@ -1355,6 +1374,7 @@ import weatherConditions from '../data/weather-conditions.json';
     document.documentElement.style.setProperty('--gradient-lower-midpoint', config.lowerMidpoint);
     document.documentElement.style.setProperty('--gradient-lower-mid-opacity', config.lowerMidOpacity);
     document.documentElement.style.setProperty('--gradient-lower-border-offset', isPhone ? GRADIENT_LOWER_BORDER_OFFSET_MOBILE : GRADIENT_LOWER_BORDER_OFFSET_DESKTOP);
+    document.documentElement.style.setProperty('--gradient-lower-bottom-fallback', config.lowerBottom);
 
     updateLowerGradientPosition();
   }
