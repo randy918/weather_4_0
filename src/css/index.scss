@@ -3463,27 +3463,33 @@ main {
     @media (min-width: 768px) {
         mix-blend-mode: normal; // Desktop uses WebM alpha channel perfectly
     }
-    will-change: transform; // Hint for iOS hardware acceleration
-    transform: translate(0, 0);
+    will-change: transform, translate; // Hint for iOS hardware acceleration
+    translate: 0 0;
+    transform: translateY(0vw) rotate(0deg);
     // Slow land down and smooth finish
-    transition: transform var(--spaceship-land-duration, 4s) cubic-bezier(0.6, 0.0, 0.4, 1.0);
+    transition: transform var(--spaceship-land-duration, 4s) cubic-bezier(0.6, 0.0, 0.4, 1.0), translate var(--spaceship-land-duration, 4s) cubic-bezier(0.6, 0.0, 0.4, 1.0);
     
     &.rising {
-        transform: translate(0, calc(-1 * var(--spaceship-rise-distance, 20vw)));
+        translate: 0 0;
+        transform: translateY(calc(-1 * var(--spaceship-rise-distance, 20vw))) rotate(0deg);
         // Slow lift off and smooth deceleration near top
-        transition: transform var(--spaceship-rise-duration, 4s) cubic-bezier(0.6, 0.0, 0.4, 1.0);
+        transition: transform var(--spaceship-rise-duration, 4s) cubic-bezier(0.6, 0.0, 0.4, 1.0), translate var(--spaceship-rise-duration, 4s) cubic-bezier(0.6, 0.0, 0.4, 1.0);
     }
     
     &.floating-away {
-        // Move randomly off-screen based on JS variables (Left, Right, or Top)
-        transform: translate(var(--spaceship-float-x, 120vw), calc(-1 * var(--spaceship-rise-distance, 20vw) + var(--spaceship-float-y, 0vw))) rotate(var(--spaceship-float-rotate, 0deg));
-        // Float slowly, using ease-in-out for a softer, more organic drift
-        transition: transform var(--spaceship-float-duration, 10s) cubic-bezier(0.42, 0.0, 0.58, 1.0);
+        // Separate translate (X axis) from transform (Y axis) to get physical curves!
+        // Applying different easing curves to X and Y creates a genuine sweeping arc path.
+        translate: var(--spaceship-float-x, 120vw) 0;
+        transform: translateY(calc(-1 * var(--spaceship-rise-distance, 20vw) + var(--spaceship-float-y, 0vw))) rotate(var(--spaceship-float-rotate, 0deg));
+        // X uses ease-in (starts slow, speeds up). Y uses ease-out (starts fast, slows down).
+        transition: translate var(--spaceship-float-duration, 10s) ease-in,
+                    transform var(--spaceship-float-duration, 10s) ease-out;
     }
     
     &.returning-from-below {
+        translate: 0 0;
         // Teleport completely off-screen straight below its base position
-        transform: translate(0, 30vw);
+        transform: translateY(30vw) rotate(0deg);
         // Instant teleport, no transition so it's not seen moving there
         transition: none;
     }

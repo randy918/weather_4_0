@@ -219,20 +219,16 @@ import weatherConditions from '../data/weather-conditions.json';
       if (Math.random() < 0.40) {
         const floatDur = (Math.random() * (SPACESHIP_FLOAT_MAX_DURATION_MS - SPACESHIP_FLOAT_MIN_DURATION_MS) + SPACESHIP_FLOAT_MIN_DURATION_MS) * 1.5; // 50% longer for the longer away trips
         
-        // Randomize float away destination (Increased distances so it doesn't stop/disappear if user follows it)
+        // Randomize float away destination (Right or Top only, never Left)
         let destX, destY;
         const dir = Math.random();
-        if (dir < 0.33) {
+        if (dir < 0.50) {
            // Float off Right with vertical drift
            destX = 250; // vw
            destY = (Math.random() - 0.5) * 120; // +/- 60vw
-        } else if (dir < 0.66) {
-           // Float off Left with vertical drift
-           destX = -250; // vw
-           destY = (Math.random() - 0.5) * 120; // +/- 60vw
         } else {
-           // Float off Top with horizontal drift
-           destX = (Math.random() - 0.5) * 180; // random horizontal drift +/- 90vw
+           // Float off Top with rightward drift
+           destX = Math.random() * 120; // positive drift to the right (0 to +120vw)
            destY = -250; // vw
         }
         
@@ -10194,7 +10190,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1312';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1314';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
