@@ -7869,7 +7869,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // The Sizzle sun is your gold standard (at 0vw).
   const SUN_IMAGE_OFFSET_X_DESKTOP = '0vw';           // EDITABLE Desktop: Inner image horizontal offset (e.g. '0vw')
   const SUN_IMAGE_OFFSET_X_MOBILE = '0vw';            // EDITABLE Mobile: Inner image horizontal offset
-  const SUN_ROTATION_OFFSET_X_DESKTOP = '-1.5vw';        // EDITABLE Desktop: Shifts 27-day movie left/right without moving others
+  const SUN_ROTATION_OFFSET_X_DESKTOP = '0vw';        // EDITABLE Desktop: Shifts 27-day movie left/right without moving others
   const SUN_ROTATION_OFFSET_X_MOBILE = '0vw';         // EDITABLE Mobile: Shifts 27-day movie left/right
 
   const SUN_MASK_RADIUS_DESKTOP = '49.5%';            // EDITABLE Desktop: Circular mask radius
@@ -15320,10 +15320,58 @@ Plan ahead for significantly warmer conditions tomorrow!`
       imB.style.opacity = '0';
       imB.style.transition = `opacity var(${durVar}) ease-in-out`;
 
+      const imRot = document.createElement('img');
+      imRot.id = imgId + '-rot';
+      imRot.className = 'sun-image sun-image-layer-rot';
+      imRot.src = initialUrl;
+      imRot.alt = altText + ' Rotation';
+      imRot.style.width = 'var(--sun-rotation-inner-scale, var(--sun-image-inner-scale, 36.7vw))';
+      imRot.style.height = 'var(--sun-rotation-inner-scale, var(--sun-image-inner-scale, 36.7vw))';
+      imRot.style.position = 'absolute';
+      imRot.style.top = 'calc(50% + var(--sun-rotation-offset-y, var(--sun-image-offset-y, 0vw)))';
+      imRot.style.left = 'calc(50% + var(--sun-rotation-offset-x, var(--sun-image-offset-x, 0vw)))';
+      imRot.style.transform = 'translate3d(-50%, -50%, 0)';
+      imRot.style.webkitTransform = 'translate3d(-50%, -50%, 0)';
+      imRot.style.clipPath = 'circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%))';
+      imRot.style.WebkitClipPath = 'circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%))';
+      imRot.style.webkitBackfaceVisibility = 'hidden';
+      imRot.style.backfaceVisibility = 'hidden';
+      imRot.style.objectFit = 'cover';
+      imRot.style.display = 'block';
+      imRot.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
+      imRot.style.zIndex = '3';
+      imRot.style.opacity = '0';
+      imRot.style.transition = 'none';
+
+      const imRotB = document.createElement('img');
+      imRotB.id = imgId + '-rot-b';
+      imRotB.className = 'sun-image sun-image-layer-rot-b';
+      imRotB.src = initialUrl;
+      imRotB.alt = altText + ' Rotation Buffer';
+      imRotB.style.width = 'var(--sun-rotation-inner-scale, var(--sun-image-inner-scale, 36.7vw))';
+      imRotB.style.height = 'var(--sun-rotation-inner-scale, var(--sun-image-inner-scale, 36.7vw))';
+      imRotB.style.position = 'absolute';
+      imRotB.style.top = 'calc(50% + var(--sun-rotation-offset-y, var(--sun-image-offset-y, 0vw)))';
+      imRotB.style.left = 'calc(50% + var(--sun-rotation-offset-x, var(--sun-image-offset-x, 0vw)))';
+      imRotB.style.transform = 'translate3d(-50%, -50%, 0)';
+      imRotB.style.webkitTransform = 'translate3d(-50%, -50%, 0)';
+      imRotB.style.clipPath = 'circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%))';
+      imRotB.style.WebkitClipPath = 'circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%))';
+      imRotB.style.webkitBackfaceVisibility = 'hidden';
+      imRotB.style.backfaceVisibility = 'hidden';
+      imRotB.style.objectFit = 'cover';
+      imRotB.style.display = 'block';
+      imRotB.style.mixBlendMode = 'var(--sun-image-blend-mode, lighten)';
+      imRotB.style.zIndex = '4';
+      imRotB.style.opacity = '0';
+      imRotB.style.transition = 'none';
+
       c.appendChild(im);
       c.appendChild(imB);
+      c.appendChild(imRot);
+      c.appendChild(imRotB);
 
-      return { container: c, img: im, imgB: imB };
+      return { container: c, img: im, imgB: imB, imgRot: imRot, imgRotB: imRotB };
     }
 
     // Helper to build a styled circular Earth element with dual buffer
@@ -15427,8 +15475,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
         lbl.id = labelId;
         lbl.className = 'sun-label';
         lbl.textContent = labelText;
-        lbl.style.width = '100%';
-        lbl.style.maxWidth = '100%';
+        lbl.style.position = 'absolute';
+        lbl.style.top = '100%';
+        lbl.style.left = '50%';
+        lbl.style.width = 'max-content';
         lbl.style.display = 'block';
         lbl.style.fontFamily = "var(--sun-label-font-family, 'light', sans-serif)";
         lbl.style.fontSize = 'var(--sun-label-font-size, 2.0vw)';
@@ -15445,7 +15495,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         lbl.style.userSelect = 'none';
         lbl.style.lineHeight = '1.2';
         lbl.style.boxSizing = 'border-box';
-        lbl.style.transform = `translateX(calc(var(--sun-label-offset-x, 0vw) + var(--sun-label-${isLeft ? 'left' : 'right'}-offset-x, 0vw)))`;
+        lbl.style.transform = `translateX(calc(-50% + var(--sun-label-offset-x, 0vw) + var(--sun-label-${isLeft ? 'left' : 'right'}-offset-x, 0vw)))`;
         col.appendChild(lbl);
       }
 
@@ -15668,17 +15718,34 @@ Plan ahead for significantly warmer conditions tomorrow!`
           isSunRotating = false;
           const sunLabel = document.getElementById('sun-label-left');
           if (sunLabel) sunLabel.textContent = SUN_LABEL_LEFT_DEFAULT_TEXT;
+          if (leftSun && leftSun.imgRot) leftSun.imgRot.style.opacity = '0';
+          if (leftSun && leftSun.imgRotB) leftSun.imgRotB.style.opacity = '0';
           return;
         }
 
         const totalFrames = sunPreloadedImages.length;
         const nextIdx = sunFrameIndex + 1;
+        const isMobile = window.innerWidth <= 767;
 
         if (nextIdx >= totalFrames) {
           isSunRotating = false;
           sunAnimationTimeoutId = null;
           const sunLabel = document.getElementById('sun-label-left');
           if (sunLabel) sunLabel.textContent = SUN_LABEL_LEFT_DEFAULT_TEXT;
+          if (leftSun && leftSun.imgRot) leftSun.imgRot.style.opacity = '0';
+          if (leftSun && leftSun.imgRotB) leftSun.imgRotB.style.opacity = '0';
+          
+          if (leftSun && leftSun.img) {
+              leftSun.img.style.transition = 'none';
+              leftSun.img.offsetHeight;
+              if (sizzleActiveLayer === 'a') leftSun.img.style.opacity = '1';
+          }
+          if (leftSun && leftSun.imgB) {
+              leftSun.imgB.style.transition = 'none';
+              leftSun.imgB.offsetHeight;
+              if (sizzleActiveLayer === 'b') leftSun.imgB.style.opacity = '1';
+          }
+
           if (SUN_SIZZLE_ENABLED && typeof startSunSizzleLoop === 'function') {
             startSunSizzleLoop();
           }
@@ -15691,106 +15758,75 @@ Plan ahead for significantly warmer conditions tomorrow!`
           return;
         }
 
-        const isLastFrame = nextIdx === totalFrames - 1;
-        const isMobile = window.innerWidth <= 767;
         const fps = isMobile ? SUN_ANIMATION_FPS_MOBILE : SUN_ANIMATION_FPS_DESKTOP;
-        const cruiseDelay = Math.max(20, Math.round(1000 / Math.max(1, fps)));
+        const delay = Math.max(20, Math.round(1000 / Math.max(1, fps)));
 
-        let delay = cruiseDelay;
-        if (SUN_ANIMATION_EASE_ENABLED && totalFrames > 10) {
-          const easeFrames = isMobile ? SUN_ANIMATION_EASE_FRAMES_MOBILE : SUN_ANIMATION_EASE_FRAMES_DESKTOP;
-          const maxDelay = isMobile ? SUN_ANIMATION_EASE_MAX_DELAY_MS_MOBILE : SUN_ANIMATION_EASE_MAX_DELAY_MS_DESKTOP;
+        // Pre-decode into the inactive buffer before swapping to prevent flicker
+        const targetBuffer = (sunActiveLayer === 'a') ? leftSun.imgRotB : leftSun.imgRot;
+        if (targetBuffer) {
+            targetBuffer.src = nextImg.src;
+            
+            // Align frames dynamically: use live offset for the last frame so it matches the underlying sizzle perfectly
+            const defaultOffsetX = isMobile ? SUN_ROTATION_OFFSET_X_MOBILE : SUN_ROTATION_OFFSET_X_DESKTOP;
+            const liveOffsetX = isMobile ? SUN_IMAGE_OFFSET_X_MOBILE : SUN_IMAGE_OFFSET_X_DESKTOP;
+            const isLastFrame = nextIdx === totalFrames - 1;
+            const currentOffsetX = (isLastFrame || nextImg.src.includes('latest.jpg')) ? liveOffsetX : defaultOffsetX;
+            targetBuffer.style.left = `calc(50% + ${currentOffsetX})`;
+            
+            const doSwap = () => {
+                if (!isSunRotating) return;
+                if (sunActiveLayer === 'a') {
+                    if (leftSun.imgRotB) leftSun.imgRotB.style.zIndex = '4';
+                    if (leftSun.imgRot) leftSun.imgRot.style.zIndex = '3';
+                    if (leftSun.imgRotB) leftSun.imgRotB.style.opacity = '1';
+                    if (leftSun.imgRot) leftSun.imgRot.style.opacity = '0';
+                    sunActiveLayer = 'b';
+                } else {
+                    if (leftSun.imgRot) leftSun.imgRot.style.zIndex = '4';
+                    if (leftSun.imgRotB) leftSun.imgRotB.style.zIndex = '3';
+                    if (leftSun.imgRot) leftSun.imgRot.style.opacity = '1';
+                    if (leftSun.imgRotB) leftSun.imgRotB.style.opacity = '0';
+                    sunActiveLayer = 'a';
+                }
+                
+                sunFrameIndex = nextIdx;
 
-          let factorIn = 0;
-          if (nextIdx < easeFrames) {
-            const progIn = nextIdx / easeFrames;
-            factorIn = 0.5 * (1 + Math.cos(Math.PI * progIn));
-          }
+                if (isLastFrame) {
+                  const loopPause = isMobile ? SUN_ANIMATION_LOOP_PAUSE_MS_MOBILE : SUN_ANIMATION_LOOP_PAUSE_MS_DESKTOP;
+                  const pauseMs = (typeof loopPause === 'number' && loopPause > 0) ? loopPause : (SUN_ANIMATION_LOOP_PAUSE_MS || 1200);
+                  setTimeout(() => {
+                    isSunRotating = false;
+                    sunAnimationTimeoutId = null;
+                    const sunLabel = document.getElementById('sun-label-left');
+                    if (sunLabel) sunLabel.textContent = SUN_LABEL_LEFT_DEFAULT_TEXT;
+                    if (leftSun && leftSun.imgRot) leftSun.imgRot.style.opacity = '0';
+                    if (leftSun && leftSun.imgRotB) leftSun.imgRotB.style.opacity = '0';
+                    
+                    if (leftSun && leftSun.img) {
+                        leftSun.img.style.transition = 'none';
+                        leftSun.img.offsetHeight;
+                        if (sizzleActiveLayer === 'a') leftSun.img.style.opacity = '1';
+                    }
+                    if (leftSun && leftSun.imgB) {
+                        leftSun.imgB.style.transition = 'none';
+                        leftSun.imgB.offsetHeight;
+                        if (sizzleActiveLayer === 'b') leftSun.imgB.style.opacity = '1';
+                    }
 
-          let factorOut = 0;
-          const distEnd = (totalFrames - 1) - nextIdx;
-          if (distEnd >= 0 && distEnd < easeFrames) {
-            const progOut = distEnd / easeFrames;
-            factorOut = 0.5 * (1 + Math.cos(Math.PI * progOut));
-          }
+                    if (SUN_SIZZLE_ENABLED && typeof startSunSizzleLoop === 'function') {
+                      startSunSizzleLoop();
+                    }
+                  }, pauseMs);
+                } else {
+                  sunAnimationTimeoutId = setTimeout(runSunCycleStep, delay);
+                }
+            };
 
-          const factor = Math.max(factorIn, factorOut);
-          delay = Math.round(cruiseDelay + (maxDelay - cruiseDelay) * factor);
-        }
-
-        const baseFade = isMobile ? SUN_ANIMATION_CROSSFADE_MS_MOBILE : SUN_ANIMATION_CROSSFADE_MS_DESKTOP;
-        const dynamicFade = SUN_ANIMATION_EASE_ENABLED
-          ? Math.min(Math.round(delay * 0.70), Math.round(baseFade * 2.0))
-          : Math.min(baseFade, Math.round(delay * 0.70));
-
-        if (leftSun) {
-          if (leftSun.img) leftSun.img.style.transitionDuration = `${dynamicFade}ms`;
-          if (leftSun.imgB) leftSun.imgB.style.transitionDuration = `${dynamicFade}ms`;
-        }
-
-        if (SUN_ANIMATION_CROSSFADE_ENABLED && leftSun && leftSun.imgB) {
-          if (sunActiveLayer === 'a') {
-            leftSun.imgB.style.left = 'calc(50% + var(--sun-rotation-offset-x, 0vw))'; // Enforce before fade
-            leftSun.imgB.style.zIndex = '2';
-            leftSun.img.style.zIndex = '1';
-            leftSun.imgB.style.opacity = '1';
-            leftSun.img.style.opacity = '0';
-            sunActiveLayer = 'b';
-            sunFrameIndex = nextIdx;
-
-            if (!isLastFrame) {
-              const cueIdx = nextIdx + 1;
-              const cueImg = (cueIdx < totalFrames) ? sunPreloadedImages[cueIdx] : null;
-              if (cueImg && cueImg.src) {
-                setTimeout(() => {
-                  if (leftSun && leftSun.img && sunActiveLayer === 'b') {
-                    leftSun.img.src = cueImg.src;
-                    if (leftSun.img.decode) leftSun.img.decode().catch(() => {});
-                  }
-                }, dynamicFade + 10);
-              }
+            if (targetBuffer.decode) {
+                targetBuffer.decode().then(doSwap).catch(doSwap);
+            } else {
+                doSwap();
             }
-          } else {
-            leftSun.img.style.left = 'calc(50% + var(--sun-rotation-offset-x, 0vw))'; // Enforce before fade
-            leftSun.img.style.zIndex = '2';
-            leftSun.imgB.style.zIndex = '1';
-            leftSun.img.style.opacity = '1';
-            leftSun.imgB.style.opacity = '0';
-            sunActiveLayer = 'a';
-            sunFrameIndex = nextIdx;
-
-            if (!isLastFrame) {
-              const cueIdx = nextIdx + 1;
-              const cueImg = (cueIdx < totalFrames) ? sunPreloadedImages[cueIdx] : null;
-              if (cueImg && cueImg.src) {
-                setTimeout(() => {
-                  if (leftSun && leftSun.imgB && sunActiveLayer === 'a') {
-                    leftSun.imgB.src = cueImg.src;
-                    if (leftSun.imgB.decode) leftSun.imgB.decode().catch(() => {});
-                  }
-                }, dynamicFade + 10);
-              }
-            }
-          }
-        } else if (leftSun && leftSun.img) {
-          sunFrameIndex = nextIdx;
-          if (nextImg && nextImg.src) leftSun.img.src = nextImg.src;
-        }
-
-        if (isLastFrame) {
-          const loopPause = isMobile ? SUN_ANIMATION_LOOP_PAUSE_MS_MOBILE : SUN_ANIMATION_LOOP_PAUSE_MS_DESKTOP;
-          const pauseMs = (typeof loopPause === 'number' && loopPause > 0) ? loopPause : (SUN_ANIMATION_LOOP_PAUSE_MS || 1200);
-          setTimeout(() => {
-            isSunRotating = false;
-            sunAnimationTimeoutId = null;
-            const sunLabel = document.getElementById('sun-label-left');
-            if (sunLabel) sunLabel.textContent = SUN_LABEL_LEFT_DEFAULT_TEXT;
-            if (SUN_SIZZLE_ENABLED && typeof startSunSizzleLoop === 'function') {
-              startSunSizzleLoop();
-            }
-          }, dynamicFade + pauseMs);
-        } else {
-          sunAnimationTimeoutId = setTimeout(runSunCycleStep, delay);
         }
       }
 
@@ -15802,32 +15838,47 @@ Plan ahead for significantly warmer conditions tomorrow!`
         }
         isSunRotating = true;
         sunFrameIndex = 0;
+        sunActiveLayer = 'a';
 
         const sunLabel = document.getElementById('sun-label-left');
         if (sunLabel) sunLabel.textContent = SUN_LABEL_LEFT_ROTATING_TEXT;
-
-        // Smooth dissolve from the current visible sizzle frame into the rotation frames
-        const activeImg = (sizzleActiveLayer === 'b') ? leftSun.imgB : leftSun.img;
-        const nextImg = (sizzleActiveLayer === 'b') ? leftSun.img : leftSun.imgB;
-
-        if (activeImg) {
-          activeImg.style.zIndex = '1';
-          activeImg.style.opacity = '1';
+        
+        // Hide the Sizzle Sun instantly so it doesn't bleed through via mix-blend-mode
+        if (leftSun && leftSun.img) {
+            leftSun.img.style.transition = 'none';
+            leftSun.img.style.opacity = '0';
         }
-        if (nextImg && sunPreloadedImages[0]) {
-          nextImg.src = sunPreloadedImages[0].src;
-          nextImg.style.zIndex = '2';
-          nextImg.style.opacity = '0';
-          nextImg.style.left = 'calc(50% + var(--sun-rotation-offset-x, 0vw))';
-          if (nextImg.decode) nextImg.decode().catch(() => {});
+        if (leftSun && leftSun.imgB) {
+            leftSun.imgB.style.transition = 'none';
+            leftSun.imgB.style.opacity = '0';
         }
-        sunActiveLayer = (sizzleActiveLayer === 'b') ? 'b' : 'a';
 
-        const isMobile = window.innerWidth <= 767;
-        const initFps = isMobile ? SUN_ANIMATION_FPS_MOBILE : SUN_ANIMATION_FPS_DESKTOP;
-        const initDelay = Math.max(20, Math.round(1000 / Math.max(1, initFps)));
-        if (sunAnimationTimeoutId) clearTimeout(sunAnimationTimeoutId);
-        sunAnimationTimeoutId = setTimeout(runSunCycleStep, initDelay);
+        if (leftSun && leftSun.imgRot && sunPreloadedImages[0]) {
+          leftSun.imgRot.src = sunPreloadedImages[0].src;
+          const isMobile = window.innerWidth <= 767;
+          const defaultOffsetX = isMobile ? SUN_ROTATION_OFFSET_X_MOBILE : SUN_ROTATION_OFFSET_X_DESKTOP;
+          const liveOffsetX = isMobile ? SUN_IMAGE_OFFSET_X_MOBILE : SUN_IMAGE_OFFSET_X_DESKTOP;
+          const currentOffsetX = sunPreloadedImages[0].src.includes('latest.jpg') ? liveOffsetX : defaultOffsetX;
+          leftSun.imgRot.style.left = `calc(50% + ${currentOffsetX})`;
+          
+          const startPlayback = () => {
+              leftSun.imgRot.style.zIndex = '4';
+              leftSun.imgRot.style.opacity = '1';
+              if (leftSun.imgRotB) {
+                  leftSun.imgRotB.style.zIndex = '3';
+                  leftSun.imgRotB.style.opacity = '0';
+              }
+              const initFps = isMobile ? SUN_ANIMATION_FPS_MOBILE : SUN_ANIMATION_FPS_DESKTOP;
+              const initDelay = Math.max(20, Math.round(1000 / Math.max(1, initFps)));
+              if (sunAnimationTimeoutId) clearTimeout(sunAnimationTimeoutId);
+              sunAnimationTimeoutId = setTimeout(runSunCycleStep, initDelay);
+          };
+          if (leftSun.imgRot.decode) {
+              leftSun.imgRot.decode().then(startPlayback).catch(startPlayback);
+          } else {
+              startPlayback();
+          }
+        }
       }
 
       window.triggerSunRotation = triggerSunRotation;
