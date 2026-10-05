@@ -86,19 +86,19 @@ import weatherConditions from '../data/weather-conditions.json';
   let refreshTimerId = null;
 
   // --- CONFIG: Barometer Future Dot ---
-  const BAROMETER_FUTURE_HOURS = 12; // EDITABLE: Hours ahead for the future prediction dot (0 to disable)
+  const BAROMETER_FUTURE_HOURS = 0; // EDITABLE: Hours ahead for the future prediction dot (0 to disable)
   const BAROMETER_FUTURE_DOT_SIZE = 3.5; // EDITABLE: Radius of the future prediction dot
 
   // --- CONFIG: Wind Future Dot ---
-  const WIND_FUTURE_HOURS = 6; // EDITABLE: Hours ahead for the future wind prediction dot (0 to disable)
+  const WIND_FUTURE_HOURS = 0; // EDITABLE: Hours ahead for the future wind prediction dot (0 to disable)
   const WIND_FUTURE_DOT_SIZE = 3.5; // EDITABLE: Radius of the future wind prediction dot
 
   // --- CONFIG: Humidity Future Dot ---
-  const HUMIDITY_FUTURE_HOURS = 6; // EDITABLE: Hours ahead for the future humidity prediction dot (0 to disable)
+  const HUMIDITY_FUTURE_HOURS = 0; // EDITABLE: Hours ahead for the future humidity prediction dot (0 to disable)
   const HUMIDITY_FUTURE_DOT_SIZE = 3.5; // EDITABLE: Radius of the future humidity prediction dot
 
   // --- CONFIG: Dew Point Future Dot ---
-  const DEWPOINT_FUTURE_HOURS = 6; // EDITABLE: Hours ahead for the future dew point prediction dot (0 to disable)
+  const DEWPOINT_FUTURE_HOURS = 0; // EDITABLE: Hours ahead for the future dew point prediction dot (0 to disable)
   const DEWPOINT_FUTURE_DOT_SIZE = 3.5; // EDITABLE: Radius of the future dew point prediction dot
 
   // --- CONFIG: Rain Drop Animation ---
@@ -10190,7 +10190,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1314';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1318';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
