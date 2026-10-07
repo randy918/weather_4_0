@@ -10190,7 +10190,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1319';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1320';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -20545,3 +20545,33 @@ function applyTextLineShadows(el, shadowValue) {
     el.appendChild(lineSpan);
   });
 }
+
+// --- DATABASE BABY STEP 1 ---
+// This function acts as "Earth" calling the "mock GoDaddy" server in the sky.
+async function fetchWeatherDatabase() {
+   // 1. Put the car in park and wait for the sky to answer
+   const response = await fetch('/data/db.json');
+   
+   // 2. Put the car in park and wait for the data to unpack
+   const database = await response.json();
+   
+   // 3. Drive home and look at the raw data!
+   console.log("🌎 EARTH RECEIVED DATA FROM SKY:", database);
+   
+   // 4. Look at the first rigid record
+   const dayOneRecord = database.data_records[0];
+   console.log(`Peak Flare on ${dayOneRecord.dt_record} was: ${dayOneRecord.pk_flr_cls}`);
+   
+   // --- BABY STEP 2: THE NEW "TEMPORAL" SYSTEM ---
+   // Note: Because Temporal is brand new, if your browser throws an error here, 
+   // it just means we need to add the 1-line polyfill script to your index.html later.
+   try {
+      const recordDate = Temporal.PlainDate.from(dayOneRecord.dt_record);
+      console.log(`The Temporal Date Object:`, recordDate);
+   } catch (e) {
+      console.log("⚠️ Temporal isn't native in this browser yet! (We will need the polyfill).");
+   }
+}
+
+// Fire the test!
+fetchWeatherDatabase();
