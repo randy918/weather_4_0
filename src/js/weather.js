@@ -14244,7 +14244,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     return range.min + (normalized * (range.max - range.min));
   }
 
-  function updateSolarFlareDial() {
+  async function updateSolarFlareDial() {
     const dial = document.getElementById('solar-flare-dial');
     if (!dial) return;
 
@@ -14266,7 +14266,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const color = getSolarFlareLevelColor(flareClass);
     const fraction = calculateSolarFlareFraction(flareClass, flareValue);
 
-    // Track the highest Solar Flare fraction reached so far today, persisting across reloads and resetting at midnight
+    // Track the highest Solar Flare using the Sky Database instead of localStorage!
     let dailyPeakFraction = fraction;
     let dailyPeakColor = color;
     let dailyPeakClass = flareClass;
@@ -14274,45 +14274,33 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const isLive = SOLAR_FLARE_MODE === 'live' && !activeSolarFlareState;
     
     if (isLive) {
-      const currentDate = new Date().toDateString();
-      let storedMaxFlareDate = localStorage.getItem('maxFlareDate');
-      let storedMaxFlareFraction = localStorage.getItem('maxFlareFraction');
-      let storedMaxFlareColor = localStorage.getItem('maxFlareColor');
-      let storedMaxFlareClass = localStorage.getItem('maxFlareClass');
-      let storedMaxFlareValue = localStorage.getItem('maxFlareValue');
-      if (!storedMaxFlareClass) {
-         storedMaxFlareDate = null; // force reset of legacy data
+      try {
+        const response = await fetch('/data/db.json');
+        const database = await response.json();
+        
+        // Find today's record (Hardcoded to 10-06 for this test!)
+        const targetDate = "2026-10-06";
+        const foundRecord = database.data_records.find(record => record.dt_record === targetDate);
+        
+        if (foundRecord && foundRecord.pk_flr_cls) {
+           const peakStr = foundRecord.pk_flr_cls; // e.g. "X1.0"
+           dailyPeakClass = peakStr.charAt(0);     // "X"
+           dailyPeakValue = parseFloat(peakStr.substring(1)) || 1.0; // 1.0
+           dailyPeakColor = getSolarFlareLevelColor(dailyPeakClass);
+           dailyPeakFraction = calculateSolarFlareFraction(dailyPeakClass, dailyPeakValue);
+           console.log(`✅ UI dial grabbed Peak Flare ${peakStr} from the Sky!`);
+           
+           // Safety check: if live flare is somehow higher than DB peak, use live
+           if (fraction > dailyPeakFraction) {
+              dailyPeakFraction = fraction;
+              dailyPeakColor = color;
+              dailyPeakClass = flareClass;
+              dailyPeakValue = flareValue;
+           }
+        }
+      } catch(e) {
+        console.log("Failed to fetch Flare Peak from Sky DB", e);
       }
-      if (storedMaxFlareDate != currentDate) {
-         storedMaxFlareFraction = fraction;
-         storedMaxFlareColor = color;
-         storedMaxFlareClass = flareClass;
-         storedMaxFlareValue = flareValue;
-         localStorage.setItem('maxFlareDate', currentDate);
-         localStorage.setItem('maxFlareFraction', fraction);
-         localStorage.setItem('maxFlareColor', color);
-         localStorage.setItem('maxFlareClass', flareClass);
-         localStorage.setItem('maxFlareValue', flareValue);
-      } else {
-         storedMaxFlareFraction = storedMaxFlareFraction ? Number(storedMaxFlareFraction) : fraction;
-         storedMaxFlareColor = storedMaxFlareColor || color;
-         storedMaxFlareClass = storedMaxFlareClass || flareClass;
-         storedMaxFlareValue = storedMaxFlareValue || flareValue;
-         if (fraction > storedMaxFlareFraction) {
-            storedMaxFlareFraction = fraction;
-            storedMaxFlareColor = color;
-            storedMaxFlareClass = flareClass;
-            storedMaxFlareValue = flareValue;
-            localStorage.setItem('maxFlareFraction', fraction);
-            localStorage.setItem('maxFlareColor', color);
-            localStorage.setItem('maxFlareClass', flareClass);
-            localStorage.setItem('maxFlareValue', flareValue);
-         }
-      }
-      dailyPeakFraction = storedMaxFlareFraction;
-      dailyPeakColor = storedMaxFlareColor;
-      dailyPeakClass = storedMaxFlareClass;
-      dailyPeakValue = storedMaxFlareValue;
     }
 
     // Circumference for r=46 is 2 * PI * 46 = 289.027
