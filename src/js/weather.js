@@ -10190,7 +10190,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1323';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1326';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -11828,21 +11828,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
     let dailyPeakUv = null;
     
     try {
-      // 1. Ask the Sky Database for the Peak!
-      const response = await fetch('data/db.json');
-      const database = await response.json();
-      
-      // 2. Find today's record dynamically!
-      const d = new Date();
-      const targetDate = d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
-      const foundRecord = database.data_records.find(record => record.dt_record === targetDate);
-      
-      if (foundRecord) {
-         dailyPeakUv = foundRecord.pk_uv_val;
-         console.log(`✅ UI dial successfully grabbed Peak UV ${dailyPeakUv} from the Sky!`);
+      // 1. Ask the globally fetched Sky Database for the Peak!
+      if (window.todaySkyRecord) {
+         dailyPeakUv = window.todaySkyRecord.pk_uv_val;
+         // console.log(`✅ UI dial successfully grabbed Peak UV ${dailyPeakUv} from the Sky!`);
       }
     } catch (e) {
-      console.log("Failed to fetch from Sky DB", e);
+      console.log("Failed to parse Peak UV from Sky DB", e);
     }
     
     // Safety check: If the live API is somehow higher than our DB peak (like if the DB hasn't updated yet), use the live value
@@ -14276,21 +14268,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
     
     if (isLive) {
       try {
-        const response = await fetch('data/db.json');
-        const database = await response.json();
-        
-        // Find today's record dynamically!
-        const d = new Date();
-        const targetDate = d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
-        const foundRecord = database.data_records.find(record => record.dt_record === targetDate);
-        
-        if (foundRecord && foundRecord.pk_flr_cls) {
-           const peakStr = foundRecord.pk_flr_cls; // e.g. "X1.0"
+        // Find today's record dynamically from the global fetch!
+        if (window.todaySkyRecord && window.todaySkyRecord.pk_flr_cls) {
+           const peakStr = window.todaySkyRecord.pk_flr_cls; // e.g. "X1.0"
            dailyPeakClass = peakStr.charAt(0);     // "X"
            dailyPeakValue = parseFloat(peakStr.substring(1)) || 1.0; // 1.0
            dailyPeakColor = getSolarFlareLevelColor(dailyPeakClass);
            dailyPeakFraction = calculateSolarFlareFraction(dailyPeakClass, dailyPeakValue);
-           console.log(`✅ UI dial grabbed Peak Flare ${peakStr} from the Sky!`);
            
            // Safety check: if live flare is somehow higher than DB peak, use live
            if (fraction > dailyPeakFraction) {
@@ -14301,7 +14285,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
            }
         }
       } catch(e) {
-        console.log("Failed to fetch Flare Peak from Sky DB", e);
+        console.log("Failed to parse Flare Peak from Sky DB", e);
       }
     }
 
@@ -20559,6 +20543,9 @@ async function fetchWeatherDatabase() {
    
    // 2. Loop through all the records and "find" the matching date
    const foundRecord = database.data_records.find(record => record.dt_record === targetDate);
+   
+   // Store it globally so the rapidly spinning clock dials can read it instantly without fetching!
+   window.todaySkyRecord = foundRecord;
    
    // 3. Print the results!
    if (foundRecord) {

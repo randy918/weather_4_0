@@ -8,9 +8,12 @@ except ImportError:
     zoneinfo = None
 
 def get_central_now():
-    if zoneinfo:
-        return datetime.now(zoneinfo.ZoneInfo("America/Chicago"))
-    # Fallback for old servers: UTC minus 5 hours (Central Daylight Time)
+    try:
+        if zoneinfo:
+            return datetime.now(zoneinfo.ZoneInfo("America/Chicago"))
+    except Exception:
+        pass
+    # Fallback for old servers or servers missing tzdata: UTC minus 5 hours
     return datetime.now(timezone.utc) - timedelta(hours=5)
 
 print("🤖 SKY ROBOT: Waking up...")
