@@ -1,0 +1,33 @@
+{
+  "_glossary": {
+    "Data Points": {
+      "flr_cls": "Solar Flare Class (e.g., X1.0, M2.1)",
+      "rain_day": "Did measurable rain occur on this date?",
+      "uv_val": "UV Index Value",
+      "wnd_mph": "Wind Speed in MPH"
+    },
+    "Prefixes": {
+      "av_": "Average (Mean value recorded)",
+      "dt_": "Date/Time (Temporal-compatible ISO format)",
+      "is_": "Boolean flag (true/false)",
+      "pk_": "Peak (Maximum value recorded)"
+    }
+  },
+  "sys_last_upd": "2026-10-07T09:00:00Z",
+  "data_records": [
+    {
+      "dt_record": "2026-10-05",
+      "pk_uv_val": 6.2,
+      "pk_flr_cls": "M2.1",
+      "av_wnd_mph": 12.0,
+      "is_rain_day": false
+    },
+    {
+      "dt_record": "2026-10-06",
+      "pk_uv_val": 7.1,
+      "pk_flr_cls": "X1.0",
+      "av_wnd_mph": 18.5,
+      "is_rain_day": true
+    }
+  ]
+}
