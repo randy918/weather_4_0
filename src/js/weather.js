@@ -20527,7 +20527,7 @@ function applyTextLineShadows(el, shadowValue) {
 // This function acts as "Earth" calling the "mock GoDaddy" server in the sky.
 async function fetchWeatherDatabase() {
    // 1. Put the car in park and wait for the sky to answer
-   const response = await fetch('data/db.json');
+   const response = await fetch('data/db.json?t=' + Date.now());
    
    // 2. Put the car in park and wait for the data to unpack
    const database = await response.json();
