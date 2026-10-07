@@ -1,7 +1,17 @@
 import json
 import os
 import urllib.request
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+try:
+    import zoneinfo
+except ImportError:
+    zoneinfo = None
+
+def get_central_now():
+    if zoneinfo:
+        return datetime.now(zoneinfo.ZoneInfo("America/Chicago"))
+    # Fallback for old servers: UTC minus 5 hours (Central Daylight Time)
+    return datetime.now(timezone.utc) - timedelta(hours=5)
 
 print("🤖 SKY ROBOT: Waking up...")
 
@@ -32,8 +42,8 @@ else:
     with open(db_path, "r") as file:
         database = json.load(file)
 
-# 3. Figure out what "Today" is
-today_str = datetime.now().strftime("%Y-%m-%d")
+# 3. Figure out what "Today" is in Central Time
+today_str = get_central_now().strftime("%Y-%m-%d")
 
 # 4. Search for Today's record, or create it if it's a new day
 today_record = None
@@ -60,7 +70,8 @@ if real_uv > today_record["pk_uv_val"]:
 else:
     print(f"🤖 SKY ROBOT: UV Peak remains at {today_record['pk_uv_val']}")
 
-# 6. Save it perfectly formatted for Earth
+# 6. Update the system timestamp and save it perfectly formatted for Earth
+database["sys_last_upd"] = get_central_now().strftime("%Y-%m-%d %I:%M %p")
 with open(db_path, "w") as file:
     json.dump(database, file, indent=3)
 

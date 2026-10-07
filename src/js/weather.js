@@ -10190,7 +10190,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1321';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1323';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -11829,7 +11829,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     
     try {
       // 1. Ask the Sky Database for the Peak!
-      const response = await fetch('/data/db.json');
+      const response = await fetch('data/db.json');
       const database = await response.json();
       
       // 2. Find today's record dynamically!
@@ -14276,7 +14276,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     
     if (isLive) {
       try {
-        const response = await fetch('/data/db.json');
+        const response = await fetch('data/db.json');
         const database = await response.json();
         
         // Find today's record dynamically!
@@ -20543,7 +20543,7 @@ function applyTextLineShadows(el, shadowValue) {
 // This function acts as "Earth" calling the "mock GoDaddy" server in the sky.
 async function fetchWeatherDatabase() {
    // 1. Put the car in park and wait for the sky to answer
-   const response = await fetch('/data/db.json');
+   const response = await fetch('data/db.json');
    
    // 2. Put the car in park and wait for the data to unpack
    const database = await response.json();

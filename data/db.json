@@ -1,0 +1,12 @@
+{
+   "data_records": [
+      {
+         "dt_record": "2026-10-07",
+         "pk_uv_val": 4.41,
+         "pk_flr_cls": "C1.0",
+         "av_wnd_mph": 0.0,
+         "is_rain_day": false
+      }
+   ],
+   "sys_last_upd": "2026-10-07 03:10 PM"
+}
