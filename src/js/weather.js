@@ -11822,28 +11822,31 @@ Plan ahead for significantly warmer conditions tomorrow!`
     // exactly like the desktop UV dial. Handled by updateUvDial().
   }
   
-  function updateUvDial(data) {
+  async function updateUvDial(data) {
     const uvIndex = data?.current?.uvi !== undefined ? Number(data.current.uvi) : null;
     
-    // Track the highest UV index reached so far today, persisting across reloads and resetting at midnight
     let dailyPeakUv = null;
-    if (uvIndex !== null) {
-      const currentDate = new Date().getDate();
-      let storedMaxUv = localStorage.getItem('maxUvReachedToday');
-      let storedMaxUvDate = localStorage.getItem('maxUvDate');
+    
+    try {
+      // 1. Ask the Sky Database for the Peak!
+      const response = await fetch('/data/db.json');
+      const database = await response.json();
       
-      if (storedMaxUvDate != currentDate) {
-         storedMaxUv = 0; // Reset at midnight
-         localStorage.setItem('maxUvDate', currentDate);
-      } else {
-         storedMaxUv = storedMaxUv ? Number(storedMaxUv) : 0;
-      }
+      // 2. Find today's record (Hardcoded to 10-06 for this test!)
+      const targetDate = "2026-10-06";
+      const foundRecord = database.data_records.find(record => record.dt_record === targetDate);
       
-      if (uvIndex > storedMaxUv) {
-         storedMaxUv = uvIndex;
-         localStorage.setItem('maxUvReachedToday', storedMaxUv);
+      if (foundRecord) {
+         dailyPeakUv = foundRecord.pk_uv_val;
+         console.log(`✅ UI dial successfully grabbed Peak UV ${dailyPeakUv} from the Sky!`);
       }
-      dailyPeakUv = storedMaxUv;
+    } catch (e) {
+      console.log("Failed to fetch from Sky DB", e);
+    }
+    
+    // Safety check: If the live API is somehow higher than our DB peak (like if the DB hasn't updated yet), use the live value
+    if (uvIndex !== null && dailyPeakUv !== null && uvIndex > dailyPeakUv) {
+       dailyPeakUv = uvIndex;
     }
     
     const itemEls = document.querySelectorAll('.clockGridItem-8, .clockGridItem-4');
@@ -20558,18 +20561,19 @@ async function fetchWeatherDatabase() {
    // 3. Drive home and look at the raw data!
    console.log("🌎 EARTH RECEIVED DATA FROM SKY:", database);
    
-   // 4. Look at the first rigid record
-   const dayOneRecord = database.data_records[0];
-   console.log(`Peak Flare on ${dayOneRecord.dt_record} was: ${dayOneRecord.pk_flr_cls}`);
+   // --- BABY STEP 3: SEARCHING THE DATABASE ---
    
-   // --- BABY STEP 2: THE NEW "TEMPORAL" SYSTEM ---
-   // Note: Because Temporal is brand new, if your browser throws an error here, 
-   // it just means we need to add the 1-line polyfill script to your index.html later.
-   try {
-      const recordDate = Temporal.PlainDate.from(dayOneRecord.dt_record);
-      console.log(`The Temporal Date Object:`, recordDate);
-   } catch (e) {
-      console.log("⚠️ Temporal isn't native in this browser yet! (We will need the polyfill).");
+   // 1. Tell JS exactly what day we are hunting for
+   const targetDate = "2026-10-06";
+   
+   // 2. Loop through all the records and "find" the matching date
+   const foundRecord = database.data_records.find(record => record.dt_record === targetDate);
+   
+   // 3. Print the results!
+   if (foundRecord) {
+      console.log(`✅ FOUND IT! On ${targetDate}, the Peak UV was ${foundRecord.pk_uv_val} and Flare was ${foundRecord.pk_flr_cls}`);
+   } else {
+      console.log(`❌ Could not find any data for ${targetDate}`);
    }
 }
 
