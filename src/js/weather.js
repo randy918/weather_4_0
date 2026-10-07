@@ -10190,7 +10190,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1320';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1321';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -11832,8 +11832,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const response = await fetch('/data/db.json');
       const database = await response.json();
       
-      // 2. Find today's record (Hardcoded to 10-06 for this test!)
-      const targetDate = "2026-10-06";
+      // 2. Find today's record dynamically!
+      const d = new Date();
+      const targetDate = d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
       const foundRecord = database.data_records.find(record => record.dt_record === targetDate);
       
       if (foundRecord) {
@@ -14278,8 +14279,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
         const response = await fetch('/data/db.json');
         const database = await response.json();
         
-        // Find today's record (Hardcoded to 10-06 for this test!)
-        const targetDate = "2026-10-06";
+        // Find today's record dynamically!
+        const d = new Date();
+        const targetDate = d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
         const foundRecord = database.data_records.find(record => record.dt_record === targetDate);
         
         if (foundRecord && foundRecord.pk_flr_cls) {
@@ -20551,8 +20553,9 @@ async function fetchWeatherDatabase() {
    
    // --- BABY STEP 3: SEARCHING THE DATABASE ---
    
-   // 1. Tell JS exactly what day we are hunting for
-   const targetDate = "2026-10-06";
+   // 1. Tell JS to hunt for "Today's" date!
+   const d = new Date();
+   const targetDate = d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
    
    // 2. Loop through all the records and "find" the matching date
    const foundRecord = database.data_records.find(record => record.dt_record === targetDate);
