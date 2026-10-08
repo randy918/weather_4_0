@@ -10190,7 +10190,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1328';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1329';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -14760,8 +14760,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
         if (RADIO_BLACKOUT_SUBLABEL_MODE === 'dynamic') {
           const impact = getRadioBlackoutImpact(rClass, currentRadioBlackoutTrend);
           const baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
-          const peakValDisplay = (typeof dailyPeakValue === 'number' || !isNaN(parseFloat(dailyPeakValue))) ? parseFloat(dailyPeakValue).toFixed(1) : String(dailyPeakValue);
-          sublabelEl.innerHTML = `${baseHtml}<br><span>Peak ${dailyPeakClass} (${peakValDisplay})</span>`;
+          const peakValDisplay = formatRadioBlackoutValue(dailyPeakValue);
+          sublabelEl.innerHTML = `${baseHtml}<br><span>Peak ${peakValDisplay}</span>`;
         }
         if (RADIO_BLACKOUT_SUBLABEL_COLOR === 'auto') {
           sublabelEl.style.color = color;
@@ -14918,8 +14918,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
       let innerContent = '';
       if (RADIO_BLACKOUT_SUBLABEL_MODE === 'dynamic') {
         const baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
-        const peakValDisplay = (typeof initialVal === 'number' || !isNaN(parseFloat(initialVal))) ? parseFloat(initialVal).toFixed(1) : String(initialVal);
-        innerContent = `${baseHtml}<br><span>Peak ${initialClass} (${peakValDisplay})</span>`;
+        const peakValDisplay = formatRadioBlackoutValue(initialVal);
+        innerContent = `${baseHtml}<br><span>Peak ${peakValDisplay}</span>`;
       } else {
         innerContent = (isMobile ? RADIO_BLACKOUT_SUBLABEL_TEXT_MOBILE : RADIO_BLACKOUT_SUBLABEL_TEXT_DESKTOP);
       }
