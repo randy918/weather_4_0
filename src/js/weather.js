@@ -10190,7 +10190,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1326';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1328';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -14282,7 +14282,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
               dailyPeakColor = color;
               dailyPeakClass = flareClass;
               dailyPeakValue = flareValue;
+              // Persist the local live peak in memory so the peak marker doesn't vanish if the value drops
+              window.todaySkyRecord.pk_flr_cls = flareClass + ((typeof flareValue === 'number') ? flareValue.toFixed(1) : String(flareValue));
            }
+        } else {
+           if (!window.todaySkyRecord) window.todaySkyRecord = {};
+           window.todaySkyRecord.pk_flr_cls = flareClass + ((typeof flareValue === 'number') ? flareValue.toFixed(1) : String(flareValue));
         }
       } catch(e) {
         console.log("Failed to parse Flare Peak from Sky DB", e);
@@ -14669,9 +14674,42 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const color = getRadioBlackoutLevelColor(rClass);
     const fraction = calculateRadioBlackoutFraction(rClass, rValue);
 
+    let dailyPeakFraction = fraction;
+    let dailyPeakColor = color;
+    let dailyPeakClass = rClass;
+    let dailyPeakValue = rValue;
+    const isLive = RADIO_BLACKOUT_MODE === 'live' && !activeRadioBlackoutState;
+
+    if (isLive) {
+      try {
+        if (window.todaySkyRecord && window.todaySkyRecord.pk_r_cls) {
+           dailyPeakClass = window.todaySkyRecord.pk_r_cls; // e.g. "R2"
+           dailyPeakValue = window.todaySkyRecord.pk_r_val || 0.1; // e.g. 2.8
+           dailyPeakColor = getRadioBlackoutLevelColor(dailyPeakClass);
+           dailyPeakFraction = calculateRadioBlackoutFraction(dailyPeakClass, dailyPeakValue);
+           
+           if (fraction > dailyPeakFraction) {
+              dailyPeakFraction = fraction;
+              dailyPeakColor = color;
+              dailyPeakClass = rClass;
+              dailyPeakValue = rValue;
+              window.todaySkyRecord.pk_r_cls = rClass;
+              window.todaySkyRecord.pk_r_val = rValue;
+           }
+        } else {
+           if (!window.todaySkyRecord) window.todaySkyRecord = {};
+           window.todaySkyRecord.pk_r_cls = rClass;
+           window.todaySkyRecord.pk_r_val = rValue;
+        }
+      } catch(e) {
+        console.log("Failed to parse Radio Blackout Peak from Sky DB", e);
+      }
+    }
+
     // Circumference for r=46 is 2 * PI * 46 = 289.027
     const circumference = 289.027;
     const strokeOffset = circumference * (1 - fraction);
+    const peakStrokeOffset = circumference * (1 - dailyPeakFraction);
 
     const line1El = dial.querySelector('.radio-blackout-label-line1');
     const line2El = dial.querySelector('.radio-blackout-label-line2');
@@ -14713,12 +14751,17 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }
     }
 
+    dial.style.setProperty('--radio-blackout-peak-color', dailyPeakColor);
+    dial.style.setProperty('--radio-blackout-peak-stroke-offset', peakStrokeOffset.toFixed(2));
+
     if (RADIO_BLACKOUT_SUBLABEL_ENABLED) {
       const sublabelEl = document.getElementById('radio-blackout-sublabel');
       if (sublabelEl) {
         if (RADIO_BLACKOUT_SUBLABEL_MODE === 'dynamic') {
           const impact = getRadioBlackoutImpact(rClass, currentRadioBlackoutTrend);
-          sublabelEl.innerHTML = formatImpactSublabelHtml(impact.arrow, impact.text);
+          const baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
+          const peakValDisplay = (typeof dailyPeakValue === 'number' || !isNaN(parseFloat(dailyPeakValue))) ? parseFloat(dailyPeakValue).toFixed(1) : String(dailyPeakValue);
+          sublabelEl.innerHTML = `${baseHtml}<br><span>Peak ${dailyPeakClass} (${peakValDisplay})</span>`;
         }
         if (RADIO_BLACKOUT_SUBLABEL_COLOR === 'auto') {
           sublabelEl.style.color = color;
@@ -14848,6 +14891,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     dial.innerHTML = `
       <svg class="radio-blackout-svg clock-timer-svg" viewBox="0 0 100 100">
         <circle class="radio-blackout-track countdown-track" cx="50" cy="50" r="46" fill="none" />
+        <circle class="radio-blackout-peak-progress countdown-progress" cx="50" cy="50" r="46" fill="none" />
         <circle class="radio-blackout-progress countdown-progress" cx="50" cy="50" r="46" fill="none" />
       </svg>
       <div class="radio-blackout-content">
@@ -14871,9 +14915,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
       sublabel.className = 'world-clock-label celestial-clock-label radio-blackout-sublabel';
       sublabel.id = 'radio-blackout-sublabel';
       const impact = getRadioBlackoutImpact(initialClass, currentRadioBlackoutTrend);
-      const innerContent = (RADIO_BLACKOUT_SUBLABEL_MODE === 'dynamic')
-        ? formatImpactSublabelHtml(impact.arrow, impact.text)
-        : (isMobile ? RADIO_BLACKOUT_SUBLABEL_TEXT_MOBILE : RADIO_BLACKOUT_SUBLABEL_TEXT_DESKTOP);
+      let innerContent = '';
+      if (RADIO_BLACKOUT_SUBLABEL_MODE === 'dynamic') {
+        const baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
+        const peakValDisplay = (typeof initialVal === 'number' || !isNaN(parseFloat(initialVal))) ? parseFloat(initialVal).toFixed(1) : String(initialVal);
+        innerContent = `${baseHtml}<br><span>Peak ${initialClass} (${peakValDisplay})</span>`;
+      } else {
+        innerContent = (isMobile ? RADIO_BLACKOUT_SUBLABEL_TEXT_MOBILE : RADIO_BLACKOUT_SUBLABEL_TEXT_DESKTOP);
+      }
       sublabel.innerHTML = innerContent;
       if (RADIO_BLACKOUT_SUBLABEL_COLOR === 'auto') {
         sublabel.style.color = getRadioBlackoutLevelColor(initialClass);

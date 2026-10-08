@@ -2513,6 +2513,17 @@ main {
             stroke-width: var(--radio-blackout-track-stroke-width, 4);
         }
 
+        .radio-blackout-peak-progress {
+            stroke: var(--radio-blackout-peak-color, rgba(255, 255, 255, 0.5));
+            stroke-width: var(--radio-blackout-progress-stroke-width, 4);
+            stroke-dasharray: 289.027;
+            stroke-dashoffset: var(--radio-blackout-peak-stroke-offset, 289.027);
+            stroke-linecap: var(--radio-blackout-stroke-linecap, butt);
+            opacity: 0.5;
+            transition: stroke-dashoffset var(--radio-blackout-anim-duration, 0.8s) cubic-bezier(0.25, 1, 0.5, 1),
+                        stroke 0.4s ease;
+        }
+
         .radio-blackout-progress {
             stroke: var(--radio-blackout-current-color, hsl(30, 100%, 50%));
             stroke-width: var(--radio-blackout-progress-stroke-width, 4);

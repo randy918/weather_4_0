@@ -16,6 +16,8 @@ def get_central_now():
     # Fallback for old servers or servers missing tzdata: UTC minus 5 hours
     return datetime.now(timezone.utc) - timedelta(hours=5)
 
+current_time_str = get_central_now().strftime('%Y-%m-%d %I:%M:%S %p')
+print(f"\\n--- RUN TIMESTAMP: {current_time_str} Central ---")
 print("🤖 SKY ROBOT: Waking up...")
 
 API_KEY = "d1a7fcdb2d6f38c6b216b37322444de9"
@@ -31,9 +33,58 @@ live_data = json.loads(req.read())
 real_uv = live_data.get("current", {}).get("uvi", 0.0)
 print(f"🤖 SKY ROBOT: OpenWeather says the current UV is {real_uv}")
 
+# Fetch NOAA X-ray Flux for Solar Flares and Radio Blackouts
+print("🤖 SKY ROBOT: Reaching out to NOAA SWPC for Solar Flares...")
+NOAA_URL = "https://services.swpc.noaa.gov/json/goes/primary/xrays-6-hour.json"
+real_flux = 0.0
+real_flare_str = "A1.0"
+r_cls = "R0"
+r_val = 0.1
+
+try:
+    req_noaa = urllib.request.urlopen(NOAA_URL)
+    noaa_data = json.loads(req_noaa.read())
+    primary_readings = [d for d in noaa_data if d.get("energy") == "0.1-0.8nm" and isinstance(d.get("flux"), float)]
+    if primary_readings:
+        real_flux = primary_readings[-1]["flux"]
+        
+        # Calculate Flare Class
+        if real_flux < 1e-7:
+            flare_cls, flare_val = "A", real_flux / 1e-8
+        elif real_flux < 1e-6:
+            flare_cls, flare_val = "B", real_flux / 1e-7
+        elif real_flux < 1e-5:
+            flare_cls, flare_val = "C", real_flux / 1e-6
+        elif real_flux < 1e-4:
+            flare_cls, flare_val = "M", real_flux / 1e-5
+        else:
+            flare_cls, flare_val = "X", real_flux / 1e-4
+        real_flare_str = f"{flare_cls}{flare_val:.1f}"
+        
+        # Calculate Radio Blackout Class
+        if real_flux < 1e-5:
+            r_cls, r_val = "R0", max(0.1, min(0.9, (real_flux / 1e-5) * 0.8 + 0.1))
+        elif real_flux < 5e-5:
+            r_cls, r_val = "R1", 1.0 + ((real_flux - 1e-5) / 4e-5) * 1.5
+        elif real_flux < 1e-4:
+            r_cls, r_val = "R2", 2.5 + ((real_flux - 5e-5) / 5e-5) * 2.5
+        elif real_flux < 1e-3:
+            r_cls, r_val = "R3", 5.0 + ((real_flux - 1e-4) / 9e-4) * 10.0
+        elif real_flux < 2e-3:
+            r_cls, r_val = "R4", 15.0 + ((real_flux - 1e-3) / 1e-3) * 10.0
+        else:
+            r_cls, r_val = "R5", 25.0 + min(15.0, ((real_flux - 2e-3) / 1e-3) * 10.0)
+            
+        print(f"🤖 SKY ROBOT: Current Flux is {real_flux}. Flare: {real_flare_str}, Radio Blackout: {r_cls} ({r_val:.1f})")
+except Exception as e:
+    print(f"🤖 SKY ROBOT: Failed to fetch from NOAA: {e}")
+
 # 2. Open our Database (or create it if it doesn't exist yet!)
 script_dir = os.path.dirname(os.path.abspath(__file__))
 db_path = os.path.join(script_dir, "data", "db.json")
+
+print(f"🤖 SKY ROBOT: My script directory is {script_dir}")
+print(f"🤖 SKY ROBOT: I will try to save the database to {db_path}")
 
 # Make sure the folder exists
 os.makedirs(os.path.dirname(db_path), exist_ok=True)
@@ -60,18 +111,31 @@ if not today_record:
     today_record = {
         "dt_record": today_str,
         "pk_uv_val": 0.0,
-        "pk_flr_cls": "C1.0",
+        "pk_flr_cls": "A1.0",
+        "pk_r_cls": "R0",
+        "pk_r_val": 0.1,
+        "pk_xray_flux": 0.0,
         "av_wnd_mph": 0.0,
         "is_rain_day": False
     }
     database["data_records"].append(today_record)
 
 # 5. Check if the current UV broke the daily record!
-if real_uv > today_record["pk_uv_val"]:
-    print(f"🤖 SKY ROBOT: New UV Peak! {real_uv} is higher than the old peak of {today_record['pk_uv_val']}")
+if real_uv > today_record.get("pk_uv_val", 0.0):
+    print(f"🤖 SKY ROBOT: New UV Peak! {real_uv} is higher than the old peak of {today_record.get('pk_uv_val', 0.0)}")
     today_record["pk_uv_val"] = real_uv
 else:
-    print(f"🤖 SKY ROBOT: UV Peak remains at {today_record['pk_uv_val']}")
+    print(f"🤖 SKY ROBOT: UV Peak remains at {today_record.get('pk_uv_val', 0.0)}")
+
+# 5b. Check if the current X-ray flux broke the daily record!
+if real_flux > today_record.get("pk_xray_flux", 0.0):
+    print(f"🤖 SKY ROBOT: New Solar Flare Peak! {real_flare_str} broke the old record.")
+    today_record["pk_xray_flux"] = real_flux
+    today_record["pk_flr_cls"] = real_flare_str
+    today_record["pk_r_cls"] = r_cls
+    today_record["pk_r_val"] = round(r_val, 1)
+else:
+    print(f"🤖 SKY ROBOT: Solar Flare Peak remains at {today_record.get('pk_flr_cls', 'Unknown')}")
 
 # 6. Update the system timestamp and save it perfectly formatted for Earth
 database["sys_last_upd"] = get_central_now().strftime("%Y-%m-%d %I:%M %p")
