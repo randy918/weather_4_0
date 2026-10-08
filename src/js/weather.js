@@ -10190,7 +10190,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1330';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1331';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -14277,7 +14277,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
            dailyPeakFraction = calculateSolarFlareFraction(dailyPeakClass, dailyPeakValue);
            
            // Safety check: if live flare is somehow higher than DB peak, use live
-           if (fraction > dailyPeakFraction) {
+           if (liveSolarFlareData && fraction > dailyPeakFraction) {
               dailyPeakFraction = fraction;
               dailyPeakColor = color;
               dailyPeakClass = flareClass;
@@ -14285,7 +14285,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
               // Persist the local live peak in memory so the peak marker doesn't vanish if the value drops
               window.todaySkyRecord.pk_flr_cls = flareClass + ((typeof flareValue === 'number') ? flareValue.toFixed(1) : String(flareValue));
            }
-        } else {
+        } else if (liveSolarFlareData) {
            if (!window.todaySkyRecord) window.todaySkyRecord = {};
            window.todaySkyRecord.pk_flr_cls = flareClass + ((typeof flareValue === 'number') ? flareValue.toFixed(1) : String(flareValue));
         }
@@ -14688,7 +14688,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
            dailyPeakColor = getRadioBlackoutLevelColor(dailyPeakClass);
            dailyPeakFraction = calculateRadioBlackoutFraction(dailyPeakClass, dailyPeakValue);
            
-           if (fraction > dailyPeakFraction) {
+           if (liveRadioBlackoutData && fraction > dailyPeakFraction) {
               dailyPeakFraction = fraction;
               dailyPeakColor = color;
               dailyPeakClass = rClass;
@@ -14696,7 +14696,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
               window.todaySkyRecord.pk_r_cls = rClass;
               window.todaySkyRecord.pk_r_val = rValue;
            }
-        } else {
+        } else if (liveRadioBlackoutData) {
            if (!window.todaySkyRecord) window.todaySkyRecord = {};
            window.todaySkyRecord.pk_r_cls = rClass;
            window.todaySkyRecord.pk_r_val = rValue;
