@@ -1334,8 +1334,8 @@ import weatherConditions from '../data/weather-conditions.json';
   const GRADIENT_BOTTOM_DESKTOP = '85.5vw';              // EDITABLE Desktop: 8-day forecast background gradient lower edge position
   const GRADIENT_BOTTOM_MOBILE = '125.5vw';              // EDITABLE Mobile: 8-day forecast background gradient lower edge position
   
-  const GRADIENT_LOWER_BOTTOM_DESKTOP = '151vw';         // EDITABLE Desktop: 24-hour forecast background gradient lower edge fallback position
-  const GRADIENT_LOWER_BOTTOM_MOBILE = '196vw';          // EDITABLE Mobile: 24-hour forecast background gradient lower edge fallback position
+  const GRADIENT_LOWER_BOTTOM_DESKTOP = '153vw';         // EDITABLE Desktop: 24-hour forecast background gradient lower edge fallback position
+  const GRADIENT_LOWER_BOTTOM_MOBILE = '206vw';          // EDITABLE Mobile: 24-hour forecast background gradient lower edge fallback position
 
   // EDITABLE: Lower gradient overlay lowest border vertical offset (relative to 24 sky images bottom edge)
   const GRADIENT_LOWER_BORDER_OFFSET_DESKTOP = '-4vw'; // EDITABLE Desktop: Adjust lowest border position (positive moves DOWN, negative moves UP)
