@@ -10217,7 +10217,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1342';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1350';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -14181,12 +14181,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const parts = text.split('<br>');
       return `<span style="white-space: nowrap;"><i class="${iconClass}" aria-hidden="true"></i> ${parts[0]}</span><br><span>${parts.slice(1).join('<br>')}</span>`;
     }
-    const words = text.split(' ');
-    if (words.length > 1) {
-      const first = words[0];
-      const rest = words.slice(1).join(' ');
-      return `<span style="white-space: nowrap;"><i class="${iconClass}" aria-hidden="true"></i> ${first}</span><br><span>${rest}</span>`;
-    }
+    // Keep the entire text on a single line unless it had an explicit <br>
     return `<span style="white-space: nowrap;"><i class="${iconClass}" aria-hidden="true"></i> ${text}</span>`;
   }
 
@@ -14324,7 +14319,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
     // Circumference for r=46 is 2 * PI * 46 = 289.027
     const circumference = 289.027;
     const strokeOffset = circumference * (1 - fraction);
-    const peakStrokeOffset = circumference * (1 - dailyPeakFraction);
+    
+    // Circumference for peak track (r=51) is 2 * Math.PI * 51 = 320.442
+    const peakCircumference = 320.442;
+    const peakStrokeOffset = peakCircumference * (1 - dailyPeakFraction);
 
     const line1El = dial.querySelector('.solar-flare-label-line1');
     const line2El = dial.querySelector('.solar-flare-label-line2');
@@ -14340,18 +14338,18 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
     dial.style.setProperty('--solar-flare-current-color', color);
     
-    // Apply peak styles
-    if (dailyPeakFraction > fraction) {
-      dial.style.setProperty('--solar-flare-peak-color', dailyPeakColor);
-      dial.style.setProperty('--solar-flare-peak-stroke-offset', peakStrokeOffset.toFixed(2));
-      const peakEl = dial.querySelector('.solar-flare-peak-progress');
-      if (peakEl) {
-          peakEl.style.display = ''; // Ensure it's visible
-          peakEl.style.opacity = '0.3'; // Force opacity inline to guarantee 30% transparency
-      }
-    } else {
-      const peakEl = dial.querySelector('.solar-flare-peak-progress');
-      if (peakEl) peakEl.style.display = 'none'; // Hide if current is peak or higher
+    // Apply peak styles to the new outer track
+    dial.style.setProperty('--solar-flare-peak-color', dailyPeakColor);
+    dial.style.setProperty('--solar-flare-peak-stroke-offset', peakStrokeOffset.toFixed(2));
+    
+    const peakEl = dial.querySelector('.solar-flare-peak-progress');
+    const peakTrackEl = dial.querySelector('.solar-flare-peak-track');
+    if (peakEl) {
+        peakEl.style.display = ''; // Always visible since it's on its own track now
+        peakEl.style.opacity = '1.0'; // Full opacity looks better on its own track
+    }
+    if (peakTrackEl) {
+        peakTrackEl.style.display = ''; 
     }
 
     const newOffsetStr = strokeOffset.toFixed(2);
@@ -14389,7 +14387,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           let baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
           const peakValDisplay = (typeof dailyPeakValue === 'number' || !isNaN(parseFloat(dailyPeakValue))) ? parseFloat(dailyPeakValue).toFixed(1) : String(dailyPeakValue);
           const line2Text = `Peak ${dailyPeakClass}${peakValDisplay}`;
-          sublabelEl.innerHTML = `${baseHtml}<br><span>${line2Text}</span>`;
+          sublabelEl.innerHTML = `<br>${baseHtml}<br><span style="font-family: 'euro-bold', sans-serif; color: ${dailyPeakColor};">${line2Text}</span>`;
         }
         if (SOLAR_FLARE_SUBLABEL_COLOR === 'auto') {
           sublabelEl.style.color = color;
@@ -14514,10 +14512,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const labels = getSolarFlareLabels(initialClass);
 
     dial.innerHTML = `
-      <svg class="solar-flare-svg clock-timer-svg" viewBox="0 0 100 100">
+      <svg class="solar-flare-svg clock-timer-svg" viewBox="-5 -5 110 110">
+        <!-- Main Dial (Current) -->
         <circle class="solar-flare-track countdown-track" cx="50" cy="50" r="46" fill="none" />
-        <circle class="solar-flare-peak-progress countdown-progress" cx="50" cy="50" r="46" fill="none" />
         <circle class="solar-flare-progress countdown-progress" cx="50" cy="50" r="46" fill="none" />
+        
+        <!-- Peak Dial (Outer) -->
+        <circle class="solar-flare-peak-track countdown-track" cx="50" cy="50" r="51" fill="none" style="stroke-opacity: 0.2; stroke-width: var(--clock-grid-stroke-width, 4);" />
+        <circle class="solar-flare-peak-progress countdown-progress" cx="50" cy="50" r="51" fill="none" style="stroke-dasharray: 320.442;" />
       </svg>
       <div class="solar-flare-content">
         <div class="solar-flare-label">
@@ -14545,7 +14547,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
         const baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
         // Using initial values as peak if none exists yet, will be updated immediately in requestAnimationFrame
         const peakValDisplay = (typeof initialVal === 'number' || !isNaN(parseFloat(initialVal))) ? parseFloat(initialVal).toFixed(1) : String(initialVal);
-        innerContent = `${baseHtml}<br><span>Peak ${initialClass}${peakValDisplay}</span>`;
+        const initialColor = getSolarFlareLevelColor(initialClass);
+        innerContent = `<br>${baseHtml}<br><span style="font-family: 'euro-bold', sans-serif; color: ${initialColor};">Peak ${initialClass}${peakValDisplay}</span>`;
       } else {
         innerContent = (isMobile ? SOLAR_FLARE_SUBLABEL_TEXT_MOBILE : SOLAR_FLARE_SUBLABEL_TEXT_DESKTOP);
       }
@@ -14736,7 +14739,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
     // Circumference for r=46 is 2 * PI * 46 = 289.027
     const circumference = 289.027;
     const strokeOffset = circumference * (1 - fraction);
-    const peakStrokeOffset = circumference * (1 - dailyPeakFraction);
+    
+    // Circumference for peak track (r=51) is 2 * Math.PI * 51 = 320.442
+    const peakCircumference = 320.442;
+    const peakStrokeOffset = peakCircumference * (1 - dailyPeakFraction);
 
     const line1El = dial.querySelector('.radio-blackout-label-line1');
     const line2El = dial.querySelector('.radio-blackout-label-line2');
@@ -14780,6 +14786,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
     dial.style.setProperty('--radio-blackout-peak-color', dailyPeakColor);
     dial.style.setProperty('--radio-blackout-peak-stroke-offset', peakStrokeOffset.toFixed(2));
+    
+    const peakEl = dial.querySelector('.radio-blackout-peak-progress');
+    const peakTrackEl = dial.querySelector('.radio-blackout-peak-track');
+    if (peakEl) {
+        peakEl.style.display = ''; 
+        peakEl.style.opacity = '1.0'; 
+    }
+    if (peakTrackEl) {
+        peakTrackEl.style.display = ''; 
+    }
 
     if (RADIO_BLACKOUT_SUBLABEL_ENABLED) {
       const sublabelEl = document.getElementById('radio-blackout-sublabel');
@@ -14788,7 +14804,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           const impact = getRadioBlackoutImpact(rClass, currentRadioBlackoutTrend);
           const baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
           const peakValDisplay = formatRadioBlackoutValue(dailyPeakValue);
-          sublabelEl.innerHTML = `${baseHtml}<br><span>Peak ${peakValDisplay}</span>`;
+          sublabelEl.innerHTML = `<br>${baseHtml}<br><span style="font-family: 'euro-bold', sans-serif; color: ${dailyPeakColor};">Peak ${peakValDisplay}</span>`;
         }
         if (RADIO_BLACKOUT_SUBLABEL_COLOR === 'auto') {
           sublabelEl.style.color = color;
@@ -14916,10 +14932,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const displayVal = formatRadioBlackoutValue(initialVal);
 
     dial.innerHTML = `
-      <svg class="radio-blackout-svg clock-timer-svg" viewBox="0 0 100 100">
+      <svg class="radio-blackout-svg clock-timer-svg" viewBox="-5 -5 110 110">
+        <!-- Main Dial (Current) -->
         <circle class="radio-blackout-track countdown-track" cx="50" cy="50" r="46" fill="none" />
-        <circle class="radio-blackout-peak-progress countdown-progress" cx="50" cy="50" r="46" fill="none" />
         <circle class="radio-blackout-progress countdown-progress" cx="50" cy="50" r="46" fill="none" />
+        
+        <!-- Peak Dial (Outer) -->
+        <circle class="radio-blackout-peak-track countdown-track" cx="50" cy="50" r="51" fill="none" style="stroke-opacity: 0.2; stroke-width: var(--clock-grid-stroke-width, 4);" />
+        <circle class="radio-blackout-peak-progress countdown-progress" cx="50" cy="50" r="51" fill="none" style="stroke-dasharray: 320.442;" />
       </svg>
       <div class="radio-blackout-content">
         <div class="radio-blackout-label">
@@ -14946,7 +14966,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
       if (RADIO_BLACKOUT_SUBLABEL_MODE === 'dynamic') {
         const baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
         const peakValDisplay = formatRadioBlackoutValue(initialVal);
-        innerContent = `${baseHtml}<br><span>Peak ${peakValDisplay}</span>`;
+        const initialColor = getRadioBlackoutLevelColor(initialClass);
+        innerContent = `<br>${baseHtml}<br><span style="font-family: 'euro-bold', sans-serif; color: ${initialColor};">Peak ${peakValDisplay}</span>`;
       } else {
         innerContent = (isMobile ? RADIO_BLACKOUT_SUBLABEL_TEXT_MOBILE : RADIO_BLACKOUT_SUBLABEL_TEXT_DESKTOP);
       }
@@ -16570,7 +16591,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       svg.setAttribute('class', 'orrery-svg');
-      svg.setAttribute('viewBox', '0 0 100 100');
+      svg.setAttribute('viewBox', '-5 -5 110 110');
       
       // Ring radii with ORRERY_RADIUS = 35vw (SVG scale: (radius_vw / 35) * 50):
       // Saturn  orbit track:  35/35 * 50 = 50.00  (r=50, outermost thick ring)
