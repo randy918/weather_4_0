@@ -8156,6 +8156,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SOLAR_FLARE_SUBLABEL_MARGIN_TOP_MOBILE = '1.2vw';        // EDITABLE Mobile: Margin top below dial circle
   const SOLAR_FLARE_SUBLABEL_OFFSET_Y_DESKTOP = '0vw';           // EDITABLE Desktop: Fine vertical nudge
   const SOLAR_FLARE_SUBLABEL_OFFSET_Y_MOBILE = '0vw';            // EDITABLE Mobile: Fine vertical nudge
+  const SOLAR_FLARE_SUBLABEL_WIDTH_DESKTOP = '100%';             // EDITABLE Desktop: Sublabel width (100% fits dial, wider breaks out)
+  const SOLAR_FLARE_SUBLABEL_WIDTH_MOBILE = '160%';              // EDITABLE Mobile: Sublabel width
+  const SOLAR_FLARE_SUBLABEL_MAX_WIDTH_DESKTOP = 'var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw))'; // EDITABLE Desktop: Max width boundary
+  const SOLAR_FLARE_SUBLABEL_MAX_WIDTH_MOBILE = 'none';          // EDITABLE Mobile: Max width boundary (none allows wider label)
 
   // Strategy 3: Dynamic Live Impact Sublabels per Solar Flare Level (Static Fallback / Threshold Defaults)
   const SOLAR_FLARE_IMPACT_LEVEL_A_ARROW = 'down';               // EDITABLE: Fallback arrow direction ('up' or 'down')
@@ -8281,6 +8285,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const RADIO_BLACKOUT_SUBLABEL_MARGIN_TOP_MOBILE = '1.2vw';     // EDITABLE Mobile: Margin top below dial circle
   const RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_DESKTOP = '0vw';        // EDITABLE Desktop: Fine vertical nudge
   const RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_MOBILE = '0vw';         // EDITABLE Mobile: Fine vertical nudge
+  const RADIO_BLACKOUT_SUBLABEL_WIDTH_DESKTOP = '100%';          // EDITABLE Desktop: Sublabel width
+  const RADIO_BLACKOUT_SUBLABEL_WIDTH_MOBILE = '160%';           // EDITABLE Mobile: Sublabel width
+  const RADIO_BLACKOUT_SUBLABEL_MAX_WIDTH_DESKTOP = 'var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw))'; // EDITABLE Desktop: Max width boundary
+  const RADIO_BLACKOUT_SUBLABEL_MAX_WIDTH_MOBILE = 'none';       // EDITABLE Mobile: Max width boundary (none allows wider label)
 
   // Dynamic Trend Arrow Control
   const RADIO_BLACKOUT_ARROW_MODE = 'trend';                     // EDITABLE: 'trend' (real live data trend: up/down based on recent flux history) or 'static' (uses level arrow constants below)
@@ -9089,6 +9097,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--solar-flare-sublabel-offset-y-desktop', SOLAR_FLARE_SUBLABEL_OFFSET_Y_DESKTOP);
     document.documentElement.style.setProperty('--solar-flare-sublabel-offset-y-mobile', SOLAR_FLARE_SUBLABEL_OFFSET_Y_MOBILE);
     document.documentElement.style.setProperty('--solar-flare-sublabel-offset-y', isMobile ? SOLAR_FLARE_SUBLABEL_OFFSET_Y_MOBILE : SOLAR_FLARE_SUBLABEL_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-sublabel-width-desktop', SOLAR_FLARE_SUBLABEL_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-sublabel-width-mobile', SOLAR_FLARE_SUBLABEL_WIDTH_MOBILE);
+    document.documentElement.style.setProperty('--solar-flare-sublabel-width', isMobile ? SOLAR_FLARE_SUBLABEL_WIDTH_MOBILE : SOLAR_FLARE_SUBLABEL_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-sublabel-max-width-desktop', SOLAR_FLARE_SUBLABEL_MAX_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-sublabel-max-width-mobile', SOLAR_FLARE_SUBLABEL_MAX_WIDTH_MOBILE);
+    document.documentElement.style.setProperty('--solar-flare-sublabel-max-width', isMobile ? SOLAR_FLARE_SUBLABEL_MAX_WIDTH_MOBILE : SOLAR_FLARE_SUBLABEL_MAX_WIDTH_DESKTOP);
 
     if (typeof updateSolarFlareDial === 'function') {
       updateSolarFlareDial();
@@ -9184,6 +9198,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--radio-blackout-sublabel-offset-y-desktop', RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_DESKTOP);
     document.documentElement.style.setProperty('--radio-blackout-sublabel-offset-y-mobile', RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_MOBILE);
     document.documentElement.style.setProperty('--radio-blackout-sublabel-offset-y', isMobile ? RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_MOBILE : RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-sublabel-width-desktop', RADIO_BLACKOUT_SUBLABEL_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-sublabel-width-mobile', RADIO_BLACKOUT_SUBLABEL_WIDTH_MOBILE);
+    document.documentElement.style.setProperty('--radio-blackout-sublabel-width', isMobile ? RADIO_BLACKOUT_SUBLABEL_WIDTH_MOBILE : RADIO_BLACKOUT_SUBLABEL_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-sublabel-max-width-desktop', RADIO_BLACKOUT_SUBLABEL_MAX_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-sublabel-max-width-mobile', RADIO_BLACKOUT_SUBLABEL_MAX_WIDTH_MOBILE);
+    document.documentElement.style.setProperty('--radio-blackout-sublabel-max-width', isMobile ? RADIO_BLACKOUT_SUBLABEL_MAX_WIDTH_MOBILE : RADIO_BLACKOUT_SUBLABEL_MAX_WIDTH_DESKTOP);
 
     if (typeof updateRadioBlackoutDial === 'function') {
       updateRadioBlackoutDial();
@@ -10217,7 +10237,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1366';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1368';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -14388,7 +14408,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           const impact = getSolarFlareImpact(flareClass, currentSolarFlareTrend);
           let baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
           const peakValDisplay = (typeof dailyPeakValue === 'number' || !isNaN(parseFloat(dailyPeakValue))) ? parseFloat(dailyPeakValue).toFixed(1) : String(dailyPeakValue);
-          const line2Text = `Peak ${dailyPeakClass}${peakValDisplay}`;
+          const line2Text = `PEAK ${dailyPeakClass}${peakValDisplay}`;
           sublabelEl.innerHTML = `<br>${baseHtml}<br><span style="font-family: 'euro-bold', sans-serif; color: ${dailyPeakColor};">${line2Text}</span>`;
         }
         if (SOLAR_FLARE_SUBLABEL_COLOR === 'auto') {
@@ -14550,7 +14570,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         // Using initial values as peak if none exists yet, will be updated immediately in requestAnimationFrame
         const peakValDisplay = (typeof initialVal === 'number' || !isNaN(parseFloat(initialVal))) ? parseFloat(initialVal).toFixed(1) : String(initialVal);
         const initialColor = getSolarFlareLevelColor(initialClass);
-        innerContent = `<br>${baseHtml}<br><span style="font-family: 'euro-bold', sans-serif; color: ${initialColor};">Peak ${initialClass}${peakValDisplay}</span>`;
+        innerContent = `<br>${baseHtml}<br><span style="font-family: 'euro-bold', sans-serif; color: ${initialColor};">PEAK ${initialClass}${peakValDisplay}</span>`;
       } else {
         innerContent = (isMobile ? SOLAR_FLARE_SUBLABEL_TEXT_MOBILE : SOLAR_FLARE_SUBLABEL_TEXT_DESKTOP);
       }
@@ -14806,7 +14826,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           const impact = getRadioBlackoutImpact(rClass, currentRadioBlackoutTrend);
           const baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
           const peakValDisplay = formatRadioBlackoutValue(dailyPeakValue);
-          sublabelEl.innerHTML = `<br>${baseHtml}<br><span style="font-family: 'euro-bold', sans-serif; color: ${dailyPeakColor};">Peak ${peakValDisplay}</span>`;
+          sublabelEl.innerHTML = `<br>${baseHtml}<br><span style="font-family: 'euro-bold', sans-serif; color: ${dailyPeakColor};">PEAK ${peakValDisplay}</span>`;
         }
         if (RADIO_BLACKOUT_SUBLABEL_COLOR === 'auto') {
           sublabelEl.style.color = color;
@@ -14969,7 +14989,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         const baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
         const peakValDisplay = formatRadioBlackoutValue(initialVal);
         const initialColor = getRadioBlackoutLevelColor(initialClass);
-        innerContent = `<br>${baseHtml}<br><span style="font-family: 'euro-bold', sans-serif; color: ${initialColor};">Peak ${peakValDisplay}</span>`;
+        innerContent = `<br>${baseHtml}<br><span style="font-family: 'euro-bold', sans-serif; color: ${initialColor};">PEAK ${peakValDisplay}</span>`;
       } else {
         innerContent = (isMobile ? RADIO_BLACKOUT_SUBLABEL_TEXT_MOBILE : RADIO_BLACKOUT_SUBLABEL_TEXT_DESKTOP);
       }

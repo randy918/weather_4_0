@@ -2477,8 +2477,8 @@ main {
     color: var(--solar-flare-sublabel-color, var(--temp-color, rgba(255, 255, 255, 0.70)));
     text-align: center;
     display: block;
-    width: 100%;
-    max-width: var(--solar-flare-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
+    width: var(--solar-flare-sublabel-width, 100%);
+    max-width: var(--solar-flare-sublabel-max-width, var(--solar-flare-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw))));
     white-space: normal;
     word-break: normal;
     user-select: none;
@@ -2605,8 +2605,8 @@ main {
     color: var(--radio-blackout-sublabel-color, var(--temp-color, rgba(255, 255, 255, 0.70)));
     text-align: center;
     display: block;
-    width: 100%;
-    max-width: var(--radio-blackout-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
+    width: var(--radio-blackout-sublabel-width, 100%);
+    max-width: var(--radio-blackout-sublabel-max-width, var(--radio-blackout-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw))));
     white-space: normal;
     word-break: normal;
     user-select: none;
