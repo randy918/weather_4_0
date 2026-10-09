@@ -5,7 +5,7 @@
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Weather 1339</title>
+  <title>Weather 1341</title>
   
 <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
 <link rel="icon" type="image/png" sizes="96x96" href="./favicon-96x96.png" />
@@ -46,6 +46,16 @@
 
 <body>
 
+  <!-- Hidden SVG for Advanced Distortions (e.g. Air Quality heat haze) -->
+  <svg style="position: absolute; width: 0; height: 0; pointer-events: none;" aria-hidden="true">
+    <filter id="air-quality-distortion">
+      <feTurbulence type="fractalNoise" baseFrequency="0.015 0.05" numOctaves="2" result="noise">
+        <animate attributeName="baseFrequency" values="0.015 0.05; 0.025 0.08; 0.015 0.05" dur="10s" repeatCount="indefinite" />
+      </feTurbulence>
+      <!-- The scale will be controlled dynamically by JCV config in weather.js to maintain readability -->
+      <feDisplacementMap id="air-displacement-map" in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </svg>
   <!-- Rain Animation Canvas -->
   <canvas id="weather-rain-canvas"></canvas>
 

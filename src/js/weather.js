@@ -2732,6 +2732,10 @@ import weatherConditions from '../data/weather-conditions.json';
   // --- EDITABLE: Air Quality Alert Blur (JCV) ---
   const ALERT_AIR_QUALITY_BLUR_DESKTOP = '0.2vw';                 // EDITABLE Desktop: Air Quality Alert text/content blur
   const ALERT_AIR_QUALITY_BLUR_MOBILE = '0.6vw';                  // EDITABLE Mobile: Air Quality Alert text/content blur
+  
+  // --- EDITABLE: Air Quality Distortion / Heat Haze (JCV) ---
+  const ALERT_AIR_QUALITY_DISTORTION_DESKTOP = 3.0;               // EDITABLE Desktop: Degree of SVG distortion (1.5 is subtle, 5 is heavy)
+  const ALERT_AIR_QUALITY_DISTORTION_MOBILE = 2.0;                // EDITABLE Mobile: Degree of SVG distortion
 
   document.documentElement.style.setProperty('--alert-banner-line-height', ALERT_BANNER_LINE_HEIGHT);
 
@@ -5894,8 +5898,17 @@ Plan ahead for significantly warmer conditions tomorrow!`
       bannerContent.className = 'alert-banner-content';
       
       if (eventName.includes('AIR QUALITY')) {
-        bannerContent.style.filter = 'blur(var(--alert-air-quality-blur, 3.5px))';
-        bannerContent.style.webkitFilter = 'blur(var(--alert-air-quality-blur, 3.5px))';
+        const isMobile = window.innerWidth <= 767;
+        const blurVal = 'var(--alert-air-quality-blur, 3.5px)';
+        const distortionScale = isMobile ? ALERT_AIR_QUALITY_DISTORTION_MOBILE : ALERT_AIR_QUALITY_DISTORTION_DESKTOP;
+        
+        // Dynamically update the SVG displacement scale (degree of distortion)
+        const displacementMap = document.getElementById('air-displacement-map');
+        if (displacementMap) displacementMap.setAttribute('scale', distortionScale);
+
+        // Chain the blur and the SVG filter together
+        bannerContent.style.filter = `blur(${blurVal}) url(#air-quality-distortion)`;
+        bannerContent.style.webkitFilter = `blur(${blurVal}) url(#air-quality-distortion)`;
       }
 
       const textWrapper = document.createElement('div');
@@ -10204,7 +10217,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1339';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1341';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
