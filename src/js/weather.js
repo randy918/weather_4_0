@@ -7971,8 +7971,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SUN_MASK_POSITION_Y_MOBILE = '50%';           // EDITABLE Mobile: Mask center Y position
   const SUN_IMAGE_OPACITY_DESKTOP = 1.0;              // EDITABLE Desktop: Overall opacity (0.0 to 1.0)
   const SUN_IMAGE_OPACITY_MOBILE = 1.0;               // EDITABLE Mobile: Overall opacity (0.0 to 1.0)
-  const SUN_IMAGE_BLEND_MODE_DESKTOP = 'plus-lighter';  // EDITABLE Desktop: Blend mode on dark background ('lighten', 'screen', 'plus-lighter', etc.)
-  const SUN_IMAGE_BLEND_MODE_MOBILE = 'plus-lighter';   // EDITABLE Mobile: Blend mode on dark background ('plus-lighter' prevents brightness dips)
+  const SUN_IMAGE_BLEND_MODE_DESKTOP = 'screen';  // EDITABLE Desktop: Blend mode on dark background ('lighten', 'screen', 'plus-lighter', etc.)
+  const SUN_IMAGE_BLEND_MODE_MOBILE = 'screen';   // EDITABLE Mobile: Blend mode on dark background ('plus-lighter' prevents brightness dips)
 
   // =========================================================================
   // --- Earth Sizing & Position Controls (JCV) ---
@@ -10217,7 +10217,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1355';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1356';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
