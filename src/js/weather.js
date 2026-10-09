@@ -10204,7 +10204,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1335';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1339';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -16220,13 +16220,25 @@ Plan ahead for significantly warmer conditions tomorrow!`
             const imgObj = new Image();
             imgObj.onload = () => { loaded++; };
             imgObj.onerror = () => { loaded++; };
-            imgObj.src = u;
+            // DO NOT immediately assign .src here, as 144 concurrent requests will make iOS Safari abort them.
             return imgObj;
           });
 
+          // Throttle image loading to prevent iOS Safari from silently aborting massive concurrent requests
+          let loadIdx = 0;
+          function loadNextBatch() {
+            let batchSize = isMobile ? 4 : 10;
+            for (let b = 0; b < batchSize && loadIdx < selectedUrls.length; b++, loadIdx++) {
+              newImages[loadIdx].src = selectedUrls[loadIdx];
+            }
+            if (loadIdx < selectedUrls.length) {
+              setTimeout(loadNextBatch, isMobile ? 150 : 50);
+            }
+          }
+          loadNextBatch();
+
           const swapWhenReady = () => {
             // Mobile browsers (like Safari) strictly throttle concurrent background image loading.
-            // Waiting for 90% of 144 images can freeze the swap indefinitely, trapping mobile in the 7-frame seed loop.
             // We now hot-swap as soon as at least 3 frames are ready.
             if (loaded >= Math.min(3, selectedUrls.length)) {
               preloadedSizzleImages = newImages;
@@ -16255,10 +16267,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
           });
           if (!res.ok) throw new Error(`SUVI HTTP status ${res.status}`);
           const html = await res.text();
-          const regex = new RegExp(`src=['"](https:\\/\\/cdn\\.star\\.nesdis\\.noaa\\.gov\\/GOES19\\/SUVI\\/FD\\/${band}\\/[0-9]+_GOES19-SUVI-${band}-600x600\\.jpg)['"]`, 'g');
+          
+          // NOAA serves different image resolutions (e.g. 1200x1200 or 300x300) depending on the User-Agent (Mobile vs Desktop).
+          // To ensure we always get a match, we capture the timestamp and manually construct the 600x600.jpg URL.
+          const regex = new RegExp(`src=['"]https:\\/\\/cdn\\.star\\.nesdis\\.noaa\\.gov\\/GOES19\\/SUVI\\/FD\\/${band}\\/([0-9]+)_GOES19-SUVI-${band}-[a-zA-Z0-9x]+\\.jpg['"]`, 'g');
           const matches = [...html.matchAll(regex)];
           if (matches && matches.length >= 2) {
-            const rawUrls = matches.map(m => m[1]);
+            // Extract unique timestamps to avoid duplicates if NOAA serves multiple resolutions of the same frame
+            const timestamps = Array.from(new Set(matches.map(m => m[1]))).sort();
+            const rawUrls = timestamps.map(ts => `https://cdn.star.nesdis.noaa.gov/GOES19/SUVI/FD/${band}/${ts}_GOES19-SUVI-${band}-600x600.jpg`);
+            
             currentSizzleUrls = rawUrls;
             setupSizzleFrames(currentSizzleUrls, false);
             return;
