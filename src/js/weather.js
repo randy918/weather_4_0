@@ -8116,8 +8116,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   // Middle Giant Class Letter ("C")
   const SOLAR_FLARE_CLASS_FONT_FAMILY = "'euro-bold', sans-serif"; // EDITABLE: Giant class letter font-family ("euro-bold" = EurostileExtendedBlack)
-  const SOLAR_FLARE_CLASS_FONT_SIZE_DESKTOP = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.38)'; // EDITABLE Desktop: Giant class letter font size
-  const SOLAR_FLARE_CLASS_FONT_SIZE_MOBILE = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.38)';  // EDITABLE Mobile: Giant class letter font size
+  const SOLAR_FLARE_CLASS_FONT_SIZE_DESKTOP = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.342)'; // EDITABLE Desktop: Giant class letter font size
+  const SOLAR_FLARE_CLASS_FONT_SIZE_MOBILE = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.342)';  // EDITABLE Mobile: Giant class letter font size
   const SOLAR_FLARE_CLASS_LINE_HEIGHT = 0.82;                    // EDITABLE: Giant class letter line height
   const SOLAR_FLARE_CLASS_OFFSET_Y_DESKTOP = '0vw';              // EDITABLE Desktop: Fine vertical nudge for giant class letter
   const SOLAR_FLARE_CLASS_OFFSET_Y_MOBILE = '0vw';               // EDITABLE Mobile: Fine vertical nudge for giant class letter
@@ -8126,8 +8126,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   // Bottom Decimal Value ("2.8")
   const SOLAR_FLARE_VALUE_FONT_FAMILY = "'euro-bold', sans-serif"; // EDITABLE: Bottom value font-family ("euro-bold" = EurostileExtendedBlack)
-  const SOLAR_FLARE_VALUE_FONT_SIZE_DESKTOP = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.175)'; // EDITABLE Desktop: Bottom value font size
-  const SOLAR_FLARE_VALUE_FONT_SIZE_MOBILE = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.175)';  // EDITABLE Mobile: Bottom value font size
+  const SOLAR_FLARE_VALUE_FONT_SIZE_DESKTOP = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1575)'; // EDITABLE Desktop: Bottom value font size
+  const SOLAR_FLARE_VALUE_FONT_SIZE_MOBILE = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1575)';  // EDITABLE Mobile: Bottom value font size
   const SOLAR_FLARE_VALUE_LINE_HEIGHT = 0.92;                    // EDITABLE: Bottom value line height
   const SOLAR_FLARE_VALUE_LETTER_SPACING_DESKTOP = '0.04vw';     // EDITABLE Desktop: Bottom value letter spacing
   const SOLAR_FLARE_VALUE_LETTER_SPACING_MOBILE = '0.04vw';      // EDITABLE Mobile: Bottom value letter spacing
@@ -8240,8 +8240,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   // Middle Giant Class ("R2")
   const RADIO_BLACKOUT_CLASS_FONT_FAMILY = "'euro-bold', sans-serif"; // EDITABLE: Giant class font-family ("euro-bold" = EurostileExtendedBlack)
-  const RADIO_BLACKOUT_CLASS_FONT_SIZE_DESKTOP = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.34)'; // EDITABLE Desktop: Giant class text font size
-  const RADIO_BLACKOUT_CLASS_FONT_SIZE_MOBILE = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.34)';  // EDITABLE Mobile: Giant class text font size
+  const RADIO_BLACKOUT_CLASS_FONT_SIZE_DESKTOP = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.306)'; // EDITABLE Desktop: Giant class text font size
+  const RADIO_BLACKOUT_CLASS_FONT_SIZE_MOBILE = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.306)';  // EDITABLE Mobile: Giant class text font size
   const RADIO_BLACKOUT_CLASS_LINE_HEIGHT = 0.82;                 // EDITABLE: Giant class line height
   const RADIO_BLACKOUT_CLASS_OFFSET_Y_DESKTOP = '0vw';           // EDITABLE Desktop: Fine vertical nudge for giant class text
   const RADIO_BLACKOUT_CLASS_OFFSET_Y_MOBILE = '0vw';            // EDITABLE Mobile: Fine vertical nudge for giant class text
@@ -8252,8 +8252,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const RADIO_BLACKOUT_UNIT = 'dB';                              // EDITABLE: SI/IEEE decibel unit symbol ('dB', 'db', or '')
   const RADIO_BLACKOUT_TWO_SIG_DIGITS = true;                    // EDITABLE: If true, formats to 2 significant digits (e.g. 2.8dB, 16dB vs 16.0dB) to avoid circle crowding
   const RADIO_BLACKOUT_VALUE_FONT_FAMILY = "'euro-bold', sans-serif"; // EDITABLE: Bottom value font-family ("euro-bold" = EurostileExtendedBlack)
-  const RADIO_BLACKOUT_VALUE_FONT_SIZE_DESKTOP = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.165)'; // EDITABLE Desktop: Bottom value font size
-  const RADIO_BLACKOUT_VALUE_FONT_SIZE_MOBILE = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.165)';  // EDITABLE Mobile: Bottom value font size
+  const RADIO_BLACKOUT_VALUE_FONT_SIZE_DESKTOP = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1485)'; // EDITABLE Desktop: Bottom value font size
+  const RADIO_BLACKOUT_VALUE_FONT_SIZE_MOBILE = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1485)';  // EDITABLE Mobile: Bottom value font size
   const RADIO_BLACKOUT_VALUE_LINE_HEIGHT = 0.92;                 // EDITABLE: Bottom value line height
   const RADIO_BLACKOUT_VALUE_LETTER_SPACING_DESKTOP = '-0.03vw'; // EDITABLE Desktop: Bottom value letter spacing
   const RADIO_BLACKOUT_VALUE_LETTER_SPACING_MOBILE = '-0.06vw';  // EDITABLE Mobile: Bottom value letter spacing
@@ -10217,7 +10217,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1358';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1359';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
