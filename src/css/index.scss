@@ -2650,6 +2650,8 @@ main {
     width: var(--sun-image-width, var(--celestial-base-circle-size, 34vw));
     height: var(--sun-image-width, var(--celestial-base-circle-size, 34vw));
     margin-top: var(--sun-image-container-margin-top, 0vw);
+    border-radius: 50%;
+    overflow: hidden;
     clip-path: circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%));
     -webkit-clip-path: circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%));
     position: relative;
