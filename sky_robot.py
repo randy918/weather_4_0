@@ -1,3 +1,17 @@
+#!/usr/bin/env python3
+"""
+=============================================================================
+🤖 SKY ROBOT - Backend Automation Script
+=============================================================================
+Description:
+Fetches weather, UV, and solar flare data to maintain the db.json database.
+
+Changelog / Metadata:
+- 2026-10-09: Added 30-day passive auto-backup feature for db.json.
+- [Prior]: Initial script creation; OpenWeather & NOAA API integrations.
+=============================================================================
+"""
+
 import json
 import os
 import urllib.request
@@ -142,4 +156,24 @@ database["sys_last_upd"] = get_central_now().strftime("%Y-%m-%d %I:%M %p")
 with open(db_path, "w") as file:
     json.dump(database, file, indent=3)
 
-print("🤖 SKY ROBOT: I have updated db.json with real data. Going back to sleep!")
+# 7. Passively create a daily backup and clean up files older than 30 days
+backup_dir = os.path.join(os.path.dirname(db_path), "backup-json")
+os.makedirs(backup_dir, exist_ok=True)
+backup_path = os.path.join(backup_dir, f"db_{today_str}.json")
+
+with open(backup_path, "w") as b_file:
+    json.dump(database, b_file, indent=3)
+
+thirty_days_ago = get_central_now() - timedelta(days=30)
+for filename in os.listdir(backup_dir):
+    if filename.startswith("db_") and filename.endswith(".json"):
+        date_str = filename.replace("db_", "").replace(".json", "")
+        try:
+            file_date = datetime.strptime(date_str, "%Y-%m-%d")
+            if file_date.date() < thirty_days_ago.date():
+                os.remove(os.path.join(backup_dir, filename))
+                print(f"🤖 SKY ROBOT: Erased old backup {filename}")
+        except ValueError:
+            pass
+
+print("🤖 SKY ROBOT: I have updated db.json and created a daily backup. Going back to sleep!")

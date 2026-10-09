@@ -13,7 +13,17 @@
          "pk_flr_cls": "C1.0",
          "av_wnd_mph": 0.0,
          "is_rain_day": false
+      },
+      {
+         "dt_record": "2026-10-09",
+         "pk_uv_val": 1.62,
+         "pk_flr_cls": "C1.1",
+         "pk_r_cls": "R0",
+         "pk_r_val": 0.2,
+         "pk_xray_flux": 1.0685413371902541e-06,
+         "av_wnd_mph": 0.0,
+         "is_rain_day": false
       }
    ],
-   "sys_last_upd": "2026-10-08 01:37 PM"
+   "sys_last_upd": "2026-10-09 10:18 AM"
 }

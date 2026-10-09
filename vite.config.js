@@ -105,6 +105,23 @@ const passiveVersioningPlugin = () => {
             updateDistVersionFile(match[1]);
           }
         }
+        
+        // Remove the local db.json from the dist folder so it isn't accidentally uploaded
+        const distDbPath = resolve(__dirname, "dist/data/db.json");
+        if (fs.existsSync(distDbPath)) {
+          fs.unlinkSync(distDbPath);
+          console.log(`\n[Build Cleanup] Removed local db.json from dist folder to prevent accidental upload.\n`);
+        }
+        
+        // Remove the data folder entirely if it is empty to prevent Forklift from emptying the remote folder
+        const distDataDir = resolve(__dirname, "dist/data");
+        if (fs.existsSync(distDataDir)) {
+          const files = fs.readdirSync(distDataDir);
+          if (files.length === 0) {
+            fs.rmdirSync(distDataDir);
+            console.log(`[Build Cleanup] Removed empty dist/data directory.\n`);
+          }
+        }
       }
     }
   };

@@ -2729,6 +2729,10 @@ import weatherConditions from '../data/weather-conditions.json';
   const ALERT_NICE_WEATHER_ICON_Y_OFFSET_DESKTOP = '0vw';  // EDITABLE Desktop: Vertical nudge for Nice Weather icon
   const ALERT_NICE_WEATHER_ICON_Y_OFFSET_MOBILE = '.5vw';   // EDITABLE Mobile: Vertical nudge for Nice Weather icon
 
+  // --- EDITABLE: Air Quality Alert Blur (JCV) ---
+  const ALERT_AIR_QUALITY_BLUR_DESKTOP = '0.2vw';                 // EDITABLE Desktop: Air Quality Alert text/content blur
+  const ALERT_AIR_QUALITY_BLUR_MOBILE = '0.6vw';                  // EDITABLE Mobile: Air Quality Alert text/content blur
+
   document.documentElement.style.setProperty('--alert-banner-line-height', ALERT_BANNER_LINE_HEIGHT);
 
   document.documentElement.style.setProperty('--alert-modal-line-height', window.innerWidth <= 767 ? ALERT_MODAL_LINE_HEIGHT_MOBILE : ALERT_MODAL_LINE_HEIGHT_DESKTOP);
@@ -2750,8 +2754,13 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--alert-nice-weather-icon-y-offset-desktop', ALERT_NICE_WEATHER_ICON_Y_OFFSET_DESKTOP);
   document.documentElement.style.setProperty('--alert-nice-weather-icon-y-offset-mobile', ALERT_NICE_WEATHER_ICON_Y_OFFSET_MOBILE);
 
+  document.documentElement.style.setProperty('--alert-air-quality-blur-desktop', ALERT_AIR_QUALITY_BLUR_DESKTOP);
+  document.documentElement.style.setProperty('--alert-air-quality-blur-mobile', ALERT_AIR_QUALITY_BLUR_MOBILE);
+  document.documentElement.style.setProperty('--alert-air-quality-blur', window.innerWidth <= 767 ? ALERT_AIR_QUALITY_BLUR_MOBILE : ALERT_AIR_QUALITY_BLUR_DESKTOP);
+
   const ALERT_COLORS = {
     "DEFAULT": "rgba(0,0,0, 0.75)", // Default translucent red for anything else
+    "AIR QUALITY": "rgba(0,0,0, 1)", // Solid black background
     "GREAT WEATHER ADVISORY": "rgba(110, 170, 35, 0.88)", // Vibrant yellow-green
     "NICE WEATHER ADVISORY": "rgba(46, 204, 113, 0.75)", // Cool emerald green
     "TEMPERATURE DROP & RISE ADVISORY": "rgba(142, 68, 173, 0.85)", // Purple/Indigo
@@ -5883,6 +5892,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
       // Create the content container (sits above background)
       const bannerContent = document.createElement('div');
       bannerContent.className = 'alert-banner-content';
+      
+      if (eventName.includes('AIR QUALITY')) {
+        bannerContent.style.filter = 'blur(var(--alert-air-quality-blur, 3.5px))';
+        bannerContent.style.webkitFilter = 'blur(var(--alert-air-quality-blur, 3.5px))';
+      }
 
       const textWrapper = document.createElement('div');
       textWrapper.style.display = 'flex';
@@ -10190,7 +10204,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1331';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1335';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
