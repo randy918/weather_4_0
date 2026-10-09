@@ -589,7 +589,7 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--hourly-gradient-group-opacity-mobile', HOURLY_GRADIENT_GROUP_OPACITY_MOBILE);
 
   // --- CONFIG: Clock Grid (8 Countdown Circles Row) ---
-  const CLOCK_GRID_SIZE = '11vw';         // EDITABLE: Width and height of each circle widget
+  const CLOCK_GRID_SIZE = '10.56vw';         // EDITABLE: Width and height of each circle widget
   const CLOCK_GRID_GAP = '1vw';          // EDITABLE: Gap between cells
   const CLOCK_GRID_MARGIN_TOP_DESKTOP = '2.2vw'; // EDITABLE Desktop: Top margin of the row / gap below summary
   const CLOCK_GRID_MARGIN_TOP_MOBILE = '3.0vw';  // EDITABLE Mobile: Top margin of the row / gap below summary
@@ -8384,8 +8384,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // --- Primary Row Geometry Controls (JCV) ---
   // The dials automatically become bigger or smaller as a group on their own from these two settings:
   // Dial Diameter = (Row Width - (4 * Gap)) / 5
-  const WORLD_CLOCKS_WIDTH_DESKTOP = '95vw';                 // EDITABLE Desktop: Row container width centered across viewport
-  const WORLD_CLOCKS_WIDTH_MOBILE = '95vw';                  // EDITABLE Mobile: Row container width centered across viewport
+  const WORLD_CLOCKS_WIDTH_DESKTOP = '91.2vw';                 // EDITABLE Desktop: Row container width centered across viewport
+  const WORLD_CLOCKS_WIDTH_MOBILE = '91.2vw';                  // EDITABLE Mobile: Row container width centered across viewport
   const WORLD_CLOCKS_GAP_DESKTOP = '2vw';                  // EDITABLE Desktop: Spacing between each clock column
   const WORLD_CLOCKS_GAP_MOBILE = '1.875vw';                 // EDITABLE Mobile: Spacing between each clock column
 
@@ -10217,7 +10217,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1359';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1366';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -10962,7 +10962,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
               <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
-              <circle class="uv-peak-progress" cx="50" cy="50" r="46" fill="none" style="stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease-out, stroke 0.5s ease-out, opacity 0.5s ease;" />
+              <circle class="uv-peak-track countdown-track" cx="50" cy="50" r="51" fill="none" style="stroke-opacity: 0.2; stroke-width: var(--clock-grid-stroke-width, 4);" />
+              <circle class="uv-peak-progress" cx="50" cy="50" r="51" fill="none" style="stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease-out, stroke 0.5s ease-out, opacity 0.5s ease;" />
               <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
             </svg>
             <div class="grid-uv-text"></div>
@@ -11899,17 +11900,18 @@ Plan ahead for significantly warmer conditions tomorrow!`
       peakEls.forEach(el => {
         el.style.display = '';
         el.style.stroke = peakColor;
-        el.style.opacity = '0.5';
+        el.style.opacity = '1.0';
       });
-      const getRadius = () => 46;
+      const getRadius = () => 51;
       animateGauge(peakEls, dailyPeakUv, prevUvPeakDialVal, 0, 5.5, 11, getRadius);
       prevUvPeakDialVal = dailyPeakUv;
     } else {
+      const peakCircumference = 2 * Math.PI * 51;
       peakEls.forEach(el => {
         el.style.display = 'none';
         el.style.removeProperty('stroke');
         el.style.removeProperty('opacity');
-        el.style.strokeDashoffset = circumference;
+        el.style.strokeDashoffset = peakCircumference;
       });
       prevUvPeakDialVal = null;
     }
@@ -11925,18 +11927,18 @@ Plan ahead for significantly warmer conditions tomorrow!`
        
     textEls.forEach(gridUvTextEl => {
        if (uvIndex !== null) {
-          const uvVal = uvIndex.toFixed(1);
+          const uvVal = (uvIndex === 0) ? '–.–' : uvIndex.toFixed(1);
           gridUvTextEl.innerHTML = `${uvVal}<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">UV</span>`;
           gridUvTextEl.style.color = uvColor;
        } else {
-          gridUvTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">UV</span>`;
+          gridUvTextEl.innerHTML = `–.–<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">UV</span>`;
           gridUvTextEl.style.color = '#ffffff';
        }
     });
        
     const labelEls = document.querySelectorAll('.label-title-8, .label-title-4');
     labelEls.forEach(labelEl => {
-       const peakStr = dailyPeakUv !== null ? dailyPeakUv.toFixed(1) : '0.0';
+       const peakStr = (dailyPeakUv !== null && dailyPeakUv !== 0) ? dailyPeakUv.toFixed(1) : '–.–';
        labelEl.innerHTML = `Peak UV ${peakStr}`;
        labelEl.style.color = getUvColor(dailyPeakUv);
        labelEl.style.textTransform = 'none';
