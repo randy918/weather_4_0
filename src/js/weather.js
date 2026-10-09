@@ -7965,8 +7965,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SUN_ROTATION_OFFSET_X_DESKTOP = '2vw';       // EDITABLE Desktop: Shifts 27-day movie left/right without moving others
   const SUN_ROTATION_OFFSET_X_MOBILE = '-1.5vw';        // EDITABLE Mobile: Shifts 27-day movie left/right
 
-  const SUN_MASK_RADIUS_DESKTOP = '49.5%';            // EDITABLE Desktop: Circular mask radius
-  const SUN_MASK_RADIUS_MOBILE = '49.5%';             // EDITABLE Mobile: Circular mask radius
+  const SUN_MASK_RADIUS_DESKTOP = '68%';              // EDITABLE Desktop: Circular mask radius
+  const SUN_MASK_RADIUS_MOBILE = '68%';               // EDITABLE Mobile: Circular mask radius
   const SUN_MASK_POSITION_Y_DESKTOP = '50%';          // EDITABLE Desktop: Mask center Y position
   const SUN_MASK_POSITION_Y_MOBILE = '50%';           // EDITABLE Mobile: Mask center Y position
   const SUN_IMAGE_OPACITY_DESKTOP = 1.0;              // EDITABLE Desktop: Overall opacity (0.0 to 1.0)
@@ -9530,7 +9530,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_SUN_ROTATION_PERIOD_MOBILE = '30s';         // EDITABLE Mobile: Rate of rotation for primary Sun
   const ORRERY_SUN_ROTATION_DIRECTION = 'reverse';          // EDITABLE: Rotation direction ('normal' = clockwise, 'reverse' = counter-clockwise)
   const ORRERY_SUN_OPACITY = '1.0';                        // EDITABLE: Sun opacity (0.0 to 1.0)
-  const ORRERY_SUN_BLEND_MODE = 'lighten';                 // EDITABLE: Primary Sun layer blend mode
+  const ORRERY_SUN_BLEND_MODE = 'screen';                  // EDITABLE: Primary Sun layer blend mode
   const ORRERY_SUN_PRIMARY_Z_INDEX = '1';                  // EDITABLE: Primary Sun relative z-index
   const ORRERY_SUN_Z_INDEX = '12';                         // EDITABLE: Stacking layer index for central Sun container
   const ORRERY_SUN_GLOW_BLUR_DESKTOP = '0.8vw';            // EDITABLE Desktop: Solar corona ambient glow blur
@@ -9545,7 +9545,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_SUN_SIZZLE_ROTATION_DIRECTION = 'reverse';          // EDITABLE: Counter-rotation direction ('normal' for counter-clockwise with counter-spin keyframes)
   const ORRERY_SUN_SIZZLE_OPACITY_DESKTOP = '1.0';                // EDITABLE Desktop: Sizzle duplicate layer opacity (0.0 to 1.0)
   const ORRERY_SUN_SIZZLE_OPACITY_MOBILE = '1.0';                 // EDITABLE Mobile: Sizzle duplicate layer opacity
-  const ORRERY_SUN_SIZZLE_BLEND_MODE = 'lighten';                 // EDITABLE: Blend mode for duplicate sizzle layer ('lighten')
+  const ORRERY_SUN_SIZZLE_BLEND_MODE = 'screen';                  // EDITABLE: Blend mode for duplicate sizzle layer
   const ORRERY_SUN_SIZZLE_Z_INDEX = '2';                          // EDITABLE: Sizzle duplicate layer relative z-index (stacked above primary)
 
   // --- EDITABLE: Saturn Planet On Orbit Ring Config (JCV) ---
@@ -10217,7 +10217,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1350';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1355';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version

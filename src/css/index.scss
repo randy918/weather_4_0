@@ -2650,8 +2650,6 @@ main {
     width: var(--sun-image-width, var(--celestial-base-circle-size, 34vw));
     height: var(--sun-image-width, var(--celestial-base-circle-size, 34vw));
     margin-top: var(--sun-image-container-margin-top, 0vw);
-    border-radius: 50%;
-    overflow: hidden;
     clip-path: circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%));
     -webkit-clip-path: circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%));
     position: relative;
@@ -2901,7 +2899,7 @@ main {
        Without this, the stacking context created by z-index traps all child
        mix-blend-mode operations inside the section, blending against siblings
        rather than reaching the page background. */
-    mix-blend-mode: lighten;
+    mix-blend-mode: screen;
     background-color: transparent;
 }
 
@@ -2943,7 +2941,7 @@ main {
     align-items: center;
     z-index: var(--orrery-sun-z-index, 12);
     pointer-events: auto;
-    mix-blend-mode: lighten;
+    mix-blend-mode: screen;
     background-color: transparent;
 }
 
