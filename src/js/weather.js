@@ -8602,12 +8602,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const EARTH_IMAGE_MARGIN_BOTTOM_MOBILE = '0vw';   // EDITABLE Mobile: Handled by duo row spacer
   
   const EARTH_GLOW_ENABLED = true;                                  // EDITABLE: Enable/disable the static glow behind the Earth
-  const EARTH_GLOW_SCALE_DESKTOP = '1.06';                          // EDITABLE Desktop: Scale multiplier of the glow image (e.g. 1.06 = 106% size)
-  const EARTH_GLOW_SCALE_MOBILE = '1.06';                           // EDITABLE Mobile: Scale multiplier of the glow image
-  const EARTH_GLOW_BLUR_DESKTOP = '0.6vw';                          // EDITABLE Desktop: Blur radius of the glow
-  const EARTH_GLOW_BLUR_MOBILE = '0.8vw';                           // EDITABLE Mobile: Blur radius of the glow
-  const EARTH_GLOW_OPACITY_DESKTOP = '0.85';                        // EDITABLE Desktop: Opacity of the glow image
-  const EARTH_GLOW_OPACITY_MOBILE = '0.85';                         // EDITABLE Mobile: Opacity of the glow image
+  const EARTH_GLOW_SCALE_DESKTOP = '1.20';                          // EDITABLE Desktop: Scale multiplier of the glow image (e.g. 1.06 = 106% size)
+  const EARTH_GLOW_SCALE_MOBILE = '1.20';                           // EDITABLE Mobile: Scale multiplier of the glow image
+  const EARTH_GLOW_BLUR_DESKTOP = '3vw';                            // EDITABLE Desktop: Blur radius of the glow
+  const EARTH_GLOW_BLUR_MOBILE = '4vw';                             // EDITABLE Mobile: Blur radius of the glow
+  const EARTH_GLOW_OPACITY_DESKTOP = '0.9';                         // EDITABLE Desktop: Opacity of the glow image
+  const EARTH_GLOW_OPACITY_MOBILE = '0.9';                          // EDITABLE Mobile: Opacity of the glow image
 
   const EARTH_MASK_RADIUS_DESKTOP = '45.2%';        // EDITABLE Desktop: Circle radius clipping Earth globe, completely excluding the bottom NOAA white platform
   const EARTH_MASK_RADIUS_MOBILE = '45.2%';         // EDITABLE Mobile: Circle radius clipping Earth globe
@@ -10257,7 +10257,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1375';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1378';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -15640,8 +15640,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
       imGlow.style.left = 'calc(50% + var(--earth-image-offset-x, 0vw))';
       imGlow.style.transform = 'translate3d(-50%, -45.5%, 0) scale(var(--earth-glow-scale, 1.25))';
       imGlow.style.webkitTransform = 'translate3d(-50%, -45.5%, 0) scale(var(--earth-glow-scale, 1.25))';
-      imGlow.style.clipPath = 'circle(var(--earth-mask-radius, 45.2%) at 50% var(--earth-mask-position-y, 45.5%))';
-      imGlow.style.WebkitClipPath = 'circle(var(--earth-mask-radius, 45.2%) at 50% var(--earth-mask-position-y, 45.5%))';
+      imGlow.style.maskImage = 'linear-gradient(to bottom, black 80%, transparent 92%)';
+      imGlow.style.webkitMaskImage = 'linear-gradient(to bottom, black 80%, transparent 92%)';
+      imGlow.style.clipPath = 'none';
+      imGlow.style.WebkitClipPath = 'none';
       imGlow.style.webkitBackfaceVisibility = 'hidden';
       imGlow.style.backfaceVisibility = 'hidden';
       imGlow.style.objectFit = 'cover';
