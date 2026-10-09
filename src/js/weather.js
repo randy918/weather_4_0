@@ -2731,7 +2731,7 @@ import weatherConditions from '../data/weather-conditions.json';
 
   // --- EDITABLE: Air Quality Alert Blur (JCV) ---
   const ALERT_AIR_QUALITY_BLUR_DESKTOP = '0.2vw';                 // EDITABLE Desktop: Air Quality Alert text/content blur
-  const ALERT_AIR_QUALITY_BLUR_MOBILE = '0.6vw';                  // EDITABLE Mobile: Air Quality Alert text/content blur
+  const ALERT_AIR_QUALITY_BLUR_MOBILE = '0.2vw';                  // EDITABLE Mobile: Air Quality Alert text/content blur
   
   // --- EDITABLE: Air Quality Distortion / Heat Haze (JCV) ---
   const ALERT_AIR_QUALITY_DISTORTION_DESKTOP = 3.0;               // EDITABLE Desktop: Degree of SVG distortion (1.5 is subtle, 5 is heavy)
@@ -10217,7 +10217,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1341';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1342';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
