@@ -2748,7 +2748,6 @@ main {
     mix-blend-mode: lighten;
     background-color: transparent;
     flex-shrink: 0;
-    -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);

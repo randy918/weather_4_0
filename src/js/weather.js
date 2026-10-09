@@ -8157,7 +8157,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SOLAR_FLARE_SUBLABEL_OFFSET_Y_DESKTOP = '0vw';           // EDITABLE Desktop: Fine vertical nudge
   const SOLAR_FLARE_SUBLABEL_OFFSET_Y_MOBILE = '0vw';            // EDITABLE Mobile: Fine vertical nudge
   const SOLAR_FLARE_SUBLABEL_WIDTH_DESKTOP = '100%';             // EDITABLE Desktop: Sublabel width (100% fits dial, wider breaks out)
-  const SOLAR_FLARE_SUBLABEL_WIDTH_MOBILE = '160%';              // EDITABLE Mobile: Sublabel width
+  const SOLAR_FLARE_SUBLABEL_WIDTH_MOBILE = '120%';              // EDITABLE Mobile: Sublabel width
   const SOLAR_FLARE_SUBLABEL_MAX_WIDTH_DESKTOP = 'var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw))'; // EDITABLE Desktop: Max width boundary
   const SOLAR_FLARE_SUBLABEL_MAX_WIDTH_MOBILE = 'none';          // EDITABLE Mobile: Max width boundary (none allows wider label)
 
@@ -8286,7 +8286,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_DESKTOP = '0vw';        // EDITABLE Desktop: Fine vertical nudge
   const RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_MOBILE = '0vw';         // EDITABLE Mobile: Fine vertical nudge
   const RADIO_BLACKOUT_SUBLABEL_WIDTH_DESKTOP = '100%';          // EDITABLE Desktop: Sublabel width
-  const RADIO_BLACKOUT_SUBLABEL_WIDTH_MOBILE = '160%';           // EDITABLE Mobile: Sublabel width
+  const RADIO_BLACKOUT_SUBLABEL_WIDTH_MOBILE = '120%';           // EDITABLE Mobile: Sublabel width
   const RADIO_BLACKOUT_SUBLABEL_MAX_WIDTH_DESKTOP = 'var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw))'; // EDITABLE Desktop: Max width boundary
   const RADIO_BLACKOUT_SUBLABEL_MAX_WIDTH_MOBILE = 'none';       // EDITABLE Mobile: Max width boundary (none allows wider label)
 
@@ -8600,6 +8600,15 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const EARTH_IMAGE_MARGIN_TOP_MOBILE = '0vw';      // EDITABLE Mobile: Handled by duo row wrapper
   const EARTH_IMAGE_MARGIN_BOTTOM_DESKTOP = '0vw';  // EDITABLE Desktop: Handled by duo row spacer
   const EARTH_IMAGE_MARGIN_BOTTOM_MOBILE = '0vw';   // EDITABLE Mobile: Handled by duo row spacer
+  
+  const EARTH_GLOW_ENABLED = true;                                  // EDITABLE: Enable/disable the static glow behind the Earth
+  const EARTH_GLOW_SCALE_DESKTOP = '1.06';                          // EDITABLE Desktop: Scale multiplier of the glow image (e.g. 1.06 = 106% size)
+  const EARTH_GLOW_SCALE_MOBILE = '1.06';                           // EDITABLE Mobile: Scale multiplier of the glow image
+  const EARTH_GLOW_BLUR_DESKTOP = '0.6vw';                          // EDITABLE Desktop: Blur radius of the glow
+  const EARTH_GLOW_BLUR_MOBILE = '0.8vw';                           // EDITABLE Mobile: Blur radius of the glow
+  const EARTH_GLOW_OPACITY_DESKTOP = '0.85';                        // EDITABLE Desktop: Opacity of the glow image
+  const EARTH_GLOW_OPACITY_MOBILE = '0.85';                         // EDITABLE Mobile: Opacity of the glow image
+
   const EARTH_MASK_RADIUS_DESKTOP = '45.2%';        // EDITABLE Desktop: Circle radius clipping Earth globe, completely excluding the bottom NOAA white platform
   const EARTH_MASK_RADIUS_MOBILE = '45.2%';         // EDITABLE Mobile: Circle radius clipping Earth globe
   const EARTH_MASK_POSITION_Y_DESKTOP = '45.5%';    // EDITABLE Desktop: Center of the Earth globe in the NOAA frame (45.5%)
@@ -8748,6 +8757,17 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--earth-mask-position-y-desktop', EARTH_MASK_POSITION_Y_DESKTOP);
     document.documentElement.style.setProperty('--earth-mask-position-y-mobile', EARTH_MASK_POSITION_Y_MOBILE);
     document.documentElement.style.setProperty('--earth-mask-position-y', maskPosY);
+
+    document.documentElement.style.setProperty('--earth-glow-display', EARTH_GLOW_ENABLED ? 'block' : 'none');
+    document.documentElement.style.setProperty('--earth-glow-scale-desktop', EARTH_GLOW_SCALE_DESKTOP);
+    document.documentElement.style.setProperty('--earth-glow-scale-mobile', EARTH_GLOW_SCALE_MOBILE);
+    document.documentElement.style.setProperty('--earth-glow-scale', isMobile ? EARTH_GLOW_SCALE_MOBILE : EARTH_GLOW_SCALE_DESKTOP);
+    document.documentElement.style.setProperty('--earth-glow-blur-desktop', EARTH_GLOW_BLUR_DESKTOP);
+    document.documentElement.style.setProperty('--earth-glow-blur-mobile', EARTH_GLOW_BLUR_MOBILE);
+    document.documentElement.style.setProperty('--earth-glow-blur', isMobile ? EARTH_GLOW_BLUR_MOBILE : EARTH_GLOW_BLUR_DESKTOP);
+    document.documentElement.style.setProperty('--earth-glow-opacity-desktop', EARTH_GLOW_OPACITY_DESKTOP);
+    document.documentElement.style.setProperty('--earth-glow-opacity-mobile', EARTH_GLOW_OPACITY_MOBILE);
+    document.documentElement.style.setProperty('--earth-glow-opacity', isMobile ? EARTH_GLOW_OPACITY_MOBILE : EARTH_GLOW_OPACITY_DESKTOP);
 
     const container = document.getElementById('earth-image-container');
     if (container) {
@@ -10237,7 +10257,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1368';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1375';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -14201,10 +14221,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const iconClass = (arrowDir === 'down') ? 'fa-solid fa-arrow-down' : 'fa-solid fa-arrow-up';
     if (text.includes('<br>')) {
       const parts = text.split('<br>');
-      return `<span style="white-space: nowrap;"><i class="${iconClass}" aria-hidden="true"></i> ${parts[0]}</span><br><span>${parts.slice(1).join('<br>')}</span>`;
+      return `<span style="white-space: normal;"><i class="${iconClass}" aria-hidden="true"></i> ${parts[0]}</span><br><span>${parts.slice(1).join('<br>')}</span>`;
     }
-    // Keep the entire text on a single line unless it had an explicit <br>
-    return `<span style="white-space: nowrap;"><i class="${iconClass}" aria-hidden="true"></i> ${text}</span>`;
+    // Allow wrapping if needed by CSS
+    return `<span style="white-space: normal;"><i class="${iconClass}" aria-hidden="true"></i> ${text}</span>`;
   }
 
   function getSolarFlareImpact(flareClass, trendDir) {
@@ -15608,6 +15628,31 @@ Plan ahead for significantly warmer conditions tomorrow!`
       imB.style.opacity = '0';
       imB.style.transition = `opacity var(${durVar}) ease-in-out`;
 
+      const imGlow = document.createElement('img');
+      imGlow.id = imgId + '-glow';
+      imGlow.className = 'earth-image-glow';
+      imGlow.src = initialUrl;
+      imGlow.alt = altText + ' Glow';
+      imGlow.style.width = 'var(--earth-image-inner-scale, 23.2vw)';
+      imGlow.style.height = 'var(--earth-image-inner-scale, 23.2vw)';
+      imGlow.style.position = 'absolute';
+      imGlow.style.top = 'calc(50% + var(--earth-image-offset-y, 0vw))';
+      imGlow.style.left = 'calc(50% + var(--earth-image-offset-x, 0vw))';
+      imGlow.style.transform = 'translate3d(-50%, -45.5%, 0) scale(var(--earth-glow-scale, 1.25))';
+      imGlow.style.webkitTransform = 'translate3d(-50%, -45.5%, 0) scale(var(--earth-glow-scale, 1.25))';
+      imGlow.style.clipPath = 'circle(var(--earth-mask-radius, 45.2%) at 50% var(--earth-mask-position-y, 45.5%))';
+      imGlow.style.WebkitClipPath = 'circle(var(--earth-mask-radius, 45.2%) at 50% var(--earth-mask-position-y, 45.5%))';
+      imGlow.style.webkitBackfaceVisibility = 'hidden';
+      imGlow.style.backfaceVisibility = 'hidden';
+      imGlow.style.objectFit = 'cover';
+      imGlow.style.display = 'var(--earth-glow-display, block)';
+      imGlow.style.mixBlendMode = 'lighten';
+      imGlow.style.filter = 'blur(var(--earth-glow-blur, 2vw))';
+      imGlow.style.opacity = 'var(--earth-glow-opacity, 0.7)';
+      imGlow.style.zIndex = '0';
+      imGlow.style.pointerEvents = 'none';
+
+      c.appendChild(imGlow);
       c.appendChild(imA);
       c.appendChild(imB);
 
