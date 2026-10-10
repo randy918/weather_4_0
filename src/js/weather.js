@@ -8088,7 +8088,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SOLAR_FLARE_TRACK_STROKE_WIDTH_MOBILE = 4.0;             // EDITABLE Mobile: SVG track stroke thickness
   const SOLAR_FLARE_PROGRESS_STROKE_WIDTH_DESKTOP = 4.0;         // EDITABLE Desktop: SVG active progress stroke thickness
   const SOLAR_FLARE_PROGRESS_STROKE_WIDTH_MOBILE = 4.0;          // EDITABLE Mobile: SVG active progress stroke thickness
-  const SOLAR_FLARE_STROKE_LINECAP = 'butt';                     // EDITABLE: Progress arc end cap ('butt' for flush radial cut as in screenshot, or 'round')
+  const SOLAR_FLARE_STROKE_LINECAP = 'round';                    // EDITABLE: Progress arc end cap ('butt' for flush radial cut as in screenshot, or 'round')
   const SOLAR_FLARE_ANIM_DURATION_S = 0.8;                       // EDITABLE: Transition duration in seconds for arc updates
 
   // --- Dial Frame & Sizing (JCV) ---
@@ -8135,8 +8135,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SOLAR_FLARE_VALUE_OFFSET_Y_MOBILE = '-.5vw';               // EDITABLE Mobile: Fine vertical nudge for bottom value
 
   // Overall Content Block Alignment
-  const SOLAR_FLARE_CONTENT_OFFSET_Y_DESKTOP = '0vw';            // EDITABLE Desktop: Vertical nudge for entire text block inside dial
-  const SOLAR_FLARE_CONTENT_OFFSET_Y_MOBILE = '0vw';             // EDITABLE Mobile: Vertical nudge for entire text block inside dial
+  const SOLAR_FLARE_CONTENT_OFFSET_Y_DESKTOP = '0.9vw';          // EDITABLE Desktop: Vertical nudge for entire text block inside dial
+  const SOLAR_FLARE_CONTENT_OFFSET_Y_MOBILE = '0.5vw';           // EDITABLE Mobile: Vertical nudge for entire text block inside dial
 
   // Sublabel Below Dial (Strategy 3: Live Impact)
   const SOLAR_FLARE_SUBLABEL_ENABLED = true;                     // EDITABLE: Enable/disable live impact label below dial
@@ -8216,7 +8216,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const RADIO_BLACKOUT_TRACK_STROKE_WIDTH_MOBILE = 4.0;          // EDITABLE Mobile: SVG track stroke thickness
   const RADIO_BLACKOUT_PROGRESS_STROKE_WIDTH_DESKTOP = 4.0;      // EDITABLE Desktop: SVG active progress stroke thickness
   const RADIO_BLACKOUT_PROGRESS_STROKE_WIDTH_MOBILE = 4.0;       // EDITABLE Mobile: SVG active progress stroke thickness
-  const RADIO_BLACKOUT_STROKE_LINECAP = 'butt';                  // EDITABLE: Progress arc end cap ('butt' or 'round')
+  const RADIO_BLACKOUT_STROKE_LINECAP = 'round';                 // EDITABLE: Progress arc end cap ('butt' or 'round')
   const RADIO_BLACKOUT_ANIM_DURATION_S = 0.8;                    // EDITABLE: Transition duration in seconds for arc updates
 
   // --- Dial Frame & Sizing (JCV) ---
@@ -8602,12 +8602,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const EARTH_IMAGE_MARGIN_BOTTOM_MOBILE = '0vw';   // EDITABLE Mobile: Handled by duo row spacer
   
   const EARTH_GLOW_ENABLED = true;                                  // EDITABLE: Enable/disable the static glow behind the Earth
-  const EARTH_GLOW_SCALE_DESKTOP = '1.15';                          // EDITABLE Desktop: Scale multiplier of the glow image (e.g. 1.15 = 115% size)
+  const EARTH_GLOW_SCALE_DESKTOP = '1.05';                          // EDITABLE Desktop: Scale multiplier of the glow image (e.g. 1.15 = 115% size)
   const EARTH_GLOW_SCALE_MOBILE = '1.15';                           // EDITABLE Mobile: Scale multiplier of the glow image
   const EARTH_GLOW_BLUR_DESKTOP = '1vw';                            // EDITABLE Desktop: Blur radius of the glow
   const EARTH_GLOW_BLUR_MOBILE = '1.2vw';                           // EDITABLE Mobile: Blur radius of the glow
   const EARTH_GLOW_OPACITY_DESKTOP = '0.9';                         // EDITABLE Desktop: Opacity of the glow image
   const EARTH_GLOW_OPACITY_MOBILE = '0.9';                          // EDITABLE Mobile: Opacity of the glow image
+  const EARTH_GLOW_WRAPPER_SIZE_DESKTOP = '150%';                   // EDITABLE Desktop: Hardware texture bounding box for the glow (must be larger than the scaled image)
+  const EARTH_GLOW_WRAPPER_SIZE_MOBILE = '150%';                    // EDITABLE Mobile: Hardware texture bounding box for the glow
+  const EARTH_GLOW_WRAPPER_OFFSET_DESKTOP = '-25%';                 // EDITABLE Desktop: Top/left offset for the hardware texture bounding box
+  const EARTH_GLOW_WRAPPER_OFFSET_MOBILE = '-25%';                  // EDITABLE Mobile: Top/left offset for the hardware texture bounding box
 
   const EARTH_MASK_RADIUS_DESKTOP = '45.2%';        // EDITABLE Desktop: Circle radius clipping Earth globe, completely excluding the bottom NOAA white platform
   const EARTH_MASK_RADIUS_MOBILE = '45.2%';         // EDITABLE Mobile: Circle radius clipping Earth globe
@@ -8768,6 +8772,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--earth-glow-opacity-desktop', EARTH_GLOW_OPACITY_DESKTOP);
     document.documentElement.style.setProperty('--earth-glow-opacity-mobile', EARTH_GLOW_OPACITY_MOBILE);
     document.documentElement.style.setProperty('--earth-glow-opacity', isMobile ? EARTH_GLOW_OPACITY_MOBILE : EARTH_GLOW_OPACITY_DESKTOP);
+    document.documentElement.style.setProperty('--earth-glow-wrapper-size-desktop', EARTH_GLOW_WRAPPER_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--earth-glow-wrapper-size-mobile', EARTH_GLOW_WRAPPER_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--earth-glow-wrapper-size', isMobile ? EARTH_GLOW_WRAPPER_SIZE_MOBILE : EARTH_GLOW_WRAPPER_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--earth-glow-wrapper-offset-desktop', EARTH_GLOW_WRAPPER_OFFSET_DESKTOP);
+    document.documentElement.style.setProperty('--earth-glow-wrapper-offset-mobile', EARTH_GLOW_WRAPPER_OFFSET_MOBILE);
+    document.documentElement.style.setProperty('--earth-glow-wrapper-offset', isMobile ? EARTH_GLOW_WRAPPER_OFFSET_MOBILE : EARTH_GLOW_WRAPPER_OFFSET_DESKTOP);
 
     const container = document.getElementById('earth-image-container');
     if (container) {
@@ -10257,7 +10267,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1385';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1390';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -11894,20 +11904,27 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const uvIndex = data?.current?.uvi !== undefined ? Number(data.current.uvi) : null;
     
     let dailyPeakUv = null;
+    let forecastMaxUv = data?.daily?.[0]?.uvi !== undefined ? Number(data.daily[0].uvi) : null;
+    let dbPeakUv = null;
     
     try {
       // 1. Ask the globally fetched Sky Database for the Peak!
-      if (window.todaySkyRecord) {
-         dailyPeakUv = window.todaySkyRecord.pk_uv_val;
-         // console.log(`✅ UI dial successfully grabbed Peak UV ${dailyPeakUv} from the Sky!`);
+      if (window.todaySkyRecord && window.todaySkyRecord.pk_uv_val !== undefined) {
+         dbPeakUv = Number(window.todaySkyRecord.pk_uv_val);
       }
     } catch (e) {
       console.log("Failed to parse Peak UV from Sky DB", e);
     }
     
-    // Safety check: If the live API is somehow higher than our DB peak (like if the DB hasn't updated yet), use the live value
-    if (uvIndex !== null && dailyPeakUv !== null && uvIndex > dailyPeakUv) {
-       dailyPeakUv = uvIndex;
+    // Determine the true peak for the day by taking the max of forecasted max, db recorded peak, and current UV
+    dailyPeakUv = Math.max(
+      forecastMaxUv !== null ? forecastMaxUv : 0, 
+      dbPeakUv !== null ? dbPeakUv : 0, 
+      uvIndex !== null ? uvIndex : 0
+    );
+    
+    if (dailyPeakUv === 0 && forecastMaxUv === null && dbPeakUv === null && uvIndex === null) {
+      dailyPeakUv = null;
     }
     
     const itemEls = document.querySelectorAll('.clockGridItem-8, .clockGridItem-4');
@@ -11924,18 +11941,31 @@ Plan ahead for significantly warmer conditions tomorrow!`
     
     function getUvColor(uv) {
        if (uv === null) return '#ffffff';
-       let mappedTemp = 55;
-       if (uv >= 11) mappedTemp = -5;
-       else if (uv >= 8) mappedTemp = 105;
-       else if (uv >= 6) mappedTemp = 85;
-       else if (uv >= 3) mappedTemp = 75;
-       return tempToColor(mappedTemp) || '#ffffff';
+       
+       let h, s = 90, l = 50;
+       if (uv <= 3) {
+           // Green (120) to Yellow (60)
+           h = 120 - (uv / 3) * 60;
+           l = 40 + (uv / 3) * 10; // Lightens from 40% to 50%
+       } else if (uv <= 6) {
+           // Yellow (60) to Orange (30)
+           h = 60 - ((uv - 3) / 3) * 30;
+       } else if (uv <= 8) {
+           // Orange (30) to Red (0)
+           h = 30 - ((uv - 6) / 2) * 30;
+       } else if (uv <= 11) {
+           // Red (0) to Purple (280, wrapping via 360)
+           h = 360 - ((uv - 8) / 3) * 80;
+       } else {
+           h = 280; // Purple for extreme
+       }
+       return `hsl(${h}, ${s}%, ${l}%)`;
     }
 
     const uvColor = getUvColor(uvIndex);
     progressEls.forEach(el => el.style.stroke = uvColor);
        
-    if (dailyPeakUv !== null && uvIndex !== null && dailyPeakUv > uvIndex) {
+    if (dailyPeakUv !== null && uvIndex !== null && dailyPeakUv >= uvIndex && dailyPeakUv > 0) {
       const peakColor = getUvColor(dailyPeakUv);
       peakEls.forEach(el => {
         el.style.display = '';
@@ -15631,10 +15661,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const glowWrapper = document.createElement('div');
       glowWrapper.id = imgId + '-glow-wrapper';
       glowWrapper.style.position = 'absolute';
-      glowWrapper.style.top = '-25%';
-      glowWrapper.style.left = '-25%';
-      glowWrapper.style.width = '150%';
-      glowWrapper.style.height = '150%';
+      glowWrapper.style.top = 'var(--earth-glow-wrapper-offset, -25%)';
+      glowWrapper.style.left = 'var(--earth-glow-wrapper-offset, -25%)';
+      glowWrapper.style.width = 'var(--earth-glow-wrapper-size, 150%)';
+      glowWrapper.style.height = 'var(--earth-glow-wrapper-size, 150%)';
       glowWrapper.style.display = 'var(--earth-glow-display, block)';
       glowWrapper.style.mixBlendMode = 'lighten';
       glowWrapper.style.opacity = 'var(--earth-glow-opacity, 0.9)';
