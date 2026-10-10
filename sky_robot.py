@@ -102,11 +102,11 @@ g_cls = "G0"
 try:
     req_kp = urllib.request.urlopen(NOAA_KP_URL)
     kp_data = json.loads(req_kp.read())
-    # data is [["time_tag", "Kp_index", ...], ...]
-    if isinstance(kp_data, list) and len(kp_data) > 1:
+    # data is [{"time_tag": "...", "Kp": 2.33, ...}, ...]
+    if isinstance(kp_data, list) and len(kp_data) > 0:
         latest = kp_data[-1]
-        if len(latest) >= 2:
-            real_kp = float(latest[1])
+        if "Kp" in latest:
+            real_kp = float(latest["Kp"])
             
             # Calculate Geomagnetic Storm Class
             if real_kp < 5:

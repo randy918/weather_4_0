@@ -7963,7 +7963,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // The Live Sizzle images and 27-day Rotation images are provided by NOAA with slightly different internal centerings!
   // The Sizzle sun is your gold standard (at 0vw).
   const SUN_IMAGE_OFFSET_X_DESKTOP = '0vw';           // EDITABLE Desktop: Inner image horizontal offset (e.g. '0vw')
-  const SUN_IMAGE_OFFSET_X_MOBILE = '0vw';            // EDITABLE Mobile: Inner image horizontal offset
+  const SUN_IMAGE_OFFSET_X_MOBILE = '-3vw';            // EDITABLE Mobile: Inner image horizontal offset
   const SUN_ROTATION_OFFSET_X_DESKTOP = '2vw';       // EDITABLE Desktop: Shifts 27-day movie left/right without moving others
   const SUN_ROTATION_OFFSET_X_MOBILE = '-1.5vw';        // EDITABLE Mobile: Shifts 27-day movie left/right
 
@@ -7991,8 +7991,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // Direct scale multipliers relative to the timezone clock dial size (var(--world-clock-size)):
   // e.g. 1.0 = exactly matches clock size (17.4vw); 1.85 = 185% size (~32vw); 1.2 = 120% size (~21vw)
   // =========================================================================
-  const SUN_SIZE_SCALE_DESKTOP = 2.0;                // EDITABLE Desktop: Sun diameter multiplier (1.85 = ~32vw, 1.2 = ~21vw, 2.0 = ~35vw)
-  const SUN_SIZE_SCALE_MOBILE = 2.0;                 // EDITABLE Mobile: Sun diameter multiplier
+  const SUN_SIZE_SCALE_DESKTOP = 3.0;                // EDITABLE Desktop: Sun diameter multiplier (1.85 = ~32vw, 1.2 = ~21vw, 2.0 = ~35vw)
+  const SUN_SIZE_SCALE_MOBILE = 3.2;                 // EDITABLE Mobile: Sun diameter multiplier
   const SUN_CORONA_SCALE_DESKTOP = SUN_SIZE_SCALE_DESKTOP;
   const SUN_CORONA_SCALE_MOBILE = SUN_SIZE_SCALE_MOBILE;
   const EARTH_SIZE_SCALE_DESKTOP = 1.35;              // EDITABLE Desktop: Earth diameter multiplier (0.92 = ~16vw, 1.0 = ~17.4vw)
@@ -8015,19 +8015,19 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const CELESTIAL_ROW_EDGE_GAP_RIGHT_MOBILE = '0vw';          // EDITABLE Mobile: Edge offset for #4 (UK) from 95% right boundary
 
   // Object 1: Left Dial (Pacific/Flare) <--> Object 2: Sun
-  const GAP_PACIFIC_TO_SUN_DESKTOP = '1vw';                   // EDITABLE Desktop: Spacing between Left (Flare/Pacific) dial and the Sun
-  const GAP_PACIFIC_TO_SUN_MOBILE = '2vw';                    // EDITABLE Mobile: Spacing between Left dial and the Sun
+  const GAP_PACIFIC_TO_SUN_DESKTOP = '2.6vw';                   // EDITABLE Desktop: Spacing between Left (Flare/Pacific) dial and the Sun
+  const GAP_PACIFIC_TO_SUN_MOBILE = '-4.5vw';                   // EDITABLE Mobile: Spacing between Left dial and the Sun
   const CELESTIAL_DIAL_LEFT_GAP_RIGHT_DESKTOP = GAP_PACIFIC_TO_SUN_DESKTOP; // Compatibility alias
   const CELESTIAL_DIAL_LEFT_GAP_RIGHT_MOBILE = GAP_PACIFIC_TO_SUN_MOBILE;   // Compatibility alias
 
   // Object 2: Sun (150% size) <--> Object 3: Earth (Derived Middle Space)
-  const SUN_GAP_LEFT_DESKTOP = '-.5vw';                     // EDITABLE Desktop: Additional gap to the left of Sun (perfected by user)
-  const SUN_GAP_LEFT_MOBILE = '-3.6vw';                          // EDITABLE Mobile: Additional gap to the left of Sun
+  const SUN_GAP_LEFT_DESKTOP = '0vw';                     // EDITABLE Desktop: Additional gap to the left of Sun (perfected by user)
+  const SUN_GAP_LEFT_MOBILE = '0vw';                          // EDITABLE Mobile: Additional gap to the left of Sun
   // The gap between Sun and Earth is NOT explicitly defined; it is derived automatically
   // from the remaining space in the 95vw row between the left pair (Pacific/Sun) and right pair (Earth/UK).
   // Resizing Sun expands rightward into this space; resizing Earth expands leftward into this space.
-  const GAP_SUN_TO_EARTH_DESKTOP = 'auto';                     // DERIVED: Remaining space between Sun & Earth (automatic)
-  const GAP_SUN_TO_EARTH_MOBILE = 'auto';                      // DERIVED: Remaining space between Sun & Earth (automatic)
+  const GAP_SUN_TO_EARTH_DESKTOP = '2.6vw';                    // DERIVED: Remaining space between Sun & Earth (automatic)
+  const GAP_SUN_TO_EARTH_MOBILE = '-4.5vw';                    // DERIVED: Remaining space between Sun & Earth (automatic)
   const SUN_GAP_RIGHT_DESKTOP = GAP_SUN_TO_EARTH_DESKTOP;      // Compatibility alias
   const SUN_GAP_RIGHT_MOBILE = GAP_SUN_TO_EARTH_MOBILE;        // Compatibility alias
 
@@ -8035,8 +8035,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // Editable fixed gap between Earth (#3) and UK dial (#4).
   // Dial #4 (UK) is fixed at the right 95% edge. When Earth is resized, Dial #4 does NOT move,
   // and this gap stays fixed (Earth grows/shrinks towards the Sun into the derived middle space).
-  const GAP_EARTH_TO_UK_DESKTOP = '1.6vw';                       // EDITABLE Desktop: Spacing between Earth and UK dial (e.g. '0vw', '-2vw', '2.5vw')
-  const GAP_EARTH_TO_UK_MOBILE = '1.4vw';                        // EDITABLE Mobile: Spacing between Earth and UK dial
+  const GAP_EARTH_TO_UK_DESKTOP = '2.6vw';                       // EDITABLE Desktop: Spacing between Earth and UK dial (e.g. '0vw', '-2vw', '2.5vw')
+  const GAP_EARTH_TO_UK_MOBILE = '-4.5vw';                       // EDITABLE Mobile: Spacing between Earth and UK dial
   const EARTH_GAP_RIGHT_DESKTOP = GAP_EARTH_TO_UK_DESKTOP;     // Compatibility alias for Earth-to-UK gap
   const EARTH_GAP_RIGHT_MOBILE = GAP_EARTH_TO_UK_MOBILE;       // Compatibility alias
   const EARTH_GAP_LEFT_DESKTOP = '0vw';                        // EDITABLE Desktop: Additional gap to the left of Earth
@@ -8481,7 +8481,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // --- Sun & Earth Labels Config (JCV) ---
   // Centered labels beneath each circle
   // Default is 'Live' for both; changes to '27-Day Rotation' / '24-Hour Rotation' ONLY during animation
-  const SUN_LABEL_ENABLED = true;                     // EDITABLE: Enable/disable centered labels under each circle
+  const SUN_LABEL_LEFT_ENABLED = false;               // EDITABLE: Enable/disable centered label under left circle (Sun Sizzle)
+  const SUN_LABEL_RIGHT_ENABLED = true;               // EDITABLE: Enable/disable centered label under right circle (Earth)
   const SUN_LABEL_LEFT_DEFAULT_TEXT = 'Live';         // EDITABLE: Default label under left circle (when not rotating)
   const SUN_LABEL_RIGHT_DEFAULT_TEXT = 'Live';        // EDITABLE: Default label under right circle (when not rotating)
   const SUN_LABEL_LEFT_ROTATING_TEXT = '27-Day Rotation'; // EDITABLE: Label under left circle during rotation animation
@@ -10511,7 +10512,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1395';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1402';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -10854,14 +10855,15 @@ Plan ahead for significantly warmer conditions tomorrow!`
             <div class="grid-humidity-text"></div>
           `;
         } else if (i === 4) {
-          // Cell #5: Dew point (Td) display with starting at bottom (6 o'clock) 0 to 100 degrees (clockwise)
+          // Cell #5: UV Index display (Mobile Layout)
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
               <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
-              <circle class="uv-peak-progress" cx="50" cy="50" r="46" fill="none" style="stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease-out, stroke 0.5s ease-out, opacity 0.5s ease;" />
+              <circle class="uv-peak-track countdown-track" cx="50" cy="50" r="51" fill="none" style="stroke-opacity: 0.2; stroke-width: var(--clock-grid-stroke-width, 4);" />
+              <circle class="uv-peak-progress" cx="50" cy="50" r="51" fill="none" style="stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease-out, stroke 0.5s ease-out, opacity 0.5s ease;" />
               <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
             </svg>
-            <div class="grid-dewpoint-text"></div>
+            <div class="grid-uv-text"></div>
           `;
         } else if (i === 7) {
           // Cell #8: Barometric pressure display with radius 46 matching standard clock circles
@@ -11725,10 +11727,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
           innerHtml = `
             <svg class="clock-timer-svg" viewBox="0 0 100 100">
               <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
-              <circle class="uv-peak-progress" cx="50" cy="50" r="46" fill="none" style="stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease-out, stroke 0.5s ease-out, opacity 0.5s ease;" />
+              <circle class="uv-peak-track countdown-track" cx="50" cy="50" r="51" fill="none" style="stroke-opacity: 0.2; stroke-width: var(--clock-grid-stroke-width, 4);" />
+              <circle class="uv-peak-progress" cx="50" cy="50" r="51" fill="none" style="stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease-out, stroke 0.5s ease-out, opacity 0.5s ease;" />
               <circle class="countdown-progress" cx="50" cy="50" r="46" fill="none" />
             </svg>
-            <div class="grid-dewpoint-text"></div>
+            <div class="grid-uv-text"></div>
           `;
         }
 
@@ -12179,7 +12182,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     
     const progressEls = document.querySelectorAll('.clockGridItem-8 .countdown-progress, .clockGridItem-4 .countdown-progress');
     const peakEls = document.querySelectorAll('.clockGridItem-8 .uv-peak-progress, .clockGridItem-4 .uv-peak-progress');
-    const textEls = document.querySelectorAll('.clockGridItem-8 .grid-uv-text, .clockGridItem-4 .grid-dewpoint-text');
+    const textEls = document.querySelectorAll('.clockGridItem-8 .grid-uv-text, .clockGridItem-4 .grid-uv-text');
     const radius = 46;
     const circumference = 2 * Math.PI * radius;
     
@@ -15598,12 +15601,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const response = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json', { cache: 'no-store' });
       if (!response.ok) return;
       const data = await response.json();
-      // Data is an array of arrays: [["time_tag", "Kp_index", ...], ["2026-...", "2.33", ...]]
-      if (!Array.isArray(data) || data.length <= 1) return;
+      // Data is an array of objects: [{"time_tag": "...", "Kp": 2.33, ...}, ...]
+      if (!Array.isArray(data) || data.length === 0) return;
       
       const latest = data[data.length - 1];
-      if (!latest || typeof latest[1] === 'undefined') return;
-      const kp = parseFloat(latest[1]);
+      if (!latest || typeof latest.Kp === 'undefined') return;
+      const kp = parseFloat(latest.Kp);
       if (isNaN(kp)) return;
 
       let cls = 'G0';
@@ -15616,8 +15619,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       // Determine live trend by comparing latest Kp against previous
       let liveTrend = currentGeomagneticStormTrend || 'down';
-      for (let i = data.length - 2; i > 0; i--) {
-        const prevKp = parseFloat(data[i][1]);
+      for (let i = data.length - 2; i >= 0; i--) {
+        const prevKp = parseFloat(data[i].Kp);
         if (!isNaN(prevKp)) {
           const diff = kp - prevKp;
           if (Math.abs(diff) > 0.01) {
@@ -15647,7 +15650,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const isMobile = window.innerWidth <= 767;
     const col = document.createElement('div');
     col.className = 'world-clock-column celestial-clock-column celestial-clock-column-right geomagnetic-storm-column';
-    col.id = 'celestial-clock-right';
+    col.id = 'sun-col-right';
 
     const dial = document.createElement('div');
     dial.className = 'world-clock-dial celestial-clock-dial geomagnetic-storm-dial';
@@ -16379,9 +16382,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       col.appendChild(circleObj.container);
 
-      if (SUN_LABEL_ENABLED && labelText) {
+      if (labelText) {
         const isLeft = colId === 'sun-col-left';
-        const lbl = document.createElement('div');
+        if ((isLeft && SUN_LABEL_LEFT_ENABLED) || (!isLeft && SUN_LABEL_RIGHT_ENABLED)) {
+          const lbl = document.createElement('div');
         lbl.id = labelId;
         lbl.className = 'sun-label';
         lbl.textContent = labelText;
@@ -16407,6 +16411,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         lbl.style.boxSizing = 'border-box';
         lbl.style.transform = `translateX(calc(-50% + var(--sun-label-offset-x, 0vw) + var(--sun-label-${isLeft ? 'left' : 'right'}-offset-x, 0vw)))`;
         col.appendChild(lbl);
+        }
       }
 
       return col;
