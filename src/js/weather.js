@@ -10257,7 +10257,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1381';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1383';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -15642,8 +15642,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
       imGlow.style.webkitTransform = 'translate3d(-50%, -45.5%, 0) scale(var(--earth-glow-scale, 1.15))';
       
       // Soft mask applied directly to the scaled element ensures a perfectly smooth fade at the edge
-      imGlow.style.maskImage = 'radial-gradient(circle at 50% var(--earth-mask-position-y, 45.5%), black calc(var(--earth-mask-radius, 45.2%) - 4%), transparent var(--earth-mask-radius, 45.2%))';
-      imGlow.style.webkitMaskImage = 'radial-gradient(circle at 50% var(--earth-mask-position-y, 45.5%), black calc(var(--earth-mask-radius, 45.2%) - 4%), transparent var(--earth-mask-radius, 45.2%))';
+      // Hardcoded values to bypass WebKit CSS variable parsing bugs in mask-images
+      imGlow.style.maskImage = 'radial-gradient(circle at 50% 45.5%, black 41%, transparent 45.2%)';
+      imGlow.style.webkitMaskImage = 'radial-gradient(circle at 50% 45.5%, black 41%, transparent 45.2%)';
       imGlow.style.clipPath = 'none';
       imGlow.style.WebkitClipPath = 'none';
       imGlow.style.webkitBackfaceVisibility = 'hidden';
