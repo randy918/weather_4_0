@@ -8602,12 +8602,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const EARTH_IMAGE_MARGIN_BOTTOM_MOBILE = '0vw';   // EDITABLE Mobile: Handled by duo row spacer
   
   const EARTH_GLOW_ENABLED = true;                                  // EDITABLE: Enable/disable the static glow behind the Earth
-  const EARTH_GLOW_SCALE_DESKTOP = '1.08';                          // EDITABLE Desktop: Scale multiplier of the glow image (e.g. 1.08 = 108% size)
-  const EARTH_GLOW_SCALE_MOBILE = '1.08';                           // EDITABLE Mobile: Scale multiplier of the glow image
-  const EARTH_GLOW_BLUR_DESKTOP = '1.5vw';                          // EDITABLE Desktop: Blur radius of the glow
-  const EARTH_GLOW_BLUR_MOBILE = '2vw';                             // EDITABLE Mobile: Blur radius of the glow
-  const EARTH_GLOW_OPACITY_DESKTOP = '0.85';                        // EDITABLE Desktop: Opacity of the glow image
-  const EARTH_GLOW_OPACITY_MOBILE = '0.85';                         // EDITABLE Mobile: Opacity of the glow image
+  const EARTH_GLOW_SCALE_DESKTOP = '1.15';                          // EDITABLE Desktop: Scale multiplier of the glow image (e.g. 1.15 = 115% size)
+  const EARTH_GLOW_SCALE_MOBILE = '1.15';                           // EDITABLE Mobile: Scale multiplier of the glow image
+  const EARTH_GLOW_BLUR_DESKTOP = '1vw';                            // EDITABLE Desktop: Blur radius of the glow
+  const EARTH_GLOW_BLUR_MOBILE = '1.2vw';                           // EDITABLE Mobile: Blur radius of the glow
+  const EARTH_GLOW_OPACITY_DESKTOP = '0.9';                         // EDITABLE Desktop: Opacity of the glow image
+  const EARTH_GLOW_OPACITY_MOBILE = '0.9';                          // EDITABLE Mobile: Opacity of the glow image
 
   const EARTH_MASK_RADIUS_DESKTOP = '45.2%';        // EDITABLE Desktop: Circle radius clipping Earth globe, completely excluding the bottom NOAA white platform
   const EARTH_MASK_RADIUS_MOBILE = '45.2%';         // EDITABLE Mobile: Circle radius clipping Earth globe
@@ -10257,7 +10257,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1380';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1381';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -15628,20 +15628,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
       imB.style.opacity = '0';
       imB.style.transition = `opacity var(${durVar}) ease-in-out`;
 
-      const glowWrapper = document.createElement('div');
-      glowWrapper.id = imgId + '-glow-wrapper';
-      glowWrapper.style.position = 'absolute';
-      glowWrapper.style.top = '0';
-      glowWrapper.style.left = '0';
-      glowWrapper.style.width = '100%';
-      glowWrapper.style.height = '100%';
-      glowWrapper.style.display = 'var(--earth-glow-display, block)';
-      glowWrapper.style.mixBlendMode = 'lighten';
-      glowWrapper.style.filter = 'blur(var(--earth-glow-blur, 1.5vw))';
-      glowWrapper.style.opacity = 'var(--earth-glow-opacity, 0.85)';
-      glowWrapper.style.zIndex = '0';
-      glowWrapper.style.pointerEvents = 'none';
-
       const imGlow = document.createElement('img');
       imGlow.id = imgId + '-glow';
       imGlow.className = 'earth-image-glow';
@@ -15652,20 +15638,25 @@ Plan ahead for significantly warmer conditions tomorrow!`
       imGlow.style.position = 'absolute';
       imGlow.style.top = 'calc(50% + var(--earth-image-offset-y, 0vw))';
       imGlow.style.left = 'calc(50% + var(--earth-image-offset-x, 0vw))';
-      imGlow.style.transform = 'translate3d(-50%, -45.5%, 0) scale(var(--earth-glow-scale, 1.08))';
-      imGlow.style.webkitTransform = 'translate3d(-50%, -45.5%, 0) scale(var(--earth-glow-scale, 1.08))';
+      imGlow.style.transform = 'translate3d(-50%, -45.5%, 0) scale(var(--earth-glow-scale, 1.15))';
+      imGlow.style.webkitTransform = 'translate3d(-50%, -45.5%, 0) scale(var(--earth-glow-scale, 1.15))';
       
-      // Tight radial mask removes all noisy space background and text, leaving only the Earth globe
-      imGlow.style.maskImage = 'radial-gradient(circle at 50% var(--earth-mask-position-y, 45.5%), black calc(var(--earth-mask-radius, 45.2%) - 2%), transparent calc(var(--earth-mask-radius, 45.2%) - 0.5%))';
-      imGlow.style.webkitMaskImage = 'radial-gradient(circle at 50% var(--earth-mask-position-y, 45.5%), black calc(var(--earth-mask-radius, 45.2%) - 2%), transparent calc(var(--earth-mask-radius, 45.2%) - 0.5%))';
+      // Soft mask applied directly to the scaled element ensures a perfectly smooth fade at the edge
+      imGlow.style.maskImage = 'radial-gradient(circle at 50% var(--earth-mask-position-y, 45.5%), black calc(var(--earth-mask-radius, 45.2%) - 4%), transparent var(--earth-mask-radius, 45.2%))';
+      imGlow.style.webkitMaskImage = 'radial-gradient(circle at 50% var(--earth-mask-position-y, 45.5%), black calc(var(--earth-mask-radius, 45.2%) - 4%), transparent var(--earth-mask-radius, 45.2%))';
       imGlow.style.clipPath = 'none';
       imGlow.style.WebkitClipPath = 'none';
       imGlow.style.webkitBackfaceVisibility = 'hidden';
       imGlow.style.backfaceVisibility = 'hidden';
       imGlow.style.objectFit = 'cover';
+      imGlow.style.display = 'var(--earth-glow-display, block)';
+      imGlow.style.mixBlendMode = 'lighten';
+      imGlow.style.filter = 'blur(var(--earth-glow-blur, 1vw))';
+      imGlow.style.opacity = 'var(--earth-glow-opacity, 0.9)';
+      imGlow.style.zIndex = '0';
+      imGlow.style.pointerEvents = 'none';
 
-      glowWrapper.appendChild(imGlow);
-      c.appendChild(glowWrapper);
+      c.appendChild(imGlow);
       c.appendChild(imA);
       c.appendChild(imB);
 
