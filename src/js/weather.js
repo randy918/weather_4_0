@@ -8323,27 +8323,27 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // --- Temperature Colors per Geomagnetic Storm Level (JCV) ---
   // Assign numeric temperature degree (maps directly to app's TEMP_COLORS palette)
   // OR assign a custom CSS color string (e.g. 'hsl(120, 100%, 50%)', '#f60')
-  const GEOMAGNETIC_STORM_COLOR_LEVEL_G0 = 55;                      // EDITABLE: Level G0 (No Fade / Normal) temperature color (50s green)
-  const GEOMAGNETIC_STORM_COLOR_LEVEL_G1 = 75;                      // EDITABLE: Level G1 (Weak Fade) temperature color (70s yellow-gold)
-  const GEOMAGNETIC_STORM_COLOR_LEVEL_G2 = 85;                      // EDITABLE: Level G2 (Partial Fade) temperature color (80s orange, matches mockup)
-  const GEOMAGNETIC_STORM_COLOR_LEVEL_G3 = 95;                      // EDITABLE: Level G3 (Strong Fade) temperature color (90s tomato coral/red)
-  const GEOMAGNETIC_STORM_COLOR_LEVEL_G4 = 105;                     // EDITABLE: Level G4 (Severe Fade) temperature color (100s vibrant red)
-  const GEOMAGNETIC_STORM_COLOR_LEVEL_G5 = -5;                      // EDITABLE: Level G5 (Extreme Fade) temperature color (Below 0 shocking magenta)
+  const GEOMAGNETIC_STORM_COLOR_LEVEL_G0 = 55;                      // EDITABLE: Level G0 (Magnetic Quiet) temperature color (50s green)
+  const GEOMAGNETIC_STORM_COLOR_LEVEL_G1 = 75;                      // EDITABLE: Level G1 (Minor Storm) temperature color (70s yellow-gold)
+  const GEOMAGNETIC_STORM_COLOR_LEVEL_G2 = 85;                      // EDITABLE: Level G2 (Moderate Storm) temperature color (80s orange, matches mockup)
+  const GEOMAGNETIC_STORM_COLOR_LEVEL_G3 = 95;                      // EDITABLE: Level G3 (Strong Storm) temperature color (90s tomato coral/red)
+  const GEOMAGNETIC_STORM_COLOR_LEVEL_G4 = 105;                     // EDITABLE: Level G4 (Severe Storm) temperature color (100s vibrant red)
+  const GEOMAGNETIC_STORM_COLOR_LEVEL_G5 = -5;                      // EDITABLE: Level G5 (Extreme Storm) temperature color (Below 0 shocking magenta)
   const GEOMAGNETIC_STORM_COLOR_OVERRIDE = null;                    // EDITABLE: Optional universal color override (e.g. null, 85, or '#f60')
 
   // --- Level Descriptive Labels (JCV) ---
-  const GEOMAGNETIC_STORM_LABEL_G0_LINE1 = 'NO';                    // EDITABLE: Line 1 label for G0
-  const GEOMAGNETIC_STORM_LABEL_G0_LINE2 = 'FADE';                  // EDITABLE: Line 2 label for G0
-  const GEOMAGNETIC_STORM_LABEL_G1_LINE1 = 'WEAK';                  // EDITABLE: Line 1 label for G1
-  const GEOMAGNETIC_STORM_LABEL_G1_LINE2 = 'FADE';                  // EDITABLE: Line 2 label for G1
-  const GEOMAGNETIC_STORM_LABEL_G2_LINE1 = 'PARTIAL';               // EDITABLE: Line 1 label for G2 (matches mockup)
-  const GEOMAGNETIC_STORM_LABEL_G2_LINE2 = 'FADE';                  // EDITABLE: Line 2 label for G2 (matches mockup)
+  const GEOMAGNETIC_STORM_LABEL_G0_LINE1 = 'MAGNETIC';              // EDITABLE: Line 1 label for G0
+  const GEOMAGNETIC_STORM_LABEL_G0_LINE2 = 'QUIET';                 // EDITABLE: Line 2 label for G0
+  const GEOMAGNETIC_STORM_LABEL_G1_LINE1 = 'MINOR';                 // EDITABLE: Line 1 label for G1
+  const GEOMAGNETIC_STORM_LABEL_G1_LINE2 = 'STORM';                 // EDITABLE: Line 2 label for G1
+  const GEOMAGNETIC_STORM_LABEL_G2_LINE1 = 'MODERATE';              // EDITABLE: Line 1 label for G2 
+  const GEOMAGNETIC_STORM_LABEL_G2_LINE2 = 'STORM';                 // EDITABLE: Line 2 label for G2 
   const GEOMAGNETIC_STORM_LABEL_G3_LINE1 = 'STRONG';                // EDITABLE: Line 1 label for G3
-  const GEOMAGNETIC_STORM_LABEL_G3_LINE2 = 'FADE';                  // EDITABLE: Line 2 label for G3
+  const GEOMAGNETIC_STORM_LABEL_G3_LINE2 = 'STORM';                 // EDITABLE: Line 2 label for G3
   const GEOMAGNETIC_STORM_LABEL_G4_LINE1 = 'SEVERE';                // EDITABLE: Line 1 label for G4
-  const GEOMAGNETIC_STORM_LABEL_G4_LINE2 = 'FADE';                  // EDITABLE: Line 2 label for G4
+  const GEOMAGNETIC_STORM_LABEL_G4_LINE2 = 'STORM';                 // EDITABLE: Line 2 label for G4
   const GEOMAGNETIC_STORM_LABEL_G5_LINE1 = 'EXTREME';               // EDITABLE: Line 1 label for G5
-  const GEOMAGNETIC_STORM_LABEL_G5_LINE2 = 'FADE';                  // EDITABLE: Line 2 label for G5
+  const GEOMAGNETIC_STORM_LABEL_G5_LINE2 = 'STORM';                 // EDITABLE: Line 2 label for G5
 
   // --- Circular Progress Ring & Track (JCV) ---
   const GEOMAGNETIC_STORM_START_ANGLE_DEG = 90;                     // EDITABLE: Arc start angle (90deg in SVG = 6 o'clock / lowest point)
@@ -8388,9 +8388,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const GEOMAGNETIC_STORM_GAP_CLASS_TO_VALUE_DESKTOP = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02)'; // EDITABLE Desktop: Gap between giant class and bottom value
   const GEOMAGNETIC_STORM_GAP_CLASS_TO_VALUE_MOBILE = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02)';  // EDITABLE Mobile: Gap between giant class and bottom value
 
-  // Bottom Value ("2.8dB")
-  const GEOMAGNETIC_STORM_UNIT = 'dB';                              // EDITABLE: SI/IEEE decibel unit symbol ('dB', 'Kp', or '')
-  const GEOMAGNETIC_STORM_TWO_SIG_DIGITS = true;                    // EDITABLE: If true, formats to 2 significant digits (e.g. 2.8dB, 16dB vs 16.0dB) to avoid circle crowding
+  // Bottom Value ("2.8Kp")
+  const GEOMAGNETIC_STORM_UNIT = 'Kp';                              // EDITABLE: SI/IEEE decibel unit symbol ('dB', 'Kp', or '')
+  const GEOMAGNETIC_STORM_TWO_SIG_DIGITS = true;                    // EDITABLE: If true, formats to 2 significant digits (e.g. 2.8Kp, 16Kp vs 16.0Kp) to avoid circle crowding
   const GEOMAGNETIC_STORM_VALUE_FONT_FAMILY = "'euro-bold', sans-serif"; // EDITABLE: Bottom value font-family ("euro-bold" = EurostileExtendedBlack)
   const GEOMAGNETIC_STORM_VALUE_FONT_SIZE_DESKTOP = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1485)'; // EDITABLE Desktop: Bottom value font size
   const GEOMAGNETIC_STORM_VALUE_FONT_SIZE_MOBILE = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1485)';  // EDITABLE Mobile: Bottom value font size
@@ -8431,17 +8431,17 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   // Strategy 3: Dynamic Live Impact Sublabels per Geomagnetic Storm Level (Static Fallback / Threshold Defaults)
   const GEOMAGNETIC_STORM_IMPACT_LEVEL_G0_ARROW = 'down';           // EDITABLE: Fallback arrow direction ('up' or 'down')
-  const GEOMAGNETIC_STORM_IMPACT_LEVEL_G0_TEXT = 'All Bands Clear'; // EDITABLE: Situation text
+  const GEOMAGNETIC_STORM_IMPACT_LEVEL_G0_TEXT = 'Field is Quiet';  // EDITABLE: Situation text
   const GEOMAGNETIC_STORM_IMPACT_LEVEL_G1_ARROW = 'up';             // EDITABLE: Fallback arrow direction ('up' or 'down')
-  const GEOMAGNETIC_STORM_IMPACT_LEVEL_G1_TEXT = 'Minor HF Noise';  // EDITABLE: Situation text
+  const GEOMAGNETIC_STORM_IMPACT_LEVEL_G1_TEXT = 'Minor Grid Issues'; // EDITABLE: Situation text
   const GEOMAGNETIC_STORM_IMPACT_LEVEL_G2_ARROW = 'up';             // EDITABLE: Fallback arrow direction ('up' or 'down')
-  const GEOMAGNETIC_STORM_IMPACT_LEVEL_G2_TEXT = 'HF Signal Loss';  // EDITABLE: Situation text
+  const GEOMAGNETIC_STORM_IMPACT_LEVEL_G2_TEXT = 'High-Lat Auroras';  // EDITABLE: Situation text
   const GEOMAGNETIC_STORM_IMPACT_LEVEL_G3_ARROW = 'up';             // EDITABLE: Fallback arrow direction ('up' or 'down')
-  const GEOMAGNETIC_STORM_IMPACT_LEVEL_G3_TEXT = 'Wide HF Outage';  // EDITABLE: Situation text
+  const GEOMAGNETIC_STORM_IMPACT_LEVEL_G3_TEXT = 'Voltage Irregularities'; // EDITABLE: Situation text
   const GEOMAGNETIC_STORM_IMPACT_LEVEL_G4_ARROW = 'up';             // EDITABLE: Fallback arrow direction ('up' or 'down')
-  const GEOMAGNETIC_STORM_IMPACT_LEVEL_G4_TEXT = 'Major Day Outage';// EDITABLE: Situation text
+  const GEOMAGNETIC_STORM_IMPACT_LEVEL_G4_TEXT = 'Severe Grid Issues';// EDITABLE: Situation text
   const GEOMAGNETIC_STORM_IMPACT_LEVEL_G5_ARROW = 'up';             // EDITABLE: Fallback arrow direction ('up' or 'down')
-  const GEOMAGNETIC_STORM_IMPACT_LEVEL_G5_TEXT = 'Total Dayside<br>Blackout'; // EDITABLE: Situation text
+  const GEOMAGNETIC_STORM_IMPACT_LEVEL_G5_TEXT = 'Extreme Grid Danger'; // EDITABLE: Situation text
 
   
   // --- Flanking Duplicate Timezone Dials Config (JCV) ---
@@ -10511,7 +10511,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1393';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1395';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -15456,7 +15456,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (isLive) {
       try {
         if (window.todaySkyRecord && window.todaySkyRecord.pk_g_cls) {
-           dailyPeakClass = window.todaySkyRecord.pk_r_cls; // e.g. "G2"
+           dailyPeakClass = window.todaySkyRecord.pk_g_cls; // e.g. "G2"
            dailyPeakValue = window.todaySkyRecord.pk_g_val || 0.1; // e.g. 2.8
            dailyPeakColor = getGeomagneticStormLevelColor(dailyPeakClass);
            dailyPeakFraction = calculateGeomagneticStormFraction(dailyPeakClass, dailyPeakValue);
@@ -15466,13 +15466,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
               dailyPeakColor = color;
               dailyPeakClass = rClass;
               dailyPeakValue = rValue;
-              window.todaySkyRecord.pk_r_cls = rClass;
-              window.todaySkyRecord.pk_r_val = rValue;
+              window.todaySkyRecord.pk_g_cls = rClass;
+              window.todaySkyRecord.pk_g_val = rValue;
            }
         } else if (liveGeomagneticStormData) {
            if (!window.todaySkyRecord) window.todaySkyRecord = {};
-           window.todaySkyRecord.pk_r_cls = rClass;
-           window.todaySkyRecord.pk_r_val = rValue;
+           window.todaySkyRecord.pk_g_cls = rClass;
+           window.todaySkyRecord.pk_g_val = rValue;
         }
       } catch(e) {
         console.log("Failed to parse Geomagnetic Storm Peak from Sky DB", e);
@@ -15595,61 +15595,51 @@ Plan ahead for significantly warmer conditions tomorrow!`
   async function fetchLiveGeomagneticStormData() {
     if (GEOMAGNETIC_STORM_MODE !== 'live') return;
     try {
-      const response = await fetch('https://services.swpc.noaa.gov/json/goes/primary/xrays-6-hour.json', { cache: 'no-store' });
+      const response = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json', { cache: 'no-store' });
       if (!response.ok) return;
       const data = await response.json();
-      if (!Array.isArray(data) || data.length === 0) return;
-      const primaryReadings = data.filter(d => d.energy === '0.1-0.8nm' && typeof d.flux === 'number');
-      const latest = primaryReadings[primaryReadings.length - 1];
-      if (!latest) return;
-      const flux = latest.flux;
+      // Data is an array of arrays: [["time_tag", "Kp_index", ...], ["2026-...", "2.33", ...]]
+      if (!Array.isArray(data) || data.length <= 1) return;
+      
+      const latest = data[data.length - 1];
+      if (!latest || typeof latest[1] === 'undefined') return;
+      const kp = parseFloat(latest[1]);
+      if (isNaN(kp)) return;
 
       let cls = 'G0';
-      let val = 0.2;
+      if (kp < 5) cls = 'G0';
+      else if (kp < 6) cls = 'G1';
+      else if (kp < 7) cls = 'G2';
+      else if (kp < 8) cls = 'G3';
+      else if (kp < 9) cls = 'G4';
+      else cls = 'G5';
 
-      if (flux < 1e-5) {
-        cls = 'G0';
-        val = Math.max(0.1, Math.min(0.9, (flux / 1e-5) * 0.8 + 0.1));
-      } else if (flux < 5e-5) {
-        cls = 'G1';
-        val = 1.0 + ((flux - 1e-5) / 4e-5) * 1.5;
-      } else if (flux < 1e-4) {
-        cls = 'G2';
-        val = 2.5 + ((flux - 5e-5) / 5e-5) * 2.5;
-      } else if (flux < 1e-3) {
-        cls = 'G3';
-        val = 5.0 + ((flux - 1e-4) / 9e-4) * 10.0;
-      } else if (flux < 2e-3) {
-        cls = 'G4';
-        val = 15.0 + ((flux - 1e-3) / 1e-3) * 10.0;
-      } else {
-        cls = 'G5';
-        val = 25.0 + Math.min(15.0, ((flux - 2e-3) / 1e-3) * 10.0);
-      }
-
-      // Determine live trend by comparing latest reading against recent previous readings in the time-series
+      // Determine live trend by comparing latest Kp against previous
       let liveTrend = currentGeomagneticStormTrend || 'down';
-      for (let i = primaryReadings.length - 2; i >= 0; i--) {
-        const diff = flux - primaryReadings[i].flux;
-        if (Math.abs(diff) > 1e-10) {
-          liveTrend = diff > 0 ? 'up' : 'down';
-          break;
+      for (let i = data.length - 2; i > 0; i--) {
+        const prevKp = parseFloat(data[i][1]);
+        if (!isNaN(prevKp)) {
+          const diff = kp - prevKp;
+          if (Math.abs(diff) > 0.01) {
+            liveTrend = diff > 0 ? 'up' : 'down';
+            break;
+          }
         }
       }
       currentGeomagneticStormTrend = liveTrend;
       try {
-        localStorage.setItem('weather_trend_radio_blackout', JSON.stringify({ flux, trend: liveTrend, time: Date.now() }));
+        localStorage.setItem('weather_trend_geomagnetic_storm', JSON.stringify({ kp, trend: liveTrend, time: Date.now() }));
       } catch (e) {}
 
       liveGeomagneticStormData = {
         class: cls,
-        value: parseFloat(val.toFixed(1)),
-        flux: flux,
+        value: parseFloat(kp.toFixed(1)),
+        flux: kp, // Keep property for compatibility with any logic expecting .flux
         trend: liveTrend
       };
       updateGeomagneticStormDial();
     } catch (err) {
-      console.warn('Unable to fetch live radio blackout data from NOAA SWPC:', err);
+      console.warn('Unable to fetch live geomagnetic storm data from NOAA SWPC:', err);
     }
   }
 

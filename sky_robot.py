@@ -91,7 +91,39 @@ try:
             
         print(f"🤖 SKY ROBOT: Current Flux is {real_flux}. Flare: {real_flare_str}, Radio Blackout: {r_cls} ({r_val:.1f})")
 except Exception as e:
-    print(f"🤖 SKY ROBOT: Failed to fetch from NOAA: {e}")
+    print(f"🤖 SKY ROBOT: Failed to fetch from NOAA (X-ray): {e}")
+
+# Fetch NOAA Planetary K-index for Geomagnetic Storms (G-Scale)
+print("🤖 SKY ROBOT: Reaching out to NOAA SWPC for Geomagnetic Storms...")
+NOAA_KP_URL = "https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json"
+real_kp = 0.0
+g_cls = "G0"
+
+try:
+    req_kp = urllib.request.urlopen(NOAA_KP_URL)
+    kp_data = json.loads(req_kp.read())
+    # data is [["time_tag", "Kp_index", ...], ...]
+    if isinstance(kp_data, list) and len(kp_data) > 1:
+        latest = kp_data[-1]
+        if len(latest) >= 2:
+            real_kp = float(latest[1])
+            
+            # Calculate Geomagnetic Storm Class
+            if real_kp < 5:
+                g_cls = "G0"
+            elif real_kp < 6:
+                g_cls = "G1"
+            elif real_kp < 7:
+                g_cls = "G2"
+            elif real_kp < 8:
+                g_cls = "G3"
+            elif real_kp < 9:
+                g_cls = "G4"
+            else:
+                g_cls = "G5"
+            print(f"🤖 SKY ROBOT: Current Kp Index is {real_kp:.1f}. Geomagnetic Storm: {g_cls}")
+except Exception as e:
+    print(f"🤖 SKY ROBOT: Failed to fetch from NOAA (Kp-index): {e}")
 
 # 2. Open our Database (or create it if it doesn't exist yet!)
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -128,7 +160,10 @@ if not today_record:
         "pk_flr_cls": "A1.0",
         "pk_r_cls": "R0",
         "pk_r_val": 0.1,
+        "pk_g_cls": "G0",
+        "pk_g_val": 0.0,
         "pk_xray_flux": 0.0,
+        "pk_kp_index": 0.0,
         "av_wnd_mph": 0.0,
         "is_rain_day": False
     }
@@ -150,6 +185,15 @@ if real_flux > today_record.get("pk_xray_flux", 0.0):
     today_record["pk_r_val"] = round(r_val, 1)
 else:
     print(f"🤖 SKY ROBOT: Solar Flare Peak remains at {today_record.get('pk_flr_cls', 'Unknown')}")
+
+# 5c. Check if the current Kp index broke the daily record!
+if real_kp > today_record.get("pk_kp_index", 0.0):
+    print(f"🤖 SKY ROBOT: New Geomagnetic Peak! {g_cls} ({real_kp:.1f} Kp) broke the old record.")
+    today_record["pk_kp_index"] = real_kp
+    today_record["pk_g_cls"] = g_cls
+    today_record["pk_g_val"] = round(real_kp, 1)
+else:
+    print(f"🤖 SKY ROBOT: Geomagnetic Peak remains at {today_record.get('pk_g_cls', 'G0')} ({today_record.get('pk_kp_index', 0.0):.1f} Kp)")
 
 # 6. Update the system timestamp and save it perfectly formatted for Earth
 database["sys_last_upd"] = get_central_now().strftime("%Y-%m-%d %I:%M %p")
