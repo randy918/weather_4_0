@@ -10257,7 +10257,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1383';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1385';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -15628,6 +15628,20 @@ Plan ahead for significantly warmer conditions tomorrow!`
       imB.style.opacity = '0';
       imB.style.transition = `opacity var(${durVar}) ease-in-out`;
 
+      const glowWrapper = document.createElement('div');
+      glowWrapper.id = imgId + '-glow-wrapper';
+      glowWrapper.style.position = 'absolute';
+      glowWrapper.style.top = '-25%';
+      glowWrapper.style.left = '-25%';
+      glowWrapper.style.width = '150%';
+      glowWrapper.style.height = '150%';
+      glowWrapper.style.display = 'var(--earth-glow-display, block)';
+      glowWrapper.style.mixBlendMode = 'lighten';
+      glowWrapper.style.opacity = 'var(--earth-glow-opacity, 0.9)';
+      glowWrapper.style.zIndex = '0';
+      glowWrapper.style.pointerEvents = 'none';
+      glowWrapper.style.filter = 'blur(var(--earth-glow-blur, 1vw))';
+
       const imGlow = document.createElement('img');
       imGlow.id = imgId + '-glow';
       imGlow.className = 'earth-image-glow';
@@ -15641,23 +15655,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
       imGlow.style.transform = 'translate3d(-50%, -45.5%, 0) scale(var(--earth-glow-scale, 1.15))';
       imGlow.style.webkitTransform = 'translate3d(-50%, -45.5%, 0) scale(var(--earth-glow-scale, 1.15))';
       
-      // Soft mask applied directly to the scaled element ensures a perfectly smooth fade at the edge
-      // Hardcoded values to bypass WebKit CSS variable parsing bugs in mask-images
-      imGlow.style.maskImage = 'radial-gradient(circle at 50% 45.5%, black 41%, transparent 45.2%)';
-      imGlow.style.webkitMaskImage = 'radial-gradient(circle at 50% 45.5%, black 41%, transparent 45.2%)';
-      imGlow.style.clipPath = 'none';
-      imGlow.style.WebkitClipPath = 'none';
+      // Safari WILL crash if we use mask-image + blur. So we use clip-path to extract the Earth, 
+      // and let the parent glowWrapper's blur soften the sharp clip-path edge perfectly!
+      imGlow.style.clipPath = 'circle(var(--earth-mask-radius, 45.2%) at 50% var(--earth-mask-position-y, 45.5%))';
+      imGlow.style.WebkitClipPath = 'circle(var(--earth-mask-radius, 45.2%) at 50% var(--earth-mask-position-y, 45.5%))';
       imGlow.style.webkitBackfaceVisibility = 'hidden';
       imGlow.style.backfaceVisibility = 'hidden';
       imGlow.style.objectFit = 'cover';
-      imGlow.style.display = 'var(--earth-glow-display, block)';
-      imGlow.style.mixBlendMode = 'lighten';
-      imGlow.style.filter = 'blur(var(--earth-glow-blur, 1vw))';
-      imGlow.style.opacity = 'var(--earth-glow-opacity, 0.9)';
-      imGlow.style.zIndex = '0';
-      imGlow.style.pointerEvents = 'none';
 
-      c.appendChild(imGlow);
+      glowWrapper.appendChild(imGlow);
+      c.appendChild(glowWrapper);
       c.appendChild(imA);
       c.appendChild(imB);
 
