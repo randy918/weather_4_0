@@ -3531,3 +3531,132 @@ main {
   text-shadow: 0 0.1vw 0.2vw rgba(0, 0, 0, 0.8), 0 0 0.4vw rgba(0, 0, 0, 0.8);
   /* The counter-rotation is handled by the parent body */
 }
+
+
+// Geomagnetic Storm (G-Scale) Dial in Celestial Row (JCV)
+.geomagnetic-storm-dial {
+    position: relative;
+    border-radius: 50%;
+    width: var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
+    height: var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
+    margin-top: var(--celestial-dial-margin-top, 0vw);
+    transform: translate(var(--geomagnetic-storm-offset-x, 0vw), var(--geomagnetic-storm-offset-y, 0vw));
+    background-color: var(--geomagnetic-storm-dial-bg-color, transparent);
+    box-shadow: var(--geomagnetic-storm-dial-inner-shadow, inset 0 0 1vw rgba(0, 0, 0, 0.5));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: pointer;
+    box-sizing: border-box;
+
+    .geomagnetic-storm-svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transform: rotate(var(--geomagnetic-storm-start-angle, 90deg));
+        overflow: visible;
+        z-index: 1;
+
+        .geomagnetic-storm-track {
+            stroke: var(--geomagnetic-storm-track-color, rgba(255, 255, 255, 0.22));
+            stroke-width: var(--geomagnetic-storm-track-stroke-width, 4);
+        }
+
+        .geomagnetic-storm-peak-progress {
+            stroke: var(--geomagnetic-storm-peak-color, rgba(255, 255, 255, 0.5));
+            stroke-width: var(--geomagnetic-storm-progress-stroke-width, 4);
+            stroke-dasharray: 289.027;
+            stroke-dashoffset: var(--geomagnetic-storm-peak-stroke-offset, 289.027);
+            stroke-linecap: var(--geomagnetic-storm-stroke-linecap, butt);
+            opacity: 0.5;
+            transition: stroke-dashoffset var(--geomagnetic-storm-anim-duration, 0.8s) cubic-bezier(0.25, 1, 0.5, 1),
+                        stroke 0.4s ease;
+        }
+
+        .geomagnetic-storm-progress {
+            stroke: var(--geomagnetic-storm-current-color, hsl(30, 100%, 50%));
+            stroke-width: var(--geomagnetic-storm-progress-stroke-width, 4);
+            stroke-dasharray: 289.027;
+            stroke-dashoffset: var(--geomagnetic-storm-stroke-offset, 161.85);
+            stroke-linecap: var(--geomagnetic-storm-stroke-linecap, butt);
+            transition: stroke-dashoffset var(--geomagnetic-storm-anim-duration, 0.8s) cubic-bezier(0.25, 1, 0.5, 1),
+                        stroke 0.4s ease;
+        }
+    }
+
+    .geomagnetic-storm-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        color: var(--geomagnetic-storm-current-color, hsl(30, 100%, 50%));
+        transform: translateY(var(--geomagnetic-storm-content-offset-y, 0vw));
+        pointer-events: none;
+        transition: color 0.4s ease;
+    }
+
+    .geomagnetic-storm-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-family: var(--geomagnetic-storm-label-font-family, "euro", sans-serif);
+        font-size: var(--geomagnetic-storm-label-font-size, calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.088));
+        line-height: var(--geomagnetic-storm-label-line-height, 1.05);
+        letter-spacing: var(--geomagnetic-storm-label-letter-spacing, 0.05vw);
+        text-transform: uppercase;
+        color: inherit;
+        transform: translateY(var(--geomagnetic-storm-label-offset-y, 0vw));
+        margin-bottom: var(--geomagnetic-storm-gap-label-to-class, calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.04));
+    }
+
+    .geomagnetic-storm-class {
+        font-family: var(--geomagnetic-storm-class-font-family, "euro-bold", sans-serif);
+        font-size: var(--geomagnetic-storm-class-font-size, calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.34));
+        line-height: var(--geomagnetic-storm-class-line-height, 0.82);
+        letter-spacing: var(--geomagnetic-storm-class-letter-spacing, 0.02vw);
+        color: inherit;
+        transform: translateY(var(--geomagnetic-storm-class-offset-y, 0vw));
+        margin-bottom: var(--geomagnetic-storm-gap-class-to-value, calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02));
+    }
+
+    .geomagnetic-storm-value {
+        font-family: var(--geomagnetic-storm-value-font-family, "euro-bold", sans-serif);
+        font-size: var(--geomagnetic-storm-value-font-size, calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.165));
+        line-height: var(--geomagnetic-storm-value-line-height, 0.92);
+        letter-spacing: var(--geomagnetic-storm-value-letter-spacing, -0.03vw);
+        color: inherit;
+        transform: translateY(var(--geomagnetic-storm-value-offset-y, 0vw));
+    }
+}
+
+.geomagnetic-storm-sublabel {
+    margin-top: var(--geomagnetic-storm-sublabel-margin-top, var(--celestial-dial-label-margin-top, 0.8vw));
+    transform: translateY(var(--geomagnetic-storm-sublabel-offset-y, 0vw));
+    font-family: var(--geomagnetic-storm-sublabel-font-family, var(--sun-label-font-family, 'light', sans-serif));
+    font-size: var(--geomagnetic-storm-sublabel-font-size, 1.6vw);
+    line-height: var(--geomagnetic-storm-sublabel-line-height, 1.15);
+    letter-spacing: var(--geomagnetic-storm-sublabel-letter-spacing, 0.04vw);
+    color: var(--geomagnetic-storm-sublabel-color, var(--temp-color, rgba(255, 255, 255, 0.70)));
+    text-align: center;
+    display: block;
+    width: var(--geomagnetic-storm-sublabel-width, 100%);
+    max-width: var(--geomagnetic-storm-sublabel-max-width, var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw))));
+    white-space: normal;
+    word-break: normal;
+    user-select: none;
+    box-sizing: border-box;
+
+    i {
+        font-size: 0.85em;
+        vertical-align: 0.03vw;
+        margin-right: 0.35vw;
+    }
+}

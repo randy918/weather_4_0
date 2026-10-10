@@ -7764,6 +7764,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   // Duo Celestial Mode (Side-by-Side: Pacific Dial, Big Sun, Big Earth, UK Dial) Controls (JCV)
   const SUN_DUO_MODE = true;                          // EDITABLE: true = celestial row active; false = single sun
+  const EARTH_IMAGE_ENABLED = false;                  // EDITABLE: Set false to hide Earth image and show G-Scale instead
+  const GEOMAGNETIC_STORM_DIAL_ENABLED = true;        // EDITABLE: Enable G-Scale dial in place of Earth
 
 
   // Celestial Interactivity & Refresh Controls (JCV)
@@ -8307,6 +8309,141 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const RADIO_BLACKOUT_IMPACT_LEVEL_R5_ARROW = 'up';             // EDITABLE: Fallback arrow direction ('up' or 'down')
   const RADIO_BLACKOUT_IMPACT_LEVEL_R5_TEXT = 'Total Dayside<br>Blackout'; // EDITABLE: Situation text
 
+  // =========================================================================
+  // --- EDITABLE: Geomagnetic Storm (G-Scale) Dial Config (JCV) ---
+  // Replaces the right flanking dial (UK) in the Celestial row
+  // =========================================================================
+  // const GEOMAGNETIC_STORM_DIAL_ENABLED = true;                      // EDITABLE: Enable/disable Geomagnetic Storm dial in celestial row (Moved to line 7768)
+  const GEOMAGNETIC_STORM_MODE = 'live';                            // EDITABLE: 'live' (NOAA SWPC real-time) or 'manual' (uses manual class/value below)
+  const GEOMAGNETIC_STORM_CLASS_MANUAL = 'G2';                      // EDITABLE: Manual test class: 'G0', 'G1', 'G2', 'G3', 'G4', 'G5'
+  const GEOMAGNETIC_STORM_VALUE_MANUAL = 2.8;                       // EDITABLE: Manual test value in dB (e.g. 2.8Kp matches mockup)
+  const GEOMAGNETIC_STORM_CLICK_CYCLES_CLASSES = true;              // EDITABLE: Click/tap dial to cycle through test levels (G0 -> G1 -> G2 -> G3 -> G4 -> G5 -> Live)
+  const GEOMAGNETIC_STORM_AUTO_REFRESH_MS = 60000;                  // EDITABLE: Polling interval in ms for live NOAA blackout data
+
+  // --- Temperature Colors per Geomagnetic Storm Level (JCV) ---
+  // Assign numeric temperature degree (maps directly to app's TEMP_COLORS palette)
+  // OR assign a custom CSS color string (e.g. 'hsl(120, 100%, 50%)', '#f60')
+  const GEOMAGNETIC_STORM_COLOR_LEVEL_G0 = 55;                      // EDITABLE: Level G0 (No Fade / Normal) temperature color (50s green)
+  const GEOMAGNETIC_STORM_COLOR_LEVEL_G1 = 75;                      // EDITABLE: Level G1 (Weak Fade) temperature color (70s yellow-gold)
+  const GEOMAGNETIC_STORM_COLOR_LEVEL_G2 = 85;                      // EDITABLE: Level G2 (Partial Fade) temperature color (80s orange, matches mockup)
+  const GEOMAGNETIC_STORM_COLOR_LEVEL_G3 = 95;                      // EDITABLE: Level G3 (Strong Fade) temperature color (90s tomato coral/red)
+  const GEOMAGNETIC_STORM_COLOR_LEVEL_G4 = 105;                     // EDITABLE: Level G4 (Severe Fade) temperature color (100s vibrant red)
+  const GEOMAGNETIC_STORM_COLOR_LEVEL_G5 = -5;                      // EDITABLE: Level G5 (Extreme Fade) temperature color (Below 0 shocking magenta)
+  const GEOMAGNETIC_STORM_COLOR_OVERRIDE = null;                    // EDITABLE: Optional universal color override (e.g. null, 85, or '#f60')
+
+  // --- Level Descriptive Labels (JCV) ---
+  const GEOMAGNETIC_STORM_LABEL_G0_LINE1 = 'NO';                    // EDITABLE: Line 1 label for G0
+  const GEOMAGNETIC_STORM_LABEL_G0_LINE2 = 'FADE';                  // EDITABLE: Line 2 label for G0
+  const GEOMAGNETIC_STORM_LABEL_G1_LINE1 = 'WEAK';                  // EDITABLE: Line 1 label for G1
+  const GEOMAGNETIC_STORM_LABEL_G1_LINE2 = 'FADE';                  // EDITABLE: Line 2 label for G1
+  const GEOMAGNETIC_STORM_LABEL_G2_LINE1 = 'PARTIAL';               // EDITABLE: Line 1 label for G2 (matches mockup)
+  const GEOMAGNETIC_STORM_LABEL_G2_LINE2 = 'FADE';                  // EDITABLE: Line 2 label for G2 (matches mockup)
+  const GEOMAGNETIC_STORM_LABEL_G3_LINE1 = 'STRONG';                // EDITABLE: Line 1 label for G3
+  const GEOMAGNETIC_STORM_LABEL_G3_LINE2 = 'FADE';                  // EDITABLE: Line 2 label for G3
+  const GEOMAGNETIC_STORM_LABEL_G4_LINE1 = 'SEVERE';                // EDITABLE: Line 1 label for G4
+  const GEOMAGNETIC_STORM_LABEL_G4_LINE2 = 'FADE';                  // EDITABLE: Line 2 label for G4
+  const GEOMAGNETIC_STORM_LABEL_G5_LINE1 = 'EXTREME';               // EDITABLE: Line 1 label for G5
+  const GEOMAGNETIC_STORM_LABEL_G5_LINE2 = 'FADE';                  // EDITABLE: Line 2 label for G5
+
+  // --- Circular Progress Ring & Track (JCV) ---
+  const GEOMAGNETIC_STORM_START_ANGLE_DEG = 90;                     // EDITABLE: Arc start angle (90deg in SVG = 6 o'clock / lowest point)
+  const GEOMAGNETIC_STORM_TRACK_COLOR = 'rgba(255, 255, 255, 0.22)';// EDITABLE: Background circular track ring color
+  const GEOMAGNETIC_STORM_TRACK_STROKE_WIDTH_DESKTOP = 4.0;         // EDITABLE Desktop: SVG track stroke thickness
+  const GEOMAGNETIC_STORM_TRACK_STROKE_WIDTH_MOBILE = 4.0;          // EDITABLE Mobile: SVG track stroke thickness
+  const GEOMAGNETIC_STORM_PROGRESS_STROKE_WIDTH_DESKTOP = 4.0;      // EDITABLE Desktop: SVG active progress stroke thickness
+  const GEOMAGNETIC_STORM_PROGRESS_STROKE_WIDTH_MOBILE = 4.0;       // EDITABLE Mobile: SVG active progress stroke thickness
+  const GEOMAGNETIC_STORM_STROKE_LINECAP = 'round';                 // EDITABLE: Progress arc end cap ('butt' or 'round')
+  const GEOMAGNETIC_STORM_ANIM_DURATION_S = 0.8;                    // EDITABLE: Transition duration in seconds for arc updates
+
+  // --- Dial Frame & Sizing (JCV) ---
+  const GEOMAGNETIC_STORM_DIAL_SIZE_DESKTOP = 'auto';               // EDITABLE Desktop: 'auto' (matches var(--celestial-dial-size)) or custom vw
+  const GEOMAGNETIC_STORM_DIAL_SIZE_MOBILE = 'auto';                // EDITABLE Mobile: 'auto' or custom vw
+  const GEOMAGNETIC_STORM_OFFSET_X_DESKTOP = '0vw';                 // EDITABLE Desktop: Fine horizontal nudge for dial circle
+  const GEOMAGNETIC_STORM_OFFSET_X_MOBILE = '0vw';                  // EDITABLE Mobile: Fine horizontal nudge
+  const GEOMAGNETIC_STORM_OFFSET_Y_DESKTOP = '0vw';                 // EDITABLE Desktop: Fine vertical nudge for dial circle
+  const GEOMAGNETIC_STORM_OFFSET_Y_MOBILE = '0vw';                  // EDITABLE Mobile: Fine vertical nudge
+  const GEOMAGNETIC_STORM_DIAL_BG_COLOR = 'transparent';            // EDITABLE: Dial circle background color
+  const GEOMAGNETIC_STORM_DIAL_INNER_SHADOW = 'inset 0 0 1vw rgba(0, 0, 0, 0.5)'; // EDITABLE: Dial inner shadow
+
+  // --- Typography & Text Positioning (JCV) ---
+  // Top Label ("PARTIAL FADE")
+  const GEOMAGNETIC_STORM_LABEL_FONT_FAMILY = "'euro', sans-serif"; // EDITABLE: Top label font-family ("euro" = EurostileExtended)
+  const GEOMAGNETIC_STORM_LABEL_FONT_SIZE_DESKTOP = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.088)'; // EDITABLE Desktop: Top label font size
+  const GEOMAGNETIC_STORM_LABEL_FONT_SIZE_MOBILE = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.088)';  // EDITABLE Mobile: Top label font size
+  const GEOMAGNETIC_STORM_LABEL_LINE_HEIGHT = 1.0;                  // EDITABLE: Top label line height
+  const GEOMAGNETIC_STORM_LABEL_LETTER_SPACING_DESKTOP = '0.05vw';  // EDITABLE Desktop: Top label letter spacing
+  const GEOMAGNETIC_STORM_LABEL_LETTER_SPACING_MOBILE = '0.05vw';   // EDITABLE Mobile: Top label letter spacing
+  const GEOMAGNETIC_STORM_LABEL_OFFSET_Y_DESKTOP = '0vw';           // EDITABLE Desktop: Fine vertical nudge for top label
+  const GEOMAGNETIC_STORM_LABEL_OFFSET_Y_MOBILE = '0vw';            // EDITABLE Mobile: Fine vertical nudge for top label
+  const GEOMAGNETIC_STORM_GAP_LABEL_TO_CLASS_DESKTOP = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.025)'; // EDITABLE Desktop: Gap between label and giant class text
+  const GEOMAGNETIC_STORM_GAP_LABEL_TO_CLASS_MOBILE = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.025)';  // EDITABLE Mobile: Gap between label and giant class text
+
+  // Middle Giant Class ("G2")
+  const GEOMAGNETIC_STORM_CLASS_FONT_FAMILY = "'euro-bold', sans-serif"; // EDITABLE: Giant class font-family ("euro-bold" = EurostileExtendedBlack)
+  const GEOMAGNETIC_STORM_CLASS_FONT_SIZE_DESKTOP = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.306)'; // EDITABLE Desktop: Giant class text font size
+  const GEOMAGNETIC_STORM_CLASS_FONT_SIZE_MOBILE = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.306)';  // EDITABLE Mobile: Giant class text font size
+  const GEOMAGNETIC_STORM_CLASS_LINE_HEIGHT = 0.82;                 // EDITABLE: Giant class line height
+  const GEOMAGNETIC_STORM_CLASS_OFFSET_Y_DESKTOP = '0vw';           // EDITABLE Desktop: Fine vertical nudge for giant class text
+  const GEOMAGNETIC_STORM_CLASS_OFFSET_Y_MOBILE = '0vw';            // EDITABLE Mobile: Fine vertical nudge for giant class text
+  const GEOMAGNETIC_STORM_GAP_CLASS_TO_VALUE_DESKTOP = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02)'; // EDITABLE Desktop: Gap between giant class and bottom value
+  const GEOMAGNETIC_STORM_GAP_CLASS_TO_VALUE_MOBILE = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02)';  // EDITABLE Mobile: Gap between giant class and bottom value
+
+  // Bottom Value ("2.8dB")
+  const GEOMAGNETIC_STORM_UNIT = 'dB';                              // EDITABLE: SI/IEEE decibel unit symbol ('dB', 'Kp', or '')
+  const GEOMAGNETIC_STORM_TWO_SIG_DIGITS = true;                    // EDITABLE: If true, formats to 2 significant digits (e.g. 2.8dB, 16dB vs 16.0dB) to avoid circle crowding
+  const GEOMAGNETIC_STORM_VALUE_FONT_FAMILY = "'euro-bold', sans-serif"; // EDITABLE: Bottom value font-family ("euro-bold" = EurostileExtendedBlack)
+  const GEOMAGNETIC_STORM_VALUE_FONT_SIZE_DESKTOP = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1485)'; // EDITABLE Desktop: Bottom value font size
+  const GEOMAGNETIC_STORM_VALUE_FONT_SIZE_MOBILE = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1485)';  // EDITABLE Mobile: Bottom value font size
+  const GEOMAGNETIC_STORM_VALUE_LINE_HEIGHT = 0.92;                 // EDITABLE: Bottom value line height
+  const GEOMAGNETIC_STORM_VALUE_LETTER_SPACING_DESKTOP = '-0.03vw'; // EDITABLE Desktop: Bottom value letter spacing
+  const GEOMAGNETIC_STORM_VALUE_LETTER_SPACING_MOBILE = '-0.06vw';  // EDITABLE Mobile: Bottom value letter spacing
+  const GEOMAGNETIC_STORM_VALUE_OFFSET_Y_DESKTOP = '-.5vw';           // EDITABLE Desktop: Fine vertical nudge for bottom value
+  const GEOMAGNETIC_STORM_VALUE_OFFSET_Y_MOBILE = '-.5vw';            // EDITABLE Mobile: Fine vertical nudge for bottom value
+
+  // Overall Content Block Alignment
+  const GEOMAGNETIC_STORM_CONTENT_OFFSET_Y_DESKTOP = '0vw';         // EDITABLE Desktop: Vertical nudge for entire text block inside dial
+  const GEOMAGNETIC_STORM_CONTENT_OFFSET_Y_MOBILE = '0vw';          // EDITABLE Mobile: Vertical nudge for entire text block inside dial
+
+  // Sublabel Below Dial (Strategy 3: Live Impact)
+  const GEOMAGNETIC_STORM_SUBLABEL_ENABLED = true;                  // EDITABLE: Enable/disable live impact label below dial
+  const GEOMAGNETIC_STORM_SUBLABEL_MODE = 'dynamic';                // EDITABLE: 'dynamic' (strategy 3: changes with level) or 'static' (uses static text below)
+  const GEOMAGNETIC_STORM_SUBLABEL_TEXT_DESKTOP = 'Geomagnetic Storm'; // EDITABLE Desktop: Static fallback text
+  const GEOMAGNETIC_STORM_SUBLABEL_TEXT_MOBILE = 'Geomagnetic Storm';  // EDITABLE Mobile: Static fallback text
+  const GEOMAGNETIC_STORM_SUBLABEL_FONT_FAMILY = "var(--sun-label-font-family, 'light', sans-serif)"; // EDITABLE: Font family ('light', 'euro', 'bold', etc.)
+  const GEOMAGNETIC_STORM_SUBLABEL_FONT_SIZE_DESKTOP = '1.35vw';     // EDITABLE Desktop: Sublabel font size
+  const GEOMAGNETIC_STORM_SUBLABEL_FONT_SIZE_MOBILE = '2.6vw';      // EDITABLE Mobile: Sublabel font size
+  const GEOMAGNETIC_STORM_SUBLABEL_LINE_HEIGHT_DESKTOP = 1.05;      // EDITABLE Desktop: Sublabel line height for multi-line
+  const GEOMAGNETIC_STORM_SUBLABEL_LINE_HEIGHT_MOBILE = 1.05;       // EDITABLE Mobile: Sublabel line height for multi-line
+  const GEOMAGNETIC_STORM_SUBLABEL_LETTER_SPACING_DESKTOP = '0.04vw';// EDITABLE Desktop: Sublabel letter spacing
+  const GEOMAGNETIC_STORM_SUBLABEL_LETTER_SPACING_MOBILE = '0.04vw'; // EDITABLE Mobile: Sublabel letter spacing
+  const GEOMAGNETIC_STORM_SUBLABEL_COLOR = 'auto';                  // EDITABLE: 'auto' (matches dial color) or custom CSS color (e.g. 'rgba(255, 255, 255, 0.70)')
+  const GEOMAGNETIC_STORM_SUBLABEL_MARGIN_TOP_DESKTOP = '0.6vw';    // EDITABLE Desktop: Margin top below dial circle
+  const GEOMAGNETIC_STORM_SUBLABEL_MARGIN_TOP_MOBILE = '1.2vw';     // EDITABLE Mobile: Margin top below dial circle
+  const GEOMAGNETIC_STORM_SUBLABEL_OFFSET_Y_DESKTOP = '0vw';        // EDITABLE Desktop: Fine vertical nudge
+  const GEOMAGNETIC_STORM_SUBLABEL_OFFSET_Y_MOBILE = '0vw';         // EDITABLE Mobile: Fine vertical nudge
+  const GEOMAGNETIC_STORM_SUBLABEL_WIDTH_DESKTOP = '100%';          // EDITABLE Desktop: Sublabel width
+  const GEOMAGNETIC_STORM_SUBLABEL_WIDTH_MOBILE = '120%';           // EDITABLE Mobile: Sublabel width
+  const GEOMAGNETIC_STORM_SUBLABEL_MAX_WIDTH_DESKTOP = 'var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw))'; // EDITABLE Desktop: Max width boundary
+  const GEOMAGNETIC_STORM_SUBLABEL_MAX_WIDTH_MOBILE = 'none';       // EDITABLE Mobile: Max width boundary (none allows wider label)
+
+  // Dynamic Trend Arrow Control
+  const GEOMAGNETIC_STORM_ARROW_MODE = 'trend';                     // EDITABLE: 'trend' (real live data trend: up/down based on recent flux history) or 'static' (uses level arrow constants below)
+
+  // Strategy 3: Dynamic Live Impact Sublabels per Geomagnetic Storm Level (Static Fallback / Threshold Defaults)
+  const GEOMAGNETIC_STORM_IMPACT_LEVEL_G0_ARROW = 'down';           // EDITABLE: Fallback arrow direction ('up' or 'down')
+  const GEOMAGNETIC_STORM_IMPACT_LEVEL_G0_TEXT = 'All Bands Clear'; // EDITABLE: Situation text
+  const GEOMAGNETIC_STORM_IMPACT_LEVEL_G1_ARROW = 'up';             // EDITABLE: Fallback arrow direction ('up' or 'down')
+  const GEOMAGNETIC_STORM_IMPACT_LEVEL_G1_TEXT = 'Minor HF Noise';  // EDITABLE: Situation text
+  const GEOMAGNETIC_STORM_IMPACT_LEVEL_G2_ARROW = 'up';             // EDITABLE: Fallback arrow direction ('up' or 'down')
+  const GEOMAGNETIC_STORM_IMPACT_LEVEL_G2_TEXT = 'HF Signal Loss';  // EDITABLE: Situation text
+  const GEOMAGNETIC_STORM_IMPACT_LEVEL_G3_ARROW = 'up';             // EDITABLE: Fallback arrow direction ('up' or 'down')
+  const GEOMAGNETIC_STORM_IMPACT_LEVEL_G3_TEXT = 'Wide HF Outage';  // EDITABLE: Situation text
+  const GEOMAGNETIC_STORM_IMPACT_LEVEL_G4_ARROW = 'up';             // EDITABLE: Fallback arrow direction ('up' or 'down')
+  const GEOMAGNETIC_STORM_IMPACT_LEVEL_G4_TEXT = 'Major Day Outage';// EDITABLE: Situation text
+  const GEOMAGNETIC_STORM_IMPACT_LEVEL_G5_ARROW = 'up';             // EDITABLE: Fallback arrow direction ('up' or 'down')
+  const GEOMAGNETIC_STORM_IMPACT_LEVEL_G5_TEXT = 'Total Dayside<br>Blackout'; // EDITABLE: Situation text
+
+  
   // --- Flanking Duplicate Timezone Dials Config (JCV) ---
   // Duplicates the 1st (Pacific) and 5th (UK) dials down to the Sun/Earth row: [Pacific, Big Sun, Big Earth, UK]
   const CELESTIAL_DIALS_ENABLED = true;                         // EDITABLE: Enable/disable flanking dials in celestial row
@@ -9237,6 +9374,113 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
     if (typeof updateRadioBlackoutDial === 'function') {
       updateRadioBlackoutDial();
+    }
+    if (typeof updateGeomagneticStormDial === 'function') {
+      updateGeomagneticStormDial();
+    }
+
+    // Geomagnetic Storm (G-Scale) Dial Variables (JCV)
+    const isGeomagneticDialAutoDesktop = !GEOMAGNETIC_STORM_DIAL_SIZE_DESKTOP || GEOMAGNETIC_STORM_DIAL_SIZE_DESKTOP === 'auto';
+    const isGeomagneticDialAutoMobile = !GEOMAGNETIC_STORM_DIAL_SIZE_MOBILE || GEOMAGNETIC_STORM_DIAL_SIZE_MOBILE === 'auto';
+    const geomagneticDialSizeDesktop = isGeomagneticDialAutoDesktop ? 'var(--celestial-dial-size-desktop, var(--world-clock-size-desktop))' : GEOMAGNETIC_STORM_DIAL_SIZE_DESKTOP;
+    const geomagneticDialSizeMobile = isGeomagneticDialAutoMobile ? 'var(--celestial-dial-size-mobile, var(--world-clock-size-mobile))' : GEOMAGNETIC_STORM_DIAL_SIZE_MOBILE;
+    const geomagneticDialSize = (isMobile ? isGeomagneticDialAutoMobile : isGeomagneticDialAutoDesktop) ? 'var(--celestial-dial-size, var(--world-clock-size))' : (isMobile ? GEOMAGNETIC_STORM_DIAL_SIZE_MOBILE : GEOMAGNETIC_STORM_DIAL_SIZE_DESKTOP);
+
+    document.documentElement.style.setProperty('--geomagnetic-storm-dial-size-desktop', geomagneticDialSizeDesktop);
+    document.documentElement.style.setProperty('--geomagnetic-storm-dial-size-mobile', geomagneticDialSizeMobile);
+    document.documentElement.style.setProperty('--geomagnetic-storm-dial-size', geomagneticDialSize);
+
+    document.documentElement.style.setProperty('--geomagnetic-storm-offset-x-desktop', GEOMAGNETIC_STORM_OFFSET_X_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-offset-x-mobile', GEOMAGNETIC_STORM_OFFSET_X_MOBILE);
+    document.documentElement.style.setProperty('--geomagnetic-storm-offset-x', isMobile ? GEOMAGNETIC_STORM_OFFSET_X_MOBILE : GEOMAGNETIC_STORM_OFFSET_X_DESKTOP);
+
+    document.documentElement.style.setProperty('--geomagnetic-storm-offset-y-desktop', GEOMAGNETIC_STORM_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-offset-y-mobile', GEOMAGNETIC_STORM_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--geomagnetic-storm-offset-y', isMobile ? GEOMAGNETIC_STORM_OFFSET_Y_MOBILE : GEOMAGNETIC_STORM_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--geomagnetic-storm-start-angle', `${GEOMAGNETIC_STORM_START_ANGLE_DEG}deg`);
+    document.documentElement.style.setProperty('--geomagnetic-storm-track-color', GEOMAGNETIC_STORM_TRACK_COLOR);
+    document.documentElement.style.setProperty('--geomagnetic-storm-track-stroke-width', String(isMobile ? GEOMAGNETIC_STORM_TRACK_STROKE_WIDTH_MOBILE : GEOMAGNETIC_STORM_TRACK_STROKE_WIDTH_DESKTOP));
+    document.documentElement.style.setProperty('--geomagnetic-storm-progress-stroke-width', String(isMobile ? GEOMAGNETIC_STORM_PROGRESS_STROKE_WIDTH_MOBILE : GEOMAGNETIC_STORM_PROGRESS_STROKE_WIDTH_DESKTOP));
+    document.documentElement.style.setProperty('--geomagnetic-storm-stroke-linecap', GEOMAGNETIC_STORM_STROKE_LINECAP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-anim-duration', `${GEOMAGNETIC_STORM_ANIM_DURATION_S}s`);
+
+    document.documentElement.style.setProperty('--geomagnetic-storm-dial-bg-color', GEOMAGNETIC_STORM_DIAL_BG_COLOR);
+    document.documentElement.style.setProperty('--geomagnetic-storm-dial-inner-shadow', GEOMAGNETIC_STORM_DIAL_INNER_SHADOW);
+
+    document.documentElement.style.setProperty('--geomagnetic-storm-content-offset-y-desktop', GEOMAGNETIC_STORM_CONTENT_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-content-offset-y-mobile', GEOMAGNETIC_STORM_CONTENT_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--geomagnetic-storm-content-offset-y', isMobile ? GEOMAGNETIC_STORM_CONTENT_OFFSET_Y_MOBILE : GEOMAGNETIC_STORM_CONTENT_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--geomagnetic-storm-label-font-family', GEOMAGNETIC_STORM_LABEL_FONT_FAMILY);
+    document.documentElement.style.setProperty('--geomagnetic-storm-label-font-size-desktop', GEOMAGNETIC_STORM_LABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-label-font-size-mobile', GEOMAGNETIC_STORM_LABEL_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--geomagnetic-storm-label-font-size', isMobile ? GEOMAGNETIC_STORM_LABEL_FONT_SIZE_MOBILE : GEOMAGNETIC_STORM_LABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-label-line-height', String(GEOMAGNETIC_STORM_LABEL_LINE_HEIGHT));
+    document.documentElement.style.setProperty('--geomagnetic-storm-label-letter-spacing-desktop', GEOMAGNETIC_STORM_LABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-label-letter-spacing-mobile', GEOMAGNETIC_STORM_LABEL_LETTER_SPACING_MOBILE);
+    document.documentElement.style.setProperty('--geomagnetic-storm-label-letter-spacing', isMobile ? GEOMAGNETIC_STORM_LABEL_LETTER_SPACING_MOBILE : GEOMAGNETIC_STORM_LABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-label-offset-y-desktop', GEOMAGNETIC_STORM_LABEL_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-label-offset-y-mobile', GEOMAGNETIC_STORM_LABEL_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--geomagnetic-storm-label-offset-y', isMobile ? GEOMAGNETIC_STORM_LABEL_OFFSET_Y_MOBILE : GEOMAGNETIC_STORM_LABEL_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--geomagnetic-storm-gap-label-to-class-desktop', GEOMAGNETIC_STORM_GAP_LABEL_TO_CLASS_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-gap-label-to-class-mobile', GEOMAGNETIC_STORM_GAP_LABEL_TO_CLASS_MOBILE);
+    document.documentElement.style.setProperty('--geomagnetic-storm-gap-label-to-class', isMobile ? GEOMAGNETIC_STORM_GAP_LABEL_TO_CLASS_MOBILE : GEOMAGNETIC_STORM_GAP_LABEL_TO_CLASS_DESKTOP);
+
+    document.documentElement.style.setProperty('--geomagnetic-storm-class-font-family', GEOMAGNETIC_STORM_CLASS_FONT_FAMILY);
+    document.documentElement.style.setProperty('--geomagnetic-storm-class-font-size-desktop', GEOMAGNETIC_STORM_CLASS_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-class-font-size-mobile', GEOMAGNETIC_STORM_CLASS_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--geomagnetic-storm-class-font-size', isMobile ? GEOMAGNETIC_STORM_CLASS_FONT_SIZE_MOBILE : GEOMAGNETIC_STORM_CLASS_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-class-line-height', String(GEOMAGNETIC_STORM_CLASS_LINE_HEIGHT));
+    document.documentElement.style.setProperty('--geomagnetic-storm-class-offset-y-desktop', GEOMAGNETIC_STORM_CLASS_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-class-offset-y-mobile', GEOMAGNETIC_STORM_CLASS_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--geomagnetic-storm-class-offset-y', isMobile ? GEOMAGNETIC_STORM_CLASS_OFFSET_Y_MOBILE : GEOMAGNETIC_STORM_CLASS_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--geomagnetic-storm-gap-class-to-value-desktop', GEOMAGNETIC_STORM_GAP_CLASS_TO_VALUE_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-gap-class-to-value-mobile', GEOMAGNETIC_STORM_GAP_CLASS_TO_VALUE_MOBILE);
+    document.documentElement.style.setProperty('--geomagnetic-storm-gap-class-to-value', isMobile ? GEOMAGNETIC_STORM_GAP_CLASS_TO_VALUE_MOBILE : GEOMAGNETIC_STORM_GAP_CLASS_TO_VALUE_DESKTOP);
+
+    document.documentElement.style.setProperty('--geomagnetic-storm-value-font-family', GEOMAGNETIC_STORM_VALUE_FONT_FAMILY);
+    document.documentElement.style.setProperty('--geomagnetic-storm-value-font-size-desktop', GEOMAGNETIC_STORM_VALUE_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-value-font-size-mobile', GEOMAGNETIC_STORM_VALUE_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--geomagnetic-storm-value-font-size', isMobile ? GEOMAGNETIC_STORM_VALUE_FONT_SIZE_MOBILE : GEOMAGNETIC_STORM_VALUE_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-value-line-height', String(GEOMAGNETIC_STORM_VALUE_LINE_HEIGHT));
+    document.documentElement.style.setProperty('--geomagnetic-storm-value-letter-spacing-desktop', GEOMAGNETIC_STORM_VALUE_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-value-letter-spacing-mobile', GEOMAGNETIC_STORM_VALUE_LETTER_SPACING_MOBILE);
+    document.documentElement.style.setProperty('--geomagnetic-storm-value-letter-spacing', isMobile ? GEOMAGNETIC_STORM_VALUE_LETTER_SPACING_MOBILE : GEOMAGNETIC_STORM_VALUE_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-value-offset-y-desktop', GEOMAGNETIC_STORM_VALUE_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-value-offset-y-mobile', GEOMAGNETIC_STORM_VALUE_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--geomagnetic-storm-value-offset-y', isMobile ? GEOMAGNETIC_STORM_VALUE_OFFSET_Y_MOBILE : GEOMAGNETIC_STORM_VALUE_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-font-family', GEOMAGNETIC_STORM_SUBLABEL_FONT_FAMILY);
+    document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-font-size-desktop', GEOMAGNETIC_STORM_SUBLABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-font-size-mobile', GEOMAGNETIC_STORM_SUBLABEL_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-font-size', isMobile ? GEOMAGNETIC_STORM_SUBLABEL_FONT_SIZE_MOBILE : GEOMAGNETIC_STORM_SUBLABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-line-height-desktop', String(GEOMAGNETIC_STORM_SUBLABEL_LINE_HEIGHT_DESKTOP));
+    document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-line-height-mobile', String(GEOMAGNETIC_STORM_SUBLABEL_LINE_HEIGHT_MOBILE));
+    document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-line-height', String(isMobile ? GEOMAGNETIC_STORM_SUBLABEL_LINE_HEIGHT_MOBILE : GEOMAGNETIC_STORM_SUBLABEL_LINE_HEIGHT_DESKTOP));
+    document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-letter-spacing-desktop', GEOMAGNETIC_STORM_SUBLABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-letter-spacing-mobile', GEOMAGNETIC_STORM_SUBLABEL_LETTER_SPACING_MOBILE);
+    document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-letter-spacing', isMobile ? GEOMAGNETIC_STORM_SUBLABEL_LETTER_SPACING_MOBILE : GEOMAGNETIC_STORM_SUBLABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-margin-top-desktop', GEOMAGNETIC_STORM_SUBLABEL_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-margin-top-mobile', GEOMAGNETIC_STORM_SUBLABEL_MARGIN_TOP_MOBILE);
+    document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-margin-top', isMobile ? GEOMAGNETIC_STORM_SUBLABEL_MARGIN_TOP_MOBILE : GEOMAGNETIC_STORM_SUBLABEL_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-offset-y-desktop', GEOMAGNETIC_STORM_SUBLABEL_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-offset-y-mobile', GEOMAGNETIC_STORM_SUBLABEL_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-offset-y', isMobile ? GEOMAGNETIC_STORM_SUBLABEL_OFFSET_Y_MOBILE : GEOMAGNETIC_STORM_SUBLABEL_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-width-desktop', GEOMAGNETIC_STORM_SUBLABEL_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-width-mobile', GEOMAGNETIC_STORM_SUBLABEL_WIDTH_MOBILE);
+    document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-width', isMobile ? GEOMAGNETIC_STORM_SUBLABEL_WIDTH_MOBILE : GEOMAGNETIC_STORM_SUBLABEL_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-max-width-desktop', GEOMAGNETIC_STORM_SUBLABEL_MAX_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-max-width-mobile', GEOMAGNETIC_STORM_SUBLABEL_MAX_WIDTH_MOBILE);
+    document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-max-width', isMobile ? GEOMAGNETIC_STORM_SUBLABEL_MAX_WIDTH_MOBILE : GEOMAGNETIC_STORM_SUBLABEL_MAX_WIDTH_DESKTOP);
+
+    if (typeof updateRadioBlackoutDial === 'function') {
+      updateRadioBlackoutDial();
+    }
+    if (typeof updateGeomagneticStormDial === 'function') {
+      updateGeomagneticStormDial();
     }
 
     // Common margins & settings
@@ -10267,7 +10511,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1390';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1393';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -14227,7 +14471,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   function radioToNumericValue(rClass, rValue) {
     const cls = String(rClass || 'R0').toUpperCase();
     const val = parseFloat(rValue) || 0.0;
-    const base = { R0: 0, R1: 10, R2: 20, R3: 30, R4: 40, R5: 50 };
+    const base = { R0: 0, R1: 10, R2: 20, R3: 30, R4: 40, R5: 50, G0: 0, G1: 10, G2: 20, G3: 30, G4: 40, G5: 50 };
     return (base[cls] || 0) + val;
   }
 
@@ -14242,6 +14486,14 @@ Plan ahead for significantly warmer conditions tomorrow!`
   let currentRadioBlackoutTrend = (() => {
     try {
       const saved = JSON.parse(localStorage.getItem('weather_trend_radio_blackout'));
+      if (saved && (saved.trend === 'up' || saved.trend === 'down')) return saved.trend;
+    } catch (e) {}
+    return 'down';
+  })();
+
+  let currentGeomagneticStormTrend = (() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('weather_trend_geomagnetic_storm'));
       if (saved && (saved.trend === 'up' || saved.trend === 'down')) return saved.trend;
     } catch (e) {}
     return 'down';
@@ -15062,6 +15314,425 @@ Plan ahead for significantly warmer conditions tomorrow!`
     return col;
   }
 
+/* --- Geomagnetic Storm (G-Scale) Dial Component --- */
+  const GEOMAGNETIC_STORM_TEST_LEVELS = [
+    { class: 'G0', value: 0.0 },
+    { class: 'G1', value: 5.0 },
+    { class: 'G2', value: 6.0 },
+    { class: 'G3', value: 7.0 },
+    { class: 'G4', value: 8.0 },
+    { class: 'G5', value: 9.0 }
+  ];
+  let currentGeomagneticStormTestIndex = 2; // Default G2 2.8 (matches mockup)
+  let activeGeomagneticStormState = (GEOMAGNETIC_STORM_MODE === 'live') ? null : { class: GEOMAGNETIC_STORM_CLASS_MANUAL, value: GEOMAGNETIC_STORM_VALUE_MANUAL };
+  let liveGeomagneticStormData = null;
+  let geomagneticStormLiveTimer = null;
+
+  function getGeomagneticStormImpact(rClass, trendDir) {
+    const upper = String(rClass || 'G0').toUpperCase();
+    let defaultArrow = 'down';
+    let text = 'All Bands Clear';
+    switch (upper) {
+      case 'G0': defaultArrow = GEOMAGNETIC_STORM_IMPACT_LEVEL_G0_ARROW; text = GEOMAGNETIC_STORM_IMPACT_LEVEL_G0_TEXT; break;
+      case 'G1': defaultArrow = GEOMAGNETIC_STORM_IMPACT_LEVEL_G1_ARROW; text = GEOMAGNETIC_STORM_IMPACT_LEVEL_G1_TEXT; break;
+      case 'G2': defaultArrow = GEOMAGNETIC_STORM_IMPACT_LEVEL_G2_ARROW; text = GEOMAGNETIC_STORM_IMPACT_LEVEL_G2_TEXT; break;
+      case 'G3': defaultArrow = GEOMAGNETIC_STORM_IMPACT_LEVEL_G3_ARROW; text = GEOMAGNETIC_STORM_IMPACT_LEVEL_G3_TEXT; break;
+      case 'G4': defaultArrow = GEOMAGNETIC_STORM_IMPACT_LEVEL_G4_ARROW; text = GEOMAGNETIC_STORM_IMPACT_LEVEL_G4_TEXT; break;
+      case 'G5': defaultArrow = GEOMAGNETIC_STORM_IMPACT_LEVEL_G5_ARROW; text = GEOMAGNETIC_STORM_IMPACT_LEVEL_G5_TEXT; break;
+      default:   defaultArrow = 'down'; text = 'All Bands Clear'; break;
+    }
+    const arrow = (GEOMAGNETIC_STORM_ARROW_MODE === 'trend')
+      ? (trendDir || currentGeomagneticStormTrend || defaultArrow)
+      : defaultArrow;
+    return { arrow, text };
+  }
+
+  function getGeomagneticStormLabels(rClass) {
+    const upper = String(rClass || 'G0').toUpperCase();
+    switch (upper) {
+      case 'G0': return { line1: GEOMAGNETIC_STORM_LABEL_G0_LINE1, line2: GEOMAGNETIC_STORM_LABEL_G0_LINE2 };
+      case 'G1': return { line1: GEOMAGNETIC_STORM_LABEL_G1_LINE1, line2: GEOMAGNETIC_STORM_LABEL_G1_LINE2 };
+      case 'G2': return { line1: GEOMAGNETIC_STORM_LABEL_G2_LINE1, line2: GEOMAGNETIC_STORM_LABEL_G2_LINE2 };
+      case 'G3': return { line1: GEOMAGNETIC_STORM_LABEL_G3_LINE1, line2: GEOMAGNETIC_STORM_LABEL_G3_LINE2 };
+      case 'G4': return { line1: GEOMAGNETIC_STORM_LABEL_G4_LINE1, line2: GEOMAGNETIC_STORM_LABEL_G4_LINE2 };
+      case 'G5': return { line1: GEOMAGNETIC_STORM_LABEL_G5_LINE1, line2: GEOMAGNETIC_STORM_LABEL_G5_LINE2 };
+      default:   return { line1: 'GEOMAG', line2: 'STORM' };
+    }
+  }
+
+  function getGeomagneticStormLevelColor(rClass) {
+    if (GEOMAGNETIC_STORM_COLOR_OVERRIDE !== null && GEOMAGNETIC_STORM_COLOR_OVERRIDE !== undefined) {
+      if (typeof GEOMAGNETIC_STORM_COLOR_OVERRIDE === 'number') {
+        return tempToColor(GEOMAGNETIC_STORM_COLOR_OVERRIDE) || 'hsl(30, 100%, 50%)';
+      }
+      return GEOMAGNETIC_STORM_COLOR_OVERRIDE;
+    }
+    const upper = String(rClass || 'G0').toUpperCase();
+    let setting;
+    switch (upper) {
+      case 'G0': setting = GEOMAGNETIC_STORM_COLOR_LEVEL_G0; break;
+      case 'G1': setting = GEOMAGNETIC_STORM_COLOR_LEVEL_G1; break;
+      case 'G2': setting = GEOMAGNETIC_STORM_COLOR_LEVEL_G2; break;
+      case 'G3': setting = GEOMAGNETIC_STORM_COLOR_LEVEL_G3; break;
+      case 'G4': setting = GEOMAGNETIC_STORM_COLOR_LEVEL_G4; break;
+      case 'G5': setting = GEOMAGNETIC_STORM_COLOR_LEVEL_G5; break;
+      default:   setting = GEOMAGNETIC_STORM_COLOR_LEVEL_G0; break;
+    }
+    if (typeof setting === 'number') {
+      return tempToColor(setting) || 'hsl(30, 100%, 50%)';
+    }
+    return setting || 'hsl(30, 100%, 50%)';
+  }
+
+  function calculateGeomagneticStormFraction(rClass, rValue) {
+    const cls = String(rClass || 'G0').toUpperCase();
+    const val = parseFloat(rValue) || 0.0;
+
+    // 6 scale ranges across 360 degrees [0.0 to 1.0]
+    // G2 at 2.8db lands at ~0.40 (144 deg from 6 o'clock = 10:48 on clock face, matching mockup)
+    const ranges = {
+      G0: { min: 0.00, max: 0.16, valMin: 0.0, valMax: 4.9 },
+      G1: { min: 0.16, max: 0.33, valMin: 5.0, valMax: 5.9 },
+      G2: { min: 0.33, max: 0.50, valMin: 6.0, valMax: 6.9 },
+      G3: { min: 0.50, max: 0.67, valMin: 7.0, valMax: 7.9 },
+      G4: { min: 0.67, max: 0.84, valMin: 8.0, valMax: 8.9 },
+      G5: { min: 0.84, max: 1.00, valMin: 9.0, valMax: 9.0 }
+    };
+    const range = ranges[cls] || ranges['G2'];
+    const span = range.valMax - range.valMin;
+    const normalized = span > 0 ? Math.max(0, Math.min(1.0, (val - range.valMin) / span)) : 0.5;
+    return range.min + (normalized * (range.max - range.min));
+  }
+
+  function formatGeomagneticStormValue(rValue) {
+    if (typeof rValue !== 'number') {
+      const parsed = parseFloat(rValue);
+      if (isNaN(parsed)) return `${rValue}${GEOMAGNETIC_STORM_UNIT}`;
+      rValue = parsed;
+    }
+    let formatted;
+    if (GEOMAGNETIC_STORM_TWO_SIG_DIGITS) {
+      if (rValue >= 10) {
+        // e.g. 16, 32 (two significant digits, avoids crowding inside circular dial)
+        formatted = Math.round(rValue).toString();
+      } else {
+        // e.g. 2.8, 0.1 (two significant digits / 1 decimal place)
+        formatted = rValue.toFixed(1);
+      }
+    } else {
+      formatted = rValue.toFixed(1);
+    }
+    return `${formatted}${GEOMAGNETIC_STORM_UNIT}`;
+  }
+
+  function updateGeomagneticStormDial() {
+    const dial = document.getElementById('geomagnetic-storm-dial');
+    if (!dial) return;
+
+    let rClass = 'G2';
+    let rValue = 2.8;
+
+    if (activeGeomagneticStormState) {
+      rClass = activeGeomagneticStormState.class;
+      rValue = activeGeomagneticStormState.value;
+    } else if (GEOMAGNETIC_STORM_MODE === 'live' && liveGeomagneticStormData) {
+      rClass = liveGeomagneticStormData.class;
+      rValue = liveGeomagneticStormData.value;
+    } else {
+      rClass = GEOMAGNETIC_STORM_CLASS_MANUAL;
+      rValue = GEOMAGNETIC_STORM_VALUE_MANUAL;
+    }
+
+    const labels = getGeomagneticStormLabels(rClass);
+    const color = getGeomagneticStormLevelColor(rClass);
+    const fraction = calculateGeomagneticStormFraction(rClass, rValue);
+
+    let dailyPeakFraction = fraction;
+    let dailyPeakColor = color;
+    let dailyPeakClass = rClass;
+    let dailyPeakValue = rValue;
+    const isLive = GEOMAGNETIC_STORM_MODE === 'live' && !activeGeomagneticStormState;
+
+    if (isLive) {
+      try {
+        if (window.todaySkyRecord && window.todaySkyRecord.pk_g_cls) {
+           dailyPeakClass = window.todaySkyRecord.pk_r_cls; // e.g. "G2"
+           dailyPeakValue = window.todaySkyRecord.pk_g_val || 0.1; // e.g. 2.8
+           dailyPeakColor = getGeomagneticStormLevelColor(dailyPeakClass);
+           dailyPeakFraction = calculateGeomagneticStormFraction(dailyPeakClass, dailyPeakValue);
+           
+           if (liveGeomagneticStormData && fraction > dailyPeakFraction) {
+              dailyPeakFraction = fraction;
+              dailyPeakColor = color;
+              dailyPeakClass = rClass;
+              dailyPeakValue = rValue;
+              window.todaySkyRecord.pk_r_cls = rClass;
+              window.todaySkyRecord.pk_r_val = rValue;
+           }
+        } else if (liveGeomagneticStormData) {
+           if (!window.todaySkyRecord) window.todaySkyRecord = {};
+           window.todaySkyRecord.pk_r_cls = rClass;
+           window.todaySkyRecord.pk_r_val = rValue;
+        }
+      } catch(e) {
+        console.log("Failed to parse Geomagnetic Storm Peak from Sky DB", e);
+      }
+    }
+
+    // Circumference for r=46 is 2 * PI * 46 = 289.027
+    const circumference = 289.027;
+    const strokeOffset = circumference * (1 - fraction);
+    
+    // Circumference for peak track (r=51) is 2 * Math.PI * 51 = 320.442
+    const peakCircumference = 320.442;
+    const peakStrokeOffset = peakCircumference * (1 - dailyPeakFraction);
+
+    const line1El = dial.querySelector('.geomagnetic-storm-label-line1');
+    const line2El = dial.querySelector('.geomagnetic-storm-label-line2');
+    const classEl = dial.querySelector('.geomagnetic-storm-class');
+    const valueEl = dial.querySelector('.geomagnetic-storm-value');
+
+    if (line1El && line1El.textContent !== labels.line1) line1El.textContent = labels.line1;
+    if (line2El && line2El.textContent !== labels.line2) line2El.textContent = labels.line2;
+    if (classEl && classEl.textContent !== rClass) classEl.textContent = rClass;
+    const displayVal = formatGeomagneticStormValue(rValue);
+    if (valueEl && valueEl.textContent !== displayVal) valueEl.textContent = displayVal;
+
+    dial.style.setProperty('--geomagnetic-storm-current-color', color);
+    
+    const newOffsetStr = strokeOffset.toFixed(2);
+    
+    if (!dial.hasOwnProperty('_targetOffset')) {
+      dial._targetOffset = newOffsetStr;
+      dial.style.setProperty('--geomagnetic-storm-stroke-offset', newOffsetStr);
+    } else if (dial._targetOffset !== newOffsetStr) {
+      const prevTarget = parseFloat(dial._targetOffset);
+      const newOffset = parseFloat(newOffsetStr);
+      dial._targetOffset = newOffsetStr;
+      
+      if (dial._animTimeout) {
+        clearTimeout(dial._animTimeout);
+        dial._animTimeout = null;
+      }
+      
+      if (Math.abs(prevTarget - newOffset) > 0.1) {
+        const isHigher = newOffset < prevTarget; // smaller offset = larger circle
+        dial.style.setProperty('--geomagnetic-storm-stroke-offset', isHigher ? '0' : circumference.toFixed(2));
+        dial._animTimeout = setTimeout(() => {
+          dial.style.setProperty('--geomagnetic-storm-stroke-offset', newOffsetStr);
+          dial._animTimeout = null;
+        }, 800);
+      } else {
+        dial.style.setProperty('--geomagnetic-storm-stroke-offset', newOffsetStr);
+      }
+    }
+
+    dial.style.setProperty('--geomagnetic-storm-peak-color', dailyPeakColor);
+    dial.style.setProperty('--geomagnetic-storm-peak-stroke-offset', peakStrokeOffset.toFixed(2));
+    
+    const peakEl = dial.querySelector('.geomagnetic-storm-peak-progress');
+    const peakTrackEl = dial.querySelector('.geomagnetic-storm-peak-track');
+    if (peakEl) {
+        peakEl.style.display = ''; 
+        peakEl.style.opacity = '1.0'; 
+    }
+    if (peakTrackEl) {
+        peakTrackEl.style.display = ''; 
+    }
+
+    if (GEOMAGNETIC_STORM_SUBLABEL_ENABLED) {
+      const sublabelEl = document.getElementById('geomagnetic-storm-sublabel');
+      if (sublabelEl) {
+        if (GEOMAGNETIC_STORM_SUBLABEL_MODE === 'dynamic') {
+          const impact = getGeomagneticStormImpact(rClass, currentGeomagneticStormTrend);
+          const baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
+          const peakValDisplay = formatGeomagneticStormValue(dailyPeakValue);
+          sublabelEl.innerHTML = `<br>${baseHtml}<br><span style="font-family: 'euro-bold', sans-serif; color: ${dailyPeakColor};">PEAK ${peakValDisplay}</span>`;
+        }
+        if (GEOMAGNETIC_STORM_SUBLABEL_COLOR === 'auto') {
+          sublabelEl.style.color = color;
+        }
+      }
+    }
+  }
+
+  function handleGeomagneticStormDialClick(e) {
+    if (e) e.stopPropagation();
+    const prevNumeric = activeGeomagneticStormState
+      ? radioToNumericValue(activeGeomagneticStormState.class, activeGeomagneticStormState.value)
+      : (liveGeomagneticStormData ? (liveGeomagneticStormData.value || radioToNumericValue(liveGeomagneticStormData.class, liveGeomagneticStormData.value)) : radioToNumericValue(GEOMAGNETIC_STORM_CLASS_MANUAL, GEOMAGNETIC_STORM_VALUE_MANUAL));
+
+    if (GEOMAGNETIC_STORM_MODE === 'live') {
+      if (!GEOMAGNETIC_STORM_CLICK_CYCLES_CLASSES) {
+        fetchLiveGeomagneticStormData();
+        return;
+      }
+      currentGeomagneticStormTestIndex = (currentGeomagneticStormTestIndex + 1) % (GEOMAGNETIC_STORM_TEST_LEVELS.length + 1);
+      if (currentGeomagneticStormTestIndex === GEOMAGNETIC_STORM_TEST_LEVELS.length) {
+        // Return to live feed
+        activeGeomagneticStormState = null;
+        if (liveGeomagneticStormData) {
+          currentGeomagneticStormTrend = liveGeomagneticStormData.trend || 'down';
+          updateGeomagneticStormDial();
+        }
+        fetchLiveGeomagneticStormData();
+      } else {
+        activeGeomagneticStormState = GEOMAGNETIC_STORM_TEST_LEVELS[currentGeomagneticStormTestIndex];
+        const nextNumeric = radioToNumericValue(activeGeomagneticStormState.class, activeGeomagneticStormState.value);
+        currentGeomagneticStormTrend = (nextNumeric >= prevNumeric) ? 'up' : 'down';
+        updateGeomagneticStormDial();
+      }
+      return;
+    }
+    if (!GEOMAGNETIC_STORM_CLICK_CYCLES_CLASSES) return;
+    currentGeomagneticStormTestIndex = (currentGeomagneticStormTestIndex + 1) % GEOMAGNETIC_STORM_TEST_LEVELS.length;
+    activeGeomagneticStormState = GEOMAGNETIC_STORM_TEST_LEVELS[currentGeomagneticStormTestIndex];
+    const nextNumeric = radioToNumericValue(activeGeomagneticStormState.class, activeGeomagneticStormState.value);
+    currentGeomagneticStormTrend = (nextNumeric >= prevNumeric) ? 'up' : 'down';
+    updateGeomagneticStormDial();
+  }
+
+  async function fetchLiveGeomagneticStormData() {
+    if (GEOMAGNETIC_STORM_MODE !== 'live') return;
+    try {
+      const response = await fetch('https://services.swpc.noaa.gov/json/goes/primary/xrays-6-hour.json', { cache: 'no-store' });
+      if (!response.ok) return;
+      const data = await response.json();
+      if (!Array.isArray(data) || data.length === 0) return;
+      const primaryReadings = data.filter(d => d.energy === '0.1-0.8nm' && typeof d.flux === 'number');
+      const latest = primaryReadings[primaryReadings.length - 1];
+      if (!latest) return;
+      const flux = latest.flux;
+
+      let cls = 'G0';
+      let val = 0.2;
+
+      if (flux < 1e-5) {
+        cls = 'G0';
+        val = Math.max(0.1, Math.min(0.9, (flux / 1e-5) * 0.8 + 0.1));
+      } else if (flux < 5e-5) {
+        cls = 'G1';
+        val = 1.0 + ((flux - 1e-5) / 4e-5) * 1.5;
+      } else if (flux < 1e-4) {
+        cls = 'G2';
+        val = 2.5 + ((flux - 5e-5) / 5e-5) * 2.5;
+      } else if (flux < 1e-3) {
+        cls = 'G3';
+        val = 5.0 + ((flux - 1e-4) / 9e-4) * 10.0;
+      } else if (flux < 2e-3) {
+        cls = 'G4';
+        val = 15.0 + ((flux - 1e-3) / 1e-3) * 10.0;
+      } else {
+        cls = 'G5';
+        val = 25.0 + Math.min(15.0, ((flux - 2e-3) / 1e-3) * 10.0);
+      }
+
+      // Determine live trend by comparing latest reading against recent previous readings in the time-series
+      let liveTrend = currentGeomagneticStormTrend || 'down';
+      for (let i = primaryReadings.length - 2; i >= 0; i--) {
+        const diff = flux - primaryReadings[i].flux;
+        if (Math.abs(diff) > 1e-10) {
+          liveTrend = diff > 0 ? 'up' : 'down';
+          break;
+        }
+      }
+      currentGeomagneticStormTrend = liveTrend;
+      try {
+        localStorage.setItem('weather_trend_radio_blackout', JSON.stringify({ flux, trend: liveTrend, time: Date.now() }));
+      } catch (e) {}
+
+      liveGeomagneticStormData = {
+        class: cls,
+        value: parseFloat(val.toFixed(1)),
+        flux: flux,
+        trend: liveTrend
+      };
+      updateGeomagneticStormDial();
+    } catch (err) {
+      console.warn('Unable to fetch live radio blackout data from NOAA SWPC:', err);
+    }
+  }
+
+  function buildGeomagneticStormColumn() {
+    const isMobile = window.innerWidth <= 767;
+    const col = document.createElement('div');
+    col.className = 'world-clock-column celestial-clock-column celestial-clock-column-right geomagnetic-storm-column';
+    col.id = 'celestial-clock-right';
+
+    const dial = document.createElement('div');
+    dial.className = 'world-clock-dial celestial-clock-dial geomagnetic-storm-dial';
+    dial.id = 'geomagnetic-storm-dial';
+    const titleText = (GEOMAGNETIC_STORM_MODE === 'live') ? 'Live Geomagnetic Storm Scale (NOAA SWPC G-Scale)' : 'Geomagnetic Storm Scale (Click to test levels)';
+    dial.setAttribute('title', titleText);
+
+    const initialClass = (GEOMAGNETIC_STORM_MODE === 'live' && liveGeomagneticStormData)
+      ? liveGeomagneticStormData.class
+      : (activeGeomagneticStormState?.class || GEOMAGNETIC_STORM_CLASS_MANUAL);
+    const initialVal = (GEOMAGNETIC_STORM_MODE === 'live' && liveGeomagneticStormData)
+      ? liveGeomagneticStormData.value
+      : (activeGeomagneticStormState?.value || GEOMAGNETIC_STORM_VALUE_MANUAL);
+    const labels = getGeomagneticStormLabels(initialClass);
+    const displayVal = formatGeomagneticStormValue(initialVal);
+
+    dial.innerHTML = `
+      <svg class="geomagnetic-storm-svg clock-timer-svg" viewBox="-5 -5 110 110">
+        <!-- Main Dial (Current) -->
+        <circle class="geomagnetic-storm-track countdown-track" cx="50" cy="50" r="46" fill="none" />
+        <circle class="geomagnetic-storm-progress countdown-progress" cx="50" cy="50" r="46" fill="none" />
+        
+        <!-- Peak Dial (Outer) -->
+        <circle class="geomagnetic-storm-peak-track countdown-track" cx="50" cy="50" r="51" fill="none" style="stroke-opacity: 0.2; stroke-width: var(--clock-grid-stroke-width, 4);" />
+        <circle class="geomagnetic-storm-peak-progress countdown-progress" cx="50" cy="50" r="51" fill="none" style="stroke-dasharray: 320.442;" />
+      </svg>
+      <div class="geomagnetic-storm-content">
+        <div class="geomagnetic-storm-label">
+          <span class="geomagnetic-storm-label-line1">${labels.line1}</span>
+          <span class="geomagnetic-storm-label-line2">${labels.line2}</span>
+        </div>
+        <div class="geomagnetic-storm-class">${initialClass}</div>
+        <div class="geomagnetic-storm-value">${displayVal}</div>
+      </div>
+    `;
+
+    if (GEOMAGNETIC_STORM_CLICK_CYCLES_CLASSES) {
+      dial.addEventListener('click', handleGeomagneticStormDialClick);
+    }
+
+    col.appendChild(dial);
+
+    if (GEOMAGNETIC_STORM_SUBLABEL_ENABLED) {
+      const sublabel = document.createElement('div');
+      sublabel.className = 'world-clock-label celestial-clock-label geomagnetic-storm-sublabel';
+      sublabel.id = 'geomagnetic-storm-sublabel';
+      const impact = getGeomagneticStormImpact(initialClass, currentGeomagneticStormTrend);
+      let innerContent = '';
+      if (GEOMAGNETIC_STORM_SUBLABEL_MODE === 'dynamic') {
+        const baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
+        const peakValDisplay = formatGeomagneticStormValue(initialVal);
+        const initialColor = getGeomagneticStormLevelColor(initialClass);
+        innerContent = `<br>${baseHtml}<br><span style="font-family: 'euro-bold', sans-serif; color: ${initialColor};">PEAK ${peakValDisplay}</span>`;
+      } else {
+        innerContent = (isMobile ? GEOMAGNETIC_STORM_SUBLABEL_TEXT_MOBILE : GEOMAGNETIC_STORM_SUBLABEL_TEXT_DESKTOP);
+      }
+      sublabel.innerHTML = innerContent;
+      if (GEOMAGNETIC_STORM_SUBLABEL_COLOR === 'auto') {
+        sublabel.style.color = getGeomagneticStormLevelColor(initialClass);
+      }
+      col.appendChild(sublabel);
+    }
+
+    if (GEOMAGNETIC_STORM_MODE === 'live' && !geomagneticStormLiveTimer) {
+      fetchLiveGeomagneticStormData();
+      geomagneticStormLiveTimer = setInterval(fetchLiveGeomagneticStormData, GEOMAGNETIC_STORM_AUTO_REFRESH_MS);
+    }
+
+    requestAnimationFrame(() => {
+      updateGeomagneticStormDial();
+    });
+
+    return col;
+  }
+
   function buildWorldClockColumn(zoneConfig) {
     const {
       id,
@@ -15813,8 +16484,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
       // 2. Big Sun column (150% size, vertically centered with other 3 circles)
       mainWrapper.appendChild(leftCol);
 
-      // 3. Earth column (vertically centered with other 3 circles)
-      mainWrapper.appendChild(rightCol);
+      // 3. Earth column or Geomagnetic Storm Dial
+      if (EARTH_IMAGE_ENABLED) {
+        mainWrapper.appendChild(rightCol);
+      } else if (GEOMAGNETIC_STORM_DIAL_ENABLED) {
+        const middleDial = buildGeomagneticStormColumn();
+        mainWrapper.appendChild(middleDial);
+      }
 
       // 4. Duplicate 5th timezone dial (UK) or Radio Blackout dial on the right
       if (CELESTIAL_DIALS_ENABLED) {

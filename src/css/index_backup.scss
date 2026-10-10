@@ -1,0 +1,3533 @@
+//>  ████████████████████████████████████  1
+
+
+
+body {
+    margin: 0;
+    
+    // Hide scrollbar while keeping scroll functionality
+    &::-webkit-scrollbar {
+        display: none; // Chrome, Safari, Opera
+    }
+    -ms-overflow-style: none;  // IE and Edge
+    scrollbar-width: none;  // Firefox
+}
+
+html {
+    // Hide scrollbar while keeping scroll functionality
+    &::-webkit-scrollbar {
+        display: none; // Chrome, Safari, Opera
+    }
+    -ms-overflow-style: none;  // IE and Edge
+    scrollbar-width: none;  // Firefox
+}
+
+#weather-rain-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: var(--rain-area-height, 50vw);
+    z-index: var(--rain-z-index, -1);
+    pointer-events: none;
+    opacity: var(--rain-opacity, 1);
+    transform: translateY(var(--alert-push, 0vw));
+    transition: transform 1000ms ease, opacity 500ms ease;
+    overflow: hidden;
+
+    mask-image: linear-gradient(to bottom,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 1) var(--rain-fade-top, 5vw),
+        rgba(0, 0, 0, 1) calc(100% - var(--rain-fade-bottom, 10vw)),
+        rgba(0, 0, 0, 0) 100%
+    );
+    -webkit-mask-image: linear-gradient(to bottom,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 1) var(--rain-fade-top, 5vw),
+        rgba(0, 0, 0, 1) calc(100% - var(--rain-fade-bottom, 10vw)),
+        rgba(0, 0, 0, 0) 100%
+    );
+    mask-size: 100% 100%;
+    -webkit-mask-size: 100% 100%;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+}
+
+#weather-snow-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    pointer-events: none;
+}
+
+#starfield-container {
+    position: absolute;
+    top: var(--starfield-container-top, 0vw);
+    left: 0;
+    width: 100vw;
+    height: var(--starfield-container-height, 100vh);
+    z-index: var(--starfield-z-index, -9990); // Placed z-wise just above the full page gradient background (-9999) and below overlays (0)
+    pointer-events: none;
+    overflow: hidden;
+    opacity: var(--starfield-opacity, 0);
+    transform: translateY(var(--alert-push, 0vw));
+    transition: opacity 1200ms ease, transform 1000ms ease;
+
+    // Square vertical mask with dynamic dial cutout support:
+    mask-image: var(--starfield-mask-image, linear-gradient(to bottom, rgba(0, 0, 0, 1) var(--starfield-mask-start, 0%), rgba(0, 0, 0, 0) var(--starfield-mask-end, 75%)));
+    -webkit-mask-image: var(--starfield-mask-image, linear-gradient(to bottom, rgba(0, 0, 0, 1) var(--starfield-mask-start, 0%), rgba(0, 0, 0, 0) var(--starfield-mask-end, 75%)));
+    mask-size: 100% 100%;
+    -webkit-mask-size: 100% 100%;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    mask-position: 0 0;
+    -webkit-mask-position: 0 0;
+}
+
+#starfield-circle {
+    position: absolute;
+    top: var(--starfield-center-y, calc(var(--starfield-diameter, 100vw) / 2 - var(--starfield-top-cutoff, 12vw)));
+    left: var(--starfield-center-x, 50vw);
+    width: var(--starfield-diameter, 100vw);
+    height: var(--starfield-diameter, 100vw);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    overflow: hidden;
+    pointer-events: none;
+}
+
+#starfield-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 50%;
+    transform-origin: 50% 50%;
+    will-change: transform;
+    animation: starfield-rotate var(--starfield-rotation-speed, 480s) linear infinite !important;
+    animation-direction: var(--starfield-rotation-direction, normal);
+}
+
+@keyframes starfield-rotate {
+    from {
+        transform: rotate(0.01deg);
+    }
+    to {
+        transform: rotate(360.01deg);
+    }
+}
+
+.scrolling-gradient-overlay {
+    position: absolute;
+    top: calc(var(--gradient-bottom, 85.5vw) - var(--gradient-height, 45vw)); // Dynamically calculated from bottom lock
+    left: 0;
+    width: 100vw;
+    height: var(--gradient-height, 45vw); // DOM SCSS variable for JS manipulation
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%);
+    pointer-events: none; // Don't interfere with clicks
+    z-index: 0; // Behind other UI elements but over the background
+    transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw) + var(--daily-summary-push, 0px)));
+    transition: transform 1000ms ease;
+}
+
+.scrolling-gradient-overlay-lower {
+    position: absolute;
+    top: var(--gradient-lower-top, calc(var(--gradient-lower-bottom-fallback, 154vw) - var(--gradient-lower-height, 38vw))); // DOM SCSS variable for JS manipulation (anchored dynamically to 24 sky images, falls back to static bottom lock)
+    left: 0;
+    width: 100vw;
+    height: var(--gradient-lower-height, 38vw); // DOM SCSS variable for JS manipulation
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%);
+    pointer-events: none; // Don't interfere with clicks
+    z-index: 0; // Behind other UI elements but over the background
+    transform: translateY(calc(var(--alert-push, 0vw) + var(--fragile-y-offset, 0vw) + var(--daily-summary-push, 0px)));
+    transition: transform 1000ms ease;
+}
+
+//>  ████████████████████████████████████  STARTUP LOADER
+
+// EDITABLE: Startup Logo Vertical Offset (increase to move UP)
+$loader-logo-offset-y: 25vw;
+
+#startup-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: var(--gradient, #000); // Perfectly mirrors your background gradient
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999; // Stays above everything
+    pointer-events: none; // Allows clicks to pass through once transparent
+    opacity: 1; // Explicit starting state
+    
+    img {
+        margin-bottom: $loader-logo-offset-y;
+        width: 25vw;
+        height: 25vw;
+        object-fit: contain;
+        border-radius: 5vw;
+        animation: startup-pulse-simple 1.5s ease-in-out infinite alternate !important;
+    }
+}
+
+@keyframes startup-pulse-simple {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+// Moon Phase Display - Upper Left Corner
+.moon-phase-display {
+    position: absolute;
+    top: -.25vw;
+    left: 2vw;
+    width: 20vw;
+    height: 20vw;
+    z-index: 1000;
+    pointer-events: none; // Don't interfere with clicks
+    opacity: 0.9;
+    
+    // Mask color settings to match current temp
+    background-color: var(--clock-hands-color, #FFF); // Fallback to clock hands color just in case temp-color is uninherited
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+
+    &.moon-down {
+        // We now rely on the color shift (White -> Temp) to indicate the moon is down,
+        // so we preserve the standard opacity so the color is easily visible.
+        opacity: 0.9;
+    }
+}
+
+// EDITABLE: Analog Clock
+.clock-hands-container {
+    position: absolute;
+    top: 13.25vw; // Set to whatever fits your top-right layout best!
+    right: 85.75vw; 
+    width: 12vw;
+    height: 12vw;
+    z-index: 999;
+    pointer-events: none;
+    opacity: 0.9;
+
+    .clock-timer-svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+        overflow: visible;
+        z-index: 1;
+
+        .countdown-track {
+            stroke: rgba(255, 255, 255, 0.2); // Faded background track like the barometer
+            stroke-width: 4; // Matches progress thickness
+        }
+
+        .countdown-progress {
+            stroke: var(--clock-hands-color, rgba(255, 255, 255, 0.4));
+            stroke-width: 4; // roughly matching 0.445vw border in a 100 viewbox
+            stroke-dasharray: 289; /* 2 * PI * r(46) */
+            stroke-dashoffset: 0;
+            stroke-linecap: round;
+            // Removed transition so it counts down perfectly smoothly without jitter as Date.now() updates
+            // transition: stroke-dashoffset 0.1s linear; 
+        }
+    }
+    
+    .clock-face {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 0.445vw solid transparent; // Keeps sizing consistent while SVG does the ring
+        background: rgba(0, 0, 0, 0.0); 
+        box-shadow: inset 0 0 1vw rgba(0,0,0,0.5);
+
+        // Hour Hand
+        .clock-hour-hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            width: 0.5vw; // Thickness of the hour hand (responsive)
+            height: 30%; // Length
+            background-color: var(--clock-hands-color, rgba(255, 255, 255, 0.9));
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(var(--hour-rotation, 0deg));
+            border-radius: 0.4vw;
+        }
+
+        // Minute Hand
+        .clock-minute-hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            width: 0.5vw; // Thickness of the minute hand (responsive)
+            height: 42%; // Slightly longer than hour hand
+            background-color: var(--clock-hands-color, rgba(255, 255, 255, 0.9));
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(var(--minute-rotation, 0deg));
+            border-radius: 0.3vw;
+            box-shadow: 0 0 0.3vw rgba(0,0,0,0.3);
+        }
+
+        // Second Hand
+        .clock-second-hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            width: 0.25vw; // Half thickness of hour/minute hand, matching wind pointer scale
+            height: 46%; // Length matching wind pointer
+            background-color: rgba(255, 255, 255, 0.2); // Subtle track color
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(var(--second-rotation, 0deg));
+            border-radius: 0.2vw;
+            z-index: 1;
+        }
+
+        // Center Pivot Dot
+        .clock-center-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0.8vw;
+            height: 0.8vw;
+            background-color: white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 0.4vw rgba(0,0,0,0.5);
+            opacity: 0; // EDITABLE: Center dot opacity (set to 0 to hide)
+        }
+    }
+}
+
+// EDITABLE: Wind Direction Arrow - Upper Left, Right of Moon
+.wind-direction-display {
+    position: absolute;
+    top: 2vw; // EDITABLE: Vertical position
+    left: 16vw; // EDITABLE: Horizontal position
+    width: 12vw; // EDITABLE: Arrow width (10% smaller than previous)
+    height: 12vw; // EDITABLE: Arrow height (10% smaller than previous)
+    z-index: 999;
+    pointer-events: none;
+    opacity: 0.9; // EDITABLE: Transparency
+
+    &.spinning .wind-arrow-color {
+        animation: wind-direction-spin 1s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    }
+
+    .wind-arrow-color {
+        width: 100%;
+        height: 100%;
+        background-color: transparent; // Default transparent to prevent white flash, updated by JS
+        -webkit-mask-image: url('../img/dir2.svg');
+        mask-image: url('../img/dir2.svg');
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        transition: background-color 0.3s ease, transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        transform: rotate(var(--wind-rotation, 0deg));
+        transform-origin: center center;
+    }
+}
+
+@keyframes wind-direction-spin {
+    0% {
+        transform: rotate(calc(var(--wind-rotation, 0deg) - 360deg));
+    }
+
+    100% {
+        transform: rotate(var(--wind-rotation, 0deg));
+    }
+}
+
+// EDITABLE: Barometric Pressure Circular Gauge
+.barometric-pressure-display {
+    position: absolute;
+    top: 12.75vw; // EDITABLE: Vertical position (placed below the wind arrow)
+    left: 16vw; // EDITABLE: Horizontal position
+    width: 12.75vw; // EDITABLE: Matches wind arrow width
+    height: 12.75vw; // EDITABLE: Matches wind arrow height
+    z-index: 999;
+    pointer-events: none;
+    opacity: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .barometric-gauge-svg {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        transform: rotate(90deg); // Starts at the bottom (6 o'clock)
+        
+        .barometric-track {
+            stroke: rgba(255, 255, 255, 0.2); // Dimmed background track
+            stroke-width: 3; // Same thickness feel as the arrow
+            stroke-linecap: round;
+        }
+
+        .barometric-fill {
+            stroke: white; // Replaced by JS dynamically to match theme
+            stroke-width: 3;
+            stroke-linecap: round;
+            transition: stroke-dashoffset var(--gauge-transition-duration, 0.8s) var(--gauge-transition-easing, cubic-bezier(0.25, 1, 0.5, 1)), stroke 0.5s ease;
+        }
+
+        .barometric-needle {
+            stroke: rgba(255, 255, 255, 0.9);
+            stroke-width: 3;
+            transform-origin: 50px 50px;
+            transition: transform 1s ease-in-out;
+            opacity: 0; // Hide by default, can un-hide if you prefer a needle over a fill ring
+        }
+    }
+
+    .barometric-text {
+        position: relative;
+        font-family: "bold", sans-serif;
+        font-size: 4vw; // EDITABLE: Size of pressure text inside the circle
+        color: white;
+        text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5);
+        text-align: center;
+        line-height: .5;
+        transform: translateY(1vw); // Shift down slightly inside the ring
+    }
+}
+
+// EDITABLE: High wind pulsating glow effect (Stage 1 preview)
+@-webkit-keyframes high-wind-glow-pulse {
+    0%, 100% {
+        -webkit-filter: drop-shadow(0 0 0.1vw var(--base-color, white));
+        filter: drop-shadow(0 0 0.1vw var(--base-color, white));
+    }
+    50% {
+        // Tighter radius (0.6vw) without brightness shift to maintain pure temp color
+        -webkit-filter: drop-shadow(0 0 1.5vw var(--glow-color, white));
+        filter: drop-shadow(0 0 1.5vw var(--glow-color, white));
+    }
+}
+
+@keyframes high-wind-glow-pulse {
+    0%, 100% {
+        -webkit-filter: drop-shadow(0 0 0.1vw var(--base-color, white));
+        filter: drop-shadow(0 0 0.1vw var(--base-color, white));
+    }
+    50% {
+        // Tighter radius (0.6vw) without brightness shift to maintain pure temp color
+        -webkit-filter: drop-shadow(0 0 1.5vw var(--glow-color, white));
+        filter: drop-shadow(0 0 1.5vw var(--glow-color, white));
+    }
+}
+
+@-webkit-keyframes high-wind-bg-pulse {
+    0%, 100% { background-color: var(--base-color, white); }
+    50% { background-color: var(--glow-color, white); }
+}
+
+@keyframes high-wind-bg-pulse {
+    0%, 100% { background-color: var(--base-color, white); }
+    50% { background-color: var(--glow-color, white); }
+}
+
+.high-wind-active {
+    -webkit-animation: high-wind-glow-pulse 1.8s ease-in-out infinite !important;
+    animation: high-wind-glow-pulse 1.8s ease-in-out infinite !important;
+    
+    &.circular-overlay {
+        animation: high-wind-glow-pulse 1.8s ease-in-out infinite, high-wind-bg-pulse 1.8s ease-in-out infinite !important;
+    }
+    
+    .wind-arrow-color {
+        animation: high-wind-bg-pulse 1.8s ease-in-out infinite !important;
+    }
+}
+
+// EDITABLE: Temperature Pointer - White triangle indicating current temp on today's hi/lo cells
+.temp-pointer {
+    position: absolute;
+    width: var(--temp-pointer-width-desktop, 1.732vw);
+    height: var(--temp-pointer-height-desktop, 2vw);
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0; // Initially hidden until positioned by JS
+    transition: top 0.5s ease-out, opacity 0.3s ease; // EDITABLE: Smooth sliding animation duration
+    border-radius: 0; // Ensure sharp corners, no rounding
+    shape-rendering: crispEdges; // Force sharp rendering
+
+    @media (max-width: 767px) {
+        width: var(--temp-pointer-width-mobile, 2.5vw);
+        height: var(--temp-pointer-height-mobile, 2.88vw);
+    }
+
+    // EDITABLE: Shadow effect (now applied to parent container to prevent clip-path clipping)
+    filter: var(--temp-pointer-shadow, drop-shadow(-0.3vw 0.3vw 0.4vw rgba(0, 0, 0, 0.6)));
+
+    &::after {
+        content: '';
+        display: block;
+        width: 100%;
+        height: 100%;
+        background-color: var(--temp-pointer-color, white); // EDITABLE: Dynamic temp color
+        clip-path: polygon(0% 50%, 100% 0%, 100% 100%); // Left-pointing triangle (vertical side at right)
+    }
+}
+
+// EDITABLE: Day 0 High Bar 10-degree horizontal indicator lines
+.day0-temp-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: var(--day0-lines-z-index, 15);
+    overflow: visible;
+}
+
+.day0-temp-line {
+    position: absolute;
+    pointer-events: none;
+    left: 0;
+    width: 100%;
+    height: var(--day0-lines-height-desktop, 0.22vw);
+    opacity: var(--day0-lines-opacity-desktop, var(--day0-lines-opacity, 0.55));
+    transition: top 0.5s ease-out, background-color 0.5s ease, opacity 0.5s ease;
+    box-sizing: border-box;
+    box-shadow: 0 0.08vw 0.18vw rgba(0, 0, 0, 0.55), 0 0 1px rgba(255, 255, 255, 0.25);
+
+    @media (max-width: 767px) {
+        height: var(--day0-lines-height-mobile, 0.40vw);
+        opacity: var(--day0-lines-opacity-mobile, var(--day0-lines-opacity, 0.50));
+    }
+
+    &.animating-change {
+        transition: top 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease !important;
+    }
+}
+
+//>  ████████████████████████████████████  CITY OVERLAY BUTTON
+
+main {
+    position: relative;
+}
+
+// EDITABLE: City Text Overlay Button - Positioned in the city text area
+.city-overlay-button {
+    // EDITABLE: Size controls
+    width: 60vw;            // EDITABLE: Button width (widened to ensure it covers long descriptions)
+    height: 24vw;           // EDITABLE: Button height (tall enough to catch City through line 3/4)
+    
+    // EDITABLE: Positioning - ABSOLUTE so it doesn't move other elements
+    position: absolute;     // Removed from document flow - won't affect other elements
+    top: -.5vw;               // EDITABLE: Distance from top of MAIN (not page). 2vw is right at the top of the City name
+    left: 50%;              // EDITABLE: Horizontal centering (50% = center)
+    transform: translateX(-50%) translateY(0vw); // Centers it + fine-tune Y position
+    
+    // Note: The button now floats independently and won't push/pull other elements!
+    
+    // EDITABLE: Visual appearance (now invisible)
+    background: transparent;           // EDITABLE: Background color
+    border: none;                      // EDITABLE: No border (invisible)
+    border-radius: 0.5vw;              // EDITABLE: Corner rounding
+    
+    // EDITABLE: Behavior
+    cursor: pointer;                   // EDITABLE: Mouse cursor on hover
+    z-index: 50;                       // EDITABLE: Stacking order
+    transition: all 0.3s ease;         // EDITABLE: Smooth transitions
+    
+    // EDITABLE: Text/Content styling (if you add text later)
+    font-family: 'bold', sans-serif;
+    font-size: 3vw;
+    color: white;
+    text-align: center;
+    line-height: 15vw;                 // EDITABLE: Vertical center text (matches height)
+    
+    // EDITABLE: Shadow for depth (disabled for invisible button)
+    box-shadow: none; // EDITABLE: No shadow when invisible
+    
+    // EDITABLE: Hover state
+    &:hover {
+        opacity: 1;                    // EDITABLE: No opacity change when invisible
+        cursor: pointer;               // Show it's clickable
+        transform: translateX(-50%) translateY(0vw); // EDITABLE: No movement for invisible button
+    }
+    
+    // EDITABLE: Active/Click state
+    &:active {
+        transform: translateX(-50%) translateY(0.1vw); // EDITABLE: Press down effect (keeps centering!)
+        opacity: 0.9;
+    }
+    
+    // Remove default button styling
+    outline: none;
+    padding: 0;
+    
+    // EDITABLE: Remove iOS tap highlight and selection
+    -webkit-tap-highlight-color: transparent; // Remove gray flash on iOS
+    -webkit-touch-callout: none;              // Disable iOS callout menu
+    user-select: none;                        // Prevent text selection
+    -webkit-user-select: none;                // Prevent text selection (Safari)
+}
+
+//>  ████████████████████████████████████  2
+
+//>  ████████████████████████████████████  HOURLY FORECAST
+
+.hourly-forecast-wrapper {
+    width: 100vw;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 10;
+}
+
+.hourly-bars-container {
+    width: 100%;
+    height: 40vw; // Match the hi-lo dualContainer exactly
+    display: grid;
+    grid-template-columns: repeat(24, minmax(0, 1fr));
+    align-items: end;
+    gap: 0.25vw;
+}
+
+.hourly-bar {
+    text-align: center;
+    color: white;
+    font-size: 0.72vw; // Base size (can be overridden by JS inline style)
+    font-family: 'bold', sans-serif;
+    padding-top: 0.5vw;
+    padding-left: 0.3vw; // Visual centering adjustment for the degree symbol
+    line-height: 1.2;
+}
+
+.hourly-images-wrapper {
+    display: grid;
+    grid-template-columns: 1fr;
+    position: relative;
+    width: 100%;
+    margin-top: 0.5vw;
+}
+
+.hourly-images-container,
+.hourly-gradients-container {
+    grid-area: 1 / 1;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(24, minmax(0, 1fr));
+    gap: 0.25vw;
+    margin: 0;
+    padding: 0;
+}
+
+.hourly-gradients-container {
+    pointer-events: none;
+    z-index: 5;
+    opacity: var(--hourly-gradient-group-opacity-desktop, var(--hourly-gradient-group-opacity, 1));
+    margin-top: var(--hourly-gradient-offset-y-desktop, var(--hourly-gradient-offset-y, 0vw));
+
+    @media (max-width: 767px) {
+        opacity: var(--hourly-gradient-group-opacity-mobile, var(--hourly-gradient-group-opacity, 1));
+        margin-top: var(--hourly-gradient-offset-y-mobile, var(--hourly-gradient-offset-y, 0vw));
+    }
+}
+
+.hourly-image,
+.hourly-gradient-cell {
+    padding: 0 !important;
+    box-sizing: border-box;
+}
+
+.hourly-image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background-color: rgba(100, 100, 100, 0.3);
+    background-size: auto 100%;
+    background-repeat: repeat-x;
+    background-position: 0 center;
+    overflow: hidden;
+}
+
+.hourly-gradient-cell {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--hourly-image-border-radius, 0.5vw);
+    overflow: hidden;
+    pointer-events: none;
+    mix-blend-mode: var(--hourly-gradient-blend-mode, normal);
+    background-image: linear-gradient(
+        to bottom,
+        var(--hourly-cell-gradient-top, transparent) 0%,
+        var(--hourly-cell-gradient-mid, transparent) var(--hourly-gradient-mid-point-desktop, var(--hourly-gradient-mid-point, 50%)),
+        var(--hourly-cell-gradient-bottom, transparent) 100%
+    );
+    background-size: 100% var(--hourly-gradient-height-desktop, var(--hourly-gradient-height, 45%));
+    background-repeat: no-repeat;
+    background-position: top left;
+
+    @media (max-width: 767px) {
+        background-image: linear-gradient(
+            to bottom,
+            var(--hourly-cell-gradient-top, transparent) 0%,
+            var(--hourly-cell-gradient-mid, transparent) var(--hourly-gradient-mid-point-mobile, var(--hourly-gradient-mid-point, 50%)),
+            var(--hourly-cell-gradient-bottom, transparent) 100%
+        );
+        background-size: 100% var(--hourly-gradient-height-mobile, var(--hourly-gradient-height, 45%));
+    }
+}
+
+.hourly-labels-container {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(24, minmax(0, 1fr));
+    gap: 0.25vw;
+    margin-top: var(--hourly-label-space-above-desktop, 0.5vw);
+
+    @media (max-width: 767px) {
+        margin-top: var(--hourly-label-space-above-mobile, var(--hourly-label-space-above-desktop, 0.5vw));
+    }
+}
+
+.hourly-label {
+    text-align: center;
+    color: white;
+    font-size: var(--hourly-label-font-size-desktop, 1.5vw);
+    line-height: 1;
+    white-space: nowrap;
+
+    @media (max-width: 767px) {
+        font-size: var(--hourly-label-font-size-mobile, var(--hourly-label-font-size-desktop, 1.5vw));
+    }
+
+    .time-hour {
+        font-family: 'bold', sans-serif;
+        color: white; // Force white to prevent inheriting brown
+        font-size: inherit; // Enforce scaling exactly with parent
+    }
+
+    .time-ampm {
+        font-family: 'medium', sans-serif;
+        opacity: 0.8;
+        color: white; // Force white to prevent inheriting brown
+        font-size: inherit; // Enforce scaling exactly with parent
+    }
+}
+
+.hourly-rain-container {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(24, minmax(0, 1fr));
+    gap: 0.25vw;
+    margin-top: 0vw;
+}
+
+.hourly-rain-cell {
+    background-color: var(--bitByBitBlue, hsl(205, 100%, 27%));
+    text-align: center;
+    color: white;
+    font-family: 'light', sans-serif;
+    padding: 0;
+    aspect-ratio: 1 / 1; // Force perfectly square cells
+    display: flex;
+    flex-direction: column;
+    justify-content: center; // Center the text vertically inside the square
+    align-items: center;
+    border-radius: 0 0 0.2vw 0.2vw;
+
+    .rain-text {
+        display: inline-block;
+        color: white; // Enforce white text
+        line-height: 1; // Keep text block compact
+        font-size: inherit; // Guarantee it matches JS inline style exactly
+        font-family: 'bold', sans-serif;
+    }
+}
+
+//^  FLEX START██████████████████████████  
+
+
+.container {
+
+    background-color: var(--theRed);
+    padding: var(--padding-m);
+
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 1vw;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.item {
+
+    background-color: var(--theBrown);
+
+    padding: var(--padding-m);
+    padding-top: var(--padding-s);
+    padding-bottom: var(--padding-s);
+
+    font-size: var(--fontsize-l);
+}
+
+//^  ██████████GRID START██████████████████████████ 
+
+.dualContainer {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1vw;
+
+    margin-top: var(--dual-container-margin-top, -4vw); // EDITABLE: Spacing between dials and temperature highs (shrunk to 12vw)
+    padding-top: var(--padding-l);
+    position: relative; // Positioning context for temp-pointer
+}
+
+.loContainer,
+.hiContainer {
+    width: 100%;
+    height: 40vw;
+    margin: 0 auto;
+    padding-top: var(--padding-l);
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-column: 1;
+    grid-row: 1;
+    align-items: end;
+    gap: 1vw;
+}
+
+.loContainer {
+    z-index: auto; // Allow individual loItems to stack relative to hiItems in dualContainer
+}
+
+.hiContainer {
+    z-index: auto; // Do not create a separate stacking context so .hiItem span can stack above .day0-temp-lines (15)
+}
+
+.loItem,
+.hiItem {
+    background-color: transparent; // Start transparent until JS injects the actual temp color
+    opacity: 0; // Hide until JS injects data
+    transition: opacity 0.5s ease; // Smooth fade-in
+    line-height: 1.2;
+    font-family: "bold", sans-serif;
+    font-size: 5vw;
+    color: var(--theBrown);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow: visible;
+    text-align: center;
+    box-sizing: border-box;
+    position: relative;
+
+    span {
+        display: block;
+        font-family: "bold", sans-serif;
+        color: var(--theBrown);
+        font-size: inherit;
+        line-height: 1;
+        position: relative;
+        z-index: var(--hi-bar-text-z-index, 25);
+    }
+}
+
+.hiItem {
+    z-index: var(--hi-bar-z-index, 1);
+    padding-top: var(--hi-bar-padding-top-desktop, 0.4vw);
+    box-shadow: 0 0.4vw 1.2vw 0 rgba(0, 0, 0, 1);
+
+    @media (max-width: 767px) {
+        padding-top: var(--hi-bar-padding-top-mobile, 0.4vw);
+    }
+}
+
+.loItem {
+    z-index: var(--lo-bar-z-index, 2);
+    padding-top: var(--lo-bar-padding-top-desktop, 0.4vw);
+    box-shadow: none; // Disable standard downward shadow
+    background-color: transparent !important; // Keeps parent container transparent so shadow sits Z-under the fill layer
+
+    @media (max-width: 767px) {
+        padding-top: var(--lo-bar-padding-top-mobile, 0.4vw);
+    }
+
+    // In close high and low situations, layer low bar and its text above high bar and its text
+    &.close-hi-lo {
+        z-index: var(--lo-bar-close-z-index, 30) !important;
+
+        span {
+            z-index: var(--lo-bar-close-text-z-index, 35) !important;
+        }
+    }
+
+    // EDITABLE: Upward multiply shadow cast from low bars onto the high bars beneath them
+    // Placed at z-index 1 (Z-under the cell fill layer at z-index 2)
+    &::before {
+        content: '';
+        position: absolute;
+        top: var(--lo-temp-shadow-top-desktop, var(--lo-temp-shadow-top, 1.2vw));
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: transparent;
+        box-shadow: var(--lo-temp-shadow-desktop, 0 -0.8vw 1.5vw rgba(0, 0, 0, 0.8));
+        mix-blend-mode: var(--lo-temp-shadow-blend-mode, multiply);
+        pointer-events: none;
+        z-index: var(--lo-temp-shadow-z-index, 1);
+
+        @media (max-width: 767px) {
+            top: var(--lo-temp-shadow-top-mobile, var(--lo-temp-shadow-top, 1.2vw));
+            box-shadow: var(--lo-temp-shadow-mobile, 0 -1.2vw 2.0vw rgba(0, 0, 0, 0.8));
+        }
+    }
+
+    // Solid cell fill layer: placed at z-index 2 (above shadow, below text)
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--lo-item-bg, transparent);
+        border-radius: inherit;
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    span {
+        position: relative;
+        z-index: 3;
+    }
+}
+
+// 8-Day Forecast Condition Images & Low Temp Reflection Gradient Tinges
+.forecast-images-wrapper {
+    display: grid;
+    grid-template-columns: 1fr;
+    position: relative;
+    width: 100%;
+    padding-top: 1.05vw;
+    margin-bottom: -0.5vw;
+}
+
+.forecast-images-container,
+.forecast-gradients-container {
+    grid-area: 1 / 1;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 1vw;
+    width: 100%;
+    margin: 0 auto;
+    padding-top: 0;
+    margin-bottom: 0;
+    align-items: center;
+}
+
+.forecast-gradients-container {
+    pointer-events: none;
+    z-index: 5;
+    opacity: var(--forecast-gradient-group-opacity-desktop, var(--forecast-gradient-group-opacity, 1));
+    margin-top: var(--forecast-gradient-offset-y-desktop, var(--forecast-gradient-offset-y, 0vw));
+
+    @media (max-width: 767px) {
+        opacity: var(--forecast-gradient-group-opacity-mobile, var(--forecast-gradient-group-opacity, 1));
+        margin-top: var(--forecast-gradient-offset-y-mobile, var(--forecast-gradient-offset-y, 0vw));
+    }
+}
+
+.forecast-image-cell,
+.forecast-gradient-cell {
+    padding: 0 !important;
+    box-sizing: border-box;
+}
+
+.forecast-gradient-cell {
+    aspect-ratio: 1 / 1;
+    border-radius: 1vw;
+    overflow: hidden;
+    pointer-events: none;
+    mix-blend-mode: var(--forecast-gradient-blend-mode, normal);
+    background-image: linear-gradient(
+        to bottom,
+        var(--cell-gradient-top, transparent) 0%,
+        var(--cell-gradient-mid, transparent) var(--forecast-gradient-mid-point-desktop, var(--forecast-gradient-mid-point, 50%)),
+        var(--cell-gradient-bottom, transparent) 100%
+    );
+    background-size: 100% var(--forecast-gradient-height-desktop, var(--forecast-gradient-height, 45%));
+    background-repeat: no-repeat;
+    background-position: top left;
+
+    @media (max-width: 767px) {
+        background-image: linear-gradient(
+            to bottom,
+            var(--cell-gradient-top, transparent) 0%,
+            var(--cell-gradient-mid, transparent) var(--forecast-gradient-mid-point-mobile, var(--forecast-gradient-mid-point, 50%)),
+            var(--cell-gradient-bottom, transparent) 100%
+        );
+        background-size: 100% var(--forecast-gradient-height-mobile, var(--forecast-gradient-height, 45%));
+    }
+}
+
+.dayContainer {
+    width: 100%;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 1vw;
+    padding-top: 0.25vw;
+    margin-bottom: -.5vw; // EDITABLE: Gap above days and dates row
+}
+
+.dayItem {
+    color: white;
+    text-align: center;
+    padding: 0.25vw 0;
+    font-size: 3.5vw;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+
+    .day-letter {
+        font-family: 'light', sans-serif;
+        opacity: 1;
+        font-weight: normal;
+        font-size: inherit;
+        color: white;
+    }
+}
+
+.rainContainer {
+    width: 100%;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 1vw;
+    padding-top: 0vw; // EDITABLE: Gap between day dates row and rain inches row
+}
+
+.rainItem {
+    background-color: var(--bitByBitBlue);
+    opacity: 0; // Hide until JS calculates rain percentage
+    visibility: hidden;
+    transition: opacity 0.5s ease, transform 0.5s ease-out; // Smooth fade and stretch
+    padding: 0.25vw 0;
+    text-align: center;
+    color: white;
+    font-size: 3.5vw;
+
+    // Stack children vertically and align to top
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+
+    // Rain text span (prevents stretching when cell scales)
+    .rain-text {
+        display: inline-block;
+        color: white;
+        font-family: 'bold', sans-serif;
+    }
+}
+
+//>  ████████████████████████████████████  CLOCK GRID ROW
+.clockGridContainer {
+    --dynamic-item-size: calc((100vw - var(--clock-grid-margin-left, 0vw) - var(--clock-grid-margin-right, 0vw) - 7 * var(--clock-grid-gap, 1vw)) / 8);
+
+    width: auto;
+    margin-top: var(--clock-grid-margin-top, 2vw);
+    margin-bottom: var(--clock-grid-margin-bottom, 2vw);
+    margin-left: var(--clock-grid-margin-left, 0vw);
+    margin-right: var(--clock-grid-margin-right, 0vw);
+    display: none !important; /* Removed for all versions */
+    grid-template-columns: repeat(8, 1fr);
+    gap: var(--clock-grid-gap, 1vw);
+    justify-items: center;
+    align-items: center;
+}
+
+.clockGridLabelsContainer {
+    --label-item-size: calc((100vw - var(--clock-grid-margin-left, 0vw) - var(--clock-grid-margin-right, 0vw) - 7 * var(--clock-grid-gap, 1vw)) / 8);
+
+    width: auto;
+    margin-top: calc(var(--clock-grid-margin-bottom, 2vw) * -1 + var(--clock-grid-label-margin-top, 0.5vw)); /* Pull up under the grid */
+    margin-bottom: var(--clock-grid-margin-bottom, 2vw);
+    margin-left: var(--clock-grid-margin-left, 0vw);
+    margin-right: var(--clock-grid-margin-right, 0vw);
+    display: none !important; /* Removed for all versions */
+    grid-template-columns: repeat(8, 1fr);
+    gap: var(--clock-grid-gap, 1vw);
+    justify-items: center;
+    align-items: start;
+    
+    .clockGridLabel {
+        font-family: var(--clock-grid-label-font-family, 'bold');
+        font-size: calc(var(--label-item-size) * 0.18) !important;
+        letter-spacing: calc(var(--label-item-size) * 0.005) !important;
+        color: var(--temp-color, rgba(255,255,255,0.7)); /* Use current temperature color */
+        text-align: center;
+        width: 100%;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        
+        .label-title {
+            text-transform: uppercase;
+        }
+
+        .label-title-0,
+        .label-title-1,
+        .label-title-2,
+        .label-title-3,
+        .label-title-4,
+        .label-title-5,
+        .label-title-6,
+        .label-title-7,
+        .label-title-8 {
+            text-transform: none !important; /* Keep natural case for dynamic text */
+            font-family: 'light', sans-serif !important;
+            white-space: nowrap !important;
+            letter-spacing: calc(var(--label-item-size) * -0.005) !important;
+            font-size: calc(var(--label-item-size) * 0.16) !important;
+        }
+    }
+}
+
+// 8-cell Clock Grid Container & Labels
+.clockGridContainer8 {
+    --dynamic-item-size-8: calc((100vw - var(--clock-grid-margin-left, 0vw) - var(--clock-grid-margin-right, 0vw) - 7 * var(--clock-grid-gap, 1vw)) / 8);
+
+    width: auto;
+    margin-top: var(--clock-grid-margin-top, 2vw);
+    margin-bottom: var(--clock-grid-margin-bottom, 2vw);
+    margin-left: var(--clock-grid-margin-left, 0vw);
+    margin-right: var(--clock-grid-margin-right, 0vw);
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: var(--clock-grid-gap, 1vw);
+    justify-items: center;
+    align-items: center;
+}
+
+.clockGridLabelsContainer8 {
+    --label-item-size: calc((100vw - var(--clock-grid-margin-left, 0vw) - var(--clock-grid-margin-right, 0vw) - 7 * var(--clock-grid-gap, 1vw)) / 8);
+
+    width: auto;
+    margin-top: calc(var(--clock-grid-margin-bottom, 2vw) * -1 + var(--clock-grid-label-margin-top, 0.5vw)); /* Pull up under the grid */
+    margin-bottom: var(--clock-grid-margin-bottom, 2vw);
+    margin-left: var(--clock-grid-margin-left, 0vw);
+    margin-right: var(--clock-grid-margin-right, 0vw);
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: var(--clock-grid-gap, 1vw);
+    justify-items: center;
+    align-items: start;
+    
+    .clockGridLabel8 {
+        font-family: var(--clock-grid-label-font-family, 'bold');
+        font-size: calc(var(--label-item-size) * 0.18) !important;
+        letter-spacing: calc(var(--label-item-size) * 0.005) !important;
+        color: var(--temp-color, rgba(255,255,255,0.7)); /* Use current temperature color */
+        text-align: center;
+        width: 100%;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        
+        .label-title {
+            text-transform: uppercase;
+        }
+
+        .label-title-0,
+        .label-title-1,
+        .label-title-2,
+        .label-title-3,
+        .label-title-4,
+        .label-title-5,
+        .label-title-6,
+        .label-title-7,
+        .label-title-8 {
+            text-transform: none !important; /* Keep natural case for dynamic text */
+            font-family: 'light', sans-serif !important;
+            white-space: nowrap !important;
+            letter-spacing: calc(var(--label-item-size) * -0.005) !important;
+            font-size: calc(var(--label-item-size) * 0.16) !important;
+        }
+    }
+}
+
+// Daily Weather Summary Line
+.daily-weather-summary {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    font-family: var(--daily-summary-font-family, 'light', sans-serif) !important;
+    color: var(--temp-color, rgba(255, 255, 255, 0.7));
+    text-transform: none !important;
+    text-wrap: balance;
+}
+
+// 4-cell Clock Grid Container & Labels
+.clockGridContainer4 {
+    --dynamic-item-size-4: calc((100vw - var(--clock-grid-margin-left, 0vw) - var(--clock-grid-margin-right, 0vw) - 3 * var(--clock-grid-gap, 1vw)) / 4);
+
+    width: auto;
+    margin-top: var(--clock-grid-margin-top, 2vw);
+    margin-bottom: var(--clock-grid-margin-bottom, 2vw);
+    margin-left: var(--clock-grid-margin-left, 0vw);
+    margin-right: var(--clock-grid-margin-right, 0vw);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--clock-grid-gap, 1vw);
+    justify-items: center;
+    align-items: center;
+}
+
+#clock-grid-container-4-2 {
+    margin-top: var(--clock-grid-row2-margin-top, 2vw);
+}
+
+.clockGridLabelsContainer4 {
+    --label-item-size: calc((100vw - var(--clock-grid-margin-left, 0vw) - var(--clock-grid-margin-right, 0vw) - 3 * var(--clock-grid-gap, 1vw)) / 4);
+    --clock-grid-4-label-scale: 0.867; /* EDITABLE: Font size scale factor (scaled up 30% from 0.667) */
+
+    width: auto;
+    margin-top: calc(var(--clock-grid-margin-bottom, 2vw) * -1 + var(--clock-grid-label-margin-top, 0.5vw)); /* Pull up under the grid */
+    margin-bottom: var(--clock-grid-margin-bottom, 2vw);
+    margin-left: var(--clock-grid-margin-left, 0vw);
+    margin-right: var(--clock-grid-margin-right, 0vw);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--clock-grid-gap, 1vw);
+    justify-items: center;
+    align-items: start;
+    
+    .clockGridLabel4 {
+        font-family: 'medium', sans-serif !important;
+        font-size: calc(var(--label-item-size) * 0.18 * var(--clock-grid-4-label-scale, 1)) !important;
+        letter-spacing: calc(var(--label-item-size) * 0.005) !important;
+        color: var(--temp-color, rgba(255,255,255,0.7)); /* Use current temperature color */
+        text-align: center;
+        width: 100%;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        
+        .label-title {
+            text-transform: uppercase;
+        }
+
+        .label-title-0,
+        .label-title-1,
+        .label-title-2,
+        .label-title-3,
+        .label-title-4,
+        .label-title-5,
+        .label-title-6,
+        .label-title-7,
+        .label-title-8 {
+            text-transform: none !important; /* Keep natural case for dynamic text */
+            font-family: 'medium', sans-serif !important;
+            white-space: nowrap !important;
+            letter-spacing: calc(var(--label-item-size) * -0.005) !important;
+            font-size: calc(var(--label-item-size) * 0.16 * var(--clock-grid-4-label-scale, 1)) !important;
+        }
+    }
+}
+
+.clockGridItem {
+    --item-current-size: var(--clock-grid-size, 10vw);
+
+    .clockGridContainer & {
+        --item-current-size: var(--dynamic-item-size);
+    }
+    .clockGridContainer8 & {
+        --item-current-size: var(--dynamic-item-size-8);
+    }
+    .clockGridContainer4 & {
+        --item-current-size: var(--dynamic-item-size-4);
+    }
+
+    position: relative;
+    width: var(--item-current-size);
+    height: var(--item-current-size);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &.clockGridItem-0, &.clockGridItem-2, &.clockGridItem-3, &.clockGridItem-4, &.clockGridItem-5, &.clockGridItem-6, &.clockGridItem-8 {
+        .clock-timer-svg .countdown-progress {
+            stroke: var(--temp-color, var(--clock-hands-color, rgba(255, 255, 255, 0.4)));
+        }
+    }
+
+    &.clockGridItem-0 {
+        .clock-timer-svg .countdown-progress,
+        .clock-timer-svg .countdown-track {
+            transition: stroke-dashoffset 1s linear, stroke-dasharray 1s linear, stroke 0.5s ease !important;
+        }
+    }
+
+    &.clockGridItem-2, &.clockGridItem-3, &.clockGridItem-4, &.clockGridItem-5, &.clockGridItem-6, &.clockGridItem-8 {
+        .clock-timer-svg {
+            transform: rotate(90deg) !important;
+        }
+    }
+
+    .clock-timer-svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+        overflow: visible;
+
+        .countdown-track {
+            stroke: var(--clock-grid-track-color, rgba(255, 255, 255, 0.2));
+            stroke-width: var(--clock-grid-stroke-width, 4);
+        }
+
+        .countdown-progress {
+            stroke: var(--clock-grid-progress-color, rgba(255, 255, 255, 0.5));
+            stroke-width: var(--clock-grid-stroke-width, 4);
+            stroke-dasharray: 289; /* 2 * PI * r(46) */
+            stroke-dashoffset: 0; /* Default fully full */
+            stroke-linecap: round;
+            transition: stroke-dashoffset var(--gauge-transition-duration, 0.8s) var(--gauge-transition-easing, cubic-bezier(0.25, 1, 0.5, 1)), stroke 0.5s ease;
+        }
+
+        /* Override absolute positioning and sizing for Solar Flare and Radio Blackout to prevent clipping of outer r=51 tracks on iOS Safari */
+        &.solar-flare-svg, &.radio-blackout-svg {
+            top: -5%;
+            left: -5%;
+            width: 110%;
+            height: 110%;
+        }
+
+        .gust-progress {
+            stroke-width: var(--clock-grid-stroke-width, 4);
+            stroke-linecap: round;
+        }
+    }
+
+    .clock-face {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: calc(var(--clock-grid-stroke-width, 4) * var(--item-current-size) * 0.011) solid transparent;
+        background: rgba(0, 0, 0, 0.0); 
+        box-shadow: inset 0 0 1vw rgba(0,0,0,0.5);
+
+        // Hour Hand
+        .clock-hour-hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            width: calc(var(--item-current-size) * 0.04);
+            height: 30%; // Length
+            background-color: var(--clock-hands-color, rgba(255, 255, 255, 0.9));
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(var(--hour-rotation, 0deg));
+            border-radius: calc(var(--item-current-size) * 0.04);
+        }
+
+        // Minute Hand
+        .clock-minute-hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            width: calc(var(--item-current-size) * 0.04);
+            height: 42%; // Slightly longer than hour hand
+            background-color: var(--clock-hands-color, rgba(255, 255, 255, 0.9));
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(var(--minute-rotation, 0deg));
+            border-radius: calc(var(--item-current-size) * 0.04);
+        }
+
+        // Second Hand
+        .clock-second-hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            width: calc(var(--item-current-size) * 0.02); // Thin stem matching wind direction pointer
+            height: 46%; // Length matching wind direction pointer
+            background-color: var(--clock-grid-track-color, rgba(255, 255, 255, 0.2)); // Subtle track color
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(var(--second-rotation, 0deg));
+            border-radius: calc(var(--item-current-size) * 0.02);
+            z-index: 1;
+        }
+
+        // Center Pivot Dot
+        .clock-center-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: calc(var(--item-current-size) * 0.1);
+            height: calc(var(--item-current-size) * 0.1);
+            background-color: var(--clock-hands-color, rgba(255, 255, 255, 0.9));
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            opacity: 0; // Hidden matching main clock center pivot dot
+        }
+    }
+
+    .grid-moon-phase {
+        position: absolute !important;
+        top: calc(50% + var(--grid-moon-phase-y-offset, 0vw)) !important;
+        left: calc(50% + var(--grid-moon-phase-x-offset, 0vw)) !important;
+        width: var(--grid-moon-phase-size, 92%) !important;
+        height: var(--grid-moon-phase-size, 92%) !important;
+        transform: translate(-50%, -50%) !important;
+        z-index: 1 !important;
+    }
+
+    .grid-wind-speed-text, .grid-humidity-text, .grid-dewpoint-text, .grid-sun-text, .grid-moon-text, .grid-uv-text {
+        position: absolute !important;
+        top: 50% !important;
+        left: 50% !important;
+        font-family: "bold", sans-serif !important;
+        font-size: calc(var(--item-current-size) * 0.35) !important;
+        color: var(--clock-hands-color, white);
+        text-shadow: var(--grid-wind-speed-text-shadow, 0px 1px 3px rgba(0, 0, 0, 0.5)) !important;
+        text-align: center !important;
+        line-height: .5 !important;
+        z-index: 2 !important;
+    }
+
+    .grid-wind-speed-text {
+        // Desktop default, mobile override below
+        transform: translate(-50%, calc(-50% + var(--item-current-size) * 0.07 + var(--wind-number-y-offset-desktop, 0vw))) !important;
+    }
+
+    .grid-humidity-text {
+        transform: translate(-50%, calc(-50% + var(--item-current-size) * 0.07)) !important;
+        line-height: 0.5 !important;
+    }
+
+    .grid-dewpoint-text, .grid-uv-text {
+        transform: translate(-50%, calc(-50% + var(--item-current-size) * 0.07)) !important;
+        line-height: 0.5 !important;
+        font-size: var(--grid-dewpoint-font-size, calc(var(--item-current-size) * 0.35)) !important;
+    }
+
+    .grid-sun-text {
+        transform: translate(-50%, -50%) !important;
+        line-height: 1.1 !important;
+        font-size: calc(var(--item-current-size) * 0.27) !important; /* Scaled to 90% of original 0.30 to keep time beautifully centered */
+    }
+
+    .grid-moon-text {
+        transform: translate(-50%, -50%) !important;
+        line-height: 1.1 !important;
+        font-size: calc(var(--item-current-size) * 0.27) !important; /* Scaled to 90% of original 0.30 to keep time beautifully centered */
+    }
+
+    .clock-hand-wind-direction {
+        position: absolute !important;
+        bottom: 50% !important;
+        left: 50% !important;
+        width: calc(var(--item-current-size) * 0.02 * var(--wind-stem-multiplier, 1)) !important;
+        height: 46% !important;
+        background: var(--clock-hands-color, rgba(255, 255, 255, 0.9));
+        transform-origin: bottom center !important;
+        border-radius: calc(var(--item-current-size) * 0.02 * var(--wind-stem-multiplier, 1)) !important;
+        z-index: 1 !important;
+        transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    }
+
+    .grid-barometric-pressure {
+        position: relative !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        z-index: 1 !important;
+
+        .barometric-text {
+            font-size: calc(var(--item-current-size) * 0.35) !important;
+            transform: translateY(calc(var(--item-current-size) * 0.07)) !important;
+        }
+
+        .barometric-gauge-svg {
+            transform: rotate(90deg) !important; // Starts at the bottom (6 o'clock)
+            
+            .barometric-track {
+                stroke-width: var(--clock-grid-stroke-width, 4) !important;
+                stroke: var(--clock-grid-track-color, rgba(255, 255, 255, 0.2)) !important;
+                stroke-dasharray: none !important;
+            }
+            .barometric-fill {
+                stroke-width: var(--clock-grid-stroke-width, 4) !important;
+            }
+        }
+    }
+}
+
+//^  ████████████████████████████████████  F&C MODE HELPER CLASSES
+.fc-mode-text {
+    display: inline-block;
+    transform: scaleX(1.0);
+    transform-origin: center;
+    white-space: nowrap;
+}
+
+// Hide the original 4 upper-left dials since they are duplicated in the row of 8
+#moon-phase-img,
+#analog-clock,
+#wind-direction-arrow,
+#barometric-pressure-gauge {
+    display: none !important;
+}
+
+// Hide the 5 dots wrapper rows since they are replaced by dials
+#wind-dots-wrapper,
+#humidity-dots-wrapper,
+#dewpoint-dots-wrapper,
+#sun-dots-wrapper,
+#moon-dots-wrapper {
+    display: none !important;
+}
+
+// Responsive layout: 7-dial row is for tablet/desktop only; 4-dial rows are for phone only
+:root {
+    --clock-inner-label-size: var(--clock-grid-inner-label-font-size-desktop, 2.2vw);
+    --grid-moon-phase-size: var(--grid-moon-phase-size-desktop, 93%);
+    --grid-moon-phase-x-offset: var(--grid-moon-phase-x-offset-desktop, 0vw);
+    --grid-moon-phase-y-offset: var(--grid-moon-phase-y-offset-desktop, 0vw);
+    --clock-grid-margin-top: var(--clock-grid-margin-top-desktop, 2.2vw);
+    --circle-cell-top: var(--circle-cell-top-desktop, 0vw);
+    --fragile-y-offset: var(--fragile-y-offset-desktop, 2vw);
+    --alert-temp-drop-type-y-offset: var(--alert-temp-drop-type-y-offset-desktop, 0.3vw);
+    --alert-temp-drop-icon-y-offset: var(--alert-temp-drop-icon-y-offset-desktop, 0.4vw);
+    --alert-temp-rise-type-y-offset: var(--alert-temp-rise-type-y-offset-desktop, 0.3vw);
+    --alert-temp-rise-icon-y-offset: var(--alert-temp-rise-icon-y-offset-desktop, -0.15vw);
+    --lo-bar-z-index: var(--lo-bar-z-index-desktop, 2);
+    --hi-bar-z-index: var(--hi-bar-z-index-desktop, 1);
+    --lo-bar-close-z-index: var(--lo-bar-close-z-index-desktop, 30);
+    --lo-bar-close-text-z-index: var(--lo-bar-close-text-z-index-desktop, 35);
+
+    --radar-center-dot-color: #ffffff;
+    --radar-center-dot-opacity: 1;
+    --radar-center-dot-z-index: var(--radar-center-dot-z-index-desktop, 100);
+    --radar-center-dot-size: var(--radar-center-dot-size-desktop, 1.0vw);
+    --radar-threshold-left: 150;
+    --radar-threshold-right: 300;
+    --rain-area-height: var(--rain-area-height-desktop, 50vw);
+    --rain-fade-top: var(--rain-fade-top-desktop, 5vw);
+    --rain-fade-bottom: var(--rain-fade-bottom-desktop, 10vw);
+    --rain-opacity: var(--rain-opacity-desktop, 1);
+
+    /* Sun Image (GOES-19 SUVI Fe195 Å) */
+    --sun-image-width: var(--sun-image-width-desktop, 34vw);
+    --sun-image-margin-top: var(--sun-image-margin-top-desktop, 2vw);
+    --sun-image-margin-bottom: var(--sun-image-margin-bottom-desktop, 2vw);
+    --sun-image-inner-scale: var(--sun-image-inner-scale-desktop, 36.7vw);
+    --sun-image-offset-y: var(--sun-image-offset-y-desktop, 0vw);
+    --sun-image-offset-x: var(--sun-image-offset-x-desktop, 0vw);
+    --sun-mask-radius: var(--sun-mask-radius-desktop, 49.5%);
+    --sun-mask-position-y: var(--sun-mask-position-y-desktop, 50%);
+    --sun-image-opacity: var(--sun-image-opacity-desktop, 1);
+    --sun-image-blend-mode: var(--sun-image-blend-mode-desktop, lighten);
+    --sun-duo-gap: var(--sun-duo-gap-desktop, 3vw);
+    --sun-trio-gap: var(--sun-trio-gap-desktop, 2vw);
+    --sun-row-gap: var(--sun-trio-gap, var(--sun-duo-gap, 2vw));
+    --sun-label-font-size: var(--sun-label-font-size-desktop, 2.0vw);
+    --sun-label-margin-top: var(--sun-label-margin-top-desktop, 0.8vw);
+    --sun-label-letter-spacing: var(--sun-label-letter-spacing-desktop, 0.08vw);
+    --sun-label-font-family: var(--sun-label-font-family-desktop, "'light', sans-serif");
+    --sun-label-color: var(--sun-label-color-desktop, #ffffff);
+    --sun-label-opacity: var(--sun-label-opacity-desktop, 0.70);
+    --sun-label-text-transform: var(--sun-label-text-transform-desktop, none);
+    --sun-animation-crossfade-duration: var(--sun-animation-crossfade-duration-desktop, 60ms);
+    --sun-sizzle-crossfade-duration: var(--sun-sizzle-crossfade-duration-desktop, 35ms);
+    --sun-animation-ease-max-delay: var(--sun-animation-ease-max-delay-desktop, 280ms);
+    --sun-animation-ease-frames: var(--sun-animation-ease-frames-desktop, 6);
+    --sun-label-offset-x: var(--sun-label-offset-x-desktop, 0vw);
+    --sun-label-left-offset-x: var(--sun-label-left-offset-x-desktop, 0vw);
+    --sun-label-right-offset-x: var(--sun-label-right-offset-x-desktop, 0vw);
+
+    /* Earth Image & Living Weather Config */
+    --earth-image-width: var(--earth-image-width-desktop, 34vw);
+    --earth-image-inner-scale: var(--earth-image-inner-scale-desktop, 23.2vw);
+    --earth-image-offset-y: var(--earth-image-offset-y-desktop, 0vw);
+    --earth-image-offset-x: var(--earth-image-offset-x-desktop, 0vw);
+    --earth-image-margin-top: var(--earth-image-margin-top-desktop, 0vw);
+    --earth-image-margin-bottom: var(--earth-image-margin-bottom-desktop, 0vw);
+    --earth-image-blur: var(--earth-image-blur-desktop, 0.8px);
+    --earth-mask-radius: var(--earth-mask-radius-desktop, 45.2%);
+    --earth-mask-position-y: var(--earth-mask-position-y-desktop, 45.5%);
+    --earth-animation-crossfade-duration: var(--earth-animation-crossfade-duration-desktop, 70ms);
+
+    /* World Clocks Row Config */
+    --world-clocks-width: var(--world-clocks-width-desktop, 90vw);
+    --world-clocks-gap: var(--world-clocks-gap-desktop, 2.9vw);
+    --world-clock-size: var(--world-clock-size-desktop, calc((var(--world-clocks-width, 90vw) - (4 * var(--world-clocks-gap, 2.9vw))) / 5));
+    --world-clocks-margin-top: var(--world-clocks-margin-top-desktop, -5vw);
+    --world-clocks-margin-bottom: var(--world-clocks-margin-bottom-desktop, -1vw);
+    --world-clock-track-color: var(--world-clock-track-color-desktop, rgba(255, 255, 255, 0.2));
+    --world-clock-track-width: var(--world-clock-track-width-desktop, 4);
+    --world-clock-user-track-color: var(--world-clock-user-track-color-desktop, var(--temp-color, var(--world-clock-track-color)));
+    --world-clock-label-layout: var(--world-clock-label-layout-desktop, column);
+    --world-clock-label-gap: var(--world-clock-label-gap-desktop, 0vw);
+    --world-clock-label-line-gap: var(--world-clock-label-line-gap-desktop, calc(var(--world-clock-size) * 0.015));
+    --world-clock-label-margin-top: var(--world-clock-label-margin-top-desktop, calc(var(--world-clock-size) * 0.06));
+    --world-clock-label-font-size: var(--world-clock-label-font-size-desktop, calc(var(--world-clock-size) * 0.13));
+    --world-clock-label-letter-spacing: var(--world-clock-label-letter-spacing-desktop, 0.046vw);
+    --world-clock-label-font-family: var(--world-clock-label-font-family-desktop, "'light', sans-serif");
+    --world-clock-label-color: var(--world-clock-label-color-desktop, #ffffff);
+    --world-clock-label-opacity: var(--world-clock-label-opacity-desktop, 0.85);
+
+    /* Line 1: Zone Name (Where) */
+    --world-clock-name-font-size: var(--world-clock-name-font-size-desktop, calc(var(--world-clock-size) * 0.13));
+    --world-clock-name-font-family: var(--world-clock-name-font-family-desktop, "'light', sans-serif");
+    --world-clock-name-color: var(--world-clock-name-color-desktop, #ffffff);
+    --world-clock-name-opacity: var(--world-clock-name-opacity-desktop, 0.85);
+    --world-clock-name-letter-spacing: var(--world-clock-name-letter-spacing-desktop, 0.046vw);
+
+    /* Line 2: Actual Time */
+    --world-clock-time-font-size: var(--world-clock-time-font-size-desktop, calc(var(--world-clock-size) * 0.13));
+    --world-clock-time-font-family: var(--world-clock-time-font-family-desktop, "'light', sans-serif");
+    --world-clock-time-color: var(--world-clock-time-color-desktop, #ffffff);
+    --world-clock-time-opacity: var(--world-clock-time-opacity-desktop, 0.85);
+    --world-clock-time-letter-spacing: var(--world-clock-time-letter-spacing-desktop, 0.046vw);
+
+    /* Floating Sticky Back-to-Top Button (Desktop) */
+    --scroll-top-bottom: var(--scroll-top-bottom-desktop, 2.0vw);
+    --scroll-top-right: var(--scroll-top-right-desktop, 2.5vw);
+    --scroll-top-size: var(--scroll-top-size-desktop, 3.2vw);
+    --scroll-top-icon-size: var(--scroll-top-icon-size-desktop, 1.3vw);
+    --scroll-top-btn-border-width: var(--scroll-top-border-width-desktop, 0.35vw);
+    --scroll-top-arrow-stroke-width: var(--scroll-top-arrow-stroke-desktop, 0.04vw);
+    --scroll-top-color: red;
+    --scroll-top-stroke-color: red;
+    --scroll-top-hover-color: #ff3333;
+    --scroll-top-hover-stroke-color: #ff3333;
+
+    /* Doppler Radar Experiment: "Lighten Only" HUD overlay on the page background */
+    /* Option A: Lighten HUD Overlay on page background (Default) */
+    --radar-blend-mode: lighten;
+    --radar-bg-color: transparent;
+    --radar-bg-image: none;
+    --radar-animation: none;
+
+    /* Doppler Radar Color Matrix Coefficients (Baseline approved settings) */
+    --radar-matrix-r: 3.0;
+    --radar-matrix-g: 0.0;
+    --radar-matrix-b: -5.0;
+    --radar-matrix-offset: -0.6;
+
+    /* Option B: Solid Dark Map (To revert, uncomment below and comment out Option A) */
+    /*
+    --radar-blend-mode: normal;
+    --radar-bg-color: black;
+    --radar-bg-image: none;
+    --radar-animation: none;
+    */
+}
+
+@media (max-width: 767px) {
+    :root {
+        --clock-inner-label-size: var(--clock-grid-inner-label-font-size-mobile, 4vw);
+        --dynamic-item-size-4: calc((100vw - var(--clock-grid-margin-left, 0vw) - var(--clock-grid-margin-right, 0vw) - 3 * var(--clock-grid-gap, 1vw)) / 4);
+        --grid-moon-phase-size: var(--grid-moon-phase-size-mobile, 93%);
+        --grid-moon-phase-x-offset: var(--grid-moon-phase-x-offset-mobile, 0vw);
+        --grid-moon-phase-y-offset: var(--grid-moon-phase-y-offset-mobile, 0vw);
+        --clock-grid-margin-top: var(--clock-grid-margin-top-mobile, 3vw);
+        --circle-cell-top: var(--circle-cell-top-mobile, 0vw);
+        --fragile-y-offset: var(--fragile-y-offset-mobile, 2vw);
+        --alert-temp-drop-type-y-offset: var(--alert-temp-drop-type-y-offset-mobile, 0.3vw);
+        --alert-temp-drop-icon-y-offset: var(--alert-temp-drop-icon-y-offset-mobile, 0.4vw);
+        --alert-temp-rise-type-y-offset: var(--alert-temp-rise-type-y-offset-mobile, 0.3vw);
+        --alert-temp-rise-icon-y-offset: var(--alert-temp-rise-icon-y-offset-mobile, -0.15vw);
+        --lo-bar-z-index: var(--lo-bar-z-index-mobile, 2);
+        --hi-bar-z-index: var(--hi-bar-z-index-mobile, 1);
+        --lo-bar-close-z-index: var(--lo-bar-close-z-index-mobile, 30);
+        --lo-bar-close-text-z-index: var(--lo-bar-close-text-z-index-mobile, 35);
+
+        --radar-center-dot-z-index: var(--radar-center-dot-z-index-mobile, 100);
+        --radar-center-dot-size: var(--radar-center-dot-size-mobile, 1.2vw);
+        --rain-area-height: var(--rain-area-height-mobile, 50vw);
+        --rain-fade-top: var(--rain-fade-top-mobile, 5vw);
+        --rain-fade-bottom: var(--rain-fade-bottom-mobile, 10vw);
+        --rain-opacity: var(--rain-opacity-mobile, 1);
+
+        --sun-image-width: var(--sun-image-width-mobile, 42vw);
+        --sun-image-margin-top: var(--sun-image-margin-top-mobile, 3vw);
+        --sun-image-margin-bottom: var(--sun-image-margin-bottom-mobile, 3vw);
+        --sun-image-inner-scale: var(--sun-image-inner-scale-mobile, 45.4vw);
+        --sun-image-offset-y: var(--sun-image-offset-y-mobile, 0vw);
+        --sun-image-offset-x: var(--sun-image-offset-x-mobile, 0vw);
+        --sun-mask-radius: var(--sun-mask-radius-mobile, 49.5%);
+        --sun-mask-position-y: var(--sun-mask-position-y-mobile, 50%);
+        --sun-image-opacity: var(--sun-image-opacity-mobile, 1);
+        --sun-image-blend-mode: var(--sun-image-blend-mode-mobile, lighten);
+        --sun-duo-gap: var(--sun-duo-gap-mobile, 2vw);
+        --sun-trio-gap: var(--sun-trio-gap-mobile, 2vw);
+        --sun-row-gap: var(--sun-trio-gap, var(--sun-duo-gap, 2vw));
+        --sun-label-font-size: var(--sun-label-font-size-mobile, 2.6vw);
+        --sun-label-margin-top: var(--sun-label-margin-top-mobile, 1.2vw);
+        --sun-label-letter-spacing: var(--sun-label-letter-spacing-mobile, 0.06vw);
+        --sun-label-offset-x: var(--sun-label-offset-x-mobile, 0vw);
+        --sun-label-left-offset-x: var(--sun-label-left-offset-x-mobile, 0vw);
+        --sun-label-right-offset-x: var(--sun-label-right-offset-x-mobile, 0vw);
+        --sun-animation-crossfade-duration: var(--sun-animation-crossfade-duration-mobile, 60ms);
+        --sun-sizzle-crossfade-duration: var(--sun-sizzle-crossfade-duration-mobile, 35ms);
+        --sun-animation-ease-max-delay: var(--sun-animation-ease-max-delay-mobile, 280ms);
+        --sun-animation-ease-frames: var(--sun-animation-ease-frames-mobile, 6);
+
+        /* Earth Image & Living Weather Config Mobile */
+        --earth-image-width: var(--earth-image-width-mobile, 42vw);
+        --earth-image-inner-scale: var(--earth-image-inner-scale-mobile, 28.7vw);
+        --earth-image-offset-y: var(--earth-image-offset-y-mobile, 0vw);
+        --earth-image-offset-x: var(--earth-image-offset-x-mobile, 0vw);
+        --earth-image-margin-top: var(--earth-image-margin-top-mobile, 0vw);
+        --earth-image-margin-bottom: var(--earth-image-margin-bottom-mobile, 0vw);
+        --earth-image-blur: var(--earth-image-blur-mobile, 0.5px);
+        --earth-mask-radius: var(--earth-mask-radius-mobile, 45.2%);
+        --earth-mask-position-y: var(--earth-mask-position-y-mobile, 45.5%);
+        --earth-animation-crossfade-duration: var(--earth-animation-crossfade-duration-mobile, 70ms);
+
+        /* Celestial Row 4-Object Gaps & Lateral Offsets Mobile */
+        --celestial-row-edge-gap-left: var(--celestial-row-edge-gap-left-mobile, 0vw);
+        --celestial-row-edge-gap-right: var(--celestial-row-edge-gap-right-mobile, 0vw);
+        --gap-pacific-to-sun: var(--gap-pacific-to-sun-mobile, 0vw);
+        --sun-gap-left: var(--sun-gap-left-mobile, 0vw);
+        --gap-sun-to-earth: var(--gap-sun-to-earth-mobile, auto);
+        --earth-gap-left: var(--earth-gap-left-mobile, 0vw);
+        --gap-earth-to-uk: var(--gap-earth-to-uk-mobile, var(--earth-gap-right-mobile, 0vw));
+        --earth-gap-right: var(--earth-gap-right-mobile, 0vw);
+        --celestial-dial-right-gap-left: var(--celestial-dial-right-gap-left-mobile, 0vw);
+
+        --world-clocks-width: var(--world-clocks-width-mobile, 90vw);
+        --world-clocks-gap: var(--world-clocks-gap-mobile, 1.875vw);
+        --world-clock-size: var(--world-clock-size-mobile, calc((var(--world-clocks-width, 90vw) - (4 * var(--world-clocks-gap, 1.875vw))) / 5));
+        --world-clocks-margin-top: var(--world-clocks-margin-top-mobile, -5.0vw);
+        --world-clocks-margin-bottom: var(--world-clocks-margin-bottom-mobile, -4vw);
+        --world-clock-track-color: var(--world-clock-track-color-mobile, rgba(255, 255, 255, 0.2));
+        --world-clock-track-width: var(--world-clock-track-width-mobile, 4);
+        --world-clock-user-track-color: var(--world-clock-user-track-color-mobile, var(--temp-color, var(--world-clock-track-color)));
+        --world-clock-label-layout: var(--world-clock-label-layout-mobile, column);
+        --world-clock-label-gap: var(--world-clock-label-gap-mobile, 0vw);
+        --world-clock-label-line-gap: var(--world-clock-label-line-gap-mobile, calc(var(--world-clock-size) * 0.019));
+        --world-clock-label-margin-top: var(--world-clock-label-margin-top-mobile, calc(var(--world-clock-size) * 0.062));
+        --world-clock-label-font-size: var(--world-clock-label-font-size-mobile, calc(var(--world-clock-size) * 0.144));
+        --world-clock-label-letter-spacing: var(--world-clock-label-letter-spacing-mobile, 0.02vw);
+        --world-clock-label-font-family: var(--world-clock-label-font-family-mobile, "'light', sans-serif");
+        --world-clock-label-color: var(--world-clock-label-color-mobile, #ffffff);
+        --world-clock-label-opacity: var(--world-clock-label-opacity-mobile, 0.85);
+
+        /* Line 1: Zone Name (Where) Mobile */
+        --world-clock-name-font-size: var(--world-clock-name-font-size-mobile, calc(var(--world-clock-size) * 0.144));
+        --world-clock-name-font-family: var(--world-clock-name-font-family-mobile, "'light', sans-serif");
+        --world-clock-name-color: var(--world-clock-name-color-mobile, #ffffff);
+        --world-clock-name-opacity: var(--world-clock-name-opacity-mobile, 0.85);
+        --world-clock-name-letter-spacing: var(--world-clock-name-letter-spacing-mobile, 0.02vw);
+
+        /* Line 2: Actual Time Mobile */
+        --world-clock-time-font-size: var(--world-clock-time-font-size-mobile, calc(var(--world-clock-size) * 0.144));
+        --world-clock-time-font-family: var(--world-clock-time-font-family-mobile, "'light', sans-serif");
+        --world-clock-time-color: var(--world-clock-time-color-mobile, #ffffff);
+        --world-clock-time-opacity: var(--world-clock-time-opacity-mobile, 0.85);
+        --world-clock-time-letter-spacing: var(--world-clock-time-letter-spacing-mobile, 0.02vw);
+
+        /* Floating Sticky Back-to-Top Button (Mobile) */
+        --scroll-top-bottom: var(--scroll-top-bottom-mobile, 2.5vw);
+        --scroll-top-right: var(--scroll-top-right-mobile, 5.0vw);
+        --scroll-top-size: var(--scroll-top-size-mobile, 11.0vw);
+        --scroll-top-icon-size: var(--scroll-top-icon-size-mobile, 4.5vw);
+        --scroll-top-btn-border-width: var(--scroll-top-border-width-mobile, 1.1vw);
+        --scroll-top-arrow-stroke-width: var(--scroll-top-arrow-stroke-mobile, 0.12vw);
+    }
+
+    .grid-wind-speed-text {
+        transform: translate(-50%, calc(-50% + var(--item-current-size) * 0.07 + var(--wind-number-y-offset-mobile, 0vw))) !important;
+    }
+    
+    .grid-dewpoint-text, .grid-uv-text {
+        font-size: var(--grid-dewpoint-font-size, calc(var(--item-current-size) * 0.30)) !important;
+    }
+    
+    .clockGridContainer8,
+    .clockGridLabelsContainer8 {
+        display: none !important;
+    }
+    .clockGridContainer4,
+    .clockGridLabelsContainer4 {
+        display: grid !important;
+    }
+
+    #weather-desc-image-left {
+        width: var(--dynamic-item-size-4) !important;
+        height: var(--dynamic-item-size-4) !important;
+        left: calc(var(--clock-grid-margin-left, 2vw) + (100vw - var(--clock-grid-margin-left, 2vw) - var(--clock-grid-margin-right, 2vw)) * 0.125 - var(--dynamic-item-size-4) / 2) !important;
+        top: var(--circle-cell-top, 0vw) !important;
+    }
+
+    #weather-desc-image {
+        width: var(--dynamic-item-size-4) !important;
+        height: var(--dynamic-item-size-4) !important;
+        right: calc(var(--clock-grid-margin-right, 2vw) + (100vw - var(--clock-grid-margin-left, 2vw) - var(--clock-grid-margin-right, 2vw)) * 0.125 - var(--dynamic-item-size-4) / 2) !important;
+        top: var(--circle-cell-top, 0vw) !important;
+    }
+}
+
+@media (min-width: 768px) {
+    :root {
+        --grid-moon-phase-size: var(--grid-moon-phase-size-desktop, 93%);
+        --grid-moon-phase-x-offset: var(--grid-moon-phase-x-offset-desktop, 0vw);
+        --grid-moon-phase-y-offset: var(--grid-moon-phase-y-offset-desktop, 0vw);
+        --rain-area-height: var(--rain-area-height-desktop, 50vw);
+        --rain-fade-top: var(--rain-fade-top-desktop, 5vw);
+        --rain-fade-bottom: var(--rain-fade-bottom-desktop, 10vw);
+        --rain-opacity: var(--rain-opacity-desktop, 1);
+
+        --sun-image-width: var(--sun-image-width-desktop, 34vw);
+        --sun-image-margin-top: var(--sun-image-margin-top-desktop, 2vw);
+        --sun-image-margin-bottom: var(--sun-image-margin-bottom-desktop, 2vw);
+        --sun-image-inner-scale: var(--sun-image-inner-scale-desktop, 36.7vw);
+        --sun-image-offset-y: var(--sun-image-offset-y-desktop, 0vw);
+        --sun-image-offset-x: var(--sun-image-offset-x-desktop, 0vw);
+        --sun-mask-radius: var(--sun-mask-radius-desktop, 49.5%);
+        --sun-mask-position-y: var(--sun-mask-position-y-desktop, 50%);
+        --sun-image-opacity: var(--sun-image-opacity-desktop, 1);
+        --sun-image-blend-mode: var(--sun-image-blend-mode-desktop, lighten);
+        --sun-duo-gap: var(--sun-duo-gap-desktop, 3vw);
+        --sun-trio-gap: var(--sun-trio-gap-desktop, 2vw);
+        --sun-row-gap: var(--sun-trio-gap, var(--sun-duo-gap, 2vw));
+        --sun-label-font-size: var(--sun-label-font-size-desktop, 2.0vw);
+        --sun-label-margin-top: var(--sun-label-margin-top-desktop, 0.8vw);
+        --sun-label-letter-spacing: var(--sun-label-letter-spacing-desktop, 0.08vw);
+        --sun-label-offset-x: var(--sun-label-offset-x-desktop, 0vw);
+        --sun-label-left-offset-x: var(--sun-label-left-offset-x-desktop, 0vw);
+        --sun-label-right-offset-x: var(--sun-label-right-offset-x-desktop, 0vw);
+        --sun-animation-crossfade-duration: var(--sun-animation-crossfade-duration-desktop, 60ms);
+        --sun-sizzle-crossfade-duration: var(--sun-sizzle-crossfade-duration-desktop, 35ms);
+        --sun-animation-ease-max-delay: var(--sun-animation-ease-max-delay-desktop, 280ms);
+        --sun-animation-ease-frames: var(--sun-animation-ease-frames-desktop, 6);
+
+        /* Earth Image & Living Weather Config Desktop */
+        --earth-image-width: var(--earth-image-width-desktop, 34vw);
+        --earth-image-inner-scale: var(--earth-image-inner-scale-desktop, 23.2vw);
+        --earth-image-offset-y: var(--earth-image-offset-y-desktop, 0vw);
+        --earth-image-offset-x: var(--earth-image-offset-x-desktop, 0vw);
+        --earth-image-margin-top: var(--earth-image-margin-top-desktop, 0vw);
+        --earth-image-margin-bottom: var(--earth-image-margin-bottom-desktop, 0vw);
+        --earth-image-blur: var(--earth-image-blur-desktop, 0.8px);
+        --earth-mask-radius: var(--earth-mask-radius-desktop, 45.2%);
+        --earth-mask-position-y: var(--earth-mask-position-y-desktop, 45.5%);
+        --earth-animation-crossfade-duration: var(--earth-animation-crossfade-duration-desktop, 70ms);
+
+        /* Celestial Row 4-Object Gaps & Lateral Offsets Desktop */
+        --celestial-row-edge-gap-left: var(--celestial-row-edge-gap-left-desktop, 0vw);
+        --celestial-row-edge-gap-right: var(--celestial-row-edge-gap-right-desktop, 0vw);
+        --gap-pacific-to-sun: var(--gap-pacific-to-sun-desktop, 0vw);
+        --sun-gap-left: var(--sun-gap-left-desktop, 0vw);
+        --gap-sun-to-earth: var(--gap-sun-to-earth-desktop, auto);
+        --earth-gap-left: var(--earth-gap-left-desktop, 0vw);
+        --gap-earth-to-uk: var(--gap-earth-to-uk-desktop, var(--earth-gap-right-desktop, 0vw));
+        --earth-gap-right: var(--earth-gap-right-desktop, 0vw);
+        --celestial-dial-right-gap-left: var(--celestial-dial-right-gap-left-desktop, 0vw);
+
+        --world-clock-size: var(--world-clock-size-desktop, 13.5vw);
+        --world-clocks-gap: var(--world-clocks-gap-desktop, 2.5vw);
+        --world-clocks-margin-top: var(--world-clocks-margin-top-desktop, 2.5vw);
+        --world-clocks-margin-bottom: var(--world-clocks-margin-bottom-desktop, 1.0vw);
+        --world-clock-track-color: var(--world-clock-track-color-desktop, rgba(255, 255, 255, 0.2));
+        --world-clock-track-width: var(--world-clock-track-width-desktop, 4);
+        --world-clock-user-track-color: var(--world-clock-user-track-color-desktop, var(--temp-color, var(--world-clock-track-color)));
+        --world-clock-label-layout: var(--world-clock-label-layout-desktop, column);
+        --world-clock-label-gap: var(--world-clock-label-gap-desktop, 0vw);
+        --world-clock-label-line-gap: var(--world-clock-label-line-gap-desktop, 0.2vw);
+        --world-clock-label-margin-top: var(--world-clock-label-margin-top-desktop, 0.8vw);
+        --world-clock-label-font-size: var(--world-clock-label-font-size-desktop, 1.75vw);
+        --world-clock-label-letter-spacing: var(--world-clock-label-letter-spacing-desktop, 0.04vw);
+        --world-clock-label-font-family: var(--world-clock-label-font-family-desktop, "'light', sans-serif");
+        --world-clock-label-color: var(--world-clock-label-color-desktop, #ffffff);
+        --world-clock-label-opacity: var(--world-clock-label-opacity-desktop, 0.85);
+
+        /* Line 1: Zone Name (Where) Desktop */
+        --world-clock-name-font-size: var(--world-clock-name-font-size-desktop, 1.75vw);
+        --world-clock-name-font-family: var(--world-clock-name-font-family-desktop, "'light', sans-serif");
+        --world-clock-name-color: var(--world-clock-name-color-desktop, #ffffff);
+        --world-clock-name-opacity: var(--world-clock-name-opacity-desktop, 0.85);
+        --world-clock-name-letter-spacing: var(--world-clock-name-letter-spacing-desktop, 0.04vw);
+
+        /* Line 2: Actual Time Desktop */
+        --world-clock-time-font-size: var(--world-clock-time-font-size-desktop, 1.75vw);
+        --world-clock-time-font-family: var(--world-clock-time-font-family-desktop, "'light', sans-serif");
+        --world-clock-time-color: var(--world-clock-time-color-desktop, #ffffff);
+        --world-clock-time-opacity: var(--world-clock-time-opacity-desktop, 0.85);
+        --world-clock-time-letter-spacing: var(--world-clock-time-letter-spacing-desktop, 0.04vw);
+    }
+    .clockGridContainer8,
+    .clockGridLabelsContainer8 {
+        display: grid !important;
+    }
+    .clockGridContainer4,
+    .clockGridLabelsContainer4 {
+        display: none !important;
+    }
+}
+
+@keyframes feelsLikeGlow {
+    0% {
+        text-shadow: 0 0 4px var(--feels-glow-color, currentColor);
+    }
+    50% {
+        text-shadow: 0 0 12px var(--feels-glow-color, currentColor);
+    }
+    100% {
+        text-shadow: 0 0 4px var(--feels-glow-color, currentColor);
+    }
+}
+
+.feels-like-temp-val {
+    animation: feelsLikeGlow 3s ease-in-out infinite !important;
+}
+
+
+.radar-sweep-line {
+    position: absolute;
+    top: 0;
+    width: var(--radar-sweep-line-width, 0.24vw);
+    left: calc(50% - var(--radar-sweep-line-width, 0.24vw) / 2);
+    height: 50%;
+    background: var(--clock-grid-track-color, rgba(255, 255, 255, 0.2)) !important;
+    transform-origin: 50% 100%;
+    z-index: 95;
+    pointer-events: none;
+    will-change: transform;
+}
+
+.radar-center-dot {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    width: var(--radar-center-dot-size, 1.0vw) !important;
+    height: var(--radar-center-dot-size, 1.0vw) !important;
+    background-color: var(--radar-center-dot-color, #ffffff) !important;
+    opacity: var(--radar-center-dot-opacity, 1.0) !important;
+    border-radius: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: var(--radar-center-dot-z-index, 100) !important;
+    pointer-events: none !important;
+}
+
+#weather-feels-like {
+    position: relative;
+    z-index: 60;
+    pointer-events: auto !important;
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: filter 0.2s ease;
+
+    &:active {
+        filter: brightness(1.18);
+    }
+
+    .feels-like-current-temp.optical-center-digits {
+        .odometer-degree {
+            width: 0 !important;
+            flex: 0 0 0px !important;
+            overflow: visible !important;
+            white-space: nowrap !important;
+            transform: translate(var(--current-temp-degree-x, 0vw), var(--current-temp-degree-y, 0vw));
+        }
+    }
+
+    .feels-like-val-container {
+        .odometer-digit {
+            margin-right: var(--feels-like-temp-letter-spacing, 0vw);
+        }
+        .odometer-static {
+            margin-left: var(--feels-like-temp-letter-spacing, 0vw);
+            margin-right: var(--feels-like-temp-letter-spacing, 0vw);
+        }
+    }
+}
+
+/* Odometer rolling number effect */
+.odometer-number {
+    display: inline-flex;
+    align-items: center; /* Center digits and static symbols vertically */
+    justify-content: center;
+    vertical-align: middle;
+}
+
+.odometer-digit {
+    position: relative;
+    display: inline-block;
+    height: 1.15em;
+    line-height: 1.15em;
+    overflow: hidden;
+    vertical-align: middle;
+    /* Soft vertical mask fade on top and bottom of digits to mimic a recessed drum aperture */
+    mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.4) 10%, black 25%, black 75%, rgba(0, 0, 0, 0.4) 90%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.4) 10%, black 25%, black 75%, rgba(0, 0, 0, 0.4) 90%, transparent 100%);
+}
+
+.odometer-strip {
+    display: block;
+    transition: transform var(--odometer-transition-duration, 0.6s) var(--odometer-easing, cubic-bezier(0.35, 0.05, 0.25, 1));
+    will-change: transform;
+    
+    span {
+        display: block;
+        height: 1.15em;
+        line-height: 1.15em;
+        text-align: center;
+    }
+}
+
+.odometer-static {
+    display: inline-block;
+    height: 1.15em;
+    line-height: 1.15em;
+    vertical-align: middle;
+
+    &.odometer-slash {
+        font-family: 'light', sans-serif !important;
+        margin: 0 var(--odometer-slash-margin, -0.20vw) !important;
+    }
+}
+
+// Clock Hands Reset Spin Animation
+@keyframes spin-clockwise {
+    from {
+        transform: translateX(-50%) rotate(var(--current-rotation, 0deg));
+    }
+    to {
+        transform: translateX(-50%) rotate(calc(var(--current-rotation, 0deg) + 360deg));
+    }
+}
+
+@keyframes spin-counter-clockwise {
+    from {
+        transform: translateX(-50%) rotate(var(--current-rotation, 0deg));
+    }
+    to {
+        transform: translateX(-50%) rotate(calc(var(--current-rotation, 0deg) - 360deg));
+    }
+}
+
+.spin-clockwise-anim {
+    animation: spin-clockwise var(--clock-spin-duration, 1.2s) cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+}
+
+.spin-counter-clockwise-anim {
+    animation: spin-counter-clockwise var(--clock-spin-duration, 1.2s) cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+}
+
+// Wind Speed & Gust reset spin animations
+@keyframes rotate-clockwise {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes rotate-counter-clockwise {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(-360deg);
+    }
+}
+
+.spin-clockwise-360 {
+    transform-origin: 50% 50% !important;
+    animation: rotate-clockwise 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+}
+
+.spin-counter-clockwise-360 {
+    transform-origin: 50% 50% !important;
+    animation: rotate-counter-clockwise 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+}
+
+// Celestial dot orbit animations
+@keyframes celestial-orbit {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.celestial-spin {
+    transform-origin: 50% 50% !important;
+    animation: celestial-orbit 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+}
+
+// Passive Versioning display
+.weather-version {
+    position: relative;
+    width: 100%;
+    text-align: center;
+    z-index: 15;
+    pointer-events: none;
+    font-family: var(--weather-version-font-family, 'light', sans-serif);
+    font-size: var(--weather-version-font-size-desktop, 5vw);
+    letter-spacing: var(--weather-version-letter-spacing-desktop, -0.05vw);
+    margin-top: var(--weather-version-margin-top-desktop, 1.5vw);
+    margin-bottom: var(--weather-version-margin-bottom-desktop, 1.5vw);
+    color: var(--weather-version-color, var(--temp-color, #ffffff));
+    transition: color 0.5s ease, opacity 1s ease;
+
+    @media (max-width: 767px) {
+        font-size: var(--weather-version-font-size-mobile, 5vw);
+        letter-spacing: var(--weather-version-letter-spacing-mobile, -0.05vw);
+        margin-top: var(--weather-version-margin-top-mobile, 2vw);
+        margin-bottom: var(--weather-version-margin-bottom-mobile, 2vw);
+    }
+}
+
+// ==========================================
+// World Clocks Row (Pacific, Mountain, Central, Eastern, UK)
+// ==========================================
+#world-clocks-row-wrapper,
+.world-clocks-row-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    width: var(--world-clocks-width, 90vw);
+    max-width: var(--world-clocks-width, 90vw);
+    gap: var(--world-clocks-gap, 2.9vw);
+    margin: var(--world-clocks-margin-top, 2.5vw) auto var(--world-clocks-margin-bottom, 1.0vw);
+    opacity: 0;
+    transition: opacity 1s ease;
+    user-select: none;
+    flex-wrap: nowrap;
+    box-sizing: border-box;
+}
+
+.world-clock-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: var(--world-clock-size, 13.5vw);
+    flex-shrink: 0;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.world-clock-dial {
+    position: relative;
+    width: var(--world-clock-size, 13.5vw);
+    height: var(--world-clock-size, 13.5vw);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .clock-timer-svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+        overflow: visible;
+
+        .countdown-track {
+            stroke: var(--world-clock-track-color, rgba(255, 255, 255, 0.2));
+            stroke-width: var(--world-clock-track-width, 4);
+            transition: stroke 0.3s ease;
+        }
+
+        &.is-user-timezone .countdown-track {
+            stroke: var(--world-clock-user-track-color, var(--temp-color, var(--world-clock-track-color, rgba(255, 255, 255, 0.2))));
+        }
+    }
+
+    .clock-face {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: calc(var(--world-clock-track-width, 4) * var(--world-clock-size, 13.5vw) * 0.011) solid transparent;
+        background: rgba(0, 0, 0, 0.0);
+        box-shadow: inset 0 0 1vw rgba(0, 0, 0, 0.5);
+
+        // Hour Hand
+        .clock-hour-hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            width: calc(var(--world-clock-size, 13.5vw) * 0.04);
+            height: 30%;
+            background-color: var(--world-clock-hands-color, var(--clock-hands-color, rgba(255, 255, 255, 0.9)));
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(var(--hour-rotation, 0deg));
+            border-radius: calc(var(--world-clock-size, 13.5vw) * 0.04);
+        }
+
+        // Minute Hand
+        .clock-minute-hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            width: calc(var(--world-clock-size, 13.5vw) * 0.04);
+            height: 42%;
+            background-color: var(--world-clock-hands-color, var(--clock-hands-color, rgba(255, 255, 255, 0.9)));
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(var(--minute-rotation, 0deg));
+            border-radius: calc(var(--world-clock-size, 13.5vw) * 0.04);
+        }
+
+        // Second Hand
+        .clock-second-hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            width: calc(var(--world-clock-size, 13.5vw) * 0.02);
+            height: 46%;
+            background-color: var(--world-clock-second-hand-color, var(--clock-grid-track-color, rgba(255, 255, 255, 0.2)));
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(var(--second-rotation, 0deg));
+            border-radius: calc(var(--world-clock-size, 13.5vw) * 0.02);
+            z-index: 1;
+        }
+
+        // Center Pivot Dot
+        .clock-center-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: calc(var(--world-clock-size, 13.5vw) * 0.1);
+            height: calc(var(--world-clock-size, 13.5vw) * 0.1);
+            background-color: var(--world-clock-hands-color, var(--clock-hands-color, rgba(255, 255, 255, 0.9)));
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            opacity: var(--world-clock-center-dot-opacity, 0);
+        }
+    }
+}
+
+.world-clock-label {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: var(--world-clock-label-layout, column);
+    justify-content: center;
+    align-items: center;
+    gap: var(--world-clock-label-line-gap, 0.2vw);
+    font-family: var(--world-clock-label-font-family, 'light', sans-serif);
+    font-size: var(--world-clock-label-font-size, 1.75vw);
+    letter-spacing: var(--world-clock-label-letter-spacing, 0.04vw);
+    padding-left: var(--world-clock-label-letter-spacing, 0.04vw);
+    color: var(--world-clock-label-color, #ffffff);
+    opacity: var(--world-clock-label-opacity, 0.85);
+    margin-top: var(--world-clock-label-margin-top, 0.8vw);
+    text-align: center;
+    white-space: normal;
+    user-select: none;
+    line-height: 1.15;
+    box-sizing: border-box;
+
+    .world-clock-name {
+        display: block;
+        font-family: var(--world-clock-name-font-family, var(--world-clock-label-font-family, 'light', sans-serif)) !important;
+        font-size: var(--world-clock-name-font-size, var(--world-clock-label-font-size, 1.75vw));
+        color: var(--world-clock-name-color, var(--world-clock-label-color, #ffffff));
+        opacity: var(--world-clock-name-opacity, var(--world-clock-label-opacity, 0.85));
+        letter-spacing: var(--world-clock-name-letter-spacing, var(--world-clock-label-letter-spacing, 0.04vw));
+        padding-left: var(--world-clock-name-letter-spacing, var(--world-clock-label-letter-spacing, 0.04vw));
+        line-height: 1.15;
+        white-space: nowrap;
+    }
+
+    .world-clock-spacer {
+        display: var(--world-clock-spacer-display, none);
+        font-family: inherit !important;
+        font-size: inherit;
+        white-space: pre;
+    }
+
+    .world-clock-time {
+        display: block;
+        font-family: var(--world-clock-time-font-family, inherit) !important;
+        font-size: var(--world-clock-time-font-size, var(--world-clock-label-font-size, 1.75vw));
+        color: var(--world-clock-time-color, #ffffff);
+        opacity: var(--world-clock-time-opacity, 0.85);
+        letter-spacing: var(--world-clock-time-letter-spacing, var(--world-clock-label-letter-spacing, 0.04vw));
+        padding-left: var(--world-clock-time-letter-spacing, var(--world-clock-label-letter-spacing, 0.04vw));
+        line-height: 1.15;
+        white-space: nowrap;
+    }
+}
+
+// Live Sun & Earth Duo Row Mode with Flanking Clocks (Pacific, Sun, Earth, UK)
+#suns-row-wrapper,
+.suns-row-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: var(--world-clocks-width, 95vw);
+    max-width: var(--world-clocks-width, 95vw);
+    gap: 0; // Gaps are controlled individually via left & right JCV margins on all 4 objects
+    margin: var(--celestial-row-margin-top, var(--sun-image-margin-top, 0vw)) auto 0;
+    opacity: 0;
+    transition: opacity 1s ease, margin 0.3s ease;
+    user-select: none;
+    flex-wrap: nowrap;
+    box-sizing: border-box;
+}
+
+// 4-Object Gaps & Lateral Edge Offsets (JCV)
+#celestial-clock-left {
+    margin-left: var(--celestial-row-edge-gap-left, 0vw);
+    margin-right: var(--gap-pacific-to-sun, var(--celestial-dial-left-gap-right, 0vw));
+    flex-shrink: 0;
+}
+
+#sun-col-left {
+    margin-left: var(--sun-gap-left, 0vw);
+    margin-right: var(--gap-sun-to-earth, auto);
+    flex-shrink: 0;
+}
+
+#sun-col-right {
+    margin-left: var(--earth-gap-left, 0vw);
+    margin-right: var(--gap-earth-to-uk, var(--earth-gap-right, 0vw));
+    flex-shrink: 0;
+}
+
+#celestial-clock-right {
+    margin-left: var(--celestial-dial-right-gap-left, 0vw);
+    margin-right: var(--celestial-row-edge-gap-right, 0vw);
+    flex-shrink: 0;
+}
+
+.celestial-duo-subwrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    width: auto;
+    gap: var(--sun-duo-gap, 2vw);
+    flex-shrink: 0;
+    background-color: transparent;
+    mix-blend-mode: var(--sun-image-blend-mode, lighten);
+    box-sizing: border-box;
+}
+
+.celestial-clock-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: var(--celestial-dial-size, var(--world-clock-size, 13.5vw));
+    flex-shrink: 0;
+    position: relative;
+    box-sizing: border-box;
+
+    .world-clock-dial {
+        width: var(--celestial-dial-size, var(--world-clock-size, 13.5vw));
+        height: var(--celestial-dial-size, var(--world-clock-size, 13.5vw));
+        margin-top: var(--celestial-dial-margin-top, 0vw);
+        transform: translate(var(--celestial-dial-offset-x, 0vw), 0);
+        transition: margin-top 0.3s ease;
+    }
+
+    .world-clock-label-container {
+        margin-top: var(--celestial-dial-label-margin-top, calc(var(--world-clock-size) * 0.06));
+        transform: translateY(var(--celestial-dial-label-offset-y, 0vw));
+    }
+}
+
+// Solar Flare Scale Dial in Celestial Row (JCV)
+.solar-flare-dial {
+    position: relative;
+    border-radius: 50%;
+    width: var(--solar-flare-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
+    height: var(--solar-flare-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
+    margin-top: var(--celestial-dial-margin-top, 0vw);
+    transform: translate(var(--solar-flare-offset-x, 0vw), var(--solar-flare-offset-y, 0vw));
+    background-color: var(--solar-flare-dial-bg-color, transparent);
+    box-shadow: var(--solar-flare-dial-inner-shadow, inset 0 0 1vw rgba(0, 0, 0, 0.5));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: pointer;
+    box-sizing: border-box;
+
+    .solar-flare-svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transform: rotate(var(--solar-flare-start-angle, 90deg));
+        overflow: visible;
+        z-index: 1;
+
+        .solar-flare-track {
+            stroke: var(--solar-flare-track-color, rgba(255, 255, 255, 0.22));
+            stroke-width: var(--solar-flare-track-stroke-width, 4);
+        }
+
+        .solar-flare-peak-progress {
+            stroke: var(--solar-flare-peak-color, rgba(255, 255, 255, 0.5));
+            stroke-width: var(--solar-flare-progress-stroke-width, 4);
+            stroke-dasharray: 289.027;
+            stroke-dashoffset: var(--solar-flare-peak-stroke-offset, 289.027);
+            stroke-linecap: var(--solar-flare-stroke-linecap, butt);
+            opacity: 0.5;
+            transition: stroke-dashoffset var(--solar-flare-anim-duration, 0.8s) cubic-bezier(0.25, 1, 0.5, 1),
+                        stroke 0.4s ease;
+        }
+
+        .solar-flare-progress {
+            stroke: var(--solar-flare-current-color, hsl(30, 100%, 50%));
+            stroke-width: var(--solar-flare-progress-stroke-width, 4);
+            stroke-dasharray: 289.027;
+            stroke-dashoffset: var(--solar-flare-stroke-offset, 161.85);
+            stroke-linecap: var(--solar-flare-stroke-linecap, butt);
+            transition: stroke-dashoffset var(--solar-flare-anim-duration, 0.8s) cubic-bezier(0.25, 1, 0.5, 1),
+                        stroke 0.4s ease;
+        }
+    }
+
+    .solar-flare-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        color: var(--solar-flare-current-color, hsl(30, 100%, 50%));
+        transform: translateY(var(--solar-flare-content-offset-y, 0vw));
+        pointer-events: none;
+        transition: color 0.4s ease;
+    }
+
+    .solar-flare-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-family: var(--solar-flare-label-font-family, "euro", sans-serif);
+        font-size: var(--solar-flare-label-font-size, calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.125));
+        line-height: var(--solar-flare-label-line-height, 1.05);
+        letter-spacing: var(--solar-flare-label-letter-spacing, 0.05vw);
+        text-transform: uppercase;
+        color: inherit;
+        transform: translateY(var(--solar-flare-label-offset-y, 0vw));
+        margin-bottom: var(--solar-flare-gap-label-to-class, calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.04));
+    }
+
+    .solar-flare-class {
+        font-family: var(--solar-flare-class-font-family, "euro-bold", sans-serif);
+        font-size: var(--solar-flare-class-font-size, calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.46));
+        line-height: var(--solar-flare-class-line-height, 0.85);
+        color: inherit;
+        transform: translateY(var(--solar-flare-class-offset-y, 0vw));
+        margin-bottom: var(--solar-flare-gap-class-to-value, calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02));
+    }
+
+    .solar-flare-value {
+        font-family: var(--solar-flare-value-font-family, "euro-bold", sans-serif);
+        font-size: var(--solar-flare-value-font-size, calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.22));
+        line-height: var(--solar-flare-value-line-height, 0.95);
+        letter-spacing: var(--solar-flare-value-letter-spacing, 0.04vw);
+        color: inherit;
+        transform: translateY(var(--solar-flare-value-offset-y, 0vw));
+    }
+}
+
+.solar-flare-sublabel {
+    margin-top: var(--solar-flare-sublabel-margin-top, var(--celestial-dial-label-margin-top, 0.8vw));
+    transform: translateY(var(--solar-flare-sublabel-offset-y, 0vw));
+    font-family: var(--solar-flare-sublabel-font-family, var(--sun-label-font-family, 'light', sans-serif));
+    font-size: var(--solar-flare-sublabel-font-size, 1.6vw);
+    line-height: var(--solar-flare-sublabel-line-height, 1.15);
+    letter-spacing: var(--solar-flare-sublabel-letter-spacing, 0.04vw);
+    color: var(--solar-flare-sublabel-color, var(--temp-color, rgba(255, 255, 255, 0.70)));
+    text-align: center;
+    display: block;
+    width: var(--solar-flare-sublabel-width, 100%);
+    max-width: var(--solar-flare-sublabel-max-width, var(--solar-flare-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw))));
+    white-space: normal;
+    word-break: normal;
+    user-select: none;
+    box-sizing: border-box;
+
+    i {
+        font-size: 0.85em;
+        vertical-align: 0.03vw;
+        margin-right: 0.35vw;
+    }
+}
+
+// Radio Blackout (R-Scale) Dial in Celestial Row (JCV)
+.radio-blackout-dial {
+    position: relative;
+    border-radius: 50%;
+    width: var(--radio-blackout-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
+    height: var(--radio-blackout-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
+    margin-top: var(--celestial-dial-margin-top, 0vw);
+    transform: translate(var(--radio-blackout-offset-x, 0vw), var(--radio-blackout-offset-y, 0vw));
+    background-color: var(--radio-blackout-dial-bg-color, transparent);
+    box-shadow: var(--radio-blackout-dial-inner-shadow, inset 0 0 1vw rgba(0, 0, 0, 0.5));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: pointer;
+    box-sizing: border-box;
+
+    .radio-blackout-svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transform: rotate(var(--radio-blackout-start-angle, 90deg));
+        overflow: visible;
+        z-index: 1;
+
+        .radio-blackout-track {
+            stroke: var(--radio-blackout-track-color, rgba(255, 255, 255, 0.22));
+            stroke-width: var(--radio-blackout-track-stroke-width, 4);
+        }
+
+        .radio-blackout-peak-progress {
+            stroke: var(--radio-blackout-peak-color, rgba(255, 255, 255, 0.5));
+            stroke-width: var(--radio-blackout-progress-stroke-width, 4);
+            stroke-dasharray: 289.027;
+            stroke-dashoffset: var(--radio-blackout-peak-stroke-offset, 289.027);
+            stroke-linecap: var(--radio-blackout-stroke-linecap, butt);
+            opacity: 0.5;
+            transition: stroke-dashoffset var(--radio-blackout-anim-duration, 0.8s) cubic-bezier(0.25, 1, 0.5, 1),
+                        stroke 0.4s ease;
+        }
+
+        .radio-blackout-progress {
+            stroke: var(--radio-blackout-current-color, hsl(30, 100%, 50%));
+            stroke-width: var(--radio-blackout-progress-stroke-width, 4);
+            stroke-dasharray: 289.027;
+            stroke-dashoffset: var(--radio-blackout-stroke-offset, 161.85);
+            stroke-linecap: var(--radio-blackout-stroke-linecap, butt);
+            transition: stroke-dashoffset var(--radio-blackout-anim-duration, 0.8s) cubic-bezier(0.25, 1, 0.5, 1),
+                        stroke 0.4s ease;
+        }
+    }
+
+    .radio-blackout-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        color: var(--radio-blackout-current-color, hsl(30, 100%, 50%));
+        transform: translateY(var(--radio-blackout-content-offset-y, 0vw));
+        pointer-events: none;
+        transition: color 0.4s ease;
+    }
+
+    .radio-blackout-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-family: var(--radio-blackout-label-font-family, "euro", sans-serif);
+        font-size: var(--radio-blackout-label-font-size, calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.088));
+        line-height: var(--radio-blackout-label-line-height, 1.05);
+        letter-spacing: var(--radio-blackout-label-letter-spacing, 0.05vw);
+        text-transform: uppercase;
+        color: inherit;
+        transform: translateY(var(--radio-blackout-label-offset-y, 0vw));
+        margin-bottom: var(--radio-blackout-gap-label-to-class, calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.04));
+    }
+
+    .radio-blackout-class {
+        font-family: var(--radio-blackout-class-font-family, "euro-bold", sans-serif);
+        font-size: var(--radio-blackout-class-font-size, calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.34));
+        line-height: var(--radio-blackout-class-line-height, 0.82);
+        letter-spacing: var(--radio-blackout-class-letter-spacing, 0.02vw);
+        color: inherit;
+        transform: translateY(var(--radio-blackout-class-offset-y, 0vw));
+        margin-bottom: var(--radio-blackout-gap-class-to-value, calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02));
+    }
+
+    .radio-blackout-value {
+        font-family: var(--radio-blackout-value-font-family, "euro-bold", sans-serif);
+        font-size: var(--radio-blackout-value-font-size, calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.165));
+        line-height: var(--radio-blackout-value-line-height, 0.92);
+        letter-spacing: var(--radio-blackout-value-letter-spacing, -0.03vw);
+        color: inherit;
+        transform: translateY(var(--radio-blackout-value-offset-y, 0vw));
+    }
+}
+
+.radio-blackout-sublabel {
+    margin-top: var(--radio-blackout-sublabel-margin-top, var(--celestial-dial-label-margin-top, 0.8vw));
+    transform: translateY(var(--radio-blackout-sublabel-offset-y, 0vw));
+    font-family: var(--radio-blackout-sublabel-font-family, var(--sun-label-font-family, 'light', sans-serif));
+    font-size: var(--radio-blackout-sublabel-font-size, 1.6vw);
+    line-height: var(--radio-blackout-sublabel-line-height, 1.15);
+    letter-spacing: var(--radio-blackout-sublabel-letter-spacing, 0.04vw);
+    color: var(--radio-blackout-sublabel-color, var(--temp-color, rgba(255, 255, 255, 0.70)));
+    text-align: center;
+    display: block;
+    width: var(--radio-blackout-sublabel-width, 100%);
+    max-width: var(--radio-blackout-sublabel-max-width, var(--radio-blackout-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw))));
+    white-space: normal;
+    word-break: normal;
+    user-select: none;
+    box-sizing: border-box;
+
+    i {
+        font-size: 0.85em;
+        vertical-align: 0.03vw;
+        margin-right: 0.35vw;
+    }
+}
+
+.sun-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: var(--sun-image-width, 34vw);
+    position: relative;
+    flex-shrink: 0;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    mix-blend-mode: var(--sun-image-blend-mode, lighten);
+    background-color: transparent;
+
+    &:hover .sun-label {
+        opacity: 0.95;
+    }
+}
+
+.sun-column.earth-column {
+    width: var(--earth-image-width, 24vw);
+    margin-top: 0vw;
+}
+
+.sun-column.single-mode {
+    margin: var(--celestial-row-margin-top, var(--sun-image-margin-top, 2vw)) auto 0;
+}
+
+#sun-image-container,
+#sun-image-container-right {
+    width: var(--sun-image-width, var(--celestial-base-circle-size, 34vw));
+    height: var(--sun-image-width, var(--celestial-base-circle-size, 34vw));
+    margin-top: var(--sun-image-container-margin-top, 0vw);
+    border-radius: 50%;
+    overflow: hidden;
+    clip-path: circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%));
+    -webkit-clip-path: circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%));
+    position: relative;
+    opacity: 0;
+    transition: opacity 1s ease, margin-top 0.3s ease;
+    mix-blend-mode: var(--sun-image-blend-mode, lighten);
+    background-color: transparent;
+    flex-shrink: 0;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+}
+
+#sun-image,
+#sun-image-b,
+.sun-image {
+    width: var(--sun-image-inner-scale, 36.7vw);
+    height: var(--sun-image-inner-scale, 36.7vw);
+    position: absolute;
+    top: calc(50% + var(--sun-image-offset-y, 0vw));
+    left: calc(50% + var(--sun-image-offset-x, 0vw));
+    transform: translate3d(-50%, -50%, 0);
+    -webkit-transform: translate3d(-50%, -50%, 0);
+    clip-path: circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%));
+    -webkit-clip-path: circle(var(--sun-mask-radius, 49.5%) at 50% var(--sun-mask-position-y, 50%));
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    object-fit: cover;
+    display: block;
+    mix-blend-mode: var(--sun-image-blend-mode, lighten);
+    will-change: opacity;
+}
+
+.sun-image-layer-a {
+    z-index: 1;
+    opacity: 1;
+    transition: opacity var(--sun-sizzle-crossfade-duration, var(--sun-animation-crossfade-duration, 70ms)) ease-in-out;
+}
+
+.sun-image-layer-b {
+    z-index: 2;
+    opacity: 0;
+    transition: opacity var(--sun-sizzle-crossfade-duration, var(--sun-animation-crossfade-duration, 70ms)) ease-in-out;
+}
+
+.sun-label {
+    width: 100%;
+    max-width: 100%;
+    display: block;
+    font-family: var(--sun-label-font-family, 'light', sans-serif);
+    font-size: var(--sun-label-font-size, 2.0vw);
+    letter-spacing: var(--sun-label-letter-spacing, 0.08vw);
+    padding-left: var(--sun-label-letter-spacing, 0.08vw);
+    color: var(--sun-label-color, #ffffff);
+    opacity: var(--sun-label-opacity, 0.70);
+    text-transform: var(--sun-label-text-transform, none);
+    text-align: center;
+    white-space: nowrap;
+    user-select: none;
+    line-height: 1.2;
+    box-sizing: border-box;
+    transition: opacity 0.3s ease;
+}
+
+#sun-label-left {
+    margin-top: var(--sun-label-margin-top, 0.8vw);
+    transform: translateX(calc(var(--sun-label-offset-x, 0vw) + var(--sun-label-left-offset-x, 0vw)));
+}
+
+#sun-label-right,
+#earth-label-right {
+    margin-top: var(--earth-label-margin-top, var(--sun-label-margin-top, 0.8vw));
+    transform: translateX(calc(var(--sun-label-offset-x, 0vw) + var(--sun-label-right-offset-x, 0vw)));
+}
+
+#sun-image-spacer {
+    height: var(--celestial-row-margin-bottom, var(--sun-image-margin-bottom, 2vw));
+    width: 100%;
+}
+
+// Live Earth Image in Duo Row Mode (NOAA GOES-19 GeoColor Full Disk)
+#earth-image-container {
+    width: var(--earth-image-width, var(--celestial-base-circle-size, var(--sun-image-width, 34vw)));
+    height: var(--earth-image-width, var(--celestial-base-circle-size, var(--sun-image-width, 34vw)));
+    margin-top: var(--earth-image-container-margin-top, 0vw);
+    border-radius: 50%;
+    position: relative;
+    opacity: 0;
+    transition: opacity 1s ease, margin-top 0.3s ease;
+    mix-blend-mode: lighten;
+    background-color: transparent;
+    flex-shrink: 0;
+    backface-visibility: hidden;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+}
+
+#earth-image,
+#earth-image-b,
+.earth-image {
+    width: var(--earth-image-inner-scale, 23.2vw);
+    height: var(--earth-image-inner-scale, 23.2vw);
+    position: absolute;
+    top: calc(50% + var(--earth-image-offset-y, 0vw));
+    left: calc(50% + var(--earth-image-offset-x, 0vw));
+    transform: translate3d(-50%, -45.5%, 0);
+    -webkit-transform: translate3d(-50%, -45.5%, 0);
+    clip-path: circle(var(--earth-mask-radius, 45.2%) at 50% var(--earth-mask-position-y, 45.5%));
+    -webkit-clip-path: circle(var(--earth-mask-radius, 45.2%) at 50% var(--earth-mask-position-y, 45.5%));
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    object-fit: cover;
+    display: block;
+    mix-blend-mode: lighten;
+    filter: blur(var(--earth-image-blur, 0.8px));
+    will-change: opacity;
+}
+
+.earth-layer-a {
+    z-index: 1;
+    opacity: 1;
+    transition: opacity var(--earth-animation-crossfade-duration, 80ms) ease-in-out;
+}
+
+.earth-layer-b {
+    z-index: 2;
+    opacity: 0;
+    transition: opacity var(--earth-animation-crossfade-duration, 80ms) ease-in-out;
+}
+
+#earth-image-spacer {
+    display: none;
+    height: 0;
+    width: 0;
+}
+
+/* ==========================================================================
+   Floating Sticky Scroll Navigation Button (JCV Controlled)
+   Merged Go-To-Top & Go-To-Bottom Single Button at Bottom Right
+   ========================================================================== */
+.scroll-nav-btn,
+.scroll-to-top-btn {
+    position: fixed;
+    bottom: calc(var(--scroll-nav-bottom, 2.0vw) + env(safe-area-inset-bottom, 0px));
+    right: var(--scroll-nav-right, 2.5vw);
+    width: var(--scroll-nav-size, 3.2vw);
+    height: var(--scroll-nav-size, 3.2vw);
+    border-radius: 50%;
+    background: var(--scroll-nav-bg, rgba(0, 0, 0, 0.45));
+    color: var(--scroll-nav-color, red);
+    border: var(--scroll-nav-border-width, 0.35vw) solid var(--scroll-nav-stroke-color, red);
+    font-size: var(--scroll-nav-icon-size, 1.3vw);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    cursor: pointer;
+    box-shadow: var(--scroll-nav-shadow, 0 0.4vw 1.5vw rgba(0, 0, 0, 0.6));
+    backdrop-filter: var(--scroll-nav-backdrop-filter, blur(4px));
+    -webkit-backdrop-filter: var(--scroll-nav-backdrop-filter, blur(4px));
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    z-index: var(--scroll-nav-z-index, 9000);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: scale(0.85);
+    transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+
+    i, svg {
+        pointer-events: none;
+        color: inherit;
+        font-size: var(--scroll-nav-icon-size, 1.3vw);
+        -webkit-text-stroke: var(--scroll-nav-arrow-stroke-width, 0.04vw) currentColor;
+        transition: transform 0.2s ease;
+    }
+
+    &.is-visible {
+        opacity: var(--scroll-nav-opacity, 0.9);
+        visibility: visible;
+        pointer-events: auto;
+        transform: scale(1);
+    }
+
+    &:hover {
+        opacity: var(--scroll-nav-hover-opacity, 1.0);
+        background: var(--scroll-nav-hover-bg, rgba(0, 0, 0, 0.75));
+        color: var(--scroll-nav-hover-color, #ff3333);
+        border-color: var(--scroll-nav-hover-stroke-color, #ff3333);
+        transform: scale(var(--scroll-nav-hover-scale, 1.08));
+    }
+
+    &:active {
+        transform: scale(0.95);
+    }
+
+    touch-action: manipulation;
+
+    &.mode-top:hover {
+        i, svg {
+            transform: translateY(-0.15vw);
+        }
+    }
+
+    &.mode-bottom:hover {
+        i, svg {
+            transform: translateY(0.15vw);
+        }
+    }
+}
+
+@media (max-width: 767px) {
+    .scroll-nav-btn,
+    .scroll-to-top-btn {
+        bottom: calc(var(--scroll-nav-bottom, var(--scroll-nav-bottom-mobile, 4.5vw)) + env(safe-area-inset-bottom, 0px));
+        right: var(--scroll-nav-right, var(--scroll-nav-right-mobile, 5.0vw));
+        width: var(--scroll-nav-size, var(--scroll-nav-size-mobile, 11.0vw));
+        height: var(--scroll-nav-size, var(--scroll-nav-size-mobile, 11.0vw));
+        border-width: var(--scroll-nav-border-width, var(--scroll-nav-border-width-mobile, 1.1vw));
+        font-size: var(--scroll-nav-icon-size, var(--scroll-nav-icon-size-mobile, 4.5vw));
+        touch-action: manipulation;
+
+        i, svg {
+            font-size: var(--scroll-nav-icon-size, var(--scroll-nav-icon-size-mobile, 4.5vw));
+            -webkit-text-stroke: var(--scroll-nav-arrow-stroke-width, var(--scroll-nav-arrow-stroke-mobile, 0.12vw)) currentColor;
+        }
+    }
+}
+
+/* ==========================================================================
+   --- Orrery / Solar System Planetary Orbit Ring Section (JCV Driven) ---
+   ========================================================================== */
+#orrery-section {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: var(--orrery-margin-top, 3vw);
+    margin-bottom: var(--orrery-margin-bottom, 2vw);
+    pointer-events: none;
+    z-index: var(--orrery-z-index, 10);
+    /* Blend the entire orrery against the dark page background.
+       Without this, the stacking context created by z-index traps all child
+       mix-blend-mode operations inside the section, blending against siblings
+       rather than reaching the page background. */
+    mix-blend-mode: screen;
+    background-color: transparent;
+}
+
+.orrery-ring-container {
+    position: relative;
+    width: calc(var(--orrery-radius, 35vw) * 2);
+    height: calc(var(--orrery-radius, 35vw) * 2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.orrery-svg {
+    position: absolute;
+    top: -5%;
+    left: -5%;
+    width: 110%;
+    height: 110%;
+    overflow: visible;
+}
+
+.orrery-orbit-track {
+    fill: none;
+    stroke: var(--orrery-track-color, rgba(255, 255, 255, 0.2));
+    stroke-width: var(--orrery-saturn-track-width, 0.15vw);
+}
+
+/* --- Central Sun Styling (Lighten Only, Centered Rotation & Sizzling Duplicate Layer) --- */
+.orrery-sun-body {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(var(--orrery-sun-scale, 1.0));
+    width: var(--orrery-sun-width, 12.0vw);
+    height: var(--orrery-sun-height, auto);
+    aspect-ratio: 1 / 1;
+    display: var(--orrery-sun-display, flex);
+    justify-content: center;
+    align-items: center;
+    z-index: var(--orrery-sun-z-index, 12);
+    pointer-events: auto;
+    mix-blend-mode: screen;
+    background-color: transparent;
+}
+
+.orrery-sun-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+    transform-origin: 50% 50%;
+    will-change: transform;
+    pointer-events: none;
+}
+
+.orrery-sun-img-primary,
+#orrery-sun-img {
+    z-index: var(--orrery-sun-primary-z-index, 1);
+    opacity: var(--orrery-sun-opacity, 1.0);
+    mix-blend-mode: var(--orrery-sun-blend-mode, lighten);
+    /* Rotating primary sun layer */
+    animation-name: var(--orrery-sun-rotation-animation-name, orrery-sun-spin);
+    animation-duration: var(--orrery-sun-rotation-period, 60s);
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: var(--orrery-sun-rotation-direction, normal);
+    animation-play-state: var(--orrery-sun-rotation-play-state, running);
+}
+
+.orrery-sun-img-sizzle,
+#orrery-sun-img-sizzle {
+    z-index: var(--orrery-sun-sizzle-z-index, 2);
+    opacity: var(--orrery-sun-sizzle-opacity, 1.0);
+    mix-blend-mode: var(--orrery-sun-sizzle-blend-mode, lighten);
+    display: var(--orrery-sun-sizzle-display, block);
+    /* Top duplicate layer slowly spinning over primary layer */
+    animation-name: var(--orrery-sun-sizzle-rotation-animation-name, orrery-sun-counter-spin);
+    animation-duration: var(--orrery-sun-sizzle-rotation-period, 24s);
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: var(--orrery-sun-sizzle-rotation-direction, normal);
+    animation-play-state: var(--orrery-sun-sizzle-rotation-play-state, running);
+}
+
+/* Centered Slow Rotation Keyframes for Sun (Clockwise) */
+@keyframes orrery-sun-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Centered Slow Counter-Rotation Keyframes for Sun (Opposite Direction Sizzle) */
+@keyframes orrery-sun-counter-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(-360deg);
+    }
+}
+
+/* --- Saturn Orbit Arm, Body & Styling --- */
+.orrery-saturn-arm {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform-origin: 0 0;
+    transform: rotate(var(--orrery-saturn-orbit-angle, 0deg));
+    z-index: var(--orrery-saturn-z-index, 15);
+    pointer-events: none;
+    animation: var(--orrery-saturn-orbit-animation, none);
+    will-change: transform;
+}
+
+.orrery-saturn-body {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-radius, 35vw) + var(--orrery-saturn-radial-offset, 0vw))));
+    pointer-events: auto;
+    will-change: transform;
+}
+
+.orrery-saturn-img {
+    width: var(--orrery-saturn-width, 6.5vw);
+    height: var(--orrery-saturn-height, auto);
+    max-width: none;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: auto;
+    opacity: var(--orrery-saturn-opacity, 1.0);
+    transform: var(--orrery-saturn-image-rotation, rotate(0deg));
+    animation: var(--orrery-saturn-counter-animation, none);
+    will-change: transform, filter;
+    filter: drop-shadow(var(--orrery-saturn-shadow-x, 0.3vw) var(--orrery-saturn-shadow-y, 0.6vw) var(--orrery-saturn-shadow-blur, 0.8vw) var(--orrery-saturn-shadow-color, rgba(0, 0, 0, 0.75)))
+            drop-shadow(0 0 var(--orrery-saturn-glow-blur, 0vw) var(--orrery-saturn-glow-color, transparent));
+    transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+/* Continuous Orbit Revolution Keyframes */
+@keyframes orrery-orbit-spin {
+    from {
+        transform: rotate(var(--orrery-saturn-orbit-angle, 0deg));
+    }
+    to {
+        transform: rotate(calc(var(--orrery-saturn-orbit-angle, 0deg) - 360deg));
+    }
+}
+
+/* Counter-spin Keyframes to keep Saturn axial tilt constant in astronomical space during revolution */
+@keyframes orrery-saturn-counter-spin {
+    from {
+        transform: rotate(calc(-1 * var(--orrery-saturn-orbit-angle, 0deg) + var(--orrery-saturn-axial-tilt, 0deg)));
+    }
+    to {
+        transform: rotate(calc(-1 * var(--orrery-saturn-orbit-angle, 0deg) + var(--orrery-saturn-axial-tilt, 0deg) + 360deg));
+    }
+}
+
+/* --- Jupiter Orbit Ring Track (inner circle, drawn in same SVG as Saturn track) --- */
+/* The Jupiter ring track is a second SVG circle injected by JS with class orrery-jupiter-track */
+.orrery-jupiter-track {
+    fill: none;
+    stroke: var(--orrery-track-color, rgba(255, 255, 255, 0.2));
+    stroke-width: var(--orrery-track-width, 0.05vw);
+}
+
+/* --- Jupiter Orbit Arm, Body & Styling --- */
+.orrery-jupiter-arm {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform-origin: 0 0;
+    transform: rotate(var(--orrery-jupiter-orbit-angle, 0deg));
+    z-index: var(--orrery-jupiter-z-index, 14);
+    pointer-events: none;
+    animation: var(--orrery-jupiter-orbit-animation, none);
+    will-change: transform;
+}
+
+.orrery-jupiter-body {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Positions planet at the Jupiter ring radius (not Saturn's) */
+    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-jupiter-ring-radius, 30vw) + var(--orrery-jupiter-radial-offset, 0vw))));
+    pointer-events: auto;
+    will-change: transform;
+}
+
+.orrery-jupiter-img {
+    width: var(--orrery-jupiter-width, 4.5vw);
+    height: var(--orrery-jupiter-height, auto);
+    max-width: none;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: auto;
+    opacity: var(--orrery-jupiter-opacity, 1.0);
+    transform: var(--orrery-jupiter-image-rotation, rotate(0deg));
+    animation: var(--orrery-jupiter-counter-animation, none);
+    will-change: transform, filter;
+    filter: drop-shadow(var(--orrery-jupiter-shadow-x, 0.2vw) var(--orrery-jupiter-shadow-y, 0.5vw) var(--orrery-jupiter-shadow-blur, 0.7vw) var(--orrery-jupiter-shadow-color, rgba(0, 0, 0, 0.75)))
+            drop-shadow(0 0 var(--orrery-jupiter-glow-blur, 0vw) var(--orrery-jupiter-glow-color, transparent));
+    transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+/* Jupiter Continuous Orbit Revolution Keyframes */
+@keyframes orrery-jupiter-orbit-spin {
+    from { transform: rotate(var(--orrery-jupiter-orbit-angle, 0deg)); }
+    to   { transform: rotate(calc(var(--orrery-jupiter-orbit-angle, 0deg) - 360deg)); }
+}
+
+/* Counter-spin to keep Jupiter orientation fixed in space during revolution */
+@keyframes orrery-jupiter-counter-spin {
+    from { transform: rotate(calc(-1 * var(--orrery-jupiter-orbit-angle, 0deg) + var(--orrery-jupiter-axial-tilt, 0deg))); }
+    to   { transform: rotate(calc(-1 * var(--orrery-jupiter-orbit-angle, 0deg) + var(--orrery-jupiter-axial-tilt, 0deg) + 360deg)); }
+}
+
+/* --- Jupiter Galilean Moons (Telescope Array Simulation) --- */
+.orrery-jupiter-moons-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform: var(--orrery-jupiter-image-rotation, rotate(0deg)) translateY(var(--orrery-jupiter-moons-y-offset, 0vw));
+    pointer-events: none;
+    z-index: 15;
+    display: var(--orrery-jupiter-moons-display, block);
+}
+
+.orrery-galilean-moon {
+    position: absolute;
+    top: 50%;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: auto;
+    cursor: default;
+    box-shadow: 0 0 var(--orrery-jupiter-moons-glow-blur, 0.25vw) var(--orrery-jupiter-moons-glow-color, rgba(255, 255, 220, 0.8));
+    transition: opacity 0.3s ease;
+}
+
+/* ==========================================================================
+   --- Mars Orbit Ring (5/6 of Jupiter circumference = 20.83vw radius) ---
+   ========================================================================== */
+.orrery-mars-track {
+    fill: none;
+    stroke: var(--orrery-track-color, rgba(255, 255, 255, 0.2));
+    stroke-width: var(--orrery-track-width, 0.05vw);
+}
+
+.orrery-mars-arm {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 0; height: 0;
+    transform-origin: 0 0;
+    transform: rotate(var(--orrery-mars-orbit-angle, 0deg));
+    z-index: var(--orrery-mars-z-index, 13);
+    pointer-events: none;
+    animation: var(--orrery-mars-orbit-animation, none);
+    will-change: transform;
+}
+
+.orrery-mars-body {
+    position: absolute;
+    top: 0; left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-mars-ring-radius, 25vw) + var(--orrery-mars-radial-offset, 0vw))));
+    pointer-events: auto;
+    will-change: transform;
+}
+
+.orrery-mars-img {
+    width: var(--orrery-mars-width, 2.8vw);
+    height: var(--orrery-mars-height, auto);
+    max-width: none;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: auto;
+    opacity: var(--orrery-mars-opacity, 1.0);
+    transform: var(--orrery-mars-image-rotation, rotate(0deg));
+    animation: var(--orrery-mars-counter-animation, none);
+    will-change: transform, filter;
+    filter: drop-shadow(var(--orrery-mars-shadow-x, 0.15vw) var(--orrery-mars-shadow-y, 0.4vw) var(--orrery-mars-shadow-blur, 0.6vw) var(--orrery-mars-shadow-color, rgba(0, 0, 0, 0.75)))
+            drop-shadow(0 0 var(--orrery-mars-glow-blur, 0vw) var(--orrery-mars-glow-color, transparent));
+    transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+@keyframes orrery-mars-orbit-spin {
+    from { transform: rotate(var(--orrery-mars-orbit-angle, 0deg)); }
+    to   { transform: rotate(calc(var(--orrery-mars-orbit-angle, 0deg) - 360deg)); }
+}
+@keyframes orrery-mars-counter-spin {
+    from { transform: rotate(calc(-1 * var(--orrery-mars-orbit-angle, 0deg) + var(--orrery-mars-axial-tilt, 0deg))); }
+    to   { transform: rotate(calc(-1 * var(--orrery-mars-orbit-angle, 0deg) + var(--orrery-mars-axial-tilt, 0deg) + 360deg)); }
+}
+
+/* ==========================================================================
+   --- Earth Orbit Ring (5/6 of Mars circumference = 17.36vw radius) ---
+   ========================================================================== */
+.orrery-earth-track {
+    fill: none;
+    stroke: var(--orrery-track-color, rgba(255, 255, 255, 0.2));
+    stroke-width: var(--orrery-track-width, 0.05vw);
+}
+
+.orrery-earth-arm {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 0; height: 0;
+    transform-origin: 0 0;
+    transform: rotate(var(--orrery-earth-orbit-angle, 0deg));
+    z-index: var(--orrery-earth-z-index, 12);
+    pointer-events: none;
+    animation: var(--orrery-earth-orbit-animation, none);
+    will-change: transform;
+}
+
+.orrery-earth-body {
+    position: absolute;
+    top: 0; left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-earth-ring-radius, 20vw) + var(--orrery-earth-radial-offset, 0vw))));
+    pointer-events: auto;
+    will-change: transform;
+}
+
+.orrery-earth-img {
+    width: var(--orrery-earth-width, 3.2vw);
+    height: var(--orrery-earth-height, auto);
+    max-width: none;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: auto;
+    opacity: var(--orrery-earth-opacity, 1.0);
+    transform: var(--orrery-earth-image-rotation, rotate(0deg));
+    animation: var(--orrery-earth-counter-animation, none);
+    will-change: transform, filter;
+    filter: drop-shadow(var(--orrery-earth-shadow-x, 0.15vw) var(--orrery-earth-shadow-y, 0.35vw) var(--orrery-earth-shadow-blur, 0.5vw) var(--orrery-earth-shadow-color, rgba(0, 0, 0, 0.75)))
+            drop-shadow(0 0 var(--orrery-earth-glow-blur, 0vw) var(--orrery-earth-glow-color, transparent));
+    transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+@keyframes orrery-earth-orbit-spin {
+    from { transform: rotate(var(--orrery-earth-orbit-angle, 0deg)); }
+    to   { transform: rotate(calc(var(--orrery-earth-orbit-angle, 0deg) - 360deg)); }
+}
+@keyframes orrery-earth-counter-spin {
+    from { transform: rotate(calc(-1 * var(--orrery-earth-orbit-angle, 0deg) + var(--orrery-earth-axial-tilt, 0deg))); }
+    to   { transform: rotate(calc(-1 * var(--orrery-earth-orbit-angle, 0deg) + var(--orrery-earth-axial-tilt, 0deg) + 360deg)); }
+}
+
+/* ==========================================================================
+   --- Moon Orbit Ring & Body around Earth ---
+   ========================================================================== */
+.orrery-moon-track {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: calc(var(--orrery-moon-distance, 2.4vw) * 2);
+    height: calc(var(--orrery-moon-distance, 2.4vw) * 2);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: var(--orrery-moon-track-width, 0.04vw) solid var(--orrery-moon-track-color, rgba(255, 255, 255, 0.18));
+    opacity: var(--orrery-moon-track-opacity, 0);
+    pointer-events: none;
+    display: var(--orrery-moon-track-display, block);
+    box-sizing: border-box;
+    z-index: 11;
+}
+
+.orrery-moon-arm {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform-origin: 0 0;
+    transform: rotate(var(--orrery-moon-orbit-angle, 0deg));
+    z-index: var(--orrery-moon-z-index, 14);
+    pointer-events: none;
+    animation: var(--orrery-moon-orbit-animation, none);
+    will-change: transform;
+    display: var(--orrery-moon-display, flex);
+}
+
+.orrery-moon-body {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-moon-distance, 2.4vw) + var(--orrery-moon-radial-offset, 0vw))));
+    pointer-events: auto;
+    will-change: transform;
+}
+
+.orrery-moon-img {
+    width: var(--orrery-moon-width, 0.8vw);
+    height: var(--orrery-moon-height, auto);
+    max-width: none;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: auto;
+    opacity: var(--orrery-moon-opacity, 1.0);
+    transform: var(--orrery-moon-image-rotation, rotate(0deg));
+    animation: var(--orrery-moon-counter-animation, none);
+    will-change: transform, filter;
+    filter: drop-shadow(var(--orrery-moon-shadow-x, 0.1vw) var(--orrery-moon-shadow-y, 0.2vw) var(--orrery-moon-shadow-blur, 0.3vw) var(--orrery-moon-shadow-color, rgba(0, 0, 0, 0.75)))
+            drop-shadow(0 0 var(--orrery-moon-glow-blur, 0vw) var(--orrery-moon-glow-color, transparent));
+    transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+@keyframes orrery-moon-orbit-spin {
+    from { transform: rotate(var(--orrery-moon-orbit-angle, 0deg)); }
+    to   { transform: rotate(calc(var(--orrery-moon-orbit-angle, 0deg) - 360deg)); }
+}
+@keyframes orrery-moon-counter-spin {
+    from { transform: rotate(calc(-1 * var(--orrery-moon-orbit-angle, 0deg) + var(--orrery-moon-axial-tilt, 0deg))); }
+    to   { transform: rotate(calc(-1 * var(--orrery-moon-orbit-angle, 0deg) + var(--orrery-moon-axial-tilt, 0deg) + 360deg)); }
+}
+
+
+/* ==========================================================================
+   --- Venus Orbit Ring (5/6 of Earth circumference = 14.47vw radius) ---
+   ========================================================================== */
+.orrery-venus-track {
+    fill: none;
+    stroke: var(--orrery-track-color, rgba(255, 255, 255, 0.2));
+    stroke-width: var(--orrery-track-width, 0.05vw);
+}
+
+.orrery-venus-arm {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 0; height: 0;
+    transform-origin: 0 0;
+    transform: rotate(var(--orrery-venus-orbit-angle, 0deg));
+    z-index: var(--orrery-venus-z-index, 11);
+    pointer-events: none;
+    animation: var(--orrery-venus-orbit-animation, none);
+    will-change: transform;
+}
+
+.orrery-venus-body {
+    position: absolute;
+    top: 0; left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-venus-ring-radius, 15vw) + var(--orrery-venus-radial-offset, 0vw))));
+    pointer-events: auto;
+    will-change: transform;
+}
+
+.orrery-venus-img {
+    width: var(--orrery-venus-width, 2.8vw);
+    height: var(--orrery-venus-height, auto);
+    max-width: none;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: auto;
+    opacity: var(--orrery-venus-opacity, 1.0);
+    transform: var(--orrery-venus-image-rotation, rotate(0deg));
+    animation: var(--orrery-venus-counter-animation, none);
+    will-change: transform, filter;
+    filter: drop-shadow(var(--orrery-venus-shadow-x, 0.12vw) var(--orrery-venus-shadow-y, 0.3vw) var(--orrery-venus-shadow-blur, 0.5vw) var(--orrery-venus-shadow-color, rgba(0, 0, 0, 0.75)))
+            drop-shadow(0 0 var(--orrery-venus-glow-blur, 0vw) var(--orrery-venus-glow-color, transparent));
+    transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+@keyframes orrery-venus-orbit-spin {
+    from { transform: rotate(var(--orrery-venus-orbit-angle, 0deg)); }
+    to   { transform: rotate(calc(var(--orrery-venus-orbit-angle, 0deg) - 360deg)); }
+}
+@keyframes orrery-venus-counter-spin {
+    from { transform: rotate(calc(-1 * var(--orrery-venus-orbit-angle, 0deg) + var(--orrery-venus-axial-tilt, 0deg))); }
+    to   { transform: rotate(calc(-1 * var(--orrery-venus-orbit-angle, 0deg) + var(--orrery-venus-axial-tilt, 0deg) + 360deg)); }
+}
+
+/* ==========================================================================
+   --- Mercury Orbit Ring (5/6 of Venus circumference = 12.06vw radius) ---
+   Sun center gap: ~12.06vw from center — 2× the Mercury-Venus radial spacing
+   ========================================================================== */
+.orrery-mercury-track {
+    fill: none;
+    stroke: var(--orrery-track-color, rgba(255, 255, 255, 0.2));
+    stroke-width: var(--orrery-track-width, 0.05vw);
+}
+
+.orrery-mercury-arm {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 0; height: 0;
+    transform-origin: 0 0;
+    transform: rotate(var(--orrery-mercury-orbit-angle, 0deg));
+    z-index: var(--orrery-mercury-z-index, 10);
+    pointer-events: none;
+    animation: var(--orrery-mercury-orbit-animation, none);
+    will-change: transform;
+}
+
+.orrery-mercury-body {
+    position: absolute;
+    top: 0; left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translate(-50%, -50%) translateY(calc(-1 * (var(--orrery-mercury-ring-radius, 10vw) + var(--orrery-mercury-radial-offset, 0vw))));
+    pointer-events: auto;
+    will-change: transform;
+}
+
+.orrery-mercury-img {
+    width: var(--orrery-mercury-width, 2.2vw);
+    height: var(--orrery-mercury-height, auto);
+    max-width: none;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: auto;
+    opacity: var(--orrery-mercury-opacity, 1.0);
+    transform: var(--orrery-mercury-image-rotation, rotate(0deg));
+    animation: var(--orrery-mercury-counter-animation, none);
+    will-change: transform, filter;
+    filter: drop-shadow(var(--orrery-mercury-shadow-x, 0.1vw) var(--orrery-mercury-shadow-y, 0.25vw) var(--orrery-mercury-shadow-blur, 0.4vw) var(--orrery-mercury-shadow-color, rgba(0, 0, 0, 0.75)))
+            drop-shadow(0 0 var(--orrery-mercury-glow-blur, 0vw) var(--orrery-mercury-glow-color, transparent));
+    transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+@keyframes orrery-mercury-orbit-spin {
+    from { transform: rotate(var(--orrery-mercury-orbit-angle, 0deg)); }
+    to   { transform: rotate(calc(var(--orrery-mercury-orbit-angle, 0deg) - 360deg)); }
+}
+@keyframes orrery-mercury-counter-spin {
+    from { transform: rotate(calc(-1 * var(--orrery-mercury-orbit-angle, 0deg) + var(--orrery-mercury-axial-tilt, 0deg))); }
+    to   { transform: rotate(calc(-1 * var(--orrery-mercury-orbit-angle, 0deg) + var(--orrery-mercury-axial-tilt, 0deg) + 360deg)); }
+}
+
+/* ==========================================================================
+   --- Spaceship Video ---
+   ========================================================================== */
+.spaceship-video {
+    position: absolute;
+    bottom: var(--spaceship-bottom, 0vw);
+    left: var(--spaceship-left, 0vw);
+    width: var(--spaceship-width, 15vw);
+    z-index: 9999;
+    pointer-events: none; // Allows clicks to pass through
+    object-fit: contain;
+    mix-blend-mode: screen; // Default to screen for iOS black background fallback
+    @media (min-width: 768px) {
+        mix-blend-mode: normal; // Desktop uses WebM alpha channel perfectly
+    }
+    will-change: transform, translate; // Hint for iOS hardware acceleration
+    translate: 0 0;
+    transform: translateY(0vw) rotate(0deg);
+    // Slow land down and smooth finish
+    transition: transform var(--spaceship-land-duration, 4s) cubic-bezier(0.6, 0.0, 0.4, 1.0), translate var(--spaceship-land-duration, 4s) cubic-bezier(0.6, 0.0, 0.4, 1.0);
+    
+    &.rising {
+        translate: 0 0;
+        transform: translateY(calc(-1 * var(--spaceship-rise-distance, 20vw))) rotate(0deg);
+        // Slow lift off and smooth deceleration near top
+        transition: transform var(--spaceship-rise-duration, 4s) cubic-bezier(0.6, 0.0, 0.4, 1.0), translate var(--spaceship-rise-duration, 4s) cubic-bezier(0.6, 0.0, 0.4, 1.0);
+    }
+    
+    &.floating-away {
+        // Separate translate (X axis) from transform (Y axis) to get physical curves!
+        // Applying different easing curves to X and Y creates a genuine sweeping arc path.
+        translate: var(--spaceship-float-x, 120vw) 0;
+        transform: translateY(calc(-1 * var(--spaceship-rise-distance, 20vw) + var(--spaceship-float-y, 0vw))) rotate(var(--spaceship-float-rotate, 0deg));
+        // X uses ease-in (starts slow, speeds up). Y uses ease-out (starts fast, slows down).
+        transition: translate var(--spaceship-float-duration, 10s) ease-in,
+                    transform var(--spaceship-float-duration, 10s) ease-out;
+    }
+    
+    &.returning-from-below {
+        translate: 0 0;
+        // Teleport completely off-screen straight below its base position
+        transform: translateY(30vw) rotate(0deg);
+        // Instant teleport, no transition so it's not seen moving there
+        transition: none;
+    }
+}
+.orrery-planet-label {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: var(--orrery-planet-label-margin-top, 1vw);
+  font-size: var(--orrery-planet-label-font-size, 1vw);
+  font-family: 'medium', sans-serif;
+  white-space: nowrap;
+  pointer-events: none;
+  text-shadow: 0 0.1vw 0.2vw rgba(0, 0, 0, 0.8), 0 0 0.4vw rgba(0, 0, 0, 0.8);
+  /* The counter-rotation is handled by the parent body */
+}
