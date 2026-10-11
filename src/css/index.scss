@@ -1016,13 +1016,15 @@ main {
     grid-template-columns: repeat(8, 1fr);
     gap: 1vw;
     padding-top: 0vw; // EDITABLE: Gap between day dates row and rain inches row
+    align-items: start;
 }
 
 .rainItem {
     background-color: var(--bitByBitBlue);
+    border-radius: 0.5vw;
     opacity: 0; // Hide until JS calculates rain percentage
     visibility: hidden;
-    transition: opacity 0.5s ease, transform 0.5s ease-out; // Smooth fade and stretch
+    transition: opacity 0.5s ease, padding-bottom 0.5s ease-out, margin-bottom 0.5s ease-out; // Smooth fade and stretch
     padding: 0.25vw 0;
     text-align: center;
     color: white;

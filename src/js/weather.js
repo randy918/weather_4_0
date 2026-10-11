@@ -8291,7 +8291,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const RADIO_BLACKOUT_SUBLABEL_MARGIN_TOP_MOBILE = '1.2vw';     // EDITABLE Mobile: Margin top below dial circle
   const RADIO_BLACKOUT_SUBLABEL_PEAK_MARGIN_TOP_DESKTOP = '1.5vw'; // EDITABLE Desktop: Margin top for the PEAK line
   const RADIO_BLACKOUT_SUBLABEL_PEAK_MARGIN_TOP_MOBILE = '1.5vw';  // EDITABLE Mobile: Margin top for the PEAK line
-  const RADIO_BLACKOUT_SUBLABEL_PEAK_VALUE_MARGIN_TOP_DESKTOP = '1.0vw'; // EDITABLE Desktop: Margin top between PEAK class and value
+  const RADIO_BLACKOUT_SUBLABEL_PEAK_VALUE_MARGIN_TOP_DESKTOP = '0vw'; // EDITABLE Desktop: Margin top between PEAK class and value
   const RADIO_BLACKOUT_SUBLABEL_PEAK_VALUE_MARGIN_TOP_MOBILE = '1.0vw';  // EDITABLE Mobile: Margin top between PEAK class and value
   const RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_DESKTOP = '0vw';        // EDITABLE Desktop: Fine vertical nudge
   const RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_MOBILE = '0vw';         // EDITABLE Mobile: Fine vertical nudge
@@ -8429,7 +8429,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const GEOMAGNETIC_STORM_SUBLABEL_MARGIN_TOP_MOBILE = '1.2vw';     // EDITABLE Mobile: Margin top below dial circle
   const GEOMAGNETIC_STORM_SUBLABEL_PEAK_MARGIN_TOP_DESKTOP = '1.5vw'; // EDITABLE Desktop: Margin top for the PEAK line
   const GEOMAGNETIC_STORM_SUBLABEL_PEAK_MARGIN_TOP_MOBILE = '1.5vw';  // EDITABLE Mobile: Margin top for the PEAK line
-  const GEOMAGNETIC_STORM_SUBLABEL_PEAK_VALUE_MARGIN_TOP_DESKTOP = '1.0vw'; // EDITABLE Desktop: Margin top between PEAK class and value
+  const GEOMAGNETIC_STORM_SUBLABEL_PEAK_VALUE_MARGIN_TOP_DESKTOP = '0vw'; // EDITABLE Desktop: Margin top between PEAK class and value
   const GEOMAGNETIC_STORM_SUBLABEL_PEAK_VALUE_MARGIN_TOP_MOBILE = '1.0vw';  // EDITABLE Mobile: Margin top between PEAK class and value
   const GEOMAGNETIC_STORM_SUBLABEL_OFFSET_Y_DESKTOP = '0vw';        // EDITABLE Desktop: Fine vertical nudge
   const GEOMAGNETIC_STORM_SUBLABEL_OFFSET_Y_MOBILE = '0vw';         // EDITABLE Mobile: Fine vertical nudge
@@ -9826,8 +9826,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_PLANET_LABELS_ENABLED = true;                   // EDITABLE: Toggle visibility of planet distance labels
   const ORRERY_PLANET_LABEL_FONT_SIZE_DESKTOP = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.11)'; // EDITABLE Desktop: Label font size
   const ORRERY_PLANET_LABEL_FONT_SIZE_MOBILE = 'calc(var(--solar-flare-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.11)';  // EDITABLE Mobile: Label font size
-  const ORRERY_PLANET_LABEL_MARGIN_TOP_DESKTOP = '0.5vw';        // EDITABLE Desktop: Label margin top
-  const ORRERY_PLANET_LABEL_MARGIN_TOP_MOBILE = '0.75vw';       // EDITABLE Mobile: Label margin top
+  const ORRERY_PLANET_LABEL_MARGIN_TOP_DESKTOP = '0.3vw';        // EDITABLE Desktop: Label margin top
+  const ORRERY_PLANET_LABEL_MARGIN_TOP_MOBILE = '0.45vw';       // EDITABLE Mobile: Label margin top
 
   // --- EDITABLE: Central Sun In Orrery Config (JCV) ---
   const ORRERY_SUN_ENABLED = true;                         // EDITABLE: Toggle visibility of central Sun
@@ -10530,7 +10530,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1434';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1446';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -12054,20 +12054,25 @@ Plan ahead for significantly warmer conditions tomorrow!`
        }
 
        labelEls.forEach(labelEl => {
-          let labelColor = 'inherit';
-          if (dewpoint !== null) {
-             const dewF = Math.round(dewpoint);
-             if (displayUnit === 'BOTH') {
-                const dewC = Math.round((dewF - 32) * 5 / 9);
-                labelEl.innerHTML = `Dew Pt ${dewF}${formatSlash()}${dewC}°`;
-             } else {
-                labelEl.innerHTML = `Dew Pt ${dewF}°`;
-             }
-             labelColor = tempToColor(dewpoint) || 'inherit';
+          if (currentIsNight) {
+             labelEl.innerHTML = `Humidity`;
+             labelEl.style.color = 'var(--temp-color, rgba(255,255,255,0.7))';
           } else {
-             labelEl.innerHTML = `Dew Pt --`;
+             let labelColor = 'inherit';
+             if (dewpoint !== null) {
+                const dewF = Math.round(dewpoint);
+                if (displayUnit === 'BOTH') {
+                   const dewC = Math.round((dewF - 32) * 5 / 9);
+                   labelEl.innerHTML = `Dew Pt ${dewF}${formatSlash()}${dewC}°`;
+                } else {
+                   labelEl.innerHTML = `Dew Pt ${dewF}°`;
+                }
+                labelColor = tempToColor(dewpoint) || 'inherit';
+             } else {
+                labelEl.innerHTML = `Dew Pt --`;
+             }
+             labelEl.style.color = labelColor;
           }
-          labelEl.style.color = labelColor;
           labelEl.style.textTransform = 'none';
        });
     } else {
@@ -12230,6 +12235,71 @@ Plan ahead for significantly warmer conditions tomorrow!`
        return `hsl(${h}, ${s}%, ${l}%)`;
     }
 
+    const labelEls = document.querySelectorAll('.label-title-8, .label-title-4');
+    
+    if (currentIsNight) {
+      const dewpoint = data?.current?.dew_point !== undefined ? Number(data.current.dew_point) : null;
+      const currentTemp = data?.current?.temp || null;
+      const tempColor = currentTemp !== null ? tempToColor(currentTemp) : null;
+      
+      peakEls.forEach(el => el.style.display = 'none');
+      
+      const dewpointColor = dewpoint !== null ? tempToColor(dewpoint) : 'hsl(120, 80%, 40%)';
+      const finalColor = tempColor || dewpointColor;
+
+      progressEls.forEach(el => {
+        if (finalColor) el.style.stroke = finalColor;
+      });
+
+      if (dewpoint !== null) {
+        const getRadius = () => 46;
+        animateGauge(progressEls, dewpoint, prevUvDialVal, DEWPOINT_DIAL_MIN, DEWPOINT_DIAL_AVG, DEWPOINT_DIAL_MAX, getRadius);
+        prevUvDialVal = dewpoint;
+      } else {
+        progressEls.forEach(el => el.style.strokeDashoffset = circumference);
+        prevUvDialVal = null;
+      }
+
+      let trendHtml = '';
+      if (dewpoint !== null) {
+        const dewF = Math.round(dewpoint);
+        const dewTrend = getPersistentTrendDirection('weather_trend_dewpoint', dewF);
+        let iconClass = '';
+        if (dewTrend === 'up') iconClass = "fa-angle-up";
+        else if (dewTrend === 'down') iconClass = "fa-angle-down";
+        if (iconClass) {
+          trendHtml = `<div style="position: absolute; top: ${BAROMETRIC_TREND_TOP_POS}; width: 100%; text-align: center; font-size: ${BAROMETRIC_TREND_FONT_SIZE};"><i class="fa-solid ${iconClass}"></i></div>`;
+        }
+      }
+
+      textEls.forEach(gridUvTextEl => {
+         if (dewpoint !== null) {
+            const dewF = Math.round(dewpoint);
+            let displayStr = '';
+            const degSuffix = '°';
+            if (displayUnit === 'BOTH') {
+               const dewC = Math.round((dewF - 32) * 5 / 9);
+               displayStr = `${dewF}${formatSlash()}${dewC}${degSuffix}`;
+            } else {
+               displayStr = `${displayUnit === 'C' ? Math.round((dewF - 32) * 5 / 9) : dewF}${degSuffix}`;
+            }
+            gridUvTextEl.innerHTML = `${trendHtml}${displayStr}<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Td</span>`;
+            gridUvTextEl.style.color = finalColor;
+         } else {
+            gridUvTextEl.innerHTML = `--<br><span style="display: inline-block; transform: translateY(${CLOCK_GRID_INNER_LABEL_Y_OFFSET}); font-size: var(--clock-inner-label-size); opacity: 1; font-family: ${CLOCK_GRID_INNER_LABEL_FONT_FAMILY};">Td</span>`;
+            gridUvTextEl.style.color = '#ffffff';
+         }
+      });
+
+      labelEls.forEach(labelEl => {
+         labelEl.innerHTML = `Dew Point`;
+         labelEl.style.color = 'var(--temp-color, rgba(255,255,255,0.7))';
+         labelEl.style.textTransform = 'none';
+         labelEl.style.letterSpacing = 'var(--clock-grid-uv-label-letter-spacing)';
+      });
+      return;
+    }
+
     const uvColor = getUvColor(uvIndex);
     progressEls.forEach(el => el.style.stroke = uvColor);
        
@@ -12274,7 +12344,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
        }
     });
        
-    const labelEls = document.querySelectorAll('.label-title-8, .label-title-4');
     labelEls.forEach(labelEl => {
        if (dailyPeakUv !== null && dailyPeakUv > 0) {
           labelEl.innerHTML = `Peak UV ${dailyPeakUv.toFixed(1)}`;
@@ -18292,26 +18361,29 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }
       
       // Set height based on rain amount (only grow if > 1 inch)
-      // Cells grow downward from fixed top position
+      // We use padding-bottom instead of scaleY to prevent border-radius distortion
       if (rainInches > 1) {
-        item.style.transformOrigin = 'top';
-        item.style.transform = `scaleY(${rainInches.toFixed(2)})`;
+        // Base height of the element is roughly 4.5vw.
+        // We add (rainInches - 1) * 4.5vw to paddingBottom.
+        const extraPadding = (rainInches - 1) * 4.5;
+        item.style.paddingBottom = `${0.25 + extraPadding}vw`;
+        item.style.marginBottom = `-${extraPadding}vw`; // Prevent pushing other elements down
+        item.style.transform = ''; // Clear any old transform
         
-        // Counter-scale the text so it doesn't stretch
+        // Reset text scale in case it was previously scaled
         const textEl = item.querySelector('.rain-text');
         if (textEl) {
-          textEl.style.transformOrigin = 'top';
-          textEl.style.transform = `scaleY(${(1 / rainInches).toFixed(3)})`;
+          textEl.style.transform = '';
         }
       } else {
-        item.style.transformOrigin = 'top';
-        item.style.transform = 'scaleY(1)';
+        item.style.paddingBottom = '0.25vw';
+        item.style.marginBottom = '0vw';
+        item.style.transform = ''; // Clear any old transform
         
         // Reset text scale
         const textEl = item.querySelector('.rain-text');
         if (textEl) {
-          textEl.style.transformOrigin = 'top';
-          textEl.style.transform = 'scaleY(1)';
+          textEl.style.transform = '';
         }
       }
       
