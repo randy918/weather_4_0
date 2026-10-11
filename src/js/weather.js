@@ -593,7 +593,8 @@ import weatherConditions from '../data/weather-conditions.json';
   const CLOCK_GRID_GAP = '1vw';          // EDITABLE: Gap between cells
   const CLOCK_GRID_MARGIN_TOP_DESKTOP = '2.2vw'; // EDITABLE Desktop: Top margin of the row / gap below summary
   const CLOCK_GRID_MARGIN_TOP_MOBILE = '3.0vw';  // EDITABLE Mobile: Top margin of the row / gap below summary
-  const CLOCK_GRID_MARGIN_BOTTOM = '0vw';// EDITABLE: Bottom margin of the row
+  const CLOCK_GRID_MARGIN_BOTTOM_DESKTOP = '-6vw'; // EDITABLE Desktop: Bottom margin of the row / gap below 5 clocks
+  const CLOCK_GRID_MARGIN_BOTTOM_MOBILE = '0vw';  // EDITABLE Mobile: Bottom margin of the row / gap below 5 clocks
   const CLOCK_GRID_MARGIN_LEFT = '2vw';  // EDITABLE: Left margin for the row as a whole
   const CLOCK_GRID_MARGIN_RIGHT = '2vw'; // EDITABLE: Right margin for the row as a whole
   const CLOCK_GRID_TRACK_COLOR = 'rgba(255, 255, 255, 0.2)'; // EDITABLE: Circle track color
@@ -658,7 +659,9 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--clock-grid-gap', CLOCK_GRID_GAP);
   document.documentElement.style.setProperty('--clock-grid-margin-top-desktop', CLOCK_GRID_MARGIN_TOP_DESKTOP);
   document.documentElement.style.setProperty('--clock-grid-margin-top-mobile', CLOCK_GRID_MARGIN_TOP_MOBILE);
-  document.documentElement.style.setProperty('--clock-grid-margin-bottom', CLOCK_GRID_MARGIN_BOTTOM);
+  document.documentElement.style.setProperty('--clock-grid-margin-bottom-desktop', CLOCK_GRID_MARGIN_BOTTOM_DESKTOP);
+  document.documentElement.style.setProperty('--clock-grid-margin-bottom-mobile', CLOCK_GRID_MARGIN_BOTTOM_MOBILE);
+  document.documentElement.style.setProperty('--clock-grid-margin-bottom', window.innerWidth <= 767 ? CLOCK_GRID_MARGIN_BOTTOM_MOBILE : CLOCK_GRID_MARGIN_BOTTOM_DESKTOP);
   document.documentElement.style.setProperty('--clock-grid-margin-left', CLOCK_GRID_MARGIN_LEFT);
   document.documentElement.style.setProperty('--clock-grid-margin-right', CLOCK_GRID_MARGIN_RIGHT);
   document.documentElement.style.setProperty('--clock-grid-track-color', CLOCK_GRID_TRACK_COLOR);
@@ -10530,7 +10533,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1425';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1426';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
