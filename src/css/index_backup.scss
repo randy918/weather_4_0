@@ -1312,8 +1312,8 @@ main {
             transition: stroke-dashoffset var(--gauge-transition-duration, 0.8s) var(--gauge-transition-easing, cubic-bezier(0.25, 1, 0.5, 1)), stroke 0.5s ease;
         }
 
-        /* Override absolute positioning and sizing for Solar Flare and Radio Blackout to prevent clipping of outer r=51 tracks on iOS Safari */
-        &.solar-flare-svg, &.radio-blackout-svg {
+        /* Override absolute positioning and sizing for dials with outer r=51 tracks to prevent clipping on iOS Safari */
+        &.solar-flare-svg, &.radio-blackout-svg, .clockGridItem-8 &, .clockGridItem-4 & {
             top: -5%;
             left: -5%;
             width: 110%;

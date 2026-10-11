@@ -1312,8 +1312,8 @@ main {
             transition: stroke-dashoffset var(--gauge-transition-duration, 0.8s) var(--gauge-transition-easing, cubic-bezier(0.25, 1, 0.5, 1)), stroke 0.5s ease;
         }
 
-        /* Override absolute positioning and sizing for Solar Flare and Radio Blackout to prevent clipping of outer r=51 tracks on iOS Safari */
-        &.solar-flare-svg, &.radio-blackout-svg {
+        /* Override absolute positioning and sizing for dials with outer r=51 tracks to prevent clipping on iOS Safari */
+        &.solar-flare-svg, &.radio-blackout-svg, .clockGridItem-8 &, .clockGridItem-4 & {
             top: -5%;
             left: -5%;
             width: 110%;
@@ -2492,7 +2492,7 @@ main {
 }
 
 // Radio Blackout (R-Scale) Dial in Celestial Row (JCV)
-.radio-blackout-dial {
+.celestial-clock-column .radio-blackout-dial {
     position: relative;
     border-radius: 50%;
     width: var(--radio-blackout-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
@@ -2597,7 +2597,7 @@ main {
 
 .radio-blackout-sublabel {
     margin-top: var(--radio-blackout-sublabel-margin-top, var(--celestial-dial-label-margin-top, 0.8vw));
-    transform: translateY(var(--radio-blackout-sublabel-offset-y, 0vw));
+    transform: translate(var(--radio-blackout-offset-x, 0vw), var(--radio-blackout-sublabel-offset-y, 0vw));
     font-family: var(--radio-blackout-sublabel-font-family, var(--sun-label-font-family, 'light', sans-serif));
     font-size: var(--radio-blackout-sublabel-font-size, 1.6vw);
     line-height: var(--radio-blackout-sublabel-line-height, 1.15);
@@ -3534,7 +3534,7 @@ main {
 
 
 // Geomagnetic Storm (G-Scale) Dial in Celestial Row (JCV)
-.geomagnetic-storm-dial {
+.celestial-clock-column .geomagnetic-storm-dial {
     position: relative;
     border-radius: 50%;
     width: var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
@@ -3639,7 +3639,7 @@ main {
 
 .geomagnetic-storm-sublabel {
     margin-top: var(--geomagnetic-storm-sublabel-margin-top, var(--celestial-dial-label-margin-top, 0.8vw));
-    transform: translateY(var(--geomagnetic-storm-sublabel-offset-y, 0vw));
+    transform: translate(var(--geomagnetic-storm-offset-x, 0vw), var(--geomagnetic-storm-sublabel-offset-y, 0vw));
     font-family: var(--geomagnetic-storm-sublabel-font-family, var(--sun-label-font-family, 'light', sans-serif));
     font-size: var(--geomagnetic-storm-sublabel-font-size, 1.6vw);
     line-height: var(--geomagnetic-storm-sublabel-line-height, 1.15);

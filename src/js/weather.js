@@ -8015,8 +8015,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const CELESTIAL_ROW_EDGE_GAP_RIGHT_MOBILE = '0vw';          // EDITABLE Mobile: Edge offset for #4 (UK) from 95% right boundary
 
   // Object 1: Left Dial (Pacific/Flare) <--> Object 2: Sun
-  const GAP_PACIFIC_TO_SUN_DESKTOP = '2.6vw';                   // EDITABLE Desktop: Spacing between Left (Flare/Pacific) dial and the Sun
-  const GAP_PACIFIC_TO_SUN_MOBILE = '-4.5vw';                   // EDITABLE Mobile: Spacing between Left dial and the Sun
+  const GAP_PACIFIC_TO_SUN_DESKTOP = '-2vw';                  // EDITABLE Desktop: Spacing between Left (Flare/Pacific) dial and the Sun
+  const GAP_PACIFIC_TO_SUN_MOBILE = '0vw';                      // EDITABLE Mobile: Spacing between Left dial and the Sun
   const CELESTIAL_DIAL_LEFT_GAP_RIGHT_DESKTOP = GAP_PACIFIC_TO_SUN_DESKTOP; // Compatibility alias
   const CELESTIAL_DIAL_LEFT_GAP_RIGHT_MOBILE = GAP_PACIFIC_TO_SUN_MOBILE;   // Compatibility alias
 
@@ -8026,8 +8026,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // The gap between Sun and Earth is NOT explicitly defined; it is derived automatically
   // from the remaining space in the 95vw row between the left pair (Pacific/Sun) and right pair (Earth/UK).
   // Resizing Sun expands rightward into this space; resizing Earth expands leftward into this space.
-  const GAP_SUN_TO_EARTH_DESKTOP = '2.6vw';                    // DERIVED: Remaining space between Sun & Earth (automatic)
-  const GAP_SUN_TO_EARTH_MOBILE = '-4.5vw';                    // DERIVED: Remaining space between Sun & Earth (automatic)
+  const GAP_SUN_TO_EARTH_DESKTOP = '-3.9vw';                   // DERIVED: Remaining space between Sun & Earth (automatic)
+  const GAP_SUN_TO_EARTH_MOBILE = '-8vw';                      // DERIVED: Remaining space between Sun & Earth (automatic)
   const SUN_GAP_RIGHT_DESKTOP = GAP_SUN_TO_EARTH_DESKTOP;      // Compatibility alias
   const SUN_GAP_RIGHT_MOBILE = GAP_SUN_TO_EARTH_MOBILE;        // Compatibility alias
 
@@ -8035,8 +8035,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // Editable fixed gap between Earth (#3) and UK dial (#4).
   // Dial #4 (UK) is fixed at the right 95% edge. When Earth is resized, Dial #4 does NOT move,
   // and this gap stays fixed (Earth grows/shrinks towards the Sun into the derived middle space).
-  const GAP_EARTH_TO_UK_DESKTOP = '2.6vw';                       // EDITABLE Desktop: Spacing between Earth and UK dial (e.g. '0vw', '-2vw', '2.5vw')
-  const GAP_EARTH_TO_UK_MOBILE = '-4.5vw';                       // EDITABLE Mobile: Spacing between Earth and UK dial
+  const GAP_EARTH_TO_UK_DESKTOP = '-0.5vw';                      // EDITABLE Desktop: Spacing between Earth and UK dial (e.g. '0vw', '-2vw', '2.5vw')
+  const GAP_EARTH_TO_UK_MOBILE = '-0.5vw';                       // EDITABLE Mobile: Spacing between Earth and UK dial
   const EARTH_GAP_RIGHT_DESKTOP = GAP_EARTH_TO_UK_DESKTOP;     // Compatibility alias for Earth-to-UK gap
   const EARTH_GAP_RIGHT_MOBILE = GAP_EARTH_TO_UK_MOBILE;       // Compatibility alias
   const EARTH_GAP_LEFT_DESKTOP = '0vw';                        // EDITABLE Desktop: Additional gap to the left of Earth
@@ -8148,14 +8148,18 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SOLAR_FLARE_SUBLABEL_TEXT_MOBILE = 'Solar Flare';        // EDITABLE Mobile: Static fallback text
   const SOLAR_FLARE_SUBLABEL_FONT_FAMILY = "var(--sun-label-font-family, 'light', sans-serif)"; // EDITABLE: Font family ('light', 'euro', 'bold', etc.)
   const SOLAR_FLARE_SUBLABEL_FONT_SIZE_DESKTOP = '1.35vw';        // EDITABLE Desktop: Sublabel font size
-  const SOLAR_FLARE_SUBLABEL_FONT_SIZE_MOBILE = '2.6vw';         // EDITABLE Mobile: Sublabel font size
+  const SOLAR_FLARE_SUBLABEL_FONT_SIZE_MOBILE = '1.95vw';         // EDITABLE Mobile: Sublabel font size
   const SOLAR_FLARE_SUBLABEL_LINE_HEIGHT_DESKTOP = 1.05;         // EDITABLE Desktop: Sublabel line height for multi-line
-  const SOLAR_FLARE_SUBLABEL_LINE_HEIGHT_MOBILE = 1.05;          // EDITABLE Mobile: Sublabel line height for multi-line
+  const SOLAR_FLARE_SUBLABEL_LINE_HEIGHT_MOBILE = 0.8;          // EDITABLE Mobile: Sublabel line height for multi-line
   const SOLAR_FLARE_SUBLABEL_LETTER_SPACING_DESKTOP = '0.04vw';  // EDITABLE Desktop: Sublabel letter spacing
   const SOLAR_FLARE_SUBLABEL_LETTER_SPACING_MOBILE = '0.04vw';   // EDITABLE Mobile: Sublabel letter spacing
   const SOLAR_FLARE_SUBLABEL_COLOR = 'auto';                     // EDITABLE: 'auto' (matches dial color) or custom CSS color (e.g. 'rgba(255, 255, 255, 0.70)')
   const SOLAR_FLARE_SUBLABEL_MARGIN_TOP_DESKTOP = '0.6vw';       // EDITABLE Desktop: Margin top below dial circle
   const SOLAR_FLARE_SUBLABEL_MARGIN_TOP_MOBILE = '1.2vw';        // EDITABLE Mobile: Margin top below dial circle
+  const SOLAR_FLARE_SUBLABEL_PEAK_MARGIN_TOP_DESKTOP = '1.5vw';  // EDITABLE Desktop: Margin top for the PEAK line
+  const SOLAR_FLARE_SUBLABEL_PEAK_MARGIN_TOP_MOBILE = '1.5vw';   // EDITABLE Mobile: Margin top for the PEAK line
+  const SOLAR_FLARE_SUBLABEL_PEAK_VALUE_MARGIN_TOP_DESKTOP = '0vw'; // EDITABLE Desktop: Margin top between PEAK class and value
+  const SOLAR_FLARE_SUBLABEL_PEAK_VALUE_MARGIN_TOP_MOBILE = '1.0vw';// EDITABLE Mobile: Margin top between PEAK class and value
   const SOLAR_FLARE_SUBLABEL_OFFSET_Y_DESKTOP = '0vw';           // EDITABLE Desktop: Fine vertical nudge
   const SOLAR_FLARE_SUBLABEL_OFFSET_Y_MOBILE = '0vw';            // EDITABLE Mobile: Fine vertical nudge
   const SOLAR_FLARE_SUBLABEL_WIDTH_DESKTOP = '100%';             // EDITABLE Desktop: Sublabel width (100% fits dial, wider breaks out)
@@ -8224,8 +8228,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // --- Dial Frame & Sizing (JCV) ---
   const RADIO_BLACKOUT_DIAL_SIZE_DESKTOP = 'auto';               // EDITABLE Desktop: 'auto' (matches var(--celestial-dial-size)) or custom vw
   const RADIO_BLACKOUT_DIAL_SIZE_MOBILE = 'auto';                // EDITABLE Mobile: 'auto' or custom vw
-  const RADIO_BLACKOUT_OFFSET_X_DESKTOP = '0vw';                 // EDITABLE Desktop: Fine horizontal nudge for dial circle
-  const RADIO_BLACKOUT_OFFSET_X_MOBILE = '0vw';                  // EDITABLE Mobile: Fine horizontal nudge
+  const RADIO_BLACKOUT_OFFSET_X_DESKTOP = '-1.5vw';                 // EDITABLE Desktop: Fine horizontal nudge for dial circle
+  const RADIO_BLACKOUT_OFFSET_X_MOBILE = '-3vw';                  // EDITABLE Mobile: Fine horizontal nudge
   const RADIO_BLACKOUT_OFFSET_Y_DESKTOP = '0vw';                 // EDITABLE Desktop: Fine vertical nudge for dial circle
   const RADIO_BLACKOUT_OFFSET_Y_MOBILE = '0vw';                  // EDITABLE Mobile: Fine vertical nudge
   const RADIO_BLACKOUT_DIAL_BG_COLOR = 'transparent';            // EDITABLE: Dial circle background color
@@ -8277,14 +8281,18 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const RADIO_BLACKOUT_SUBLABEL_TEXT_MOBILE = 'Radio Blackout';  // EDITABLE Mobile: Static fallback text
   const RADIO_BLACKOUT_SUBLABEL_FONT_FAMILY = "var(--sun-label-font-family, 'light', sans-serif)"; // EDITABLE: Font family ('light', 'euro', 'bold', etc.)
   const RADIO_BLACKOUT_SUBLABEL_FONT_SIZE_DESKTOP = '1.35vw';     // EDITABLE Desktop: Sublabel font size
-  const RADIO_BLACKOUT_SUBLABEL_FONT_SIZE_MOBILE = '2.6vw';      // EDITABLE Mobile: Sublabel font size
+  const RADIO_BLACKOUT_SUBLABEL_FONT_SIZE_MOBILE = '1.95vw';      // EDITABLE Mobile: Sublabel font size
   const RADIO_BLACKOUT_SUBLABEL_LINE_HEIGHT_DESKTOP = 1.05;      // EDITABLE Desktop: Sublabel line height for multi-line
-  const RADIO_BLACKOUT_SUBLABEL_LINE_HEIGHT_MOBILE = 1.05;       // EDITABLE Mobile: Sublabel line height for multi-line
+  const RADIO_BLACKOUT_SUBLABEL_LINE_HEIGHT_MOBILE = 0.8;       // EDITABLE Mobile: Sublabel line height for multi-line
   const RADIO_BLACKOUT_SUBLABEL_LETTER_SPACING_DESKTOP = '0.04vw';// EDITABLE Desktop: Sublabel letter spacing
   const RADIO_BLACKOUT_SUBLABEL_LETTER_SPACING_MOBILE = '0.04vw'; // EDITABLE Mobile: Sublabel letter spacing
   const RADIO_BLACKOUT_SUBLABEL_COLOR = 'auto';                  // EDITABLE: 'auto' (matches dial color) or custom CSS color (e.g. 'rgba(255, 255, 255, 0.70)')
   const RADIO_BLACKOUT_SUBLABEL_MARGIN_TOP_DESKTOP = '0.6vw';    // EDITABLE Desktop: Margin top below dial circle
   const RADIO_BLACKOUT_SUBLABEL_MARGIN_TOP_MOBILE = '1.2vw';     // EDITABLE Mobile: Margin top below dial circle
+  const RADIO_BLACKOUT_SUBLABEL_PEAK_MARGIN_TOP_DESKTOP = '1.5vw'; // EDITABLE Desktop: Margin top for the PEAK line
+  const RADIO_BLACKOUT_SUBLABEL_PEAK_MARGIN_TOP_MOBILE = '1.5vw';  // EDITABLE Mobile: Margin top for the PEAK line
+  const RADIO_BLACKOUT_SUBLABEL_PEAK_VALUE_MARGIN_TOP_DESKTOP = '1.0vw'; // EDITABLE Desktop: Margin top between PEAK class and value
+  const RADIO_BLACKOUT_SUBLABEL_PEAK_VALUE_MARGIN_TOP_MOBILE = '1.0vw';  // EDITABLE Mobile: Margin top between PEAK class and value
   const RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_DESKTOP = '0vw';        // EDITABLE Desktop: Fine vertical nudge
   const RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_MOBILE = '0vw';         // EDITABLE Mobile: Fine vertical nudge
   const RADIO_BLACKOUT_SUBLABEL_WIDTH_DESKTOP = '100%';          // EDITABLE Desktop: Sublabel width
@@ -8358,8 +8366,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // --- Dial Frame & Sizing (JCV) ---
   const GEOMAGNETIC_STORM_DIAL_SIZE_DESKTOP = 'auto';               // EDITABLE Desktop: 'auto' (matches var(--celestial-dial-size)) or custom vw
   const GEOMAGNETIC_STORM_DIAL_SIZE_MOBILE = 'auto';                // EDITABLE Mobile: 'auto' or custom vw
-  const GEOMAGNETIC_STORM_OFFSET_X_DESKTOP = '0vw';                 // EDITABLE Desktop: Fine horizontal nudge for dial circle
-  const GEOMAGNETIC_STORM_OFFSET_X_MOBILE = '0vw';                  // EDITABLE Mobile: Fine horizontal nudge
+  const GEOMAGNETIC_STORM_OFFSET_X_DESKTOP = '-1.5vw';                 // EDITABLE Desktop: Fine horizontal nudge for dial circle
+  const GEOMAGNETIC_STORM_OFFSET_X_MOBILE = '-3vw';                  // EDITABLE Mobile: Fine horizontal nudge
   const GEOMAGNETIC_STORM_OFFSET_Y_DESKTOP = '0vw';                 // EDITABLE Desktop: Fine vertical nudge for dial circle
   const GEOMAGNETIC_STORM_OFFSET_Y_MOBILE = '0vw';                  // EDITABLE Mobile: Fine vertical nudge
   const GEOMAGNETIC_STORM_DIAL_BG_COLOR = 'transparent';            // EDITABLE: Dial circle background color
@@ -8368,32 +8376,32 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // --- Typography & Text Positioning (JCV) ---
   // Top Label ("PARTIAL FADE")
   const GEOMAGNETIC_STORM_LABEL_FONT_FAMILY = "'euro', sans-serif"; // EDITABLE: Top label font-family ("euro" = EurostileExtended)
-  const GEOMAGNETIC_STORM_LABEL_FONT_SIZE_DESKTOP = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.088)'; // EDITABLE Desktop: Top label font size
-  const GEOMAGNETIC_STORM_LABEL_FONT_SIZE_MOBILE = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.088)';  // EDITABLE Mobile: Top label font size
+  const GEOMAGNETIC_STORM_LABEL_FONT_SIZE_DESKTOP = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.0748)'; // EDITABLE Desktop: Top label font size
+  const GEOMAGNETIC_STORM_LABEL_FONT_SIZE_MOBILE = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.0748)';  // EDITABLE Mobile: Top label font size
   const GEOMAGNETIC_STORM_LABEL_LINE_HEIGHT = 1.0;                  // EDITABLE: Top label line height
   const GEOMAGNETIC_STORM_LABEL_LETTER_SPACING_DESKTOP = '0.05vw';  // EDITABLE Desktop: Top label letter spacing
   const GEOMAGNETIC_STORM_LABEL_LETTER_SPACING_MOBILE = '0.05vw';   // EDITABLE Mobile: Top label letter spacing
   const GEOMAGNETIC_STORM_LABEL_OFFSET_Y_DESKTOP = '0vw';           // EDITABLE Desktop: Fine vertical nudge for top label
   const GEOMAGNETIC_STORM_LABEL_OFFSET_Y_MOBILE = '0vw';            // EDITABLE Mobile: Fine vertical nudge for top label
-  const GEOMAGNETIC_STORM_GAP_LABEL_TO_CLASS_DESKTOP = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.025)'; // EDITABLE Desktop: Gap between label and giant class text
-  const GEOMAGNETIC_STORM_GAP_LABEL_TO_CLASS_MOBILE = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.025)';  // EDITABLE Mobile: Gap between label and giant class text
+  const GEOMAGNETIC_STORM_GAP_LABEL_TO_CLASS_DESKTOP = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02125)'; // EDITABLE Desktop: Gap between label and giant class text
+  const GEOMAGNETIC_STORM_GAP_LABEL_TO_CLASS_MOBILE = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02125)';  // EDITABLE Mobile: Gap between label and giant class text
 
   // Middle Giant Class ("G2")
   const GEOMAGNETIC_STORM_CLASS_FONT_FAMILY = "'euro-bold', sans-serif"; // EDITABLE: Giant class font-family ("euro-bold" = EurostileExtendedBlack)
-  const GEOMAGNETIC_STORM_CLASS_FONT_SIZE_DESKTOP = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.306)'; // EDITABLE Desktop: Giant class text font size
-  const GEOMAGNETIC_STORM_CLASS_FONT_SIZE_MOBILE = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.306)';  // EDITABLE Mobile: Giant class text font size
+  const GEOMAGNETIC_STORM_CLASS_FONT_SIZE_DESKTOP = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.2601)'; // EDITABLE Desktop: Giant class text font size
+  const GEOMAGNETIC_STORM_CLASS_FONT_SIZE_MOBILE = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.2601)';  // EDITABLE Mobile: Giant class text font size
   const GEOMAGNETIC_STORM_CLASS_LINE_HEIGHT = 0.82;                 // EDITABLE: Giant class line height
   const GEOMAGNETIC_STORM_CLASS_OFFSET_Y_DESKTOP = '0vw';           // EDITABLE Desktop: Fine vertical nudge for giant class text
   const GEOMAGNETIC_STORM_CLASS_OFFSET_Y_MOBILE = '0vw';            // EDITABLE Mobile: Fine vertical nudge for giant class text
-  const GEOMAGNETIC_STORM_GAP_CLASS_TO_VALUE_DESKTOP = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02)'; // EDITABLE Desktop: Gap between giant class and bottom value
-  const GEOMAGNETIC_STORM_GAP_CLASS_TO_VALUE_MOBILE = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02)';  // EDITABLE Mobile: Gap between giant class and bottom value
+  const GEOMAGNETIC_STORM_GAP_CLASS_TO_VALUE_DESKTOP = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.017)'; // EDITABLE Desktop: Gap between giant class and bottom value
+  const GEOMAGNETIC_STORM_GAP_CLASS_TO_VALUE_MOBILE = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.017)';  // EDITABLE Mobile: Gap between giant class and bottom value
 
   // Bottom Value ("2.8Kp")
   const GEOMAGNETIC_STORM_UNIT = 'Kp';                              // EDITABLE: SI/IEEE decibel unit symbol ('dB', 'Kp', or '')
   const GEOMAGNETIC_STORM_TWO_SIG_DIGITS = true;                    // EDITABLE: If true, formats to 2 significant digits (e.g. 2.8Kp, 16Kp vs 16.0Kp) to avoid circle crowding
   const GEOMAGNETIC_STORM_VALUE_FONT_FAMILY = "'euro-bold', sans-serif"; // EDITABLE: Bottom value font-family ("euro-bold" = EurostileExtendedBlack)
-  const GEOMAGNETIC_STORM_VALUE_FONT_SIZE_DESKTOP = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1485)'; // EDITABLE Desktop: Bottom value font size
-  const GEOMAGNETIC_STORM_VALUE_FONT_SIZE_MOBILE = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1485)';  // EDITABLE Mobile: Bottom value font size
+  const GEOMAGNETIC_STORM_VALUE_FONT_SIZE_DESKTOP = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1262)'; // EDITABLE Desktop: Bottom value font size
+  const GEOMAGNETIC_STORM_VALUE_FONT_SIZE_MOBILE = 'calc(var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1262)';  // EDITABLE Mobile: Bottom value font size
   const GEOMAGNETIC_STORM_VALUE_LINE_HEIGHT = 0.92;                 // EDITABLE: Bottom value line height
   const GEOMAGNETIC_STORM_VALUE_LETTER_SPACING_DESKTOP = '-0.03vw'; // EDITABLE Desktop: Bottom value letter spacing
   const GEOMAGNETIC_STORM_VALUE_LETTER_SPACING_MOBILE = '-0.06vw';  // EDITABLE Mobile: Bottom value letter spacing
@@ -8411,14 +8419,18 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const GEOMAGNETIC_STORM_SUBLABEL_TEXT_MOBILE = 'Geomagnetic Storm';  // EDITABLE Mobile: Static fallback text
   const GEOMAGNETIC_STORM_SUBLABEL_FONT_FAMILY = "var(--sun-label-font-family, 'light', sans-serif)"; // EDITABLE: Font family ('light', 'euro', 'bold', etc.)
   const GEOMAGNETIC_STORM_SUBLABEL_FONT_SIZE_DESKTOP = '1.35vw';     // EDITABLE Desktop: Sublabel font size
-  const GEOMAGNETIC_STORM_SUBLABEL_FONT_SIZE_MOBILE = '2.6vw';      // EDITABLE Mobile: Sublabel font size
+  const GEOMAGNETIC_STORM_SUBLABEL_FONT_SIZE_MOBILE = '1.95vw';      // EDITABLE Mobile: Sublabel font size
   const GEOMAGNETIC_STORM_SUBLABEL_LINE_HEIGHT_DESKTOP = 1.05;      // EDITABLE Desktop: Sublabel line height for multi-line
-  const GEOMAGNETIC_STORM_SUBLABEL_LINE_HEIGHT_MOBILE = 1.05;       // EDITABLE Mobile: Sublabel line height for multi-line
+  const GEOMAGNETIC_STORM_SUBLABEL_LINE_HEIGHT_MOBILE = 0.8;       // EDITABLE Mobile: Sublabel line height for multi-line
   const GEOMAGNETIC_STORM_SUBLABEL_LETTER_SPACING_DESKTOP = '0.04vw';// EDITABLE Desktop: Sublabel letter spacing
   const GEOMAGNETIC_STORM_SUBLABEL_LETTER_SPACING_MOBILE = '0.04vw'; // EDITABLE Mobile: Sublabel letter spacing
   const GEOMAGNETIC_STORM_SUBLABEL_COLOR = 'auto';                  // EDITABLE: 'auto' (matches dial color) or custom CSS color (e.g. 'rgba(255, 255, 255, 0.70)')
   const GEOMAGNETIC_STORM_SUBLABEL_MARGIN_TOP_DESKTOP = '0.6vw';    // EDITABLE Desktop: Margin top below dial circle
   const GEOMAGNETIC_STORM_SUBLABEL_MARGIN_TOP_MOBILE = '1.2vw';     // EDITABLE Mobile: Margin top below dial circle
+  const GEOMAGNETIC_STORM_SUBLABEL_PEAK_MARGIN_TOP_DESKTOP = '1.5vw'; // EDITABLE Desktop: Margin top for the PEAK line
+  const GEOMAGNETIC_STORM_SUBLABEL_PEAK_MARGIN_TOP_MOBILE = '1.5vw';  // EDITABLE Mobile: Margin top for the PEAK line
+  const GEOMAGNETIC_STORM_SUBLABEL_PEAK_VALUE_MARGIN_TOP_DESKTOP = '1.0vw'; // EDITABLE Desktop: Margin top between PEAK class and value
+  const GEOMAGNETIC_STORM_SUBLABEL_PEAK_VALUE_MARGIN_TOP_MOBILE = '1.0vw';  // EDITABLE Mobile: Margin top between PEAK class and value
   const GEOMAGNETIC_STORM_SUBLABEL_OFFSET_Y_DESKTOP = '0vw';        // EDITABLE Desktop: Fine vertical nudge
   const GEOMAGNETIC_STORM_SUBLABEL_OFFSET_Y_MOBILE = '0vw';         // EDITABLE Mobile: Fine vertical nudge
   const GEOMAGNETIC_STORM_SUBLABEL_WIDTH_DESKTOP = '100%';          // EDITABLE Desktop: Sublabel width
@@ -9262,6 +9274,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--solar-flare-sublabel-margin-top-desktop', SOLAR_FLARE_SUBLABEL_MARGIN_TOP_DESKTOP);
     document.documentElement.style.setProperty('--solar-flare-sublabel-margin-top-mobile', SOLAR_FLARE_SUBLABEL_MARGIN_TOP_MOBILE);
     document.documentElement.style.setProperty('--solar-flare-sublabel-margin-top', isMobile ? SOLAR_FLARE_SUBLABEL_MARGIN_TOP_MOBILE : SOLAR_FLARE_SUBLABEL_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-sublabel-peak-margin-top', isMobile ? SOLAR_FLARE_SUBLABEL_PEAK_MARGIN_TOP_MOBILE : SOLAR_FLARE_SUBLABEL_PEAK_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-sublabel-peak-value-margin-top', isMobile ? SOLAR_FLARE_SUBLABEL_PEAK_VALUE_MARGIN_TOP_MOBILE : SOLAR_FLARE_SUBLABEL_PEAK_VALUE_MARGIN_TOP_DESKTOP);
     document.documentElement.style.setProperty('--solar-flare-sublabel-offset-y-desktop', SOLAR_FLARE_SUBLABEL_OFFSET_Y_DESKTOP);
     document.documentElement.style.setProperty('--solar-flare-sublabel-offset-y-mobile', SOLAR_FLARE_SUBLABEL_OFFSET_Y_MOBILE);
     document.documentElement.style.setProperty('--solar-flare-sublabel-offset-y', isMobile ? SOLAR_FLARE_SUBLABEL_OFFSET_Y_MOBILE : SOLAR_FLARE_SUBLABEL_OFFSET_Y_DESKTOP);
@@ -9363,6 +9377,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--radio-blackout-sublabel-margin-top-desktop', RADIO_BLACKOUT_SUBLABEL_MARGIN_TOP_DESKTOP);
     document.documentElement.style.setProperty('--radio-blackout-sublabel-margin-top-mobile', RADIO_BLACKOUT_SUBLABEL_MARGIN_TOP_MOBILE);
     document.documentElement.style.setProperty('--radio-blackout-sublabel-margin-top', isMobile ? RADIO_BLACKOUT_SUBLABEL_MARGIN_TOP_MOBILE : RADIO_BLACKOUT_SUBLABEL_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-sublabel-peak-margin-top', isMobile ? RADIO_BLACKOUT_SUBLABEL_PEAK_MARGIN_TOP_MOBILE : RADIO_BLACKOUT_SUBLABEL_PEAK_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--radio-blackout-sublabel-peak-value-margin-top', isMobile ? RADIO_BLACKOUT_SUBLABEL_PEAK_VALUE_MARGIN_TOP_MOBILE : RADIO_BLACKOUT_SUBLABEL_PEAK_VALUE_MARGIN_TOP_DESKTOP);
     document.documentElement.style.setProperty('--radio-blackout-sublabel-offset-y-desktop', RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_DESKTOP);
     document.documentElement.style.setProperty('--radio-blackout-sublabel-offset-y-mobile', RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_MOBILE);
     document.documentElement.style.setProperty('--radio-blackout-sublabel-offset-y', isMobile ? RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_MOBILE : RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_DESKTOP);
@@ -9467,6 +9483,8 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-margin-top-desktop', GEOMAGNETIC_STORM_SUBLABEL_MARGIN_TOP_DESKTOP);
     document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-margin-top-mobile', GEOMAGNETIC_STORM_SUBLABEL_MARGIN_TOP_MOBILE);
     document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-margin-top', isMobile ? GEOMAGNETIC_STORM_SUBLABEL_MARGIN_TOP_MOBILE : GEOMAGNETIC_STORM_SUBLABEL_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-peak-margin-top', isMobile ? GEOMAGNETIC_STORM_SUBLABEL_PEAK_MARGIN_TOP_MOBILE : GEOMAGNETIC_STORM_SUBLABEL_PEAK_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-peak-value-margin-top', isMobile ? GEOMAGNETIC_STORM_SUBLABEL_PEAK_VALUE_MARGIN_TOP_MOBILE : GEOMAGNETIC_STORM_SUBLABEL_PEAK_VALUE_MARGIN_TOP_DESKTOP);
     document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-offset-y-desktop', GEOMAGNETIC_STORM_SUBLABEL_OFFSET_Y_DESKTOP);
     document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-offset-y-mobile', GEOMAGNETIC_STORM_SUBLABEL_OFFSET_Y_MOBILE);
     document.documentElement.style.setProperty('--geomagnetic-storm-sublabel-offset-y', isMobile ? GEOMAGNETIC_STORM_SUBLABEL_OFFSET_Y_MOBILE : GEOMAGNETIC_STORM_SUBLABEL_OFFSET_Y_DESKTOP);
@@ -9792,7 +9810,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   const ORRERY_ENABLED = true;                         // EDITABLE: Toggle visibility of Orrery section
   const ORRERY_TOP_OFFSET_DESKTOP = '2vw';             // EDITABLE Desktop: Vertical offset below cumulative top banners
-  const ORRERY_TOP_OFFSET_MOBILE = '3vw';              // EDITABLE Mobile: Vertical offset below cumulative top banners
+  const ORRERY_TOP_OFFSET_MOBILE = '-2vw';              // EDITABLE Mobile: Vertical offset below cumulative top banners
   const ORRERY_MARGIN_TOP_DESKTOP = '3vw';             // EDITABLE Desktop: Spacing above Orrery section
   const ORRERY_MARGIN_TOP_MOBILE = '4vw';              // EDITABLE Mobile: Spacing above Orrery section
   const ORRERY_MARGIN_BOTTOM_DESKTOP = '2vw';          // EDITABLE Desktop: Spacing below Orrery section
@@ -10512,7 +10530,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1402';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1425';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -12151,7 +12169,6 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const uvIndex = data?.current?.uvi !== undefined ? Number(data.current.uvi) : null;
     
     let dailyPeakUv = null;
-    let forecastMaxUv = data?.daily?.[0]?.uvi !== undefined ? Number(data.daily[0].uvi) : null;
     let dbPeakUv = null;
     
     try {
@@ -12163,14 +12180,13 @@ Plan ahead for significantly warmer conditions tomorrow!`
       console.log("Failed to parse Peak UV from Sky DB", e);
     }
     
-    // Determine the true peak for the day by taking the max of forecasted max, db recorded peak, and current UV
+    // Determine the true peak for the day by taking the max of db recorded peak and current UV
     dailyPeakUv = Math.max(
-      forecastMaxUv !== null ? forecastMaxUv : 0, 
       dbPeakUv !== null ? dbPeakUv : 0, 
       uvIndex !== null ? uvIndex : 0
     );
     
-    if (dailyPeakUv === 0 && forecastMaxUv === null && dbPeakUv === null && uvIndex === null) {
+    if (dailyPeakUv === 0 && dbPeakUv === null && uvIndex === null) {
       dailyPeakUv = null;
     }
     
@@ -12212,7 +12228,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const uvColor = getUvColor(uvIndex);
     progressEls.forEach(el => el.style.stroke = uvColor);
        
-    if (dailyPeakUv !== null && uvIndex !== null && dailyPeakUv >= uvIndex && dailyPeakUv > 0) {
+    if (dailyPeakUv !== null && dailyPeakUv > 0) {
       const peakColor = getUvColor(dailyPeakUv);
       peakEls.forEach(el => {
         el.style.display = '';
@@ -12255,8 +12271,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
        
     const labelEls = document.querySelectorAll('.label-title-8, .label-title-4');
     labelEls.forEach(labelEl => {
-       const peakStr = (dailyPeakUv !== null && dailyPeakUv !== 0) ? dailyPeakUv.toFixed(1) : '–.–';
-       labelEl.innerHTML = `Peak UV ${peakStr}`;
+       if (dailyPeakUv !== null && dailyPeakUv > 0) {
+          labelEl.innerHTML = `Peak UV ${dailyPeakUv.toFixed(1)}`;
+       } else {
+          labelEl.innerHTML = `UV –.–`;
+       }
        labelEl.style.color = getUvColor(dailyPeakUv);
        labelEl.style.textTransform = 'none';
        labelEl.style.letterSpacing = 'var(--clock-grid-uv-label-letter-spacing)';
@@ -14713,8 +14732,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
           const impact = getSolarFlareImpact(flareClass, currentSolarFlareTrend);
           let baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
           const peakValDisplay = (typeof dailyPeakValue === 'number' || !isNaN(parseFloat(dailyPeakValue))) ? parseFloat(dailyPeakValue).toFixed(1) : String(dailyPeakValue);
-          const line2Text = `PEAK ${dailyPeakClass}${peakValDisplay}`;
-          sublabelEl.innerHTML = `<br>${baseHtml}<br><span style="font-family: 'euro-bold', sans-serif; color: ${dailyPeakColor};">${line2Text}</span>`;
+          const isMobile = window.innerWidth <= 767;
+          const line2Text = isMobile ? `PEAK ${dailyPeakClass}<br><span style="display:inline-block; margin-top: var(--solar-flare-sublabel-peak-value-margin-top, 0vw);">${peakValDisplay}</span>` : `PEAK ${dailyPeakClass}${peakValDisplay}`;
+          sublabelEl.innerHTML = `<br>${baseHtml}<br><span style="display: inline-block; margin-top: var(--solar-flare-sublabel-peak-margin-top, 0vw); font-family: 'euro-bold', sans-serif; color: ${dailyPeakColor};">${line2Text}</span>`;
         }
         if (SOLAR_FLARE_SUBLABEL_COLOR === 'auto') {
           sublabelEl.style.color = color;
@@ -15131,7 +15151,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           const impact = getRadioBlackoutImpact(rClass, currentRadioBlackoutTrend);
           const baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
           const peakValDisplay = formatRadioBlackoutValue(dailyPeakValue);
-          sublabelEl.innerHTML = `<br>${baseHtml}<br><span style="font-family: 'euro-bold', sans-serif; color: ${dailyPeakColor};">PEAK ${peakValDisplay}</span>`;
+          sublabelEl.innerHTML = `<br>${baseHtml}<br><span style="display: inline-block; margin-top: var(--radio-blackout-sublabel-peak-margin-top, 0vw); font-family: 'euro-bold', sans-serif; color: ${dailyPeakColor};">PEAK ${dailyPeakClass}<br><span style="display:inline-block; margin-top: var(--radio-blackout-sublabel-peak-value-margin-top, 0vw);">${peakValDisplay}</span></span>`;
         }
         if (RADIO_BLACKOUT_SUBLABEL_COLOR === 'auto') {
           sublabelEl.style.color = color;
@@ -15550,7 +15570,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           const impact = getGeomagneticStormImpact(rClass, currentGeomagneticStormTrend);
           const baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
           const peakValDisplay = formatGeomagneticStormValue(dailyPeakValue);
-          sublabelEl.innerHTML = `<br>${baseHtml}<br><span style="font-family: 'euro-bold', sans-serif; color: ${dailyPeakColor};">PEAK ${peakValDisplay}</span>`;
+          sublabelEl.innerHTML = `<br>${baseHtml}<br><span style="display: inline-block; margin-top: var(--geomagnetic-storm-sublabel-peak-margin-top, 0vw); font-family: 'euro-bold', sans-serif; color: ${dailyPeakColor};">PEAK ${dailyPeakClass}<br><span style="display:inline-block; margin-top: var(--geomagnetic-storm-sublabel-peak-value-margin-top, 0vw);">${peakValDisplay}</span></span>`;
         }
         if (GEOMAGNETIC_STORM_SUBLABEL_COLOR === 'auto') {
           sublabelEl.style.color = color;
@@ -15751,8 +15771,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
     dial.id = dialId || `world-clock-dial-${id}`;
     dial.setAttribute('data-timezone', timeZone);
     dial.setAttribute('title', `${name} Time`);
-    dial.style.cursor = 'pointer';
-    dial.addEventListener('click', handleTimeDialReset);
+    // Cursor and click logic are handled dynamically: only the active timezone resets the app
+    dial.addEventListener('click', (e) => {
+      if (dial.classList.contains('is-user-timezone')) {
+        handleTimeDialReset(e);
+      }
+    });
 
     dial.innerHTML = `
       <svg class="clock-timer-svg" viewBox="0 0 100 100">
@@ -15911,10 +15935,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       if (isUserZone) {
         dial.classList.add('is-user-timezone');
+        dial.style.cursor = 'pointer';
         dial.style.setProperty('--world-clock-track-color', resolvedUserTrackColor);
         if (trackCircle) trackCircle.style.stroke = resolvedUserTrackColor;
       } else {
         dial.classList.remove('is-user-timezone');
+        dial.style.cursor = 'default';
         dial.style.removeProperty('--world-clock-track-color');
         if (trackCircle) trackCircle.style.stroke = '';
       }
@@ -15992,10 +16018,12 @@ Plan ahead for significantly warmer conditions tomorrow!`
         const trackCircle = dial.querySelector('.countdown-track');
         if (isUserZone) {
           dial.classList.add('is-user-timezone');
+          dial.style.cursor = 'pointer';
           dial.style.setProperty('--world-clock-track-color', resolvedUserTrackColor);
           if (trackCircle) trackCircle.style.stroke = resolvedUserTrackColor;
         } else {
           dial.classList.remove('is-user-timezone');
+          dial.style.cursor = 'default';
           dial.style.removeProperty('--world-clock-track-color');
           if (trackCircle) trackCircle.style.stroke = '';
         }
