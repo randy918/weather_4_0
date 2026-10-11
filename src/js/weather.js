@@ -385,6 +385,11 @@ import weatherConditions from '../data/weather-conditions.json';
   // Editable minimum threshold for showing rain amounts (in inches) throughout the app
   const MIN_RAIN_DISPLAY_THRESHOLD = 0.05;
 
+  // --- EDITABLE: Rain Amount Boxes Config (JCV) ---
+  const RAIN_ITEM_TINGE_ENABLED = true;                         // EDITABLE: Apply low-temp color gradient tinge to top of rain items
+  const RAIN_ITEM_TINGE_STOP_DESKTOP = '0.5vw';                 // EDITABLE Desktop: Absolute gradient stop height (e.g., 1.0vw)
+  const RAIN_ITEM_TINGE_STOP_MOBILE = '0.5vw';                  // EDITABLE Mobile: Absolute gradient stop height
+
   // EDITABLE: Minimum precipitation pixels in downscaled 80x80 radar map area to trigger Doppler loop.==
   // Increase to prevent minor noise/dust (clutter) from showing the radar. Try 80, 120, or 200!
   const RADAR_PRECIPITATION_PIXEL_THRESHOLD = 120;
@@ -10530,7 +10535,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1446';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1457';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -18385,6 +18390,16 @@ Plan ahead for significantly warmer conditions tomorrow!`
         if (textEl) {
           textEl.style.transform = '';
         }
+      }
+      
+      // Color tinge based on low temp
+      const lowTemp = (dayData.temp && typeof dayData.temp.min === 'number') ? dayData.temp.min : null;
+      if (RAIN_ITEM_TINGE_ENABLED && lowTemp !== null) {
+        const lowTempColor = tempToColor(lowTemp) || 'var(--bitByBitBlue)';
+        const tingeStop = window.innerWidth <= 767 ? RAIN_ITEM_TINGE_STOP_MOBILE : RAIN_ITEM_TINGE_STOP_DESKTOP;
+        item.style.background = `linear-gradient(to bottom, ${lowTempColor} 0%, var(--bitByBitBlue) ${tingeStop})`;
+      } else {
+        item.style.background = 'var(--bitByBitBlue)';
       }
       
       // Add title for accessibility
