@@ -593,8 +593,7 @@ import weatherConditions from '../data/weather-conditions.json';
   const CLOCK_GRID_GAP = '1vw';          // EDITABLE: Gap between cells
   const CLOCK_GRID_MARGIN_TOP_DESKTOP = '2.2vw'; // EDITABLE Desktop: Top margin of the row / gap below summary
   const CLOCK_GRID_MARGIN_TOP_MOBILE = '3.0vw';  // EDITABLE Mobile: Top margin of the row / gap below summary
-  const CLOCK_GRID_MARGIN_BOTTOM_DESKTOP = '-6vw'; // EDITABLE Desktop: Bottom margin of the row / gap below 5 clocks
-  const CLOCK_GRID_MARGIN_BOTTOM_MOBILE = '0vw';  // EDITABLE Mobile: Bottom margin of the row / gap below 5 clocks
+  const CLOCK_GRID_MARGIN_BOTTOM = '0vw';// EDITABLE: Bottom margin of the row
   const CLOCK_GRID_MARGIN_LEFT = '2vw';  // EDITABLE: Left margin for the row as a whole
   const CLOCK_GRID_MARGIN_RIGHT = '2vw'; // EDITABLE: Right margin for the row as a whole
   const CLOCK_GRID_TRACK_COLOR = 'rgba(255, 255, 255, 0.2)'; // EDITABLE: Circle track color
@@ -659,9 +658,7 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--clock-grid-gap', CLOCK_GRID_GAP);
   document.documentElement.style.setProperty('--clock-grid-margin-top-desktop', CLOCK_GRID_MARGIN_TOP_DESKTOP);
   document.documentElement.style.setProperty('--clock-grid-margin-top-mobile', CLOCK_GRID_MARGIN_TOP_MOBILE);
-  document.documentElement.style.setProperty('--clock-grid-margin-bottom-desktop', CLOCK_GRID_MARGIN_BOTTOM_DESKTOP);
-  document.documentElement.style.setProperty('--clock-grid-margin-bottom-mobile', CLOCK_GRID_MARGIN_BOTTOM_MOBILE);
-  document.documentElement.style.setProperty('--clock-grid-margin-bottom', window.innerWidth <= 767 ? CLOCK_GRID_MARGIN_BOTTOM_MOBILE : CLOCK_GRID_MARGIN_BOTTOM_DESKTOP);
+  document.documentElement.style.setProperty('--clock-grid-margin-bottom', CLOCK_GRID_MARGIN_BOTTOM);
   document.documentElement.style.setProperty('--clock-grid-margin-left', CLOCK_GRID_MARGIN_LEFT);
   document.documentElement.style.setProperty('--clock-grid-margin-right', CLOCK_GRID_MARGIN_RIGHT);
   document.documentElement.style.setProperty('--clock-grid-track-color', CLOCK_GRID_TRACK_COLOR);
@@ -8556,7 +8553,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
   const WORLD_CLOCKS_MARGIN_TOP_DESKTOP = '-5vw';           // EDITABLE Desktop: Margin above the clocks row
   const WORLD_CLOCKS_MARGIN_TOP_MOBILE = '-5.0vw';            // EDITABLE Mobile: Margin above the clocks row
-  const WORLD_CLOCKS_MARGIN_BOTTOM_DESKTOP = '-1vw';        // EDITABLE Desktop: Margin below the clocks row
+  const WORLD_CLOCKS_MARGIN_BOTTOM_DESKTOP = '-6vw';        // EDITABLE Desktop: Margin below the clocks row
   const WORLD_CLOCKS_MARGIN_BOTTOM_MOBILE = '-4vw';         // EDITABLE Mobile: Margin below the clocks row
 
   // Dial Track (outer ring without 5-min countdown)
@@ -9814,9 +9811,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_ENABLED = true;                         // EDITABLE: Toggle visibility of Orrery section
   const ORRERY_TOP_OFFSET_DESKTOP = '2vw';             // EDITABLE Desktop: Vertical offset below cumulative top banners
   const ORRERY_TOP_OFFSET_MOBILE = '-2vw';              // EDITABLE Mobile: Vertical offset below cumulative top banners
-  const ORRERY_MARGIN_TOP_DESKTOP = '3vw';             // EDITABLE Desktop: Spacing above Orrery section
-  const ORRERY_MARGIN_TOP_MOBILE = '4vw';              // EDITABLE Mobile: Spacing above Orrery section
-  const ORRERY_MARGIN_BOTTOM_DESKTOP = '2vw';          // EDITABLE Desktop: Spacing below Orrery section
+  const ORRERY_MARGIN_TOP_DESKTOP = '-5vw';             // EDITABLE Desktop: Spacing above Orrery section
+  const ORRERY_MARGIN_TOP_MOBILE = '-1vw';              // EDITABLE Mobile: Spacing above Orrery section
+  const ORRERY_MARGIN_BOTTOM_DESKTOP = '-5vw';          // EDITABLE Desktop: Spacing below Orrery section
   const ORRERY_MARGIN_BOTTOM_MOBILE = '3vw';           // EDITABLE Mobile: Spacing below Orrery section
   const ORRERY_RADIUS_DESKTOP = '35vw';                // EDITABLE Desktop: Planetary orbit ring radius (diameter = 2x) — Saturn orbits here
   const ORRERY_RADIUS_MOBILE = '35vw';                 // EDITABLE Mobile: Planetary orbit ring radius (diameter = 2x) — Saturn orbits here
@@ -9836,7 +9833,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_SUN_ENABLED = true;                         // EDITABLE: Toggle visibility of central Sun
   const ORRERY_SUN_IMAGE_URL = 'img/p-su.png';             // EDITABLE: Sun transparent/lighten PNG asset path
   const ORRERY_SUN_WIDTH_DESKTOP = '12.0vw';               // EDITABLE Desktop: Central Sun image width (doubled from 6.0vw)
-  const ORRERY_SUN_WIDTH_MOBILE = '19.0vw';                // EDITABLE Mobile: Central Sun image width (doubled from 9.5vw)
+  const ORRERY_SUN_WIDTH_MOBILE = '15.2vw';                // EDITABLE Mobile: Central Sun image width (doubled from 9.5vw)
   const ORRERY_SUN_HEIGHT_DESKTOP = 'auto';                // EDITABLE Desktop: Sun height ('auto' preserves aspect ratio)
   const ORRERY_SUN_HEIGHT_MOBILE = 'auto';                 // EDITABLE Mobile: Sun height
   const ORRERY_SUN_SCALE_DESKTOP = '0.75';                  // EDITABLE Desktop: Central Sun scale (e.g. 0.5 for half size)
@@ -9867,7 +9864,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // --- EDITABLE: Saturn Planet On Orbit Ring Config (JCV) ---
   const ORRERY_SATURN_IMAGE_URL = 'img/p-sa.png';       // EDITABLE: Saturn transparent PNG asset path
   const ORRERY_SATURN_WIDTH_DESKTOP = '6.5vw';         // EDITABLE Desktop: Saturn planet width (aspect ratio maintained)
-  const ORRERY_SATURN_WIDTH_MOBILE = '10vw';           // EDITABLE Mobile: Saturn planet width (aspect ratio maintained)
+  const ORRERY_SATURN_WIDTH_MOBILE = '8vw';           // EDITABLE Mobile: Saturn planet width (aspect ratio maintained)
   const ORRERY_SATURN_HEIGHT_DESKTOP = 'auto';         // EDITABLE Desktop: Saturn height ('auto' preserves natural 855:400 aspect ratio)
   const ORRERY_SATURN_HEIGHT_MOBILE = 'auto';          // EDITABLE Mobile: Saturn height ('auto' preserves natural 855:400 aspect ratio)
   // AUTO-CALCULATED: Saturn's real ecliptic longitude for today → orrery clockwise CSS angle
@@ -9909,7 +9906,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_JUPITER_RING_RADIUS_MOBILE  = '30vw';     // EDITABLE Mobile: Jupiter orbit ring radius
   const ORRERY_JUPITER_IMAGE_URL = 'img/p-ju.png';       // EDITABLE: Jupiter transparent PNG asset path
   const ORRERY_JUPITER_WIDTH_DESKTOP = '4.5vw';          // EDITABLE Desktop: Jupiter planet image width
-  const ORRERY_JUPITER_WIDTH_MOBILE  = '7vw';            // EDITABLE Mobile: Jupiter planet image width
+  const ORRERY_JUPITER_WIDTH_MOBILE  = '5.6vw';            // EDITABLE Mobile: Jupiter planet image width
   const ORRERY_JUPITER_HEIGHT_DESKTOP = 'auto';          // EDITABLE Desktop: Jupiter height ('auto' preserves aspect ratio)
   const ORRERY_JUPITER_HEIGHT_MOBILE  = 'auto';          // EDITABLE Mobile: Jupiter height
   // AUTO-CALCULATED: Jupiter's real ecliptic longitude for today → orrery clockwise CSS angle
@@ -9960,7 +9957,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_MARS_RING_RADIUS_MOBILE  = '25vw';        // EDITABLE Mobile: Mars orbit ring radius
   const ORRERY_MARS_IMAGE_URL = 'img/p-ma.png';          // EDITABLE: Mars transparent PNG asset path
   const ORRERY_MARS_WIDTH_DESKTOP = '2.8vw';             // EDITABLE Desktop: Mars planet image width
-  const ORRERY_MARS_WIDTH_MOBILE  = '4.5vw';             // EDITABLE Mobile: Mars planet image width
+  const ORRERY_MARS_WIDTH_MOBILE  = '3.6vw';             // EDITABLE Mobile: Mars planet image width
   const ORRERY_MARS_HEIGHT_DESKTOP = 'auto';             // EDITABLE Desktop: Mars height ('auto' preserves aspect ratio)
   const ORRERY_MARS_HEIGHT_MOBILE  = 'auto';             // EDITABLE Mobile: Mars height
   // AUTO-CALCULATED: Mars's real ecliptic longitude for today → orrery clockwise CSS angle
@@ -9995,7 +9992,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_EARTH_RING_RADIUS_MOBILE  = '20vw';       // EDITABLE Mobile: Earth orbit ring radius
   const ORRERY_EARTH_IMAGE_URL = 'img/p-ea.png';         // EDITABLE: Earth transparent PNG asset path
   const ORRERY_EARTH_WIDTH_DESKTOP = '3.2vw';            // EDITABLE Desktop: Earth planet image width
-  const ORRERY_EARTH_WIDTH_MOBILE  = '5.0vw';            // EDITABLE Mobile: Earth planet image width
+  const ORRERY_EARTH_WIDTH_MOBILE  = '4.0vw';            // EDITABLE Mobile: Earth planet image width
   const ORRERY_EARTH_HEIGHT_DESKTOP = 'auto';            // EDITABLE Desktop: Earth height ('auto' preserves aspect ratio)
   const ORRERY_EARTH_HEIGHT_MOBILE  = 'auto';            // EDITABLE Mobile: Earth height
   // AUTO-CALCULATED: Earth's real heliocentric ecliptic longitude for today → orrery angle
@@ -10031,7 +10028,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_MOON_SCALE_DESKTOP = 0.25;                    // EDITABLE Desktop: Scale ratio relative to Earth width (0.25 = 25%)
   const ORRERY_MOON_SCALE_MOBILE  = 0.25;                    // EDITABLE Mobile: Scale ratio relative to Earth width (0.25 = 25%)
   const ORRERY_MOON_WIDTH_DESKTOP = '0.8vw';                 // EDITABLE Desktop: Moon image width (25% of Earth 3.2vw)
-  const ORRERY_MOON_WIDTH_MOBILE  = '1.25vw';                // EDITABLE Mobile: Moon image width (25% of Earth 5.0vw)
+  const ORRERY_MOON_WIDTH_MOBILE  = '1.0vw';                // EDITABLE Mobile: Moon image width (25% of Earth 5.0vw)
   const ORRERY_MOON_HEIGHT_DESKTOP = 'auto';                 // EDITABLE Desktop: Moon height ('auto' preserves natural aspect ratio)
   const ORRERY_MOON_HEIGHT_MOBILE  = 'auto';                 // EDITABLE Mobile: Moon height
   // Rotation distance (orbital radius) of Moon around Earth center:
@@ -10074,7 +10071,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_VENUS_RING_RADIUS_MOBILE  = '15vw';       // EDITABLE Mobile: Venus orbit ring radius
   const ORRERY_VENUS_IMAGE_URL = 'img/p-ve.png';         // EDITABLE: Venus transparent PNG asset path
   const ORRERY_VENUS_WIDTH_DESKTOP = '2.8vw';            // EDITABLE Desktop: Venus planet image width
-  const ORRERY_VENUS_WIDTH_MOBILE  = '4.5vw';            // EDITABLE Mobile: Venus planet image width
+  const ORRERY_VENUS_WIDTH_MOBILE  = '3.6vw';            // EDITABLE Mobile: Venus planet image width
   const ORRERY_VENUS_HEIGHT_DESKTOP = 'auto';            // EDITABLE Desktop: Venus height ('auto' preserves aspect ratio)
   const ORRERY_VENUS_HEIGHT_MOBILE  = 'auto';            // EDITABLE Mobile: Venus height
   // AUTO-CALCULATED: Venus's real ecliptic longitude for today → orrery clockwise CSS angle
@@ -10110,7 +10107,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const ORRERY_MERCURY_RING_RADIUS_MOBILE  = '10vw';     // EDITABLE Mobile: Mercury orbit ring radius
   const ORRERY_MERCURY_IMAGE_URL = 'img/p-me.png';       // EDITABLE: Mercury transparent PNG asset path
   const ORRERY_MERCURY_WIDTH_DESKTOP = '2.2vw';          // EDITABLE Desktop: Mercury planet image width
-  const ORRERY_MERCURY_WIDTH_MOBILE  = '3.5vw';          // EDITABLE Mobile: Mercury planet image width
+  const ORRERY_MERCURY_WIDTH_MOBILE  = '2.8vw';          // EDITABLE Mobile: Mercury planet image width
   const ORRERY_MERCURY_HEIGHT_DESKTOP = 'auto';          // EDITABLE Desktop: Mercury height ('auto' preserves aspect ratio)
   const ORRERY_MERCURY_HEIGHT_MOBILE  = 'auto';          // EDITABLE Mobile: Mercury height
   // AUTO-CALCULATED: Mercury's real ecliptic longitude for today → orrery clockwise CSS angle
@@ -10533,7 +10530,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1426';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1434';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -10878,7 +10875,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         } else if (i === 4) {
           // Cell #5: UV Index display (Mobile Layout)
           innerHtml = `
-            <svg class="clock-timer-svg" viewBox="0 0 100 100">
+            <svg class="clock-timer-svg" viewBox="-5 -5 110 110">
               <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
               <circle class="uv-peak-track countdown-track" cx="50" cy="50" r="51" fill="none" style="stroke-opacity: 0.2; stroke-width: var(--clock-grid-stroke-width, 4);" />
               <circle class="uv-peak-progress" cx="50" cy="50" r="51" fill="none" style="stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease-out, stroke 0.5s ease-out, opacity 0.5s ease;" />
@@ -11277,7 +11274,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           `;
         } else if (i === 8) {
           innerHtml = `
-            <svg class="clock-timer-svg" viewBox="0 0 100 100">
+            <svg class="clock-timer-svg" viewBox="-5 -5 110 110">
               <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
               <circle class="uv-peak-track countdown-track" cx="50" cy="50" r="51" fill="none" style="stroke-opacity: 0.2; stroke-width: var(--clock-grid-stroke-width, 4);" />
               <circle class="uv-peak-progress" cx="50" cy="50" r="51" fill="none" style="stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease-out, stroke 0.5s ease-out, opacity 0.5s ease;" />
@@ -11746,7 +11743,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           `;
         } else {
           innerHtml = `
-            <svg class="clock-timer-svg" viewBox="0 0 100 100">
+            <svg class="clock-timer-svg" viewBox="-5 -5 110 110">
               <circle class="countdown-track" cx="50" cy="50" r="46" fill="none" />
               <circle class="uv-peak-track countdown-track" cx="50" cy="50" r="51" fill="none" style="stroke-opacity: 0.2; stroke-width: var(--clock-grid-stroke-width, 4);" />
               <circle class="uv-peak-progress" cx="50" cy="50" r="51" fill="none" style="stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease-out, stroke 0.5s ease-out, opacity 0.5s ease;" />
@@ -12193,6 +12190,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
       dailyPeakUv = null;
     }
     
+    // IMPORTANT: The UV PEAK function SHOULD ONLY work locally in Tulsa
+    if (!isTulsaArea(LAT, LON)) {
+      dailyPeakUv = null;
+    }
+    
     const itemEls = document.querySelectorAll('.clockGridItem-8, .clockGridItem-4');
     itemEls.forEach(itemEl => {
        itemEl.style.cursor = 'default';
@@ -12276,10 +12278,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
     labelEls.forEach(labelEl => {
        if (dailyPeakUv !== null && dailyPeakUv > 0) {
           labelEl.innerHTML = `Peak UV ${dailyPeakUv.toFixed(1)}`;
+          labelEl.style.color = getUvColor(dailyPeakUv);
        } else {
-          labelEl.innerHTML = `UV –.–`;
+          labelEl.innerHTML = `UV Index`;
+          labelEl.style.color = 'var(--temp-color, rgba(255,255,255,0.7))';
        }
-       labelEl.style.color = getUvColor(dailyPeakUv);
        labelEl.style.textTransform = 'none';
        labelEl.style.letterSpacing = 'var(--clock-grid-uv-label-letter-spacing)';
     });
@@ -14736,7 +14739,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
           let baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
           const peakValDisplay = (typeof dailyPeakValue === 'number' || !isNaN(parseFloat(dailyPeakValue))) ? parseFloat(dailyPeakValue).toFixed(1) : String(dailyPeakValue);
           const isMobile = window.innerWidth <= 767;
-          const line2Text = isMobile ? `PEAK ${dailyPeakClass}<br><span style="display:inline-block; margin-top: var(--solar-flare-sublabel-peak-value-margin-top, 0vw);">${peakValDisplay}</span>` : `PEAK ${dailyPeakClass}${peakValDisplay}`;
+          const line2Text = `PEAK ${dailyPeakClass}<br><span style="display:inline-block; margin-top: var(--solar-flare-sublabel-peak-value-margin-top, 0vw);">${peakValDisplay}</span>`;
           sublabelEl.innerHTML = `<br>${baseHtml}<br><span style="display: inline-block; margin-top: var(--solar-flare-sublabel-peak-margin-top, 0vw); font-family: 'euro-bold', sans-serif; color: ${dailyPeakColor};">${line2Text}</span>`;
         }
         if (SOLAR_FLARE_SUBLABEL_COLOR === 'auto') {
