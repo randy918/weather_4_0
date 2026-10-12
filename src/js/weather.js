@@ -8243,32 +8243,32 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // --- Typography & Text Positioning (JCV) ---
   // Top Label ("PARTIAL FADE")
   const RADIO_BLACKOUT_LABEL_FONT_FAMILY = "'euro', sans-serif"; // EDITABLE: Top label font-family ("euro" = EurostileExtended)
-  const RADIO_BLACKOUT_LABEL_FONT_SIZE_DESKTOP = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.088)'; // EDITABLE Desktop: Top label font size
-  const RADIO_BLACKOUT_LABEL_FONT_SIZE_MOBILE = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.088)';  // EDITABLE Mobile: Top label font size
+  const RADIO_BLACKOUT_LABEL_FONT_SIZE_DESKTOP = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.0748)'; // EDITABLE Desktop: Top label font size
+  const RADIO_BLACKOUT_LABEL_FONT_SIZE_MOBILE = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.0748)';  // EDITABLE Mobile: Top label font size
   const RADIO_BLACKOUT_LABEL_LINE_HEIGHT = 1.0;                  // EDITABLE: Top label line height
   const RADIO_BLACKOUT_LABEL_LETTER_SPACING_DESKTOP = '0.05vw';  // EDITABLE Desktop: Top label letter spacing
   const RADIO_BLACKOUT_LABEL_LETTER_SPACING_MOBILE = '0.05vw';   // EDITABLE Mobile: Top label letter spacing
   const RADIO_BLACKOUT_LABEL_OFFSET_Y_DESKTOP = '0vw';           // EDITABLE Desktop: Fine vertical nudge for top label
   const RADIO_BLACKOUT_LABEL_OFFSET_Y_MOBILE = '0vw';            // EDITABLE Mobile: Fine vertical nudge for top label
-  const RADIO_BLACKOUT_GAP_LABEL_TO_CLASS_DESKTOP = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.025)'; // EDITABLE Desktop: Gap between label and giant class text
-  const RADIO_BLACKOUT_GAP_LABEL_TO_CLASS_MOBILE = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.025)';  // EDITABLE Mobile: Gap between label and giant class text
+  const RADIO_BLACKOUT_GAP_LABEL_TO_CLASS_DESKTOP = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02125)'; // EDITABLE Desktop: Gap between label and giant class text
+  const RADIO_BLACKOUT_GAP_LABEL_TO_CLASS_MOBILE = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02125)';  // EDITABLE Mobile: Gap between label and giant class text
 
   // Middle Giant Class ("R2")
   const RADIO_BLACKOUT_CLASS_FONT_FAMILY = "'euro-bold', sans-serif"; // EDITABLE: Giant class font-family ("euro-bold" = EurostileExtendedBlack)
-  const RADIO_BLACKOUT_CLASS_FONT_SIZE_DESKTOP = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.306)'; // EDITABLE Desktop: Giant class text font size
-  const RADIO_BLACKOUT_CLASS_FONT_SIZE_MOBILE = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.306)';  // EDITABLE Mobile: Giant class text font size
+  const RADIO_BLACKOUT_CLASS_FONT_SIZE_DESKTOP = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.2601)'; // EDITABLE Desktop: Giant class text font size
+  const RADIO_BLACKOUT_CLASS_FONT_SIZE_MOBILE = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.2601)';  // EDITABLE Mobile: Giant class text font size
   const RADIO_BLACKOUT_CLASS_LINE_HEIGHT = 0.82;                 // EDITABLE: Giant class line height
   const RADIO_BLACKOUT_CLASS_OFFSET_Y_DESKTOP = '0vw';           // EDITABLE Desktop: Fine vertical nudge for giant class text
   const RADIO_BLACKOUT_CLASS_OFFSET_Y_MOBILE = '0vw';            // EDITABLE Mobile: Fine vertical nudge for giant class text
-  const RADIO_BLACKOUT_GAP_CLASS_TO_VALUE_DESKTOP = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02)'; // EDITABLE Desktop: Gap between giant class and bottom value
-  const RADIO_BLACKOUT_GAP_CLASS_TO_VALUE_MOBILE = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02)';  // EDITABLE Mobile: Gap between giant class and bottom value
+  const RADIO_BLACKOUT_GAP_CLASS_TO_VALUE_DESKTOP = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.017)'; // EDITABLE Desktop: Gap between giant class and bottom value
+  const RADIO_BLACKOUT_GAP_CLASS_TO_VALUE_MOBILE = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.017)';  // EDITABLE Mobile: Gap between giant class and bottom value
 
   // Bottom Value ("2.8dB")
   const RADIO_BLACKOUT_UNIT = 'dB';                              // EDITABLE: SI/IEEE decibel unit symbol ('dB', 'db', or '')
   const RADIO_BLACKOUT_TWO_SIG_DIGITS = true;                    // EDITABLE: If true, formats to 2 significant digits (e.g. 2.8dB, 16dB vs 16.0dB) to avoid circle crowding
   const RADIO_BLACKOUT_VALUE_FONT_FAMILY = "'euro-bold', sans-serif"; // EDITABLE: Bottom value font-family ("euro-bold" = EurostileExtendedBlack)
-  const RADIO_BLACKOUT_VALUE_FONT_SIZE_DESKTOP = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1485)'; // EDITABLE Desktop: Bottom value font size
-  const RADIO_BLACKOUT_VALUE_FONT_SIZE_MOBILE = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1485)';  // EDITABLE Mobile: Bottom value font size
+  const RADIO_BLACKOUT_VALUE_FONT_SIZE_DESKTOP = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1262)'; // EDITABLE Desktop: Bottom value font size
+  const RADIO_BLACKOUT_VALUE_FONT_SIZE_MOBILE = 'calc(var(--radio-blackout-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1262)';  // EDITABLE Mobile: Bottom value font size
   const RADIO_BLACKOUT_VALUE_LINE_HEIGHT = 0.92;                 // EDITABLE: Bottom value line height
   const RADIO_BLACKOUT_VALUE_LETTER_SPACING_DESKTOP = '-0.03vw'; // EDITABLE Desktop: Bottom value letter spacing
   const RADIO_BLACKOUT_VALUE_LETTER_SPACING_MOBILE = '-0.06vw';  // EDITABLE Mobile: Bottom value letter spacing
@@ -10535,7 +10535,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1463';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1464';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
