@@ -3055,7 +3055,7 @@ import weatherConditions from '../data/weather-conditions.json';
   // Easily editable list of colors per 10° range
   // Note: MUST use hsl(H, S%, L%) format for compatibility with background animations
   const TEMP_COLORS = [
-    { max: -10, color: 'hsl(0, 100%, 37%)' },   // Below -10: deep red
+    { max: -10, color: 'hsl(340, 100%, 45%)' },   // Below -10: deep red
     { max: 0,   color: 'hsl(315, 100%, 50%)' },  // Below 0: shocking magenta (was hsl(320, 90%, 45%))
     { max: 10,  color: 'hsl(280, 90%, 50%)' },   // 0s: purple
     { max: 20,  color: 'hsl(260, 90%, 60%)' },   // 10s: blue purple
@@ -3063,7 +3063,7 @@ import weatherConditions from '../data/weather-conditions.json';
     { max: 40,  color: 'hsl(195, 90%, 45%)' },   // 30s: cyan
     { max: 50,  color: 'hsl(165, 90%, 40%)' },   // 40s: aqua
     { max: 60,  color: 'hsl(120, 80%, 35%)' },   // 50s: green
-    { max: 70,  color: 'hsl(80,  90%, 40%)' },   // 60s: yellow-green
+    { max: 70,  color: 'hsl(83,  90%, 43%)' },   // 60s: yellow-green
     { max: 80,  color: 'hsl(45,  100%, 50%)' },  // 70s: yellow-gold
     { max: 90,  color: 'hsl(30,  100%, 50%)' },  // 80s: orange
     { max: 100, color: 'hsl(0,   90%, 55%)' },   // 90s: tomato red
@@ -10535,7 +10535,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1457';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1463';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -12061,7 +12061,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
        labelEls.forEach(labelEl => {
           if (currentIsNight) {
              labelEl.innerHTML = `Humidity`;
-             labelEl.style.color = 'var(--temp-color, rgba(255,255,255,0.7))';
+             labelEl.style.color = finalColor || 'inherit';
           } else {
              let labelColor = 'inherit';
              if (dewpoint !== null) {
@@ -12298,7 +12298,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
 
       labelEls.forEach(labelEl => {
          labelEl.innerHTML = `Dew Point`;
-         labelEl.style.color = 'var(--temp-color, rgba(255,255,255,0.7))';
+         labelEl.style.color = finalColor || 'inherit';
          labelEl.style.textTransform = 'none';
          labelEl.style.letterSpacing = 'var(--clock-grid-uv-label-letter-spacing)';
       });
@@ -19599,12 +19599,20 @@ Plan ahead for significantly warmer conditions tomorrow!`
       const imgPath = 'img/' + fileName;
       const fallbackPath = 'img/desc-rem.jpg';
       
+      const lowTemp = (dayData.temp && typeof dayData.temp.min === 'number') ? dayData.temp.min : null;
+      let tingeLayer = '';
+      if (RAIN_ITEM_TINGE_ENABLED && lowTemp !== null) {
+        const lowTempColor = tempToColor(lowTemp) || 'transparent';
+        const tingeStop = window.innerWidth <= 767 ? RAIN_ITEM_TINGE_STOP_MOBILE : RAIN_ITEM_TINGE_STOP_DESKTOP;
+        tingeLayer = `linear-gradient(to bottom, ${lowTempColor} 0%, transparent ${tingeStop}), `;
+      }
+      
       const imgPreload = new Image();
       imgPreload.onload = () => {
-        cell.style.backgroundImage = `url('${imgPath}')`;
+        cell.style.backgroundImage = `${tingeLayer}url('${imgPath}')`;
       };
       imgPreload.onerror = () => {
-        cell.style.backgroundImage = `url('${fallbackPath}')`;
+        cell.style.backgroundImage = `${tingeLayer}url('${fallbackPath}')`;
         recordMissingAsset(imgPath);
       };
       imgPreload.src = imgPath;
