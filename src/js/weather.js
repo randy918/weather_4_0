@@ -10535,7 +10535,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1464';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1469';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -14605,10 +14605,10 @@ Plan ahead for significantly warmer conditions tomorrow!`
     const iconClass = (arrowDir === 'down') ? 'fa-solid fa-arrow-down' : 'fa-solid fa-arrow-up';
     if (text.includes('<br>')) {
       const parts = text.split('<br>');
-      return `<span style="white-space: normal;"><i class="${iconClass}" aria-hidden="true"></i> ${parts[0]}</span><br><span>${parts.slice(1).join('<br>')}</span>`;
+      return `<span style="white-space: normal; font-family: 'medium', sans-serif;"><i class="${iconClass}" aria-hidden="true"></i> ${parts[0]}</span><br><span style="font-family: 'medium', sans-serif;">${parts.slice(1).join('<br>')}</span>`;
     }
     // Allow wrapping if needed by CSS
-    return `<span style="white-space: normal;"><i class="${iconClass}" aria-hidden="true"></i> ${text}</span>`;
+    return `<span style="white-space: normal; font-family: 'medium', sans-serif;"><i class="${iconClass}" aria-hidden="true"></i> ${text}</span>`;
   }
 
   function getSolarFlareImpact(flareClass, trendDir) {
@@ -14718,7 +14718,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       try {
         // Find today's record dynamically from the global fetch!
         if (window.todaySkyRecord && window.todaySkyRecord.pk_flr_cls) {
-           const peakStr = window.todaySkyRecord.pk_flr_cls; // e.g. "X1.0"
+           const peakStr = String(window.todaySkyRecord.pk_flr_cls).trim(); // e.g. "X1.0"
            dailyPeakClass = peakStr.charAt(0);     // "X"
            dailyPeakValue = parseFloat(peakStr.substring(1)) || 1.0; // 1.0
            dailyPeakColor = getSolarFlareLevelColor(dailyPeakClass);
@@ -14811,6 +14811,9 @@ Plan ahead for significantly warmer conditions tomorrow!`
         if (SOLAR_FLARE_SUBLABEL_MODE === 'dynamic') {
           const impact = getSolarFlareImpact(flareClass, currentSolarFlareTrend);
           let baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
+          if (SOLAR_FLARE_SUBLABEL_COLOR === 'auto') {
+            baseHtml = `<span style="color: ${color};">${baseHtml}</span>`;
+          }
           const peakValDisplay = (typeof dailyPeakValue === 'number' || !isNaN(parseFloat(dailyPeakValue))) ? parseFloat(dailyPeakValue).toFixed(1) : String(dailyPeakValue);
           const isMobile = window.innerWidth <= 767;
           const line2Text = `PEAK ${dailyPeakClass}<br><span style="display:inline-block; margin-top: var(--solar-flare-sublabel-peak-value-margin-top, 0vw);">${peakValDisplay}</span>`;
@@ -14819,6 +14822,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
         if (SOLAR_FLARE_SUBLABEL_COLOR === 'auto') {
           sublabelEl.style.color = color;
         }
+        sublabelEl.style.opacity = '1';
       }
     }
   }
@@ -15140,7 +15144,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (isLive) {
       try {
         if (window.todaySkyRecord && window.todaySkyRecord.pk_r_cls) {
-           dailyPeakClass = window.todaySkyRecord.pk_r_cls; // e.g. "R2"
+           dailyPeakClass = String(window.todaySkyRecord.pk_r_cls).trim(); // e.g. "R2"
            dailyPeakValue = window.todaySkyRecord.pk_r_val || 0.1; // e.g. 2.8
            dailyPeakColor = getRadioBlackoutLevelColor(dailyPeakClass);
            dailyPeakFraction = calculateRadioBlackoutFraction(dailyPeakClass, dailyPeakValue);
@@ -15229,13 +15233,17 @@ Plan ahead for significantly warmer conditions tomorrow!`
       if (sublabelEl) {
         if (RADIO_BLACKOUT_SUBLABEL_MODE === 'dynamic') {
           const impact = getRadioBlackoutImpact(rClass, currentRadioBlackoutTrend);
-          const baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
+          let baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
+          if (RADIO_BLACKOUT_SUBLABEL_COLOR === 'auto') {
+            baseHtml = `<span style="color: ${color};">${baseHtml}</span>`;
+          }
           const peakValDisplay = formatRadioBlackoutValue(dailyPeakValue);
           sublabelEl.innerHTML = `<br>${baseHtml}<br><span style="display: inline-block; margin-top: var(--radio-blackout-sublabel-peak-margin-top, 0vw); font-family: 'euro-bold', sans-serif; color: ${dailyPeakColor};">PEAK ${dailyPeakClass}<br><span style="display:inline-block; margin-top: var(--radio-blackout-sublabel-peak-value-margin-top, 0vw);">${peakValDisplay}</span></span>`;
         }
         if (RADIO_BLACKOUT_SUBLABEL_COLOR === 'auto') {
           sublabelEl.style.color = color;
         }
+        sublabelEl.style.opacity = '1';
       }
     }
   }
@@ -15559,7 +15567,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
     if (isLive) {
       try {
         if (window.todaySkyRecord && window.todaySkyRecord.pk_g_cls) {
-           dailyPeakClass = window.todaySkyRecord.pk_g_cls; // e.g. "G2"
+           dailyPeakClass = String(window.todaySkyRecord.pk_g_cls).trim(); // e.g. "G2"
            dailyPeakValue = window.todaySkyRecord.pk_g_val || 0.1; // e.g. 2.8
            dailyPeakColor = getGeomagneticStormLevelColor(dailyPeakClass);
            dailyPeakFraction = calculateGeomagneticStormFraction(dailyPeakClass, dailyPeakValue);
@@ -15648,13 +15656,17 @@ Plan ahead for significantly warmer conditions tomorrow!`
       if (sublabelEl) {
         if (GEOMAGNETIC_STORM_SUBLABEL_MODE === 'dynamic') {
           const impact = getGeomagneticStormImpact(rClass, currentGeomagneticStormTrend);
-          const baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
+          let baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
+          if (GEOMAGNETIC_STORM_SUBLABEL_COLOR === 'auto') {
+            baseHtml = `<span style="color: ${color};">${baseHtml}</span>`;
+          }
           const peakValDisplay = formatGeomagneticStormValue(dailyPeakValue);
           sublabelEl.innerHTML = `<br>${baseHtml}<br><span style="display: inline-block; margin-top: var(--geomagnetic-storm-sublabel-peak-margin-top, 0vw); font-family: 'euro-bold', sans-serif; color: ${dailyPeakColor};">PEAK ${dailyPeakClass}<br><span style="display:inline-block; margin-top: var(--geomagnetic-storm-sublabel-peak-value-margin-top, 0vw);">${peakValDisplay}</span></span>`;
         }
         if (GEOMAGNETIC_STORM_SUBLABEL_COLOR === 'auto') {
           sublabelEl.style.color = color;
         }
+        sublabelEl.style.opacity = '1';
       }
     }
   }
