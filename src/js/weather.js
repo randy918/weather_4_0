@@ -8162,7 +8162,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const SOLAR_FLARE_SUBLABEL_MARGIN_TOP_DESKTOP = '0.6vw';       // EDITABLE Desktop: Margin top below dial circle
   const SOLAR_FLARE_SUBLABEL_MARGIN_TOP_MOBILE = '1.2vw';        // EDITABLE Mobile: Margin top below dial circle
   const SOLAR_FLARE_SUBLABEL_PEAK_MARGIN_TOP_DESKTOP = '1.5vw';  // EDITABLE Desktop: Margin top for the PEAK line
-  const SOLAR_FLARE_SUBLABEL_PEAK_MARGIN_TOP_MOBILE = '1.5vw';   // EDITABLE Mobile: Margin top for the PEAK line
+  const SOLAR_FLARE_SUBLABEL_PEAK_MARGIN_TOP_MOBILE = '3.0vw';   // EDITABLE Mobile: Margin top for the PEAK line
   const SOLAR_FLARE_SUBLABEL_PEAK_VALUE_MARGIN_TOP_DESKTOP = '0vw'; // EDITABLE Desktop: Margin top between PEAK class and value
   const SOLAR_FLARE_SUBLABEL_PEAK_VALUE_MARGIN_TOP_MOBILE = '1.0vw';// EDITABLE Mobile: Margin top between PEAK class and value
   const SOLAR_FLARE_SUBLABEL_OFFSET_Y_DESKTOP = '0vw';           // EDITABLE Desktop: Fine vertical nudge
@@ -8295,7 +8295,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const RADIO_BLACKOUT_SUBLABEL_MARGIN_TOP_DESKTOP = '0.6vw';    // EDITABLE Desktop: Margin top below dial circle
   const RADIO_BLACKOUT_SUBLABEL_MARGIN_TOP_MOBILE = '1.2vw';     // EDITABLE Mobile: Margin top below dial circle
   const RADIO_BLACKOUT_SUBLABEL_PEAK_MARGIN_TOP_DESKTOP = '1.5vw'; // EDITABLE Desktop: Margin top for the PEAK line
-  const RADIO_BLACKOUT_SUBLABEL_PEAK_MARGIN_TOP_MOBILE = '1.5vw';  // EDITABLE Mobile: Margin top for the PEAK line
+  const RADIO_BLACKOUT_SUBLABEL_PEAK_MARGIN_TOP_MOBILE = '3.0vw';  // EDITABLE Mobile: Margin top for the PEAK line
   const RADIO_BLACKOUT_SUBLABEL_PEAK_VALUE_MARGIN_TOP_DESKTOP = '0vw'; // EDITABLE Desktop: Margin top between PEAK class and value
   const RADIO_BLACKOUT_SUBLABEL_PEAK_VALUE_MARGIN_TOP_MOBILE = '1.0vw';  // EDITABLE Mobile: Margin top between PEAK class and value
   const RADIO_BLACKOUT_SUBLABEL_OFFSET_Y_DESKTOP = '0vw';        // EDITABLE Desktop: Fine vertical nudge
@@ -8433,7 +8433,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const GEOMAGNETIC_STORM_SUBLABEL_MARGIN_TOP_DESKTOP = '0.6vw';    // EDITABLE Desktop: Margin top below dial circle
   const GEOMAGNETIC_STORM_SUBLABEL_MARGIN_TOP_MOBILE = '1.2vw';     // EDITABLE Mobile: Margin top below dial circle
   const GEOMAGNETIC_STORM_SUBLABEL_PEAK_MARGIN_TOP_DESKTOP = '1.5vw'; // EDITABLE Desktop: Margin top for the PEAK line
-  const GEOMAGNETIC_STORM_SUBLABEL_PEAK_MARGIN_TOP_MOBILE = '1.5vw';  // EDITABLE Mobile: Margin top for the PEAK line
+  const GEOMAGNETIC_STORM_SUBLABEL_PEAK_MARGIN_TOP_MOBILE = '3.0vw';  // EDITABLE Mobile: Margin top for the PEAK line
   const GEOMAGNETIC_STORM_SUBLABEL_PEAK_VALUE_MARGIN_TOP_DESKTOP = '0vw'; // EDITABLE Desktop: Margin top between PEAK class and value
   const GEOMAGNETIC_STORM_SUBLABEL_PEAK_VALUE_MARGIN_TOP_MOBILE = '1.0vw';  // EDITABLE Mobile: Margin top between PEAK class and value
   const GEOMAGNETIC_STORM_SUBLABEL_OFFSET_Y_DESKTOP = '0vw';        // EDITABLE Desktop: Fine vertical nudge
@@ -10535,7 +10535,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1469';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1470';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
