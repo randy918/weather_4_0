@@ -1715,6 +1715,8 @@ main {
         --gap-earth-to-uk: var(--gap-earth-to-uk-mobile, var(--earth-gap-right-mobile, 0vw));
         --earth-gap-right: var(--earth-gap-right-mobile, 0vw);
         --celestial-dial-right-gap-left: var(--celestial-dial-right-gap-left-mobile, 0vw);
+        --celestial-dials-space-above: var(--celestial-dials-space-above-mobile, 0vw);
+        --celestial-dial-margin-top: var(--celestial-dials-space-above-mobile, var(--celestial-dial-margin-top-mobile, 0vw));
 
         --world-clocks-width: var(--world-clocks-width-mobile, 90vw);
         --world-clocks-gap: var(--world-clocks-gap-mobile, 1.875vw);
@@ -1845,6 +1847,8 @@ main {
         --gap-earth-to-uk: var(--gap-earth-to-uk-desktop, var(--earth-gap-right-desktop, 0vw));
         --earth-gap-right: var(--earth-gap-right-desktop, 0vw);
         --celestial-dial-right-gap-left: var(--celestial-dial-right-gap-left-desktop, 0vw);
+        --celestial-dials-space-above: var(--celestial-dials-space-above-desktop, 0vw);
+        --celestial-dial-margin-top: var(--celestial-dials-space-above-desktop, var(--celestial-dial-margin-top-desktop, 0vw));
 
         --world-clock-size: var(--world-clock-size-desktop, 13.5vw);
         --world-clocks-gap: var(--world-clocks-gap-desktop, 2.5vw);
@@ -2353,7 +2357,7 @@ main {
     .world-clock-dial {
         width: var(--celestial-dial-size, var(--world-clock-size, 13.5vw));
         height: var(--celestial-dial-size, var(--world-clock-size, 13.5vw));
-        margin-top: var(--celestial-dial-margin-top, 0vw);
+        margin-top: var(--celestial-dials-space-above, var(--celestial-dial-margin-top, 0vw));
         transform: translate(var(--celestial-dial-offset-x, 0vw), 0);
         transition: margin-top 0.3s ease;
     }
@@ -2370,7 +2374,7 @@ main {
     border-radius: 50%;
     width: var(--solar-flare-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
     height: var(--solar-flare-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
-    margin-top: var(--celestial-dial-margin-top, 0vw);
+    margin-top: var(--celestial-dials-space-above, var(--celestial-dial-margin-top, 0vw));
     transform: translate(var(--solar-flare-offset-x, 0vw), var(--solar-flare-offset-y, 0vw));
     background-color: var(--solar-flare-dial-bg-color, transparent);
     box-shadow: var(--solar-flare-dial-inner-shadow, inset 0 0 1vw rgba(0, 0, 0, 0.5));
@@ -2497,7 +2501,7 @@ main {
     border-radius: 50%;
     width: var(--radio-blackout-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
     height: var(--radio-blackout-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
-    margin-top: var(--celestial-dial-margin-top, 0vw);
+    margin-top: var(--celestial-dials-space-above, var(--celestial-dial-margin-top, 0vw));
     transform: translate(var(--radio-blackout-offset-x, 0vw), var(--radio-blackout-offset-y, 0vw));
     background-color: var(--radio-blackout-dial-bg-color, transparent);
     box-shadow: var(--radio-blackout-dial-inner-shadow, inset 0 0 1vw rgba(0, 0, 0, 0.5));

@@ -8478,10 +8478,24 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const CELESTIAL_GAUGE_STAGE1_MS = 600;                       // EDITABLE: Stage 1 duration (sweep to full if 'up', sweep to 0 if 'down') in ms
   const CELESTIAL_GAUGE_STAGE2_MS = 600;                       // EDITABLE: Stage 2 duration (settle to target offset) in ms
 
+  // =========================================================================
+  // --- JCV Marker: Y Space Above the 3 Dials (Flare, G-Scale, R-Scale) ---
+  // Space above the 3 dials raised up to the top of the celestial row.
+  // Edit these constants to adjust the vertical Y space above all 3 dials.
+  // Note: The Sun's position and size remain 100% independent and unaffected.
+  // =========================================================================
+  const CELESTIAL_DIALS_Y_SPACE_ABOVE_DESKTOP = '7vw';          // EDITABLE Desktop: Y space above the 3 dials (e.g. '0vw', '0.5vw', '1vw', '-0.5vw')
+  const CELESTIAL_DIALS_Y_SPACE_ABOVE_MOBILE = '7vw';           // EDITABLE Mobile: Y space above the 3 dials (e.g. '0vw', '0.5vw', '1vw', '-0.5vw')
+  // Compatibility aliases
+  const CELESTIAL_DIALS_SPACE_ABOVE_DESKTOP = CELESTIAL_DIALS_Y_SPACE_ABOVE_DESKTOP;
+  const CELESTIAL_DIALS_SPACE_ABOVE_MOBILE = CELESTIAL_DIALS_Y_SPACE_ABOVE_MOBILE;
+  const CELESTIAL_DIAL_MARGIN_TOP_DESKTOP = CELESTIAL_DIALS_Y_SPACE_ABOVE_DESKTOP;
+  const CELESTIAL_DIAL_MARGIN_TOP_MOBILE = CELESTIAL_DIALS_Y_SPACE_ABOVE_MOBILE;
+
   // Flanking Dials Lateral & Vertical Centering Controls (JCV)
-  // 'center' aligns the dial circle's horizontal midline with the Sun & Earth equator
-  const CELESTIAL_DIAL_VERTICAL_ALIGN_DESKTOP = 'center';       // EDITABLE Desktop: 'center' (equator aligned with Sun/Earth) or 'top'
-  const CELESTIAL_DIAL_VERTICAL_ALIGN_MOBILE = 'center';        // EDITABLE Mobile: 'center' or 'top'
+  // 'top' raises dials up near top divider; 'center' aligns horizontal midline with Sun equator
+  const CELESTIAL_DIAL_VERTICAL_ALIGN_DESKTOP = 'top';          // EDITABLE Desktop: 'top' (raised up near top divider) or 'center' (equator aligned with Sun)
+  const CELESTIAL_DIAL_VERTICAL_ALIGN_MOBILE = 'top';           // EDITABLE Mobile: 'top' or 'center'
   const CELESTIAL_DIAL_OFFSET_Y_DESKTOP = '0vw';                // EDITABLE Desktop: Fine vertical nudge for dial circle (positive = DOWN, negative = UP)
   const CELESTIAL_DIAL_OFFSET_Y_MOBILE = '0vw';                 // EDITABLE Mobile: Fine vertical nudge for dial circle
   const CELESTIAL_DIAL_OFFSET_X_DESKTOP = '0vw';                // EDITABLE Desktop: Fine horizontal nudge for dial circle (positive = RIGHT, negative = LEFT)
@@ -9146,18 +9160,26 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--earth-image-container-margin-top-mobile', earthMarginTopMobile);
     document.documentElement.style.setProperty('--earth-image-container-margin-top', earthMarginTopActive);
 
-    // Flanking Dials: Equator Centering with Sun & Earth
+    // Flanking Dials: Space Above / Vertical Alignment with Sun & Earth
+    const dialsSpaceAboveDesktop = (typeof CELESTIAL_DIALS_Y_SPACE_ABOVE_DESKTOP === 'number') ? `${CELESTIAL_DIALS_Y_SPACE_ABOVE_DESKTOP}vw` : String(CELESTIAL_DIALS_Y_SPACE_ABOVE_DESKTOP);
+    const dialsSpaceAboveMobile = (typeof CELESTIAL_DIALS_Y_SPACE_ABOVE_MOBILE === 'number') ? `${CELESTIAL_DIALS_Y_SPACE_ABOVE_MOBILE}vw` : String(CELESTIAL_DIALS_Y_SPACE_ABOVE_MOBILE);
+    const dialsSpaceAboveActive = isMobile ? dialsSpaceAboveMobile : dialsSpaceAboveDesktop;
+
+    document.documentElement.style.setProperty('--celestial-dials-space-above-desktop', dialsSpaceAboveDesktop);
+    document.documentElement.style.setProperty('--celestial-dials-space-above-mobile', dialsSpaceAboveMobile);
+    document.documentElement.style.setProperty('--celestial-dials-space-above', dialsSpaceAboveActive);
+
     const isCenterDesktop = CELESTIAL_DIAL_VERTICAL_ALIGN_DESKTOP === 'center';
     const isCenterMobile = CELESTIAL_DIAL_VERTICAL_ALIGN_MOBILE === 'center';
     const dialMarginTopDesktop = isCenterDesktop
       ? 'calc(((var(--celestial-max-circle-size-desktop) - var(--celestial-dial-size-desktop, var(--world-clock-size-desktop))) / 2) + var(--celestial-dial-offset-y-desktop, 0vw))'
-      : 'var(--celestial-dial-offset-y-desktop, 0vw)';
+      : 'calc(var(--celestial-dials-space-above-desktop, 0vw) + var(--celestial-dial-offset-y-desktop, 0vw))';
     const dialMarginTopMobile = isCenterMobile
       ? 'calc(((var(--celestial-max-circle-size-mobile) - var(--celestial-dial-size-mobile, var(--world-clock-size-mobile))) / 2) + var(--celestial-dial-offset-y-mobile, 0vw))'
-      : 'var(--celestial-dial-offset-y-mobile, 0vw)';
+      : 'calc(var(--celestial-dials-space-above-mobile, 0vw) + var(--celestial-dial-offset-y-mobile, 0vw))';
     const dialMarginTopActive = (isMobile ? isCenterMobile : isCenterDesktop)
       ? 'calc(((var(--celestial-max-circle-size) - var(--celestial-dial-size, var(--world-clock-size))) / 2) + var(--celestial-dial-offset-y, 0vw))'
-      : 'var(--celestial-dial-offset-y, 0vw)';
+      : 'calc(var(--celestial-dials-space-above, 0vw) + var(--celestial-dial-offset-y, 0vw))';
 
     document.documentElement.style.setProperty('--celestial-dial-offset-y-desktop', CELESTIAL_DIAL_OFFSET_Y_DESKTOP);
     document.documentElement.style.setProperty('--celestial-dial-offset-y-mobile', CELESTIAL_DIAL_OFFSET_Y_MOBILE);
@@ -10535,7 +10557,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1470';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1473';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
