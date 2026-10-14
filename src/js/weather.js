@@ -8570,8 +8570,18 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const WORLD_CLOCK_SIZE_DESKTOP = 'auto';                   // EDITABLE Desktop: 'auto' (dials scale on their own from width & gap) or custom string (e.g. '15.68vw')
   const WORLD_CLOCK_SIZE_MOBILE = 'auto';                    // EDITABLE Mobile: 'auto' (dials scale on their own from width & gap) or custom string (e.g. '16.5vw')
 
-  const WORLD_CLOCKS_MARGIN_TOP_DESKTOP = '-5vw';           // EDITABLE Desktop: Margin above the clocks row
-  const WORLD_CLOCKS_MARGIN_TOP_MOBILE = '-5.0vw';            // EDITABLE Mobile: Margin above the clocks row
+  // --- Margin Above Clocks Row (JCV) ---
+  // When hourly blue rain inches boxes ARE present
+  const WORLD_CLOCKS_MARGIN_TOP_DESKTOP = '-2.0vw';           // EDITABLE Desktop: Margin above clocks row (when hourly rain boxes are present)
+  const WORLD_CLOCKS_MARGIN_TOP_MOBILE = '-2.0vw';            // EDITABLE Mobile: Margin above clocks row (when hourly rain boxes are present)
+
+  // When NO hourly blue rain inches boxes are present (compensates for no vertical box height)
+  const WORLD_CLOCKS_MARGIN_TOP_NO_RAIN_DESKTOP = '-5.0vw';   // EDITABLE Desktop: Margin above clocks row when NO hourly rain boxes are present
+  const WORLD_CLOCKS_MARGIN_TOP_NO_RAIN_MOBILE = '-5.0vw';    // EDITABLE Mobile: Margin above clocks row when NO hourly rain boxes are present
+
+  // Optional: Fine-tuning offset applied when NO hourly rain boxes are present
+  const WORLD_CLOCKS_NO_RAIN_OFFSET_DESKTOP = '0vw';          // EDITABLE Desktop: Extra fine offset when NO rain boxes (e.g. '0vw', '-0.5vw')
+  const WORLD_CLOCKS_NO_RAIN_OFFSET_MOBILE = '0vw';           // EDITABLE Mobile: Extra fine offset when NO rain boxes (e.g. '0vw', '-0.5vw')
   const WORLD_CLOCKS_MARGIN_BOTTOM_DESKTOP = '-6vw';        // EDITABLE Desktop: Margin below the clocks row
   const WORLD_CLOCKS_MARGIN_BOTTOM_MOBILE = '-4vw';         // EDITABLE Mobile: Margin below the clocks row
 
@@ -8643,6 +8653,44 @@ Plan ahead for significantly warmer conditions tomorrow!`
   const WORLD_CLOCK_LABEL_OPACITY_DESKTOP = WORLD_CLOCK_NAME_OPACITY_DESKTOP;
   const WORLD_CLOCK_LABEL_OPACITY_MOBILE = WORLD_CLOCK_NAME_OPACITY_MOBILE;
 
+  // Track if hourly blue rain boxes are currently rendered in DOM
+  let hasHourlyRainBoxesState = false;
+
+  function checkHasHourlyRainBoxes() {
+    // 1. Check DOM if hourly rain cells are present with visible text or opacity
+    const rainCells = document.querySelectorAll('.hourly-rain-cell');
+    if (rainCells && rainCells.length > 0) {
+      for (const cell of rainCells) {
+        if (cell.querySelector('.rain-text') || (parseFloat(cell.style.opacity) > 0)) {
+          return true;
+        }
+      }
+      return false;
+    }
+    // 2. Check tracked state if available
+    if (typeof hasHourlyRainBoxesState === 'boolean') {
+      return hasHourlyRainBoxesState;
+    }
+    // 3. Fallback to weather data if available
+    if (typeof lastWeatherData !== 'undefined' && lastWeatherData && Array.isArray(lastWeatherData.hourly)) {
+      return lastWeatherData.hourly.slice(0, 24).some((hour, index) => {
+        let pop = typeof hour.pop === 'number' ? hour.pop : 0;
+        let rainMm = (hour.rain && typeof hour.rain === 'object' && hour.rain['1h']) ? hour.rain['1h'] : (typeof hour.rain === 'number' ? hour.rain : 0);
+        if (typeof TEST_HOURLY_RAIN !== 'undefined' && TEST_HOURLY_RAIN) {
+          if (index > 4 && index < 15) {
+            pop = Math.sin((index - 4) / 10 * Math.PI);
+            rainMm = pop * 4.5;
+          } else {
+            pop = 0;
+            rainMm = 0;
+          }
+        }
+        return (rainMm / 25.4) >= (typeof MIN_RAIN_DISPLAY_THRESHOLD !== 'undefined' ? MIN_RAIN_DISPLAY_THRESHOLD : 0.05);
+      });
+    }
+    return false;
+  }
+
   function applyWorldClocksConfig() {
     const isMobile = window.innerWidth <= 767;
     document.documentElement.style.setProperty('--world-clocks-width-desktop', WORLD_CLOCKS_WIDTH_DESKTOP);
@@ -8670,9 +8718,30 @@ Plan ahead for significantly warmer conditions tomorrow!`
     document.documentElement.style.setProperty('--world-clock-size-mobile', dialSizeMobile);
     document.documentElement.style.setProperty('--world-clock-size', dialSizeActive);
 
-    document.documentElement.style.setProperty('--world-clocks-margin-top-desktop', WORLD_CLOCKS_MARGIN_TOP_DESKTOP);
-    document.documentElement.style.setProperty('--world-clocks-margin-top-mobile', WORLD_CLOCKS_MARGIN_TOP_MOBILE);
-    document.documentElement.style.setProperty('--world-clocks-margin-top', isMobile ? WORLD_CLOCKS_MARGIN_TOP_MOBILE : WORLD_CLOCKS_MARGIN_TOP_DESKTOP);
+    const hasRain = checkHasHourlyRainBoxes();
+    const parseVw = (val) => (typeof val === 'number') ? `${val}vw` : String(val);
+
+    const resolveMarginTop = (baseVal, noRainVal, offsetVal) => {
+      if (hasRain) {
+        return parseVw(baseVal);
+      }
+      const rawNoRain = (noRainVal && noRainVal !== 'auto') ? noRainVal : '-5.0vw';
+      if (offsetVal && offsetVal !== '0vw' && offsetVal !== '0') {
+        return `calc(${parseVw(rawNoRain)} + ${parseVw(offsetVal)})`;
+      }
+      return parseVw(rawNoRain);
+    };
+
+    const activeTopDesktop = resolveMarginTop(WORLD_CLOCKS_MARGIN_TOP_DESKTOP, WORLD_CLOCKS_MARGIN_TOP_NO_RAIN_DESKTOP, WORLD_CLOCKS_NO_RAIN_OFFSET_DESKTOP);
+    const activeTopMobile = resolveMarginTop(WORLD_CLOCKS_MARGIN_TOP_MOBILE, WORLD_CLOCKS_MARGIN_TOP_NO_RAIN_MOBILE, WORLD_CLOCKS_NO_RAIN_OFFSET_MOBILE);
+
+    document.documentElement.style.setProperty('--world-clocks-margin-top-desktop', activeTopDesktop);
+    document.documentElement.style.setProperty('--world-clocks-margin-top-mobile', activeTopMobile);
+    document.documentElement.style.setProperty('--world-clocks-margin-top', isMobile ? activeTopMobile : activeTopDesktop);
+    document.documentElement.style.setProperty('--world-clocks-margin-top-rain-desktop', parseVw(WORLD_CLOCKS_MARGIN_TOP_DESKTOP));
+    document.documentElement.style.setProperty('--world-clocks-margin-top-rain-mobile', parseVw(WORLD_CLOCKS_MARGIN_TOP_MOBILE));
+    document.documentElement.style.setProperty('--world-clocks-margin-top-no-rain-desktop', parseVw(WORLD_CLOCKS_MARGIN_TOP_NO_RAIN_DESKTOP));
+    document.documentElement.style.setProperty('--world-clocks-margin-top-no-rain-mobile', parseVw(WORLD_CLOCKS_MARGIN_TOP_NO_RAIN_MOBILE));
 
     document.documentElement.style.setProperty('--world-clocks-margin-bottom-desktop', WORLD_CLOCKS_MARGIN_BOTTOM_DESKTOP);
     document.documentElement.style.setProperty('--world-clocks-margin-bottom-mobile', WORLD_CLOCKS_MARGIN_BOTTOM_MOBILE);
@@ -10557,7 +10626,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1473';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1474';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -18790,6 +18859,11 @@ Plan ahead for significantly warmer conditions tomorrow!`
     wrapper.appendChild(imagesWrapper);
     wrapper.appendChild(labelsContainer);
     wrapper.appendChild(rainContainer);
+
+    // Update hourly rain state & refresh world clocks margin to respond to presence/absence of blue rain boxes
+    if (typeof applyWorldClocksConfig === 'function') {
+      applyWorldClocksConfig();
+    }
 
     updateLowerGradientPosition();
     requestAnimationFrame(() => {

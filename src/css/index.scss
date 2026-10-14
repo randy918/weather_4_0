@@ -1582,7 +1582,7 @@ main {
     --world-clocks-width: var(--world-clocks-width-desktop, 90vw);
     --world-clocks-gap: var(--world-clocks-gap-desktop, 2.9vw);
     --world-clock-size: var(--world-clock-size-desktop, calc((var(--world-clocks-width, 90vw) - (4 * var(--world-clocks-gap, 2.9vw))) / 5));
-    --world-clocks-margin-top: var(--world-clocks-margin-top-desktop, -5vw);
+    --world-clocks-margin-top: var(--world-clocks-margin-top-desktop, -2.0vw);
     --world-clocks-margin-bottom: var(--world-clocks-margin-bottom-desktop, -1vw);
     --world-clock-track-color: var(--world-clock-track-color-desktop, rgba(255, 255, 255, 0.2));
     --world-clock-track-width: var(--world-clock-track-width-desktop, 4);
@@ -1723,7 +1723,7 @@ main {
         --world-clocks-width: var(--world-clocks-width-mobile, 90vw);
         --world-clocks-gap: var(--world-clocks-gap-mobile, 1.875vw);
         --world-clock-size: var(--world-clock-size-mobile, calc((var(--world-clocks-width, 90vw) - (4 * var(--world-clocks-gap, 1.875vw))) / 5));
-        --world-clocks-margin-top: var(--world-clocks-margin-top-mobile, -5.0vw);
+        --world-clocks-margin-top: var(--world-clocks-margin-top-mobile, -2.0vw);
         --world-clocks-margin-bottom: var(--world-clocks-margin-bottom-mobile, -4vw);
         --world-clock-track-color: var(--world-clock-track-color-mobile, rgba(255, 255, 255, 0.2));
         --world-clock-track-width: var(--world-clock-track-width-mobile, 4);
@@ -1854,7 +1854,7 @@ main {
 
         --world-clock-size: var(--world-clock-size-desktop, 13.5vw);
         --world-clocks-gap: var(--world-clocks-gap-desktop, 2.5vw);
-        --world-clocks-margin-top: var(--world-clocks-margin-top-desktop, 2.5vw);
+        --world-clocks-margin-top: var(--world-clocks-margin-top-desktop, -2.0vw);
         --world-clocks-margin-bottom: var(--world-clocks-margin-bottom-desktop, 1.0vw);
         --world-clock-track-color: var(--world-clock-track-color-desktop, rgba(255, 255, 255, 0.2));
         --world-clock-track-width: var(--world-clock-track-width-desktop, 4);
@@ -2126,9 +2126,9 @@ main {
     width: var(--world-clocks-width, 90vw);
     max-width: var(--world-clocks-width, 90vw);
     gap: var(--world-clocks-gap, 2.9vw);
-    margin: var(--world-clocks-margin-top, 2.5vw) auto var(--world-clocks-margin-bottom, 1.0vw);
+    margin: var(--world-clocks-margin-top, -2.0vw) auto var(--world-clocks-margin-bottom, 1.0vw);
     opacity: 0;
-    transition: opacity 1s ease;
+    transition: opacity 1s ease, margin-top 0.3s ease;
     user-select: none;
     flex-wrap: nowrap;
     box-sizing: border-box;
