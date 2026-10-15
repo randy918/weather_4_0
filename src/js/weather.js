@@ -8238,6 +8238,174 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
   const SOLAR_FLARE_IMPACT_LEVEL_X_TEXT = 'Radiation<br>Hazard'; // EDITABLE: Situation text
 
   // =========================================================================
+  // --- EDITABLE: Solar Radiation Storm (S-Scale) Dial Config (JCV) ---
+  // Positioned directly underneath the Solar Flare dial in the Celestial row
+  // =========================================================================
+  const SOLAR_RADIATION_STORM_DIAL_ENABLED = true;                 // EDITABLE: Enable/disable Solar Radiation Storm (S-Scale) dial
+  const SOLAR_RADIATION_STORM_MODE = 'live';                       // EDITABLE: 'live' (NOAA SWPC real-time >=10 MeV protons) or 'manual'
+  const SOLAR_RADIATION_STORM_CLASS_MANUAL = 'S0';                 // EDITABLE: Manual test class: 'S0', 'S1', 'S2', 'S3', 'S4', 'S5'
+  const SOLAR_RADIATION_STORM_VALUE_MANUAL = 0.2;                  // EDITABLE: Manual test value in pfu (e.g. 0.2 pfu matches nominal background)
+  const SOLAR_RADIATION_STORM_PEAK_CLASS_MANUAL = 'S0';            // EDITABLE: Manual test peak class
+  const SOLAR_RADIATION_STORM_PEAK_VALUE_MANUAL = 0.2;             // EDITABLE: Manual test peak value in pfu
+  const SOLAR_RADIATION_STORM_CLICK_CYCLES_CLASSES = true;         // EDITABLE: Click/tap dial to cycle through test levels (S0 -> S1 -> S2 -> S3 -> S4 -> S5 -> Live)
+  const SOLAR_RADIATION_STORM_AUTO_REFRESH_MS = 60000;             // EDITABLE: Polling interval in ms for live NOAA proton data
+
+  // --- Temperature Colors per S-Scale Level (JCV) ---
+  // Assign numeric temperature degree (maps directly to app's TEMP_COLORS palette)
+  // OR assign a custom CSS color string (e.g. 'hsl(120, 100%, 50%)', '#4ade80')
+  const SOLAR_RADIATION_STORM_COLOR_LEVEL_S0 = 55;                 // EDITABLE: Level S0 (Quiet / Normal) temperature color (50s green, matches G0 & R0)
+  const SOLAR_RADIATION_STORM_COLOR_LEVEL_S1 = 75;                 // EDITABLE: Level S1 (Minor Storm >=10 pfu) temperature color (70s yellow-gold)
+  const SOLAR_RADIATION_STORM_COLOR_LEVEL_S2 = 85;                 // EDITABLE: Level S2 (Moderate Storm >=100 pfu) temperature color (80s orange)
+  const SOLAR_RADIATION_STORM_COLOR_LEVEL_S3 = 95;                 // EDITABLE: Level S3 (Strong Storm >=1000 pfu) temperature color (90s tomato coral/red)
+  const SOLAR_RADIATION_STORM_COLOR_LEVEL_S4 = 105;                // EDITABLE: Level S4 (Severe Storm >=10000 pfu) temperature color (100s vibrant red)
+  const SOLAR_RADIATION_STORM_COLOR_LEVEL_S5 = -5;                 // EDITABLE: Level S5 (Extreme Storm >=100000 pfu) temperature color (Below 0 shocking magenta)
+  const SOLAR_RADIATION_STORM_COLOR_OVERRIDE = null;                // EDITABLE: Optional universal color override
+
+  // --- Level Descriptive Labels (JCV) ---
+  const SOLAR_RADIATION_STORM_LABEL_S0_LINE1 = 'RADIATION';        // EDITABLE: Line 1 label for S0 (Matches user mockup)
+  const SOLAR_RADIATION_STORM_LABEL_S0_LINE2 = 'QUIET';            // EDITABLE: Line 2 label for S0
+  const SOLAR_RADIATION_STORM_LABEL_S1_LINE1 = 'MINOR';            // EDITABLE: Line 1 label for S1
+  const SOLAR_RADIATION_STORM_LABEL_S1_LINE2 = 'RADIATION';        // EDITABLE: Line 2 label for S1
+  const SOLAR_RADIATION_STORM_LABEL_S2_LINE1 = 'MODERATE';         // EDITABLE: Line 1 label for S2
+  const SOLAR_RADIATION_STORM_LABEL_S2_LINE2 = 'RADIATION';        // EDITABLE: Line 2 label for S2
+  const SOLAR_RADIATION_STORM_LABEL_S3_LINE1 = 'STRONG';           // EDITABLE: Line 1 label for S3
+  const SOLAR_RADIATION_STORM_LABEL_S3_LINE2 = 'RADIATION';        // EDITABLE: Line 2 label for S3
+  const SOLAR_RADIATION_STORM_LABEL_S4_LINE1 = 'SEVERE';           // EDITABLE: Line 1 label for S4
+  const SOLAR_RADIATION_STORM_LABEL_S4_LINE2 = 'RADIATION';        // EDITABLE: Line 2 label for S4
+  const SOLAR_RADIATION_STORM_LABEL_S5_LINE1 = 'EXTREME';          // EDITABLE: Line 1 label for S5
+  const SOLAR_RADIATION_STORM_LABEL_S5_LINE2 = 'RADIATION';        // EDITABLE: Line 2 label for S5
+
+  // --- Circular Progress Ring & Track (JCV) ---
+  const SOLAR_RADIATION_STORM_START_ANGLE_DEG_DESKTOP = 90;        // EDITABLE Desktop: Arc start angle (90deg in SVG = 6 o'clock)
+  const SOLAR_RADIATION_STORM_START_ANGLE_DEG_MOBILE = 90;         // EDITABLE Mobile: Arc start angle
+  const SOLAR_RADIATION_STORM_TRACK_COLOR = 'rgba(255, 255, 255, 0.22)'; // EDITABLE: Background circular track ring color
+  const SOLAR_RADIATION_STORM_TRACK_STROKE_WIDTH_DESKTOP = 4.0;    // EDITABLE Desktop: SVG track stroke thickness
+  const SOLAR_RADIATION_STORM_TRACK_STROKE_WIDTH_MOBILE = 4.0;     // EDITABLE Mobile: SVG track stroke thickness
+  const SOLAR_RADIATION_STORM_PROGRESS_STROKE_WIDTH_DESKTOP = 4.0; // EDITABLE Desktop: SVG active progress stroke thickness
+  const SOLAR_RADIATION_STORM_PROGRESS_STROKE_WIDTH_MOBILE = 4.0;  // EDITABLE Mobile: SVG active progress stroke thickness
+  const SOLAR_RADIATION_STORM_PEAK_TRACK_STROKE_WIDTH_DESKTOP = 4.0;// EDITABLE Desktop: SVG peak outer track stroke thickness
+  const SOLAR_RADIATION_STORM_PEAK_TRACK_STROKE_WIDTH_MOBILE = 4.0; // EDITABLE Mobile: SVG peak outer track stroke thickness
+  const SOLAR_RADIATION_STORM_PEAK_PROGRESS_STROKE_WIDTH_DESKTOP = 4.0; // EDITABLE Desktop: SVG peak outer progress stroke thickness
+  const SOLAR_RADIATION_STORM_PEAK_PROGRESS_STROKE_WIDTH_MOBILE = 4.0;  // EDITABLE Mobile: SVG peak outer progress stroke thickness
+  const SOLAR_RADIATION_STORM_STROKE_LINECAP = 'round';            // EDITABLE: Progress arc end cap ('butt' or 'round')
+  const SOLAR_RADIATION_STORM_ANIM_DURATION_S_DESKTOP = 0.8;       // EDITABLE Desktop: Transition duration in seconds for arc updates
+  const SOLAR_RADIATION_STORM_ANIM_DURATION_S_MOBILE = 0.8;        // EDITABLE Mobile: Transition duration in seconds for arc updates
+
+  // --- Dial Frame & Sizing (JCV) ---
+  const SOLAR_RADIATION_STORM_MARGIN_TOP_DESKTOP = '2.0vw';        // EDITABLE Desktop: Vertical gap between upper flare label and S dial
+  const SOLAR_RADIATION_STORM_MARGIN_TOP_MOBILE = '4.0vw';         // EDITABLE Mobile: Vertical gap between upper flare label and S dial
+  const SOLAR_RADIATION_STORM_DIAL_SIZE_DESKTOP = 'auto';          // EDITABLE Desktop: 'auto' (matches upper dial) or custom vw
+  const SOLAR_RADIATION_STORM_DIAL_SIZE_MOBILE = 'auto';           // EDITABLE Mobile: 'auto' or custom vw
+  const SOLAR_RADIATION_STORM_OFFSET_X_DESKTOP = '0vw';            // EDITABLE Desktop: Fine horizontal nudge
+  const SOLAR_RADIATION_STORM_OFFSET_X_MOBILE = '0vw';             // EDITABLE Mobile: Fine horizontal nudge
+  const SOLAR_RADIATION_STORM_OFFSET_Y_DESKTOP = '0vw';            // EDITABLE Desktop: Fine vertical nudge
+  const SOLAR_RADIATION_STORM_OFFSET_Y_MOBILE = '0vw';             // EDITABLE Mobile: Fine vertical nudge
+  const SOLAR_RADIATION_STORM_DIAL_BG_COLOR = 'transparent';       // EDITABLE: Dial circle background color
+  const SOLAR_RADIATION_STORM_DIAL_INNER_SHADOW = 'inset 0 0 1vw rgba(0, 0, 0, 0.5)'; // EDITABLE: Dial inner shadow
+
+  // --- Typography & Text Positioning (JCV) ---
+  // Top Label ("RADIATION QUIET")
+  const SOLAR_RADIATION_STORM_LABEL_FONT_FAMILY = "'euro', sans-serif"; // EDITABLE: Top label font-family
+  const SOLAR_RADIATION_STORM_LABEL_FONT_SIZE_DESKTOP = 'calc(var(--solar-radiation-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.0748)'; // EDITABLE Desktop: Top label font size
+  const SOLAR_RADIATION_STORM_LABEL_FONT_SIZE_MOBILE = 'calc(var(--solar-radiation-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.0748)';  // EDITABLE Mobile: Top label font size
+  const SOLAR_RADIATION_STORM_LABEL_LINE_HEIGHT_DESKTOP = 1.0;     // EDITABLE Desktop: Top label line height
+  const SOLAR_RADIATION_STORM_LABEL_LINE_HEIGHT_MOBILE = 1.0;      // EDITABLE Mobile: Top label line height
+  const SOLAR_RADIATION_STORM_LABEL_LETTER_SPACING_DESKTOP = '0.05vw'; // EDITABLE Desktop: Top label letter spacing
+  const SOLAR_RADIATION_STORM_LABEL_LETTER_SPACING_MOBILE = '0.05vw';  // EDITABLE Mobile: Top label letter spacing
+  const SOLAR_RADIATION_STORM_LABEL_OFFSET_Y_DESKTOP = '0vw';      // EDITABLE Desktop: Fine vertical nudge
+  const SOLAR_RADIATION_STORM_LABEL_OFFSET_Y_MOBILE = '0vw';       // EDITABLE Mobile: Fine vertical nudge
+  const SOLAR_RADIATION_STORM_GAP_LABEL_TO_CLASS_DESKTOP = 'calc(var(--solar-radiation-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02125)'; // EDITABLE Desktop: Gap to class
+  const SOLAR_RADIATION_STORM_GAP_LABEL_TO_CLASS_MOBILE = 'calc(var(--solar-radiation-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02125)';  // EDITABLE Mobile: Gap to class
+
+  // Middle Giant Class ("S0")
+  const SOLAR_RADIATION_STORM_CLASS_FONT_FAMILY = "'euro-bold', sans-serif"; // EDITABLE: Giant class font-family
+  const SOLAR_RADIATION_STORM_CLASS_FONT_SIZE_DESKTOP = 'calc(var(--solar-radiation-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.2601)'; // EDITABLE Desktop: Giant class text font size
+  const SOLAR_RADIATION_STORM_CLASS_FONT_SIZE_MOBILE = 'calc(var(--solar-radiation-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.2601)';  // EDITABLE Mobile: Giant class text font size
+  const SOLAR_RADIATION_STORM_CLASS_LINE_HEIGHT_DESKTOP = 0.82;    // EDITABLE Desktop: Giant class line height
+  const SOLAR_RADIATION_STORM_CLASS_LINE_HEIGHT_MOBILE = 0.82;     // EDITABLE Mobile: Giant class line height
+  const SOLAR_RADIATION_STORM_CLASS_OFFSET_Y_DESKTOP = '0vw';      // EDITABLE Desktop: Fine vertical nudge
+  const SOLAR_RADIATION_STORM_CLASS_OFFSET_Y_MOBILE = '0vw';       // EDITABLE Mobile: Fine vertical nudge
+  const SOLAR_RADIATION_STORM_GAP_CLASS_TO_VALUE_DESKTOP = 'calc(var(--solar-radiation-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.017)'; // EDITABLE Desktop: Gap to bottom value
+  const SOLAR_RADIATION_STORM_GAP_CLASS_TO_VALUE_MOBILE = 'calc(var(--solar-radiation-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.017)';  // EDITABLE Mobile: Gap to bottom value
+
+  // Bottom Value ("0.2 pfu")
+  const SOLAR_RADIATION_STORM_UNIT = ' pfu';                       // EDITABLE: Proton Flux Unit symbol (' pfu', 'pfu', or '')
+  const SOLAR_RADIATION_STORM_VALUE_FONT_FAMILY = "'euro-bold', sans-serif"; // EDITABLE: Bottom value font-family
+  const SOLAR_RADIATION_STORM_VALUE_FONT_SIZE_DESKTOP = 'calc(var(--solar-radiation-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1262)'; // EDITABLE Desktop: Bottom value font size
+  const SOLAR_RADIATION_STORM_VALUE_FONT_SIZE_MOBILE = 'calc(var(--solar-radiation-storm-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1262)';  // EDITABLE Mobile: Bottom value font size
+  const SOLAR_RADIATION_STORM_VALUE_LINE_HEIGHT_DESKTOP = 0.92;    // EDITABLE Desktop: Bottom value line height
+  const SOLAR_RADIATION_STORM_VALUE_LINE_HEIGHT_MOBILE = 0.92;     // EDITABLE Mobile: Bottom value line height
+  const SOLAR_RADIATION_STORM_VALUE_LETTER_SPACING_DESKTOP = '-0.02vw'; // EDITABLE Desktop: Bottom value letter spacing
+  const SOLAR_RADIATION_STORM_VALUE_LETTER_SPACING_MOBILE = '-0.04vw';  // EDITABLE Mobile: Bottom value letter spacing
+  const SOLAR_RADIATION_STORM_VALUE_OFFSET_Y_DESKTOP = '-.5vw';    // EDITABLE Desktop: Fine vertical nudge
+  const SOLAR_RADIATION_STORM_VALUE_OFFSET_Y_MOBILE = '-.5vw';     // EDITABLE Mobile: Fine vertical nudge
+
+  // Overall Content Block Alignment
+  const SOLAR_RADIATION_STORM_CONTENT_OFFSET_Y_DESKTOP = '0vw';    // EDITABLE Desktop: Vertical nudge for inner content
+  const SOLAR_RADIATION_STORM_CONTENT_OFFSET_Y_MOBILE = '0vw';     // EDITABLE Mobile: Vertical nudge for inner content
+
+  // Sublabel Below Dial
+  const SOLAR_RADIATION_STORM_SUBLABEL_ENABLED = true;             // EDITABLE: Enable/disable sublabel below dial
+  const SOLAR_RADIATION_STORM_SUBLABEL_MODE = 'dynamic';           // EDITABLE: 'dynamic' (changes with level) or 'static'
+  const SOLAR_RADIATION_STORM_ARROW_MODE = 'trend';                // EDITABLE: 'trend' or 'static'
+  const SOLAR_RADIATION_STORM_SUBLABEL_TEXT_DESKTOP = 'Solar Radiation'; // EDITABLE Desktop: Static fallback text
+  const SOLAR_RADIATION_STORM_SUBLABEL_TEXT_MOBILE = 'Solar Radiation';  // EDITABLE Mobile: Static fallback text
+  const SOLAR_RADIATION_STORM_SUBLABEL_FONT_FAMILY = "var(--sun-label-font-family, 'light', sans-serif)"; // EDITABLE: Font family
+  const SOLAR_RADIATION_STORM_SUBLABEL_FONT_SIZE_DESKTOP = '1.35vw'; // EDITABLE Desktop: Sublabel font size
+  const SOLAR_RADIATION_STORM_SUBLABEL_FONT_SIZE_MOBILE = '1.95vw';  // EDITABLE Mobile: Sublabel font size
+  const SOLAR_RADIATION_STORM_SUBLABEL_LINE_HEIGHT_DESKTOP = 1.05; // EDITABLE Desktop: Sublabel line height
+  const SOLAR_RADIATION_STORM_SUBLABEL_LINE_HEIGHT_MOBILE = 0.8;   // EDITABLE Mobile: Sublabel line height
+  const SOLAR_RADIATION_STORM_SUBLABEL_LETTER_SPACING_DESKTOP = '0.04vw'; // EDITABLE Desktop: Sublabel letter spacing
+  const SOLAR_RADIATION_STORM_SUBLABEL_LETTER_SPACING_MOBILE = '0.04vw';  // EDITABLE Mobile: Sublabel letter spacing
+  const SOLAR_RADIATION_STORM_SUBLABEL_COLOR = 'auto';             // EDITABLE: 'auto' (matches dial color) or custom CSS color
+  const SOLAR_RADIATION_STORM_SUBLABEL_MARGIN_TOP_DESKTOP = '0.6vw'; // EDITABLE Desktop: Margin top below dial circle
+  const SOLAR_RADIATION_STORM_SUBLABEL_MARGIN_TOP_MOBILE = '1.2vw';  // EDITABLE Mobile: Margin top below dial circle
+  const SOLAR_RADIATION_STORM_SUBLABEL_PEAK_MARGIN_TOP_DESKTOP = '1.5vw'; // EDITABLE Desktop: Margin top for the PEAK line
+  const SOLAR_RADIATION_STORM_SUBLABEL_PEAK_MARGIN_TOP_MOBILE = '3.0vw';  // EDITABLE Mobile: Margin top for the PEAK line
+  const SOLAR_RADIATION_STORM_SUBLABEL_PEAK_VALUE_MARGIN_TOP_DESKTOP = '0vw'; // EDITABLE Desktop: Margin top between PEAK class and value
+  const SOLAR_RADIATION_STORM_SUBLABEL_PEAK_VALUE_MARGIN_TOP_MOBILE = '1.0vw'; // EDITABLE Mobile: Margin top between PEAK class and value
+  const SOLAR_RADIATION_STORM_SUBLABEL_OFFSET_Y_DESKTOP = '0vw';   // EDITABLE Desktop: Fine vertical nudge
+  const SOLAR_RADIATION_STORM_SUBLABEL_OFFSET_Y_MOBILE = '0vw';    // EDITABLE Mobile: Fine vertical nudge
+  const SOLAR_RADIATION_STORM_SUBLABEL_WIDTH_DESKTOP = '100%';     // EDITABLE Desktop: Sublabel width
+  const SOLAR_RADIATION_STORM_SUBLABEL_WIDTH_MOBILE = '120%';      // EDITABLE Mobile: Sublabel width
+  const SOLAR_RADIATION_STORM_SUBLABEL_MAX_WIDTH_DESKTOP = 'var(--solar-radiation-storm-dial-size, var(--celestial-dial-size, 13.5vw))'; // EDITABLE Desktop: Max width boundary
+  const SOLAR_RADIATION_STORM_SUBLABEL_MAX_WIDTH_MOBILE = 'none';  // EDITABLE Mobile: Max width boundary
+
+  // Dynamic Live Impact Sublabels per Level
+  const SOLAR_RADIATION_STORM_IMPACT_LEVEL_S0_ARROW = 'up';        // EDITABLE: Default arrow direction ('up' or 'down')
+  const SOLAR_RADIATION_STORM_IMPACT_LEVEL_S0_TEXT = 'Space is Quiet'; // EDITABLE: Situation text (User requested: "↑ Space is Quiet")
+  const SOLAR_RADIATION_STORM_IMPACT_LEVEL_S1_ARROW = 'up';        // EDITABLE: Fallback arrow direction
+  const SOLAR_RADIATION_STORM_IMPACT_LEVEL_S1_TEXT = 'Minor Radiation Risk'; // EDITABLE: Situation text
+  const SOLAR_RADIATION_STORM_IMPACT_LEVEL_S2_ARROW = 'up';        // EDITABLE: Fallback arrow direction
+  const SOLAR_RADIATION_STORM_IMPACT_LEVEL_S2_TEXT = 'Infrequent Events'; // EDITABLE: Situation text
+  const SOLAR_RADIATION_STORM_IMPACT_LEVEL_S3_ARROW = 'up';        // EDITABLE: Fallback arrow direction
+  const SOLAR_RADIATION_STORM_IMPACT_LEVEL_S3_TEXT = 'Radiation Advisory'; // EDITABLE: Situation text
+  const SOLAR_RADIATION_STORM_IMPACT_LEVEL_S4_ARROW = 'up';        // EDITABLE: Fallback arrow direction
+  const SOLAR_RADIATION_STORM_IMPACT_LEVEL_S4_TEXT = 'High Radiation Alert'; // EDITABLE: Situation text
+  const SOLAR_RADIATION_STORM_IMPACT_LEVEL_S5_ARROW = 'up';        // EDITABLE: Fallback arrow direction
+  const SOLAR_RADIATION_STORM_IMPACT_LEVEL_S5_TEXT = 'Extreme Radiation Threat'; // EDITABLE: Situation text
+
+  // Aliases for backwards compatibility with SOLAR_FLARE_2
+  const SOLAR_FLARE_2_DIAL_ENABLED = SOLAR_RADIATION_STORM_DIAL_ENABLED;
+  const SOLAR_FLARE_2_MODE = SOLAR_RADIATION_STORM_MODE;
+  const SOLAR_FLARE_2_CLASS_MANUAL = SOLAR_RADIATION_STORM_CLASS_MANUAL;
+  const SOLAR_FLARE_2_VALUE_MANUAL = SOLAR_RADIATION_STORM_VALUE_MANUAL;
+  const SOLAR_FLARE_2_PEAK_CLASS_MANUAL = SOLAR_RADIATION_STORM_PEAK_CLASS_MANUAL;
+  const SOLAR_FLARE_2_PEAK_VALUE_MANUAL = SOLAR_RADIATION_STORM_PEAK_VALUE_MANUAL;
+  const SOLAR_FLARE_2_CLICK_CYCLES_CLASSES = SOLAR_RADIATION_STORM_CLICK_CYCLES_CLASSES;
+  const SOLAR_FLARE_2_AUTO_REFRESH_MS = SOLAR_RADIATION_STORM_AUTO_REFRESH_MS;
+  const SOLAR_FLARE_2_MARGIN_TOP_DESKTOP = SOLAR_RADIATION_STORM_MARGIN_TOP_DESKTOP;
+  const SOLAR_FLARE_2_MARGIN_TOP_MOBILE = SOLAR_RADIATION_STORM_MARGIN_TOP_MOBILE;
+  const SOLAR_FLARE_2_DIAL_SIZE_DESKTOP = SOLAR_RADIATION_STORM_DIAL_SIZE_DESKTOP;
+  const SOLAR_FLARE_2_DIAL_SIZE_MOBILE = SOLAR_RADIATION_STORM_DIAL_SIZE_MOBILE;
+  const SOLAR_FLARE_2_OFFSET_X_DESKTOP = SOLAR_RADIATION_STORM_OFFSET_X_DESKTOP;
+  const SOLAR_FLARE_2_OFFSET_X_MOBILE = SOLAR_RADIATION_STORM_OFFSET_X_MOBILE;
+  const SOLAR_FLARE_2_OFFSET_Y_DESKTOP = SOLAR_RADIATION_STORM_OFFSET_Y_DESKTOP;
+  const SOLAR_FLARE_2_OFFSET_Y_MOBILE = SOLAR_RADIATION_STORM_OFFSET_Y_MOBILE;
+  const SOLAR_FLARE_2_DIAL_BG_COLOR = SOLAR_RADIATION_STORM_DIAL_BG_COLOR;
+  const SOLAR_FLARE_2_DIAL_INNER_SHADOW = SOLAR_RADIATION_STORM_DIAL_INNER_SHADOW;
+
+  // =========================================================================
   // --- EDITABLE: Radio Blackout (R-Scale) Dial Config (JCV) ---
   // Replaces the right flanking dial (UK) in the Celestial row
   // =========================================================================
@@ -9437,6 +9605,123 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
 
     if (typeof updateSolarFlareDial === 'function') {
       updateSolarFlareDial();
+    }
+
+    // --- Solar Radiation Storm (S-Scale) Dial Variables (JCV) ---
+    const isSolarRadDialAutoDesktop = !SOLAR_RADIATION_STORM_DIAL_SIZE_DESKTOP || SOLAR_RADIATION_STORM_DIAL_SIZE_DESKTOP === 'auto';
+    const isSolarRadDialAutoMobile = !SOLAR_RADIATION_STORM_DIAL_SIZE_MOBILE || SOLAR_RADIATION_STORM_DIAL_SIZE_MOBILE === 'auto';
+    const solarRadDialSizeDesktop = isSolarRadDialAutoDesktop ? 'var(--celestial-dial-size-desktop, var(--world-clock-size-desktop))' : SOLAR_RADIATION_STORM_DIAL_SIZE_DESKTOP;
+    const solarRadDialSizeMobile = isSolarRadDialAutoMobile ? 'var(--celestial-dial-size-mobile, var(--world-clock-size-mobile))' : SOLAR_RADIATION_STORM_DIAL_SIZE_MOBILE;
+    const solarRadDialSize = (isMobile ? isSolarRadDialAutoMobile : isSolarRadDialAutoDesktop) ? 'var(--celestial-dial-size, var(--world-clock-size))' : (isMobile ? SOLAR_RADIATION_STORM_DIAL_SIZE_MOBILE : SOLAR_RADIATION_STORM_DIAL_SIZE_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-radiation-storm-dial-size-desktop', solarRadDialSizeDesktop);
+    document.documentElement.style.setProperty('--solar-radiation-storm-dial-size-mobile', solarRadDialSizeMobile);
+    document.documentElement.style.setProperty('--solar-radiation-storm-dial-size', solarRadDialSize);
+    document.documentElement.style.setProperty('--solar-flare-2-dial-size', solarRadDialSize);
+
+    document.documentElement.style.setProperty('--solar-radiation-storm-margin-top-desktop', SOLAR_RADIATION_STORM_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-margin-top-mobile', SOLAR_RADIATION_STORM_MARGIN_TOP_MOBILE);
+    document.documentElement.style.setProperty('--solar-radiation-storm-margin-top', isMobile ? SOLAR_RADIATION_STORM_MARGIN_TOP_MOBILE : SOLAR_RADIATION_STORM_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-2-margin-top', isMobile ? SOLAR_RADIATION_STORM_MARGIN_TOP_MOBILE : SOLAR_RADIATION_STORM_MARGIN_TOP_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-radiation-storm-offset-x-desktop', SOLAR_RADIATION_STORM_OFFSET_X_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-offset-x-mobile', SOLAR_RADIATION_STORM_OFFSET_X_MOBILE);
+    document.documentElement.style.setProperty('--solar-radiation-storm-offset-x', isMobile ? SOLAR_RADIATION_STORM_OFFSET_X_MOBILE : SOLAR_RADIATION_STORM_OFFSET_X_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-2-offset-x', isMobile ? SOLAR_RADIATION_STORM_OFFSET_X_MOBILE : SOLAR_RADIATION_STORM_OFFSET_X_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-radiation-storm-offset-y-desktop', SOLAR_RADIATION_STORM_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-offset-y-mobile', SOLAR_RADIATION_STORM_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--solar-radiation-storm-offset-y', isMobile ? SOLAR_RADIATION_STORM_OFFSET_Y_MOBILE : SOLAR_RADIATION_STORM_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-2-offset-y', isMobile ? SOLAR_RADIATION_STORM_OFFSET_Y_MOBILE : SOLAR_RADIATION_STORM_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-radiation-storm-start-angle', `${isMobile ? SOLAR_RADIATION_STORM_START_ANGLE_DEG_MOBILE : SOLAR_RADIATION_STORM_START_ANGLE_DEG_DESKTOP}deg`);
+    document.documentElement.style.setProperty('--solar-flare-2-start-angle', `${isMobile ? SOLAR_RADIATION_STORM_START_ANGLE_DEG_MOBILE : SOLAR_RADIATION_STORM_START_ANGLE_DEG_DESKTOP}deg`);
+    document.documentElement.style.setProperty('--solar-radiation-storm-track-color', SOLAR_RADIATION_STORM_TRACK_COLOR);
+    document.documentElement.style.setProperty('--solar-radiation-storm-track-stroke-width', String(isMobile ? SOLAR_RADIATION_STORM_TRACK_STROKE_WIDTH_MOBILE : SOLAR_RADIATION_STORM_TRACK_STROKE_WIDTH_DESKTOP));
+    document.documentElement.style.setProperty('--solar-radiation-storm-progress-stroke-width', String(isMobile ? SOLAR_RADIATION_STORM_PROGRESS_STROKE_WIDTH_MOBILE : SOLAR_RADIATION_STORM_PROGRESS_STROKE_WIDTH_DESKTOP));
+    document.documentElement.style.setProperty('--solar-radiation-storm-peak-track-stroke-width', String(isMobile ? SOLAR_RADIATION_STORM_PEAK_TRACK_STROKE_WIDTH_MOBILE : SOLAR_RADIATION_STORM_PEAK_TRACK_STROKE_WIDTH_DESKTOP));
+    document.documentElement.style.setProperty('--solar-radiation-storm-peak-progress-stroke-width', String(isMobile ? SOLAR_RADIATION_STORM_PEAK_PROGRESS_STROKE_WIDTH_MOBILE : SOLAR_RADIATION_STORM_PEAK_PROGRESS_STROKE_WIDTH_DESKTOP));
+    document.documentElement.style.setProperty('--solar-radiation-storm-stroke-linecap', SOLAR_RADIATION_STORM_STROKE_LINECAP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-anim-duration', `${isMobile ? SOLAR_RADIATION_STORM_ANIM_DURATION_S_MOBILE : SOLAR_RADIATION_STORM_ANIM_DURATION_S_DESKTOP}s`);
+
+    document.documentElement.style.setProperty('--solar-radiation-storm-dial-bg-color', SOLAR_RADIATION_STORM_DIAL_BG_COLOR);
+    document.documentElement.style.setProperty('--solar-radiation-storm-dial-inner-shadow', SOLAR_RADIATION_STORM_DIAL_INNER_SHADOW);
+
+    document.documentElement.style.setProperty('--solar-radiation-storm-content-offset-y-desktop', SOLAR_RADIATION_STORM_CONTENT_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-content-offset-y-mobile', SOLAR_RADIATION_STORM_CONTENT_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--solar-radiation-storm-content-offset-y', isMobile ? SOLAR_RADIATION_STORM_CONTENT_OFFSET_Y_MOBILE : SOLAR_RADIATION_STORM_CONTENT_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-flare-2-content-offset-y', isMobile ? SOLAR_RADIATION_STORM_CONTENT_OFFSET_Y_MOBILE : SOLAR_RADIATION_STORM_CONTENT_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-radiation-storm-label-font-family', SOLAR_RADIATION_STORM_LABEL_FONT_FAMILY);
+    document.documentElement.style.setProperty('--solar-radiation-storm-label-font-size-desktop', SOLAR_RADIATION_STORM_LABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-label-font-size-mobile', SOLAR_RADIATION_STORM_LABEL_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--solar-radiation-storm-label-font-size', isMobile ? SOLAR_RADIATION_STORM_LABEL_FONT_SIZE_MOBILE : SOLAR_RADIATION_STORM_LABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-label-line-height', String(isMobile ? SOLAR_RADIATION_STORM_LABEL_LINE_HEIGHT_MOBILE : SOLAR_RADIATION_STORM_LABEL_LINE_HEIGHT_DESKTOP));
+    document.documentElement.style.setProperty('--solar-radiation-storm-label-letter-spacing-desktop', SOLAR_RADIATION_STORM_LABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-label-letter-spacing-mobile', SOLAR_RADIATION_STORM_LABEL_LETTER_SPACING_MOBILE);
+    document.documentElement.style.setProperty('--solar-radiation-storm-label-letter-spacing', isMobile ? SOLAR_RADIATION_STORM_LABEL_LETTER_SPACING_MOBILE : SOLAR_RADIATION_STORM_LABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-label-offset-y-desktop', SOLAR_RADIATION_STORM_LABEL_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-label-offset-y-mobile', SOLAR_RADIATION_STORM_LABEL_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--solar-radiation-storm-label-offset-y', isMobile ? SOLAR_RADIATION_STORM_LABEL_OFFSET_Y_MOBILE : SOLAR_RADIATION_STORM_LABEL_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-radiation-storm-gap-label-to-class-desktop', SOLAR_RADIATION_STORM_GAP_LABEL_TO_CLASS_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-gap-label-to-class-mobile', SOLAR_RADIATION_STORM_GAP_LABEL_TO_CLASS_MOBILE);
+    document.documentElement.style.setProperty('--solar-radiation-storm-gap-label-to-class', isMobile ? SOLAR_RADIATION_STORM_GAP_LABEL_TO_CLASS_MOBILE : SOLAR_RADIATION_STORM_GAP_LABEL_TO_CLASS_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-radiation-storm-class-font-family', SOLAR_RADIATION_STORM_CLASS_FONT_FAMILY);
+    document.documentElement.style.setProperty('--solar-radiation-storm-class-font-size-desktop', SOLAR_RADIATION_STORM_CLASS_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-class-font-size-mobile', SOLAR_RADIATION_STORM_CLASS_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--solar-radiation-storm-class-font-size', isMobile ? SOLAR_RADIATION_STORM_CLASS_FONT_SIZE_MOBILE : SOLAR_RADIATION_STORM_CLASS_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-class-line-height', String(isMobile ? SOLAR_RADIATION_STORM_CLASS_LINE_HEIGHT_MOBILE : SOLAR_RADIATION_STORM_CLASS_LINE_HEIGHT_DESKTOP));
+    document.documentElement.style.setProperty('--solar-radiation-storm-class-offset-y-desktop', SOLAR_RADIATION_STORM_CLASS_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-class-offset-y-mobile', SOLAR_RADIATION_STORM_CLASS_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--solar-radiation-storm-class-offset-y', isMobile ? SOLAR_RADIATION_STORM_CLASS_OFFSET_Y_MOBILE : SOLAR_RADIATION_STORM_CLASS_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-radiation-storm-gap-class-to-value-desktop', SOLAR_RADIATION_STORM_GAP_CLASS_TO_VALUE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-gap-class-to-value-mobile', SOLAR_RADIATION_STORM_GAP_CLASS_TO_VALUE_MOBILE);
+    document.documentElement.style.setProperty('--solar-radiation-storm-gap-class-to-value', isMobile ? SOLAR_RADIATION_STORM_GAP_CLASS_TO_VALUE_MOBILE : SOLAR_RADIATION_STORM_GAP_CLASS_TO_VALUE_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-radiation-storm-value-font-family', SOLAR_RADIATION_STORM_VALUE_FONT_FAMILY);
+    document.documentElement.style.setProperty('--solar-radiation-storm-value-font-size-desktop', SOLAR_RADIATION_STORM_VALUE_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-value-font-size-mobile', SOLAR_RADIATION_STORM_VALUE_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--solar-radiation-storm-value-font-size', isMobile ? SOLAR_RADIATION_STORM_VALUE_FONT_SIZE_MOBILE : SOLAR_RADIATION_STORM_VALUE_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-value-line-height', String(isMobile ? SOLAR_RADIATION_STORM_VALUE_LINE_HEIGHT_MOBILE : SOLAR_RADIATION_STORM_VALUE_LINE_HEIGHT_DESKTOP));
+    document.documentElement.style.setProperty('--solar-radiation-storm-value-letter-spacing-desktop', SOLAR_RADIATION_STORM_VALUE_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-value-letter-spacing-mobile', SOLAR_RADIATION_STORM_VALUE_LETTER_SPACING_MOBILE);
+    document.documentElement.style.setProperty('--solar-radiation-storm-value-letter-spacing', isMobile ? SOLAR_RADIATION_STORM_VALUE_LETTER_SPACING_MOBILE : SOLAR_RADIATION_STORM_VALUE_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-value-offset-y-desktop', SOLAR_RADIATION_STORM_VALUE_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-value-offset-y-mobile', SOLAR_RADIATION_STORM_VALUE_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--solar-radiation-storm-value-offset-y', isMobile ? SOLAR_RADIATION_STORM_VALUE_OFFSET_Y_MOBILE : SOLAR_RADIATION_STORM_VALUE_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-radiation-storm-sublabel-font-family', SOLAR_RADIATION_STORM_SUBLABEL_FONT_FAMILY);
+    document.documentElement.style.setProperty('--solar-radiation-storm-sublabel-font-size-desktop', SOLAR_RADIATION_STORM_SUBLABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-sublabel-font-size-mobile', SOLAR_RADIATION_STORM_SUBLABEL_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--solar-radiation-storm-sublabel-font-size', isMobile ? SOLAR_RADIATION_STORM_SUBLABEL_FONT_SIZE_MOBILE : SOLAR_RADIATION_STORM_SUBLABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-sublabel-line-height-desktop', String(SOLAR_RADIATION_STORM_SUBLABEL_LINE_HEIGHT_DESKTOP));
+    document.documentElement.style.setProperty('--solar-radiation-storm-sublabel-line-height-mobile', String(SOLAR_RADIATION_STORM_SUBLABEL_LINE_HEIGHT_MOBILE));
+    document.documentElement.style.setProperty('--solar-radiation-storm-sublabel-line-height', String(isMobile ? SOLAR_RADIATION_STORM_SUBLABEL_LINE_HEIGHT_MOBILE : SOLAR_RADIATION_STORM_SUBLABEL_LINE_HEIGHT_DESKTOP));
+    document.documentElement.style.setProperty('--solar-radiation-storm-sublabel-letter-spacing-desktop', SOLAR_RADIATION_STORM_SUBLABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-sublabel-letter-spacing-mobile', SOLAR_RADIATION_STORM_SUBLABEL_LETTER_SPACING_MOBILE);
+    document.documentElement.style.setProperty('--solar-radiation-storm-sublabel-letter-spacing', isMobile ? SOLAR_RADIATION_STORM_SUBLABEL_LETTER_SPACING_MOBILE : SOLAR_RADIATION_STORM_SUBLABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-sublabel-margin-top-desktop', SOLAR_RADIATION_STORM_SUBLABEL_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-sublabel-margin-top-mobile', SOLAR_RADIATION_STORM_SUBLABEL_MARGIN_TOP_MOBILE);
+    document.documentElement.style.setProperty('--solar-radiation-storm-sublabel-margin-top', isMobile ? SOLAR_RADIATION_STORM_SUBLABEL_MARGIN_TOP_MOBILE : SOLAR_RADIATION_STORM_SUBLABEL_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-sublabel-peak-margin-top', isMobile ? SOLAR_RADIATION_STORM_SUBLABEL_PEAK_MARGIN_TOP_MOBILE : SOLAR_RADIATION_STORM_SUBLABEL_PEAK_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-sublabel-peak-value-margin-top', isMobile ? SOLAR_RADIATION_STORM_SUBLABEL_PEAK_VALUE_MARGIN_TOP_MOBILE : SOLAR_RADIATION_STORM_SUBLABEL_PEAK_VALUE_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-sublabel-offset-y-desktop', SOLAR_RADIATION_STORM_SUBLABEL_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-sublabel-offset-y-mobile', SOLAR_RADIATION_STORM_SUBLABEL_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--solar-radiation-storm-sublabel-offset-y', isMobile ? SOLAR_RADIATION_STORM_SUBLABEL_OFFSET_Y_MOBILE : SOLAR_RADIATION_STORM_SUBLABEL_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-sublabel-width-desktop', SOLAR_RADIATION_STORM_SUBLABEL_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-sublabel-width-mobile', SOLAR_RADIATION_STORM_SUBLABEL_WIDTH_MOBILE);
+    document.documentElement.style.setProperty('--solar-radiation-storm-sublabel-width', isMobile ? SOLAR_RADIATION_STORM_SUBLABEL_WIDTH_MOBILE : SOLAR_RADIATION_STORM_SUBLABEL_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-sublabel-max-width-desktop', SOLAR_RADIATION_STORM_SUBLABEL_MAX_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--solar-radiation-storm-sublabel-max-width-mobile', SOLAR_RADIATION_STORM_SUBLABEL_MAX_WIDTH_MOBILE);
+    document.documentElement.style.setProperty('--solar-radiation-storm-sublabel-max-width', isMobile ? SOLAR_RADIATION_STORM_SUBLABEL_MAX_WIDTH_MOBILE : SOLAR_RADIATION_STORM_SUBLABEL_MAX_WIDTH_DESKTOP);
+
+    if (typeof updateSolarRadiationStormDial === 'function') {
+      updateSolarRadiationStormDial();
+    } else if (typeof updateSolarFlare2Dial === 'function') {
+      updateSolarFlare2Dial();
     }
 
     // Radio Blackout (R-Scale) Dial Variables (JCV)
@@ -10680,7 +10965,7 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1479';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1485';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -15135,17 +15420,436 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
       col.appendChild(sublabel);
     }
 
+    if (SOLAR_RADIATION_STORM_DIAL_ENABLED || SOLAR_FLARE_2_DIAL_ENABLED) {
+      const dial2 = document.createElement('div');
+      dial2.className = 'world-clock-dial celestial-clock-dial solar-radiation-storm-dial solar-flare-2-dial';
+      dial2.id = 'solar-radiation-storm-dial';
+      const titleText2 = (SOLAR_RADIATION_STORM_MODE === 'live') ? 'Live Solar Radiation Storm (NOAA SWPC GOES >=10 MeV Protons)' : 'Solar Radiation Storm Scale (Click to test levels)';
+      dial2.setAttribute('title', titleText2);
+
+      const initialClass2 = (SOLAR_RADIATION_STORM_MODE === 'live' && liveSolarRadiationStormData)
+        ? liveSolarRadiationStormData.class
+        : (activeSolarRadiationStormState?.class || SOLAR_RADIATION_STORM_CLASS_MANUAL);
+      const initialVal2 = (SOLAR_RADIATION_STORM_MODE === 'live' && liveSolarRadiationStormData)
+        ? liveSolarRadiationStormData.value
+        : (activeSolarRadiationStormState?.value || SOLAR_RADIATION_STORM_VALUE_MANUAL);
+
+      const labels2 = getSolarRadiationStormLabels(initialClass2);
+      const displayVal2 = formatSolarRadiationStormValue(initialVal2);
+
+      dial2.innerHTML = `
+        <svg class="solar-radiation-storm-svg solar-flare-2-svg clock-timer-svg" viewBox="-5 -5 110 110">
+          <!-- Main Dial (Current) -->
+          <circle class="solar-radiation-storm-track solar-flare-2-track countdown-track" cx="50" cy="50" r="46" fill="none" />
+          <circle class="solar-radiation-storm-progress solar-flare-2-progress countdown-progress" cx="50" cy="50" r="46" fill="none" />
+          
+          <!-- Peak Dial (Outer) -->
+          <circle class="solar-radiation-storm-peak-track solar-flare-2-peak-track countdown-track" cx="50" cy="50" r="51" fill="none" style="stroke-opacity: 0.2; stroke-width: var(--solar-radiation-storm-peak-track-stroke-width, 4);" />
+          <circle class="solar-radiation-storm-peak-progress solar-flare-2-peak-progress countdown-progress" cx="50" cy="50" r="51" fill="none" style="stroke-dasharray: 320.442;" />
+        </svg>
+        <div class="solar-radiation-storm-content solar-flare-2-content">
+          <div class="solar-radiation-storm-label solar-flare-2-label">
+            <span class="solar-radiation-storm-label-line1 solar-flare-2-label-line1">${labels2.line1}</span>
+            <span class="solar-radiation-storm-label-line2 solar-flare-2-label-line2">${labels2.line2}</span>
+          </div>
+          <div class="solar-radiation-storm-class solar-flare-2-class">${initialClass2}</div>
+          <div class="solar-radiation-storm-value solar-flare-2-value">${displayVal2}</div>
+        </div>
+      `;
+
+      if (SOLAR_RADIATION_STORM_CLICK_CYCLES_CLASSES) {
+        dial2.addEventListener('click', handleSolarRadiationStormDialClick);
+      }
+
+      col.appendChild(dial2);
+
+      if (SOLAR_RADIATION_STORM_SUBLABEL_ENABLED) {
+        const sublabel2 = document.createElement('div');
+        sublabel2.className = 'world-clock-label celestial-clock-label solar-radiation-storm-sublabel solar-flare-2-sublabel';
+        sublabel2.id = 'solar-radiation-storm-sublabel';
+        const impact2 = getSolarRadiationStormImpact(initialClass2, currentSolarRadiationStormTrend);
+        let innerContent2 = '';
+        if (SOLAR_RADIATION_STORM_SUBLABEL_MODE === 'dynamic') {
+          const baseHtml2 = formatImpactSublabelHtml(impact2.arrow, impact2.text);
+          const initialColor2 = getSolarRadiationStormLevelColor(initialClass2);
+          const formattedPeakVal = formatSolarRadiationStormValue(SOLAR_RADIATION_STORM_PEAK_VALUE_MANUAL);
+          const line2Text2 = `PEAK ${initialClass2}<br><span style="display:inline-block; margin-top: var(--solar-radiation-storm-sublabel-peak-value-margin-top, 0vw);">${formattedPeakVal}</span>`;
+          innerContent2 = `<br>${baseHtml2}<br><span style="display: inline-block; margin-top: var(--solar-radiation-storm-sublabel-peak-margin-top, 0vw); font-family: 'euro-bold', sans-serif; color: ${initialColor2};">${line2Text2}</span>`;
+        } else {
+          innerContent2 = (isMobile ? SOLAR_RADIATION_STORM_SUBLABEL_TEXT_MOBILE : SOLAR_RADIATION_STORM_SUBLABEL_TEXT_DESKTOP);
+        }
+        sublabel2.innerHTML = innerContent2;
+        if (SOLAR_RADIATION_STORM_SUBLABEL_COLOR === 'auto') {
+          sublabel2.style.color = getSolarRadiationStormLevelColor(initialClass2);
+        }
+        col.appendChild(sublabel2);
+      }
+    }
+
     if (SOLAR_FLARE_MODE === 'live' && !solarFlareLiveTimer) {
       fetchLiveSolarFlareData();
       solarFlareLiveTimer = setInterval(fetchLiveSolarFlareData, SOLAR_FLARE_AUTO_REFRESH_MS);
     }
 
+    if (SOLAR_RADIATION_STORM_MODE === 'live' && !solarRadiationStormLiveTimer) {
+      fetchLiveSolarRadiationStormData();
+      solarRadiationStormLiveTimer = setInterval(fetchLiveSolarRadiationStormData, SOLAR_RADIATION_STORM_AUTO_REFRESH_MS);
+    }
+
     requestAnimationFrame(() => {
       updateSolarFlareDial();
+      if (SOLAR_RADIATION_STORM_DIAL_ENABLED || SOLAR_FLARE_2_DIAL_ENABLED) {
+        updateSolarRadiationStormDial();
+      }
     });
 
     return col;
   }
+
+  /* --- Solar Radiation Storm (S-Scale) Dial Component --- */
+  const SOLAR_RADIATION_STORM_TEST_LEVELS = [
+    { class: 'S0', value: 0.2, peakClass: 'S0', peakValue: 0.2 },
+    { class: 'S1', value: 12.0, peakClass: 'S1', peakValue: 15.0 },
+    { class: 'S2', value: 150.0, peakClass: 'S2', peakValue: 220.0 },
+    { class: 'S3', value: 1400.0, peakClass: 'S3', peakValue: 1800.0 },
+    { class: 'S4', value: 15000.0, peakClass: 'S4', peakValue: 24000.0 },
+    { class: 'S5', value: 120000.0, peakClass: 'S5', peakValue: 150000.0 }
+  ];
+  let currentSolarRadiationStormTestIndex = 0; // Default S0 0.2 pfu (matches prompt)
+  let activeSolarRadiationStormState = (SOLAR_RADIATION_STORM_MODE === 'live') ? null : { class: SOLAR_RADIATION_STORM_CLASS_MANUAL, value: SOLAR_RADIATION_STORM_VALUE_MANUAL, peakClass: SOLAR_RADIATION_STORM_PEAK_CLASS_MANUAL, peakValue: SOLAR_RADIATION_STORM_PEAK_VALUE_MANUAL };
+  let liveSolarRadiationStormData = null;
+  let currentSolarRadiationStormTrend = 'up'; // Default user requested: "↑ Space is Quiet"
+  let solarRadiationStormLiveTimer = null;
+
+  function getSolarRadiationStormImpact(sClass, trendDir) {
+    const upper = String(sClass || 'S0').toUpperCase();
+    let defaultArrow = 'up';
+    let text = 'Space is Quiet';
+    switch (upper) {
+      case 'S0': defaultArrow = SOLAR_RADIATION_STORM_IMPACT_LEVEL_S0_ARROW; text = SOLAR_RADIATION_STORM_IMPACT_LEVEL_S0_TEXT; break;
+      case 'S1': defaultArrow = SOLAR_RADIATION_STORM_IMPACT_LEVEL_S1_ARROW; text = SOLAR_RADIATION_STORM_IMPACT_LEVEL_S1_TEXT; break;
+      case 'S2': defaultArrow = SOLAR_RADIATION_STORM_IMPACT_LEVEL_S2_ARROW; text = SOLAR_RADIATION_STORM_IMPACT_LEVEL_S2_TEXT; break;
+      case 'S3': defaultArrow = SOLAR_RADIATION_STORM_IMPACT_LEVEL_S3_ARROW; text = SOLAR_RADIATION_STORM_IMPACT_LEVEL_S3_TEXT; break;
+      case 'S4': defaultArrow = SOLAR_RADIATION_STORM_IMPACT_LEVEL_S4_ARROW; text = SOLAR_RADIATION_STORM_IMPACT_LEVEL_S4_TEXT; break;
+      case 'S5': defaultArrow = SOLAR_RADIATION_STORM_IMPACT_LEVEL_S5_ARROW; text = SOLAR_RADIATION_STORM_IMPACT_LEVEL_S5_TEXT; break;
+      default:  defaultArrow = 'up'; text = 'Space is Quiet'; break;
+    }
+    const arrow = (SOLAR_RADIATION_STORM_ARROW_MODE === 'trend')
+      ? (trendDir || currentSolarRadiationStormTrend || defaultArrow)
+      : defaultArrow;
+    return { arrow, text };
+  }
+
+  function getSolarRadiationStormLabels(sClass) {
+    const upper = String(sClass || 'S0').toUpperCase();
+    switch (upper) {
+      case 'S0': return { line1: SOLAR_RADIATION_STORM_LABEL_S0_LINE1, line2: SOLAR_RADIATION_STORM_LABEL_S0_LINE2 };
+      case 'S1': return { line1: SOLAR_RADIATION_STORM_LABEL_S1_LINE1, line2: SOLAR_RADIATION_STORM_LABEL_S1_LINE2 };
+      case 'S2': return { line1: SOLAR_RADIATION_STORM_LABEL_S2_LINE1, line2: SOLAR_RADIATION_STORM_LABEL_S2_LINE2 };
+      case 'S3': return { line1: SOLAR_RADIATION_STORM_LABEL_S3_LINE1, line2: SOLAR_RADIATION_STORM_LABEL_S3_LINE2 };
+      case 'S4': return { line1: SOLAR_RADIATION_STORM_LABEL_S4_LINE1, line2: SOLAR_RADIATION_STORM_LABEL_S4_LINE2 };
+      case 'S5': return { line1: SOLAR_RADIATION_STORM_LABEL_S5_LINE1, line2: SOLAR_RADIATION_STORM_LABEL_S5_LINE2 };
+      default:  return { line1: 'RADIATION', line2: 'QUIET' };
+    }
+  }
+
+  function getSolarRadiationStormLevelColor(sClass) {
+    if (SOLAR_RADIATION_STORM_COLOR_OVERRIDE !== null && SOLAR_RADIATION_STORM_COLOR_OVERRIDE !== undefined) {
+      if (typeof SOLAR_RADIATION_STORM_COLOR_OVERRIDE === 'number') {
+        return tempToColor(SOLAR_RADIATION_STORM_COLOR_OVERRIDE) || 'hsl(120, 100%, 50%)';
+      }
+      return SOLAR_RADIATION_STORM_COLOR_OVERRIDE;
+    }
+    const upper = String(sClass || 'S0').toUpperCase();
+    let setting;
+    switch (upper) {
+      case 'S0': setting = SOLAR_RADIATION_STORM_COLOR_LEVEL_S0; break;
+      case 'S1': setting = SOLAR_RADIATION_STORM_COLOR_LEVEL_S1; break;
+      case 'S2': setting = SOLAR_RADIATION_STORM_COLOR_LEVEL_S2; break;
+      case 'S3': setting = SOLAR_RADIATION_STORM_COLOR_LEVEL_S3; break;
+      case 'S4': setting = SOLAR_RADIATION_STORM_COLOR_LEVEL_S4; break;
+      case 'S5': setting = SOLAR_RADIATION_STORM_COLOR_LEVEL_S5; break;
+      default:  setting = SOLAR_RADIATION_STORM_COLOR_LEVEL_S0; break;
+    }
+    if (typeof setting === 'number') {
+      return tempToColor(setting) || 'hsl(120, 100%, 50%)';
+    }
+    return setting || 'hsl(120, 100%, 50%)';
+  }
+
+  function formatSolarRadiationStormValue(sValue) {
+    if (typeof sValue !== 'number') {
+      const parsed = parseFloat(sValue);
+      if (isNaN(parsed)) return `${sValue}${SOLAR_RADIATION_STORM_UNIT}`;
+      sValue = parsed;
+    }
+    let formatted;
+    if (sValue >= 1000) {
+      formatted = Math.round(sValue).toLocaleString();
+    } else if (sValue >= 10) {
+      formatted = sValue.toFixed(0);
+    } else {
+      formatted = sValue.toFixed(1);
+    }
+    return `${formatted}${SOLAR_RADIATION_STORM_UNIT}`;
+  }
+
+  function calculateSolarRadiationStormFraction(sClass, sValue) {
+    const cls = String(sClass || 'S0').toUpperCase();
+    const val = parseFloat(sValue) || 0.0;
+    const ranges = {
+      S0: { min: 0.00, max: 0.16, valMin: 0.0, valMax: 10.0 },
+      S1: { min: 0.16, max: 0.33, valMin: 10.0, valMax: 100.0 },
+      S2: { min: 0.33, max: 0.50, valMin: 100.0, valMax: 1000.0 },
+      S3: { min: 0.50, max: 0.67, valMin: 1000.0, valMax: 10000.0 },
+      S4: { min: 0.67, max: 0.84, valMin: 10000.0, valMax: 100000.0 },
+      S5: { min: 0.84, max: 1.00, valMin: 100000.0, valMax: 1000000.0 }
+    };
+    const range = ranges[cls] || ranges['S0'];
+    const span = range.valMax - range.valMin;
+    const normalized = span > 0 ? Math.max(0, Math.min(1.0, (val - range.valMin) / span)) : 0.02;
+    if (cls === 'S0') {
+      return Math.max(0.025, normalized * range.max);
+    }
+    return range.min + (normalized * (range.max - range.min));
+  }
+
+  async function updateSolarRadiationStormDial() {
+    const dial = document.getElementById('solar-radiation-storm-dial') || document.getElementById('solar-flare-2-dial');
+    if (!dial) return;
+
+    let sClass = 'S0';
+    let sValue = 0.2;
+    let dailyPeakClass = 'S0';
+    let dailyPeakValue = 0.2;
+
+    if (activeSolarRadiationStormState) {
+      sClass = activeSolarRadiationStormState.class;
+      sValue = activeSolarRadiationStormState.value;
+      dailyPeakClass = activeSolarRadiationStormState.peakClass || SOLAR_RADIATION_STORM_PEAK_CLASS_MANUAL;
+      dailyPeakValue = activeSolarRadiationStormState.peakValue || SOLAR_RADIATION_STORM_PEAK_VALUE_MANUAL;
+    } else if (SOLAR_RADIATION_STORM_MODE === 'live' && liveSolarRadiationStormData) {
+      sClass = liveSolarRadiationStormData.class;
+      sValue = liveSolarRadiationStormData.value;
+      dailyPeakClass = liveSolarRadiationStormData.peakClass || sClass;
+      dailyPeakValue = liveSolarRadiationStormData.peakValue || sValue;
+    } else {
+      sClass = SOLAR_RADIATION_STORM_CLASS_MANUAL;
+      sValue = SOLAR_RADIATION_STORM_VALUE_MANUAL;
+      dailyPeakClass = SOLAR_RADIATION_STORM_PEAK_CLASS_MANUAL;
+      dailyPeakValue = SOLAR_RADIATION_STORM_PEAK_VALUE_MANUAL;
+    }
+
+    const labels = getSolarRadiationStormLabels(sClass);
+    const color = getSolarRadiationStormLevelColor(sClass);
+    const fraction = calculateSolarRadiationStormFraction(sClass, sValue);
+
+    // Track highest daily radiation storm level
+    let dailyPeakColor = getSolarRadiationStormLevelColor(dailyPeakClass);
+    let dailyPeakFraction = calculateSolarRadiationStormFraction(dailyPeakClass, dailyPeakValue);
+    const isLive = SOLAR_RADIATION_STORM_MODE === 'live' && !activeSolarRadiationStormState;
+
+    if (isLive) {
+      try {
+        if (window.todaySkyRecord && window.todaySkyRecord.pk_s_cls) {
+          dailyPeakClass = String(window.todaySkyRecord.pk_s_cls).trim();
+          dailyPeakValue = (typeof window.todaySkyRecord.pk_s_val !== 'undefined') ? window.todaySkyRecord.pk_s_val : 0.2;
+          dailyPeakColor = getSolarRadiationStormLevelColor(dailyPeakClass);
+          dailyPeakFraction = calculateSolarRadiationStormFraction(dailyPeakClass, dailyPeakValue);
+
+          if (liveSolarRadiationStormData && fraction > dailyPeakFraction) {
+            dailyPeakFraction = fraction;
+            dailyPeakColor = color;
+            dailyPeakClass = sClass;
+            dailyPeakValue = sValue;
+            window.todaySkyRecord.pk_s_cls = sClass;
+            window.todaySkyRecord.pk_s_val = sValue;
+          }
+        } else if (liveSolarRadiationStormData) {
+          if (!window.todaySkyRecord) window.todaySkyRecord = {};
+          window.todaySkyRecord.pk_s_cls = sClass;
+          window.todaySkyRecord.pk_s_val = sValue;
+        }
+      } catch (e) {
+        console.log("Failed to parse Radiation Peak from Sky DB", e);
+      }
+    }
+
+    const circumference = 289.027;
+    const strokeOffset = circumference * (1 - fraction);
+
+    const peakCircumference = 320.442;
+    const peakStrokeOffset = peakCircumference * (1 - dailyPeakFraction);
+
+    const line1El = dial.querySelector('.solar-radiation-storm-label-line1, .solar-flare-2-label-line1');
+    const line2El = dial.querySelector('.solar-radiation-storm-label-line2, .solar-flare-2-label-line2');
+    const classEl = dial.querySelector('.solar-radiation-storm-class, .solar-flare-2-class');
+    const valueEl = dial.querySelector('.solar-radiation-storm-value, .solar-flare-2-value');
+
+    if (line1El && line1El.textContent !== labels.line1) line1El.textContent = labels.line1;
+    if (line2El && line2El.textContent !== labels.line2) line2El.textContent = labels.line2;
+    if (classEl && classEl.textContent !== sClass) classEl.textContent = sClass;
+    const displayVal = formatSolarRadiationStormValue(sValue);
+    if (valueEl && valueEl.textContent !== displayVal) valueEl.textContent = displayVal;
+
+    dial.style.setProperty('--solar-radiation-storm-current-color', color);
+    dial.style.setProperty('--solar-flare-2-current-color', color);
+    dial.style.setProperty('--solar-radiation-storm-peak-color', dailyPeakColor);
+    dial.style.setProperty('--solar-flare-2-peak-color', dailyPeakColor);
+    dial.style.setProperty('--solar-radiation-storm-peak-stroke-offset', peakStrokeOffset.toFixed(2));
+    dial.style.setProperty('--solar-flare-2-peak-stroke-offset', peakStrokeOffset.toFixed(2));
+
+    const peakEl = dial.querySelector('.solar-radiation-storm-peak-progress, .solar-flare-2-peak-progress');
+    const peakTrackEl = dial.querySelector('.solar-radiation-storm-peak-track, .solar-flare-2-peak-track');
+    if (peakEl) {
+      peakEl.style.display = '';
+      peakEl.style.opacity = '1.0';
+    }
+    if (peakTrackEl) {
+      peakTrackEl.style.display = '';
+    }
+
+    const newOffsetStr = strokeOffset.toFixed(2);
+    if (!dial.hasOwnProperty('_targetOffset')) {
+      dial._targetOffset = newOffsetStr;
+      dial.style.setProperty('--solar-radiation-storm-stroke-offset', newOffsetStr);
+      dial.style.setProperty('--solar-flare-2-stroke-offset', newOffsetStr);
+    } else if (dial._targetOffset !== newOffsetStr) {
+      const prevTarget = parseFloat(dial._targetOffset);
+      const newOffset = parseFloat(newOffsetStr);
+      dial._targetOffset = newOffsetStr;
+
+      if (dial._animTimeout) {
+        clearTimeout(dial._animTimeout);
+        dial._animTimeout = null;
+      }
+
+      if (Math.abs(prevTarget - newOffset) > 0.1) {
+        const isHigher = newOffset < prevTarget;
+        dial.style.setProperty('--solar-radiation-storm-stroke-offset', isHigher ? '0' : circumference.toFixed(2));
+        dial.style.setProperty('--solar-flare-2-stroke-offset', isHigher ? '0' : circumference.toFixed(2));
+        dial._animTimeout = setTimeout(() => {
+          dial.style.setProperty('--solar-radiation-storm-stroke-offset', newOffsetStr);
+          dial.style.setProperty('--solar-flare-2-stroke-offset', newOffsetStr);
+          dial._animTimeout = null;
+        }, 800);
+      } else {
+        dial.style.setProperty('--solar-radiation-storm-stroke-offset', newOffsetStr);
+        dial.style.setProperty('--solar-flare-2-stroke-offset', newOffsetStr);
+      }
+    }
+
+    if (SOLAR_RADIATION_STORM_SUBLABEL_ENABLED) {
+      const sublabelEl = document.getElementById('solar-radiation-storm-sublabel') || document.getElementById('solar-flare-2-sublabel');
+      if (sublabelEl) {
+        if (SOLAR_RADIATION_STORM_SUBLABEL_MODE === 'dynamic') {
+          const impact = getSolarRadiationStormImpact(sClass, currentSolarRadiationStormTrend);
+          let baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
+          if (SOLAR_RADIATION_STORM_SUBLABEL_COLOR === 'auto') {
+            baseHtml = `<span style="color: ${color};">${baseHtml}</span>`;
+          }
+          const formattedPeakVal = formatSolarRadiationStormValue(dailyPeakValue);
+          const line2Text = `PEAK ${dailyPeakClass}<br><span style="display:inline-block; margin-top: var(--solar-radiation-storm-sublabel-peak-value-margin-top, 0vw);">${formattedPeakVal}</span>`;
+          sublabelEl.innerHTML = `<br>${baseHtml}<br><span style="display: inline-block; margin-top: var(--solar-radiation-storm-sublabel-peak-margin-top, 0vw); font-family: 'euro-bold', sans-serif; color: ${dailyPeakColor};">${line2Text}</span>`;
+        }
+        if (SOLAR_RADIATION_STORM_SUBLABEL_COLOR === 'auto') {
+          sublabelEl.style.color = color;
+        }
+        sublabelEl.style.opacity = '1';
+      }
+    }
+  }
+
+  function handleSolarRadiationStormDialClick(e) {
+    if (e) e.stopPropagation();
+    if (SOLAR_RADIATION_STORM_MODE === 'live') {
+      if (!SOLAR_RADIATION_STORM_CLICK_CYCLES_CLASSES) {
+        fetchLiveSolarRadiationStormData();
+        return;
+      }
+      currentSolarRadiationStormTestIndex = (currentSolarRadiationStormTestIndex + 1) % (SOLAR_RADIATION_STORM_TEST_LEVELS.length + 1);
+      if (currentSolarRadiationStormTestIndex === SOLAR_RADIATION_STORM_TEST_LEVELS.length) {
+        activeSolarRadiationStormState = null;
+        if (liveSolarRadiationStormData) {
+          currentSolarRadiationStormTrend = liveSolarRadiationStormData.trend || 'up';
+          updateSolarRadiationStormDial();
+        }
+        fetchLiveSolarRadiationStormData();
+      } else {
+        activeSolarRadiationStormState = SOLAR_RADIATION_STORM_TEST_LEVELS[currentSolarRadiationStormTestIndex];
+        updateSolarRadiationStormDial();
+      }
+      return;
+    }
+    currentSolarRadiationStormTestIndex = (currentSolarRadiationStormTestIndex + 1) % SOLAR_RADIATION_STORM_TEST_LEVELS.length;
+    activeSolarRadiationStormState = SOLAR_RADIATION_STORM_TEST_LEVELS[currentSolarRadiationStormTestIndex];
+    updateSolarRadiationStormDial();
+  }
+
+  async function fetchLiveSolarRadiationStormData() {
+    if (SOLAR_RADIATION_STORM_MODE !== 'live') return;
+    try {
+      const response = await fetch('https://services.swpc.noaa.gov/json/goes/primary/integral-protons-plot-6-hour.json', { cache: 'no-store' });
+      if (!response.ok) return;
+      const data = await response.json();
+      if (!Array.isArray(data) || data.length === 0) return;
+
+      const primaryReadings = data.filter(d => d.energy === '>=10 MeV' && typeof d.flux === 'number');
+      const latest = primaryReadings[primaryReadings.length - 1];
+      if (!latest) return;
+      const flux = latest.flux;
+
+      let cls = 'S0';
+      if (flux >= 100000) {
+        cls = 'S5';
+      } else if (flux >= 10000) {
+        cls = 'S4';
+      } else if (flux >= 1000) {
+        cls = 'S3';
+      } else if (flux >= 100) {
+        cls = 'S2';
+      } else if (flux >= 10) {
+        cls = 'S1';
+      } else {
+        cls = 'S0';
+      }
+
+      let liveTrend = currentSolarRadiationStormTrend || 'up';
+      for (let i = primaryReadings.length - 2; i >= 0; i--) {
+        const diff = flux - primaryReadings[i].flux;
+        if (Math.abs(diff) > 1e-4) {
+          liveTrend = diff >= 0 ? 'up' : 'down';
+          break;
+        }
+      }
+      currentSolarRadiationStormTrend = liveTrend;
+
+      liveSolarRadiationStormData = {
+        class: cls,
+        value: parseFloat(flux.toFixed(1)),
+        flux: flux,
+        trend: liveTrend
+      };
+      updateSolarRadiationStormDial();
+    } catch (err) {
+      console.warn('Unable to fetch live solar radiation storm data from NOAA SWPC:', err);
+    }
+  }
+
+  window.updateSolarRadiationStormDial = updateSolarRadiationStormDial;
+  window.updateSolarRadiationStormData = function(data) {
+    if (!data) return;
+    activeSolarRadiationStormState = {
+      class: data.class || (activeSolarRadiationStormState ? activeSolarRadiationStormState.class : SOLAR_RADIATION_STORM_CLASS_MANUAL),
+      value: (typeof data.value !== 'undefined') ? data.value : (activeSolarRadiationStormState ? activeSolarRadiationStormState.value : SOLAR_RADIATION_STORM_VALUE_MANUAL),
+      peakClass: data.peakClass || (activeSolarRadiationStormState ? activeSolarRadiationStormState.peakClass : SOLAR_RADIATION_STORM_PEAK_CLASS_MANUAL),
+      peakValue: (typeof data.peakValue !== 'undefined') ? data.peakValue : (activeSolarRadiationStormState ? activeSolarRadiationStormState.peakValue : SOLAR_RADIATION_STORM_PEAK_VALUE_MANUAL)
+    };
+    if (data.trend) currentSolarRadiationStormTrend = data.trend;
+    updateSolarRadiationStormDial();
+  };
+  window.updateSolarFlare2Dial = updateSolarRadiationStormDial;
+  window.updateSolarFlare2Data = window.updateSolarRadiationStormData;
 
   /* --- Radio Blackout (R-Scale) Dial Component --- */
   const RADIO_BLACKOUT_TEST_LEVELS = [
@@ -16362,9 +17066,13 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
     if (typeof window.triggerSunRotation === 'function') window.triggerSunRotation();
     if (typeof window.triggerEarthRotation === 'function') window.triggerEarthRotation();
     
-    // Perform a dramatic sweep for the Solar Flare (#1) and Radio Blackout (#4) dials
+    // Perform a dramatic sweep for the Solar Flare (#1), S-Scale Radiation (#1 Lower), and Radio Blackout (#4) dials
     if (SOLAR_FLARE_DIAL_ENABLED) {
       forceCelestialDialSweep('solar-flare-dial');
+    }
+    if (SOLAR_RADIATION_STORM_DIAL_ENABLED || SOLAR_FLARE_2_DIAL_ENABLED) {
+      forceCelestialDialSweep('solar-radiation-storm-dial');
+      forceCelestialDialSweep('solar-flare-2-dial');
     }
     if (RADIO_BLACKOUT_DIAL_ENABLED) {
       forceCelestialDialSweep('radio-blackout-dial');
@@ -16377,7 +17085,9 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
     if (existingSunsRow) {
       const leftCol = document.getElementById('celestial-clock-left');
       const hasSolarDial = !!document.getElementById('solar-flare-dial');
-      const needsRebuild = CELESTIAL_DIALS_ENABLED && (!leftCol || (SOLAR_FLARE_DIAL_ENABLED && !hasSolarDial) || (!SOLAR_FLARE_DIAL_ENABLED && hasSolarDial));
+      const hasSolarDial2 = !!(document.getElementById('solar-radiation-storm-dial') || document.getElementById('solar-flare-2-dial'));
+      const isDial2Enabled = SOLAR_RADIATION_STORM_DIAL_ENABLED || SOLAR_FLARE_2_DIAL_ENABLED;
+      const needsRebuild = CELESTIAL_DIALS_ENABLED && (!leftCol || (SOLAR_FLARE_DIAL_ENABLED && !hasSolarDial) || (!SOLAR_FLARE_DIAL_ENABLED && hasSolarDial) || (isDial2Enabled && !hasSolarDial2) || (!isDial2Enabled && hasSolarDial2));
       if (needsRebuild) {
         existingSunsRow.remove();
         const existingSpacer = document.getElementById('sun-image-spacer');
