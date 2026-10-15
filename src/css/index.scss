@@ -1315,7 +1315,7 @@ main {
         }
 
         /* Override absolute positioning and sizing for dials with outer r=51 tracks to prevent clipping on iOS Safari */
-        &.solar-flare-svg, &.solar-flare-2-svg, &.solar-radiation-storm-svg, &.radio-blackout-svg, .clockGridItem-8 &, .clockGridItem-4 & {
+        &.solar-flare-svg, &.solar-flare-2-svg, &.solar-radiation-storm-svg, &.radio-blackout-svg, &.geomagnetic-storm-svg, &.solar-wind-bz-svg, &.solar-wind-speed-svg, .clockGridItem-8 &, .clockGridItem-4 & {
             top: -5%;
             left: -5%;
             width: 110%;
@@ -3794,6 +3794,264 @@ main {
     display: block;
     width: var(--geomagnetic-storm-sublabel-width, 100%);
     max-width: var(--geomagnetic-storm-sublabel-max-width, var(--geomagnetic-storm-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw))));
+    white-space: normal;
+    word-break: normal;
+    user-select: none;
+    box-sizing: border-box;
+
+    i {
+        font-size: 0.85em;
+        vertical-align: 0.03vw;
+        margin-right: 0.35vw;
+    }
+}
+
+// Solar Wind Bz (IMF Gatekeeper) Dial in Celestial Row (JCV)
+.solar-wind-bz-dial,
+.celestial-clock-column .solar-wind-bz-dial {
+    position: relative;
+    border-radius: 50%;
+    width: var(--solar-wind-bz-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
+    height: var(--solar-wind-bz-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
+    margin-top: var(--solar-wind-bz-margin-top, 2vw);
+    transform: translate(var(--solar-wind-bz-offset-x, 0vw), var(--solar-wind-bz-offset-y, 0vw));
+    background-color: var(--solar-wind-bz-dial-bg-color, transparent);
+    box-shadow: var(--solar-wind-bz-dial-inner-shadow, inset 0 0 1vw rgba(0, 0, 0, 0.5));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: pointer;
+    box-sizing: border-box;
+
+    .solar-wind-bz-svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transform: rotate(var(--solar-wind-bz-start-angle, 90deg));
+        overflow: visible;
+        z-index: 1;
+
+        .solar-wind-bz-track {
+            stroke: var(--solar-wind-bz-track-color, rgba(255, 255, 255, 0.22));
+            stroke-width: var(--solar-wind-bz-track-stroke-width, 4);
+        }
+
+        .solar-wind-bz-peak-progress {
+            stroke: var(--solar-wind-bz-peak-color, rgba(255, 255, 255, 0.5));
+            stroke-width: var(--solar-wind-bz-peak-progress-stroke-width, 4);
+            stroke-dasharray: 320.442;
+            stroke-dashoffset: var(--solar-wind-bz-peak-stroke-offset, 320.442);
+            stroke-linecap: var(--solar-wind-bz-stroke-linecap, round);
+            opacity: 1.0;
+            transition: stroke-dashoffset var(--solar-wind-bz-anim-duration, 0.8s) cubic-bezier(0.25, 1, 0.5, 1),
+                        stroke 0.4s ease;
+        }
+
+        .solar-wind-bz-progress {
+            stroke: var(--solar-wind-bz-current-color, hsl(120, 100%, 50%));
+            stroke-width: var(--solar-wind-bz-progress-stroke-width, 4);
+            stroke-dasharray: 289.027;
+            stroke-dashoffset: var(--solar-wind-bz-stroke-offset, 161.85);
+            stroke-linecap: var(--solar-wind-bz-stroke-linecap, round);
+            transition: stroke-dashoffset var(--solar-wind-bz-anim-duration, 0.8s) cubic-bezier(0.25, 1, 0.5, 1),
+                        stroke 0.4s ease;
+        }
+    }
+
+    .solar-wind-bz-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        color: var(--solar-wind-bz-current-color, hsl(120, 100%, 50%));
+        transform: translateY(var(--solar-wind-bz-content-offset-y, 0vw));
+        pointer-events: none;
+        transition: color 0.4s ease;
+    }
+
+    .solar-wind-bz-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-family: var(--solar-wind-bz-label-font-family, "euro", sans-serif);
+        font-size: var(--solar-wind-bz-label-font-size, calc(var(--solar-wind-bz-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.0748));
+        line-height: var(--solar-wind-bz-label-line-height, 1.0);
+        letter-spacing: var(--solar-wind-bz-label-letter-spacing, 0.05vw);
+        text-transform: uppercase;
+        color: inherit;
+        transform: translateY(var(--solar-wind-bz-label-offset-y, 0vw));
+        margin-bottom: var(--solar-wind-bz-gap-label-to-class, calc(var(--solar-wind-bz-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02125));
+    }
+
+    .solar-wind-bz-class {
+        font-family: var(--solar-wind-bz-class-font-family, "euro-bold", sans-serif);
+        font-size: var(--solar-wind-bz-class-font-size, calc(var(--solar-wind-bz-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.2601));
+        line-height: var(--solar-wind-bz-class-line-height, 0.82);
+        letter-spacing: var(--solar-wind-bz-class-letter-spacing, 0.02vw);
+        color: inherit;
+        transform: translateY(var(--solar-wind-bz-class-offset-y, 0vw));
+        margin-bottom: var(--solar-wind-bz-gap-class-to-value, calc(var(--solar-wind-bz-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.017));
+    }
+
+    .solar-wind-bz-value {
+        font-family: var(--solar-wind-bz-value-font-family, "euro-bold", sans-serif);
+        font-size: var(--solar-wind-bz-value-font-size, calc(var(--solar-wind-bz-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1262));
+        line-height: var(--solar-wind-bz-value-line-height, 0.92);
+        letter-spacing: var(--solar-wind-bz-value-letter-spacing, -0.02vw);
+        color: inherit;
+        transform: translateY(var(--solar-wind-bz-value-offset-y, -0.5vw));
+    }
+}
+
+.solar-wind-bz-sublabel {
+    margin-top: var(--solar-wind-bz-sublabel-margin-top, 0.6vw);
+    transform: translateY(var(--solar-wind-bz-sublabel-offset-y, 0vw));
+    font-family: var(--solar-wind-bz-sublabel-font-family, var(--sun-label-font-family, 'light', sans-serif));
+    font-size: var(--solar-wind-bz-sublabel-font-size, 1.35vw);
+    line-height: var(--solar-wind-bz-sublabel-line-height, 1.05);
+    letter-spacing: var(--solar-wind-bz-sublabel-letter-spacing, 0.04vw);
+    color: var(--solar-wind-bz-sublabel-color, var(--temp-color, rgba(255, 255, 255, 0.70)));
+    text-align: center;
+    display: block;
+    width: var(--solar-wind-bz-sublabel-width, 100%);
+    max-width: var(--solar-wind-bz-sublabel-max-width, var(--solar-wind-bz-dial-size, var(--celestial-dial-size, 13.5vw)));
+    white-space: normal;
+    word-break: normal;
+    user-select: none;
+    box-sizing: border-box;
+
+    i {
+        font-size: 0.85em;
+        vertical-align: 0.03vw;
+        margin-right: 0.35vw;
+    }
+}
+
+// Solar Wind Speed (W-Scale / The Energy Level) Dial in Celestial Row (JCV)
+.solar-wind-speed-dial,
+.celestial-clock-column .solar-wind-speed-dial {
+    position: relative;
+    border-radius: 50%;
+    width: var(--solar-wind-speed-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
+    height: var(--solar-wind-speed-dial-size, var(--celestial-dial-size, var(--world-clock-size, 13.5vw)));
+    margin-top: var(--solar-wind-speed-margin-top, 2vw);
+    transform: translate(var(--solar-wind-speed-offset-x, 0vw), var(--solar-wind-speed-offset-y, 0vw));
+    background-color: var(--solar-wind-speed-dial-bg-color, transparent);
+    box-shadow: var(--solar-wind-speed-dial-inner-shadow, inset 0 0 1vw rgba(0, 0, 0, 0.5));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: pointer;
+    box-sizing: border-box;
+
+    .solar-wind-speed-svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transform: rotate(var(--solar-wind-speed-start-angle, 90deg));
+        overflow: visible;
+        z-index: 1;
+
+        .solar-wind-speed-track {
+            stroke: var(--solar-wind-speed-track-color, rgba(255, 255, 255, 0.22));
+            stroke-width: var(--solar-wind-speed-track-stroke-width, 4);
+        }
+
+        .solar-wind-speed-peak-progress {
+            stroke: var(--solar-wind-speed-peak-color, rgba(255, 255, 255, 0.5));
+            stroke-width: var(--solar-wind-speed-peak-progress-stroke-width, 4);
+            stroke-dasharray: 320.442;
+            stroke-dashoffset: var(--solar-wind-speed-peak-stroke-offset, 320.442);
+            stroke-linecap: var(--solar-wind-speed-stroke-linecap, round);
+            opacity: 1.0;
+            transition: stroke-dashoffset var(--solar-wind-speed-anim-duration, 0.8s) cubic-bezier(0.25, 1, 0.5, 1),
+                        stroke 0.4s ease;
+        }
+
+        .solar-wind-speed-progress {
+            stroke: var(--solar-wind-speed-current-color, hsl(120, 100%, 50%));
+            stroke-width: var(--solar-wind-speed-progress-stroke-width, 4);
+            stroke-dasharray: 289.027;
+            stroke-dashoffset: var(--solar-wind-speed-stroke-offset, 161.85);
+            stroke-linecap: var(--solar-wind-speed-stroke-linecap, round);
+            transition: stroke-dashoffset var(--solar-wind-speed-anim-duration, 0.8s) cubic-bezier(0.25, 1, 0.5, 1),
+                        stroke 0.4s ease;
+        }
+    }
+
+    .solar-wind-speed-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        color: var(--solar-wind-speed-current-color, hsl(120, 100%, 50%));
+        transform: translateY(var(--solar-wind-speed-content-offset-y, 0vw));
+        pointer-events: none;
+        transition: color 0.4s ease;
+    }
+
+    .solar-wind-speed-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-family: var(--solar-wind-speed-label-font-family, "euro", sans-serif);
+        font-size: var(--solar-wind-speed-label-font-size, calc(var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.0748));
+        line-height: var(--solar-wind-speed-label-line-height, 1.0);
+        letter-spacing: var(--solar-wind-speed-label-letter-spacing, 0.05vw);
+        text-transform: uppercase;
+        color: inherit;
+        transform: translateY(var(--solar-wind-speed-label-offset-y, 0vw));
+        margin-bottom: var(--solar-wind-speed-gap-label-to-class, calc(var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02125));
+    }
+
+    .solar-wind-speed-class {
+        font-family: var(--solar-wind-speed-class-font-family, "euro-bold", sans-serif);
+        font-size: var(--solar-wind-speed-class-font-size, calc(var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.2601));
+        line-height: var(--solar-wind-speed-class-line-height, 0.82);
+        letter-spacing: var(--solar-wind-speed-class-letter-spacing, 0.02vw);
+        color: inherit;
+        transform: translateY(var(--solar-wind-speed-class-offset-y, 0vw));
+        margin-bottom: var(--solar-wind-speed-gap-class-to-value, calc(var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.017));
+    }
+
+    .solar-wind-speed-value {
+        font-family: var(--solar-wind-speed-value-font-family, "euro-bold", sans-serif);
+        font-size: var(--solar-wind-speed-value-font-size, calc(var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1262));
+        line-height: var(--solar-wind-speed-value-line-height, 0.92);
+        letter-spacing: var(--solar-wind-speed-value-letter-spacing, -0.02vw);
+        color: inherit;
+        transform: translateY(var(--solar-wind-speed-value-offset-y, -0.5vw));
+    }
+}
+
+.solar-wind-speed-sublabel {
+    margin-top: var(--solar-wind-speed-sublabel-margin-top, 0.6vw);
+    transform: translateY(var(--solar-wind-speed-sublabel-offset-y, 0vw));
+    font-family: var(--solar-wind-speed-sublabel-font-family, var(--sun-label-font-family, 'light', sans-serif));
+    font-size: var(--solar-wind-speed-sublabel-font-size, 1.35vw);
+    line-height: var(--solar-wind-speed-sublabel-line-height, 1.05);
+    letter-spacing: var(--solar-wind-speed-sublabel-letter-spacing, 0.04vw);
+    color: var(--solar-wind-speed-sublabel-color, var(--temp-color, rgba(255, 255, 255, 0.70)));
+    text-align: center;
+    display: block;
+    width: var(--solar-wind-speed-sublabel-width, 100%);
+    max-width: var(--solar-wind-speed-sublabel-max-width, var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)));
     white-space: normal;
     word-break: normal;
     user-select: none;

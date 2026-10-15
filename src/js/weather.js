@@ -8681,6 +8681,289 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
   const GEOMAGNETIC_STORM_IMPACT_LEVEL_G5_ARROW = 'up';             // EDITABLE: Fallback arrow direction ('up' or 'down')
   const GEOMAGNETIC_STORM_IMPACT_LEVEL_G5_TEXT = 'Extreme Grid Danger'; // EDITABLE: Situation text
 
+  // =========================================================================
+  // --- EDITABLE: Solar Wind Bz (IMF Gatekeeper) Dial Config (JCV) ---
+  // Positioned directly underneath the Geomagnetic Storm (G-Scale) dial
+  // =========================================================================
+  const SOLAR_WIND_BZ_DIAL_ENABLED = true;                 // EDITABLE: Enable/disable Solar Wind Bz dial
+  const SOLAR_WIND_BZ_MODE = 'live';                       // EDITABLE: 'live' (NOAA SWPC real-time Bz) or 'manual'
+  const SOLAR_WIND_BZ_CLASS_MANUAL = 'BZ0';                // EDITABLE: Manual test class: 'BZ0', 'BZ1', 'BZ2', 'BZ3', 'BZ4', 'BZ5'
+  const SOLAR_WIND_BZ_VALUE_MANUAL = 1.2;                  // EDITABLE: Manual test value in nT
+  const SOLAR_WIND_BZ_PEAK_CLASS_MANUAL = 'BZ0';           // EDITABLE: Manual test peak class
+  const SOLAR_WIND_BZ_PEAK_VALUE_MANUAL = 1.2;            // EDITABLE: Manual test peak value in nT
+  const SOLAR_WIND_BZ_CLICK_CYCLES_CLASSES = true;        // EDITABLE: Click/tap dial to cycle test levels
+  const SOLAR_WIND_BZ_AUTO_REFRESH_MS = 60000;            // EDITABLE: Polling interval in ms
+
+  // Temperature Colors per Bz Level (JCV)
+  const SOLAR_WIND_BZ_COLOR_LEVEL_BZ0 = 55;                // EDITABLE: Level BZ0 (North / Quiet / Shield Closed) green
+  const SOLAR_WIND_BZ_COLOR_LEVEL_BZ1 = 75;                // EDITABLE: Level BZ1 (0 to -5 nT / Weak South) yellow-gold
+  const SOLAR_WIND_BZ_COLOR_LEVEL_BZ2 = 85;                // EDITABLE: Level BZ2 (-5 to -10 nT / Moderate South) orange
+  const SOLAR_WIND_BZ_COLOR_LEVEL_BZ3 = 95;                // EDITABLE: Level BZ3 (-10 to -15 nT / Strong South) tomato coral/red
+  const SOLAR_WIND_BZ_COLOR_LEVEL_BZ4 = 105;               // EDITABLE: Level BZ4 (-15 to -20 nT / Severe South) vibrant red
+  const SOLAR_WIND_BZ_COLOR_LEVEL_BZ5 = -5;                // EDITABLE: Level BZ5 (< -20 nT / Extreme South) shocking magenta
+  const SOLAR_WIND_BZ_COLOR_OVERRIDE = null;               // EDITABLE: Universal color override
+
+  // Level Descriptive Labels (JCV)
+  const SOLAR_WIND_BZ_LABEL_BZ0_LINE1 = 'IMF BZ';          // EDITABLE: Line 1 label for BZ0
+  const SOLAR_WIND_BZ_LABEL_BZ0_LINE2 = 'NORTH';           // EDITABLE: Line 2 label for BZ0
+  const SOLAR_WIND_BZ_LABEL_BZ1_LINE1 = 'IMF BZ';          // EDITABLE: Line 1 label for BZ1
+  const SOLAR_WIND_BZ_LABEL_BZ1_LINE2 = 'SOUTH';           // EDITABLE: Line 2 label for BZ1
+  const SOLAR_WIND_BZ_LABEL_BZ2_LINE1 = 'IMF BZ';          // EDITABLE: Line 1 label for BZ2
+  const SOLAR_WIND_BZ_LABEL_BZ2_LINE2 = 'SOUTH';           // EDITABLE: Line 2 label for BZ2
+  const SOLAR_WIND_BZ_LABEL_BZ3_LINE1 = 'IMF BZ';          // EDITABLE: Line 1 label for BZ3
+  const SOLAR_WIND_BZ_LABEL_BZ3_LINE2 = 'SOUTH';           // EDITABLE: Line 2 label for BZ3
+  const SOLAR_WIND_BZ_LABEL_BZ4_LINE1 = 'IMF BZ';          // EDITABLE: Line 1 label for BZ4
+  const SOLAR_WIND_BZ_LABEL_BZ4_LINE2 = 'SOUTH';           // EDITABLE: Line 2 label for BZ4
+  const SOLAR_WIND_BZ_LABEL_BZ5_LINE1 = 'IMF BZ';          // EDITABLE: Line 1 label for BZ5
+  const SOLAR_WIND_BZ_LABEL_BZ5_LINE2 = 'SOUTH';           // EDITABLE: Line 2 label for BZ5
+
+  // Circular Progress Ring & Track (JCV)
+  const SOLAR_WIND_BZ_START_ANGLE_DEG_DESKTOP = 90;        // EDITABLE Desktop: Arc start angle
+  const SOLAR_WIND_BZ_START_ANGLE_DEG_MOBILE = 90;         // EDITABLE Mobile: Arc start angle
+  const SOLAR_WIND_BZ_TRACK_COLOR = 'rgba(255, 255, 255, 0.22)'; // EDITABLE: Track ring color
+  const SOLAR_WIND_BZ_TRACK_STROKE_WIDTH_DESKTOP = 4.0;    // EDITABLE Desktop: SVG track stroke thickness
+  const SOLAR_WIND_BZ_TRACK_STROKE_WIDTH_MOBILE = 4.0;     // EDITABLE Mobile: SVG track stroke thickness
+  const SOLAR_WIND_BZ_PROGRESS_STROKE_WIDTH_DESKTOP = 4.0; // EDITABLE Desktop: SVG progress stroke thickness
+  const SOLAR_WIND_BZ_PROGRESS_STROKE_WIDTH_MOBILE = 4.0;  // EDITABLE Mobile: SVG progress stroke thickness
+  const SOLAR_WIND_BZ_PEAK_TRACK_STROKE_WIDTH_DESKTOP = 4.0;// EDITABLE Desktop: SVG peak track stroke thickness
+  const SOLAR_WIND_BZ_PEAK_TRACK_STROKE_WIDTH_MOBILE = 4.0; // EDITABLE Mobile: SVG peak track stroke thickness
+  const SOLAR_WIND_BZ_PEAK_PROGRESS_STROKE_WIDTH_DESKTOP = 4.0; // EDITABLE Desktop: SVG peak progress stroke thickness
+  const SOLAR_WIND_BZ_PEAK_PROGRESS_STROKE_WIDTH_MOBILE = 4.0;  // EDITABLE Mobile: SVG peak progress stroke thickness
+  const SOLAR_WIND_BZ_STROKE_LINECAP = 'round';            // EDITABLE: Arc cap
+  const SOLAR_WIND_BZ_ANIM_DURATION_S_DESKTOP = 0.8;       // EDITABLE Desktop: Animation duration
+  const SOLAR_WIND_BZ_ANIM_DURATION_S_MOBILE = 0.8;        // EDITABLE Mobile: Animation duration
+
+  // Dial Frame & Sizing (JCV)
+  const SOLAR_WIND_BZ_MARGIN_TOP_DESKTOP = '2.0vw';        // EDITABLE Desktop: Gap between upper G dial label and Bz dial
+  const SOLAR_WIND_BZ_MARGIN_TOP_MOBILE = '4.0vw';         // EDITABLE Mobile: Gap between upper G dial label and Bz dial
+  const SOLAR_WIND_BZ_DIAL_SIZE_DESKTOP = 'auto';          // EDITABLE Desktop: 'auto' or custom vw
+  const SOLAR_WIND_BZ_DIAL_SIZE_MOBILE = 'auto';           // EDITABLE Mobile: 'auto' or custom vw
+  const SOLAR_WIND_BZ_OFFSET_X_DESKTOP = '0vw';            // EDITABLE Desktop: Fine horizontal nudge
+  const SOLAR_WIND_BZ_OFFSET_X_MOBILE = '0vw';             // EDITABLE Mobile: Fine horizontal nudge
+  const SOLAR_WIND_BZ_OFFSET_Y_DESKTOP = '0vw';            // EDITABLE Desktop: Fine vertical nudge
+  const SOLAR_WIND_BZ_OFFSET_Y_MOBILE = '0vw';             // EDITABLE Mobile: Fine vertical nudge
+  const SOLAR_WIND_BZ_DIAL_BG_COLOR = 'transparent';       // EDITABLE: Dial background
+  const SOLAR_WIND_BZ_DIAL_INNER_SHADOW = 'inset 0 0 1vw rgba(0, 0, 0, 0.5)'; // EDITABLE: Inner shadow
+
+  // Typography & Text Positioning (JCV)
+  const SOLAR_WIND_BZ_LABEL_FONT_FAMILY = "'euro', sans-serif"; // EDITABLE: Font family
+  const SOLAR_WIND_BZ_LABEL_FONT_SIZE_DESKTOP = 'calc(var(--solar-wind-bz-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.0748)'; // EDITABLE Desktop
+  const SOLAR_WIND_BZ_LABEL_FONT_SIZE_MOBILE = 'calc(var(--solar-wind-bz-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.0748)';  // EDITABLE Mobile
+  const SOLAR_WIND_BZ_LABEL_LINE_HEIGHT_DESKTOP = 1.0;     // EDITABLE Desktop
+  const SOLAR_WIND_BZ_LABEL_LINE_HEIGHT_MOBILE = 1.0;      // EDITABLE Mobile
+  const SOLAR_WIND_BZ_LABEL_LETTER_SPACING_DESKTOP = '0.05vw'; // EDITABLE Desktop
+  const SOLAR_WIND_BZ_LABEL_LETTER_SPACING_MOBILE = '0.05vw';  // EDITABLE Mobile
+  const SOLAR_WIND_BZ_LABEL_OFFSET_Y_DESKTOP = '0vw';      // EDITABLE Desktop
+  const SOLAR_WIND_BZ_LABEL_OFFSET_Y_MOBILE = '0vw';       // EDITABLE Mobile
+  const SOLAR_WIND_BZ_GAP_LABEL_TO_CLASS_DESKTOP = 'calc(var(--solar-wind-bz-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02125)'; // EDITABLE Desktop
+  const SOLAR_WIND_BZ_GAP_LABEL_TO_CLASS_MOBILE = 'calc(var(--solar-wind-bz-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02125)';  // EDITABLE Mobile
+
+  const SOLAR_WIND_BZ_CLASS_FONT_FAMILY = "'euro-bold', sans-serif"; // EDITABLE
+  const SOLAR_WIND_BZ_CLASS_FONT_SIZE_DESKTOP = 'calc(var(--solar-wind-bz-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.2601)'; // EDITABLE Desktop
+  const SOLAR_WIND_BZ_CLASS_FONT_SIZE_MOBILE = 'calc(var(--solar-wind-bz-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.2601)';  // EDITABLE Mobile
+  const SOLAR_WIND_BZ_CLASS_LINE_HEIGHT_DESKTOP = 0.82;    // EDITABLE Desktop
+  const SOLAR_WIND_BZ_CLASS_LINE_HEIGHT_MOBILE = 0.82;     // EDITABLE Mobile
+  const SOLAR_WIND_BZ_CLASS_OFFSET_Y_DESKTOP = '0vw';      // EDITABLE Desktop
+  const SOLAR_WIND_BZ_CLASS_OFFSET_Y_MOBILE = '0vw';       // EDITABLE Mobile
+  const SOLAR_WIND_BZ_GAP_CLASS_TO_VALUE_DESKTOP = 'calc(var(--solar-wind-bz-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.017)'; // EDITABLE Desktop
+  const SOLAR_WIND_BZ_GAP_CLASS_TO_VALUE_MOBILE = 'calc(var(--solar-wind-bz-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.017)';  // EDITABLE Mobile
+
+  const SOLAR_WIND_BZ_UNIT = ' nT';                        // EDITABLE: Unit
+  const SOLAR_WIND_BZ_VALUE_FONT_FAMILY = "'euro-bold', sans-serif"; // EDITABLE
+  const SOLAR_WIND_BZ_VALUE_FONT_SIZE_DESKTOP = 'calc(var(--solar-wind-bz-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1262)'; // EDITABLE Desktop
+  const SOLAR_WIND_BZ_VALUE_FONT_SIZE_MOBILE = 'calc(var(--solar-wind-bz-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1262)';  // EDITABLE Mobile
+  const SOLAR_WIND_BZ_VALUE_LINE_HEIGHT_DESKTOP = 0.92;    // EDITABLE Desktop
+  const SOLAR_WIND_BZ_VALUE_LINE_HEIGHT_MOBILE = 0.92;     // EDITABLE Mobile
+  const SOLAR_WIND_BZ_VALUE_LETTER_SPACING_DESKTOP = '-0.02vw'; // EDITABLE Desktop
+  const SOLAR_WIND_BZ_VALUE_LETTER_SPACING_MOBILE = '-0.04vw';  // EDITABLE Mobile
+  const SOLAR_WIND_BZ_VALUE_OFFSET_Y_DESKTOP = '-.5vw';    // EDITABLE Desktop
+  const SOLAR_WIND_BZ_VALUE_OFFSET_Y_MOBILE = '-.5vw';     // EDITABLE Mobile
+
+  const SOLAR_WIND_BZ_CONTENT_OFFSET_Y_DESKTOP = '0vw';    // EDITABLE Desktop
+  const SOLAR_WIND_BZ_CONTENT_OFFSET_Y_MOBILE = '0vw';     // EDITABLE Mobile
+
+  // Sublabel Below Bz Dial
+  const SOLAR_WIND_BZ_SUBLABEL_ENABLED = true;             // EDITABLE: Enable/disable sublabel
+  const SOLAR_WIND_BZ_SUBLABEL_MODE = 'dynamic';           // EDITABLE: 'dynamic' or 'static'
+  const SOLAR_WIND_BZ_ARROW_MODE = 'trend';                // EDITABLE: 'trend' or 'static'
+  const SOLAR_WIND_BZ_SUBLABEL_TEXT_DESKTOP = 'Magnetic Gate'; // EDITABLE Desktop
+  const SOLAR_WIND_BZ_SUBLABEL_TEXT_MOBILE = 'Magnetic Gate';  // EDITABLE Mobile
+  const SOLAR_WIND_BZ_SUBLABEL_FONT_FAMILY = "var(--sun-label-font-family, 'light', sans-serif)"; // EDITABLE
+  const SOLAR_WIND_BZ_SUBLABEL_FONT_SIZE_DESKTOP = '1.35vw'; // EDITABLE Desktop
+  const SOLAR_WIND_BZ_SUBLABEL_FONT_SIZE_MOBILE = '1.95vw';  // EDITABLE Mobile
+  const SOLAR_WIND_BZ_SUBLABEL_LINE_HEIGHT_DESKTOP = 1.05; // EDITABLE Desktop
+  const SOLAR_WIND_BZ_SUBLABEL_LINE_HEIGHT_MOBILE = 0.8;   // EDITABLE Mobile
+  const SOLAR_WIND_BZ_SUBLABEL_LETTER_SPACING_DESKTOP = '0.04vw'; // EDITABLE Desktop
+  const SOLAR_WIND_BZ_SUBLABEL_LETTER_SPACING_MOBILE = '0.04vw';  // EDITABLE Mobile
+  const SOLAR_WIND_BZ_SUBLABEL_COLOR = 'auto';             // EDITABLE: 'auto' or custom color
+  const SOLAR_WIND_BZ_SUBLABEL_MARGIN_TOP_DESKTOP = '0.6vw'; // EDITABLE Desktop
+  const SOLAR_WIND_BZ_SUBLABEL_MARGIN_TOP_MOBILE = '1.2vw';  // EDITABLE Mobile
+  const SOLAR_WIND_BZ_SUBLABEL_PEAK_MARGIN_TOP_DESKTOP = '1.5vw'; // EDITABLE Desktop
+  const SOLAR_WIND_BZ_SUBLABEL_PEAK_MARGIN_TOP_MOBILE = '3.0vw';  // EDITABLE Mobile
+  const SOLAR_WIND_BZ_SUBLABEL_PEAK_VALUE_MARGIN_TOP_DESKTOP = '0vw'; // EDITABLE Desktop
+  const SOLAR_WIND_BZ_SUBLABEL_PEAK_VALUE_MARGIN_TOP_MOBILE = '1.0vw'; // EDITABLE Mobile
+  const SOLAR_WIND_BZ_SUBLABEL_OFFSET_Y_DESKTOP = '0vw';   // EDITABLE Desktop
+  const SOLAR_WIND_BZ_SUBLABEL_OFFSET_Y_MOBILE = '0vw';    // EDITABLE Mobile
+  const SOLAR_WIND_BZ_SUBLABEL_WIDTH_DESKTOP = '100%';     // EDITABLE Desktop
+  const SOLAR_WIND_BZ_SUBLABEL_WIDTH_MOBILE = '120%';      // EDITABLE Mobile
+  const SOLAR_WIND_BZ_SUBLABEL_MAX_WIDTH_DESKTOP = 'var(--solar-wind-bz-dial-size, var(--celestial-dial-size, 13.5vw))'; // EDITABLE Desktop
+  const SOLAR_WIND_BZ_SUBLABEL_MAX_WIDTH_MOBILE = 'none';  // EDITABLE Mobile
+
+  // Dynamic Impact Strings per Bz Level
+  const SOLAR_WIND_BZ_IMPACT_LEVEL_BZ0_ARROW = 'up';       // EDITABLE: Fallback arrow direction
+  const SOLAR_WIND_BZ_IMPACT_LEVEL_BZ0_TEXT = 'Shield Closed'; // EDITABLE: Situation text
+  const SOLAR_WIND_BZ_IMPACT_LEVEL_BZ1_ARROW = 'down';     // EDITABLE
+  const SOLAR_WIND_BZ_IMPACT_LEVEL_BZ1_TEXT = 'Weak Coupling'; // EDITABLE
+  const SOLAR_WIND_BZ_IMPACT_LEVEL_BZ2_ARROW = 'down';     // EDITABLE
+  const SOLAR_WIND_BZ_IMPACT_LEVEL_BZ2_TEXT = 'Gate Opening'; // EDITABLE
+  const SOLAR_WIND_BZ_IMPACT_LEVEL_BZ3_ARROW = 'down';     // EDITABLE
+  const SOLAR_WIND_BZ_IMPACT_LEVEL_BZ3_TEXT = 'Strong Coupling'; // EDITABLE
+  const SOLAR_WIND_BZ_IMPACT_LEVEL_BZ4_ARROW = 'down';     // EDITABLE
+  const SOLAR_WIND_BZ_IMPACT_LEVEL_BZ4_TEXT = 'Storm Influx'; // EDITABLE
+  const SOLAR_WIND_BZ_IMPACT_LEVEL_BZ5_ARROW = 'down';     // EDITABLE
+  const SOLAR_WIND_BZ_IMPACT_LEVEL_BZ5_TEXT = 'Severe Disruption'; // EDITABLE
+
+  // =========================================================================
+  // --- EDITABLE: Solar Wind Speed (W-Scale) Dial Config (JCV) ---
+  // Positioned directly underneath the Radio Blackout (R-Scale) dial
+  // =========================================================================
+  const SOLAR_WIND_SPEED_DIAL_ENABLED = true;              // EDITABLE: Enable/disable Solar Wind Speed dial
+  const SOLAR_WIND_SPEED_MODE = 'live';                    // EDITABLE: 'live' or 'manual'
+  const SOLAR_WIND_SPEED_CLASS_MANUAL = 'W1';              // EDITABLE: Manual test class: 'W0', 'W1', 'W2', 'W3', 'W4', 'W5'
+  const SOLAR_WIND_SPEED_VALUE_MANUAL = 474;               // EDITABLE: Manual test speed in km/s
+  const SOLAR_WIND_SPEED_PEAK_CLASS_MANUAL = 'W1';         // EDITABLE: Manual test peak class
+  const SOLAR_WIND_SPEED_PEAK_VALUE_MANUAL = 474;          // EDITABLE: Manual test peak value in km/s
+  const SOLAR_WIND_SPEED_CLICK_CYCLES_CLASSES = true;      // EDITABLE: Click/tap to cycle test levels
+  const SOLAR_WIND_SPEED_AUTO_REFRESH_MS = 60000;          // EDITABLE: Polling interval in ms
+
+  // Temperature Colors per Speed Level (JCV)
+  const SOLAR_WIND_SPEED_COLOR_LEVEL_W0 = 55;              // EDITABLE: Level W0 (< 400 km/s / Normal) green
+  const SOLAR_WIND_SPEED_COLOR_LEVEL_W1 = 75;              // EDITABLE: Level W1 (400 - 500 km/s / Elevated) yellow-gold
+  const SOLAR_WIND_SPEED_COLOR_LEVEL_W2 = 85;              // EDITABLE: Level W2 (500 - 600 km/s / Moderate Stream) orange
+  const SOLAR_WIND_SPEED_COLOR_LEVEL_W3 = 95;              // EDITABLE: Level W3 (600 - 700 km/s / High Speed Stream) tomato red
+  const SOLAR_WIND_SPEED_COLOR_LEVEL_W4 = 105;             // EDITABLE: Level W4 (700 - 800 km/s / Severe Gale) vibrant red
+  const SOLAR_WIND_SPEED_COLOR_LEVEL_W5 = -5;              // EDITABLE: Level W5 (>= 800 km/s / Extreme Gale) shocking magenta
+  const SOLAR_WIND_SPEED_COLOR_OVERRIDE = null;            // EDITABLE: Universal color override
+
+  // Level Descriptive Labels (JCV)
+  const SOLAR_WIND_SPEED_LABEL_W0_LINE1 = 'SOLAR';         // EDITABLE: Line 1 label for W0
+  const SOLAR_WIND_SPEED_LABEL_W0_LINE2 = 'WIND';          // EDITABLE: Line 2 label for W0
+  const SOLAR_WIND_SPEED_LABEL_W1_LINE1 = 'ELEVATED';      // EDITABLE: Line 1 label for W1
+  const SOLAR_WIND_SPEED_LABEL_W1_LINE2 = 'WIND';          // EDITABLE: Line 2 label for W1
+  const SOLAR_WIND_SPEED_LABEL_W2_LINE1 = 'FAST';          // EDITABLE: Line 1 label for W2
+  const SOLAR_WIND_SPEED_LABEL_W2_LINE2 = 'STREAM';        // EDITABLE: Line 2 label for W2
+  const SOLAR_WIND_SPEED_LABEL_W3_LINE1 = 'HIGH SPEED';    // EDITABLE: Line 1 label for W3
+  const SOLAR_WIND_SPEED_LABEL_W3_LINE2 = 'STREAM';        // EDITABLE: Line 2 label for W3
+  const SOLAR_WIND_SPEED_LABEL_W4_LINE1 = 'SEVERE';        // EDITABLE: Line 1 label for W4
+  const SOLAR_WIND_SPEED_LABEL_W4_LINE2 = 'GALE';          // EDITABLE: Line 2 label for W4
+  const SOLAR_WIND_SPEED_LABEL_W5_LINE1 = 'EXTREME';       // EDITABLE: Line 1 label for W5
+  const SOLAR_WIND_SPEED_LABEL_W5_LINE2 = 'GALE';          // EDITABLE: Line 2 label for W5
+
+  // Circular Progress Ring & Track (JCV)
+  const SOLAR_WIND_SPEED_START_ANGLE_DEG_DESKTOP = 90;     // EDITABLE Desktop: Arc start angle
+  const SOLAR_WIND_SPEED_START_ANGLE_DEG_MOBILE = 90;      // EDITABLE Mobile: Arc start angle
+  const SOLAR_WIND_SPEED_TRACK_COLOR = 'rgba(255, 255, 255, 0.22)'; // EDITABLE: Track ring color
+  const SOLAR_WIND_SPEED_TRACK_STROKE_WIDTH_DESKTOP = 4.0; // EDITABLE Desktop: SVG track stroke thickness
+  const SOLAR_WIND_SPEED_TRACK_STROKE_WIDTH_MOBILE = 4.0;  // EDITABLE Mobile: SVG track stroke thickness
+  const SOLAR_WIND_SPEED_PROGRESS_STROKE_WIDTH_DESKTOP = 4.0; // EDITABLE Desktop: SVG progress stroke thickness
+  const SOLAR_WIND_SPEED_PROGRESS_STROKE_WIDTH_MOBILE = 4.0;  // EDITABLE Mobile: SVG progress stroke thickness
+  const SOLAR_WIND_SPEED_PEAK_TRACK_STROKE_WIDTH_DESKTOP = 4.0;// EDITABLE Desktop: SVG peak track stroke thickness
+  const SOLAR_WIND_SPEED_PEAK_TRACK_STROKE_WIDTH_MOBILE = 4.0; // EDITABLE Mobile: SVG peak track stroke thickness
+  const SOLAR_WIND_SPEED_PEAK_PROGRESS_STROKE_WIDTH_DESKTOP = 4.0; // EDITABLE Desktop: SVG peak progress stroke thickness
+  const SOLAR_WIND_SPEED_PEAK_PROGRESS_STROKE_WIDTH_MOBILE = 4.0;  // EDITABLE Mobile: SVG peak progress stroke thickness
+  const SOLAR_WIND_SPEED_STROKE_LINECAP = 'round';         // EDITABLE: Arc cap
+  const SOLAR_WIND_SPEED_ANIM_DURATION_S_DESKTOP = 0.8;    // EDITABLE Desktop: Animation duration
+  const SOLAR_WIND_SPEED_ANIM_DURATION_S_MOBILE = 0.8;     // EDITABLE Mobile: Animation duration
+
+  // Dial Frame & Sizing (JCV)
+  const SOLAR_WIND_SPEED_MARGIN_TOP_DESKTOP = '2.0vw';     // EDITABLE Desktop: Gap between upper R dial label and Speed dial
+  const SOLAR_WIND_SPEED_MARGIN_TOP_MOBILE = '4.0vw';      // EDITABLE Mobile: Gap between upper R dial label and Speed dial
+  const SOLAR_WIND_SPEED_DIAL_SIZE_DESKTOP = 'auto';       // EDITABLE Desktop: 'auto' or custom vw
+  const SOLAR_WIND_SPEED_DIAL_SIZE_MOBILE = 'auto';        // EDITABLE Mobile: 'auto' or custom vw
+  const SOLAR_WIND_SPEED_OFFSET_X_DESKTOP = '0vw';         // EDITABLE Desktop: Fine horizontal nudge
+  const SOLAR_WIND_SPEED_OFFSET_X_MOBILE = '0vw';          // EDITABLE Mobile: Fine horizontal nudge
+  const SOLAR_WIND_SPEED_OFFSET_Y_DESKTOP = '0vw';         // EDITABLE Desktop: Fine vertical nudge
+  const SOLAR_WIND_SPEED_OFFSET_Y_MOBILE = '0vw';          // EDITABLE Mobile: Fine vertical nudge
+  const SOLAR_WIND_SPEED_DIAL_BG_COLOR = 'transparent';    // EDITABLE: Dial background
+  const SOLAR_WIND_SPEED_DIAL_INNER_SHADOW = 'inset 0 0 1vw rgba(0, 0, 0, 0.5)'; // EDITABLE: Inner shadow
+
+  // Typography & Text Positioning (JCV)
+  const SOLAR_WIND_SPEED_LABEL_FONT_FAMILY = "'euro', sans-serif"; // EDITABLE: Font family
+  const SOLAR_WIND_SPEED_LABEL_FONT_SIZE_DESKTOP = 'calc(var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.0748)'; // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_LABEL_FONT_SIZE_MOBILE = 'calc(var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.0748)';  // EDITABLE Mobile
+  const SOLAR_WIND_SPEED_LABEL_LINE_HEIGHT_DESKTOP = 1.0;  // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_LABEL_LINE_HEIGHT_MOBILE = 1.0;   // EDITABLE Mobile
+  const SOLAR_WIND_SPEED_LABEL_LETTER_SPACING_DESKTOP = '0.05vw'; // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_LABEL_LETTER_SPACING_MOBILE = '0.05vw';  // EDITABLE Mobile
+  const SOLAR_WIND_SPEED_LABEL_OFFSET_Y_DESKTOP = '0vw';   // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_LABEL_OFFSET_Y_MOBILE = '0vw';    // EDITABLE Mobile
+  const SOLAR_WIND_SPEED_GAP_LABEL_TO_CLASS_DESKTOP = 'calc(var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02125)'; // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_GAP_LABEL_TO_CLASS_MOBILE = 'calc(var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.02125)';  // EDITABLE Mobile
+
+  const SOLAR_WIND_SPEED_CLASS_FONT_FAMILY = "'euro-bold', sans-serif"; // EDITABLE
+  const SOLAR_WIND_SPEED_CLASS_FONT_SIZE_DESKTOP = 'calc(var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.2601)'; // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_CLASS_FONT_SIZE_MOBILE = 'calc(var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.2601)';  // EDITABLE Mobile
+  const SOLAR_WIND_SPEED_CLASS_LINE_HEIGHT_DESKTOP = 0.82; // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_CLASS_LINE_HEIGHT_MOBILE = 0.82;  // EDITABLE Mobile
+  const SOLAR_WIND_SPEED_CLASS_OFFSET_Y_DESKTOP = '0vw';   // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_CLASS_OFFSET_Y_MOBILE = '0vw';    // EDITABLE Mobile
+  const SOLAR_WIND_SPEED_GAP_CLASS_TO_VALUE_DESKTOP = 'calc(var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.017)'; // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_GAP_CLASS_TO_VALUE_MOBILE = 'calc(var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.017)';  // EDITABLE Mobile
+
+  const SOLAR_WIND_SPEED_UNIT = ' km/s';                   // EDITABLE: Unit
+  const SOLAR_WIND_SPEED_VALUE_FONT_FAMILY = "'euro-bold', sans-serif"; // EDITABLE
+  const SOLAR_WIND_SPEED_VALUE_FONT_SIZE_DESKTOP = 'calc(var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1262)'; // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_VALUE_FONT_SIZE_MOBILE = 'calc(var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1262)';  // EDITABLE Mobile
+  const SOLAR_WIND_SPEED_VALUE_LINE_HEIGHT_DESKTOP = 0.92; // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_VALUE_LINE_HEIGHT_MOBILE = 0.92;  // EDITABLE Mobile
+  const SOLAR_WIND_SPEED_VALUE_LETTER_SPACING_DESKTOP = '-0.02vw'; // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_VALUE_LETTER_SPACING_MOBILE = '-0.04vw';  // EDITABLE Mobile
+  const SOLAR_WIND_SPEED_VALUE_OFFSET_Y_DESKTOP = '-.5vw'; // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_VALUE_OFFSET_Y_MOBILE = '-.5vw';  // EDITABLE Mobile
+
+  const SOLAR_WIND_SPEED_CONTENT_OFFSET_Y_DESKTOP = '0vw'; // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_CONTENT_OFFSET_Y_MOBILE = '0vw';  // EDITABLE Mobile
+
+  // Sublabel Below Speed Dial
+  const SOLAR_WIND_SPEED_SUBLABEL_ENABLED = true;          // EDITABLE: Enable/disable sublabel
+  const SOLAR_WIND_SPEED_SUBLABEL_MODE = 'dynamic';        // EDITABLE: 'dynamic' or 'static'
+  const SOLAR_WIND_SPEED_ARROW_MODE = 'trend';             // EDITABLE: 'trend' or 'static'
+  const SOLAR_WIND_SPEED_SUBLABEL_TEXT_DESKTOP = 'Solar Wind'; // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_SUBLABEL_TEXT_MOBILE = 'Solar Wind';  // EDITABLE Mobile
+  const SOLAR_WIND_SPEED_SUBLABEL_FONT_FAMILY = "var(--sun-label-font-family, 'light', sans-serif)"; // EDITABLE
+  const SOLAR_WIND_SPEED_SUBLABEL_FONT_SIZE_DESKTOP = '1.35vw'; // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_SUBLABEL_FONT_SIZE_MOBILE = '1.95vw';  // EDITABLE Mobile
+  const SOLAR_WIND_SPEED_SUBLABEL_LINE_HEIGHT_DESKTOP = 1.05; // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_SUBLABEL_LINE_HEIGHT_MOBILE = 0.8;   // EDITABLE Mobile
+  const SOLAR_WIND_SPEED_SUBLABEL_LETTER_SPACING_DESKTOP = '0.04vw'; // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_SUBLABEL_LETTER_SPACING_MOBILE = '0.04vw';  // EDITABLE Mobile
+  const SOLAR_WIND_SPEED_SUBLABEL_COLOR = 'auto';          // EDITABLE: 'auto' or custom color
+  const SOLAR_WIND_SPEED_SUBLABEL_MARGIN_TOP_DESKTOP = '0.6vw'; // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_SUBLABEL_MARGIN_TOP_MOBILE = '1.2vw';  // EDITABLE Mobile
+  const SOLAR_WIND_SPEED_SUBLABEL_PEAK_MARGIN_TOP_DESKTOP = '1.5vw'; // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_SUBLABEL_PEAK_MARGIN_TOP_MOBILE = '3.0vw';  // EDITABLE Mobile
+  const SOLAR_WIND_SPEED_SUBLABEL_PEAK_VALUE_MARGIN_TOP_DESKTOP = '0vw'; // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_SUBLABEL_PEAK_VALUE_MARGIN_TOP_MOBILE = '1.0vw'; // EDITABLE Mobile
+  const SOLAR_WIND_SPEED_SUBLABEL_OFFSET_Y_DESKTOP = '0vw';// EDITABLE Desktop
+  const SOLAR_WIND_SPEED_SUBLABEL_OFFSET_Y_MOBILE = '0vw'; // EDITABLE Mobile
+  const SOLAR_WIND_SPEED_SUBLABEL_WIDTH_DESKTOP = '100%';  // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_SUBLABEL_WIDTH_MOBILE = '120%';   // EDITABLE Mobile
+  const SOLAR_WIND_SPEED_SUBLABEL_MAX_WIDTH_DESKTOP = 'var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw))'; // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_SUBLABEL_MAX_WIDTH_MOBILE = 'none'; // EDITABLE Mobile
+
+  // Dynamic Impact Strings per Speed Level
+  const SOLAR_WIND_SPEED_IMPACT_LEVEL_W0_ARROW = 'up';     // EDITABLE: Fallback arrow direction
+  const SOLAR_WIND_SPEED_IMPACT_LEVEL_W0_TEXT = 'Wind is Calm'; // EDITABLE: Situation text
+  const SOLAR_WIND_SPEED_IMPACT_LEVEL_W1_ARROW = 'up';     // EDITABLE
+  const SOLAR_WIND_SPEED_IMPACT_LEVEL_W1_TEXT = 'Elevated Flow'; // EDITABLE
+  const SOLAR_WIND_SPEED_IMPACT_LEVEL_W2_ARROW = 'up';     // EDITABLE
+  const SOLAR_WIND_SPEED_IMPACT_LEVEL_W2_TEXT = 'Fast Solar Stream'; // EDITABLE
+  const SOLAR_WIND_SPEED_IMPACT_LEVEL_W3_ARROW = 'up';     // EDITABLE
+  const SOLAR_WIND_SPEED_IMPACT_LEVEL_W3_TEXT = 'High Speed Gale'; // EDITABLE
+  const SOLAR_WIND_SPEED_IMPACT_LEVEL_W4_ARROW = 'up';     // EDITABLE
+  const SOLAR_WIND_SPEED_IMPACT_LEVEL_W4_TEXT = 'Severe Gale'; // EDITABLE
+  const SOLAR_WIND_SPEED_IMPACT_LEVEL_W5_ARROW = 'up';     // EDITABLE
+  const SOLAR_WIND_SPEED_IMPACT_LEVEL_W5_TEXT = 'Extreme Solar Gale'; // EDITABLE
   
   // --- Flanking Duplicate Timezone Dials Config (JCV) ---
   // Duplicates the 1st (Pacific) and 5th (UK) dials down to the Sun/Earth row: [Pacific, Big Sun, Big Earth, UK]
@@ -9936,6 +10219,224 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
       updateGeomagneticStormDial();
     }
 
+    // --- Solar Wind Bz (IMF Gatekeeper) Dial Variables (JCV) ---
+    const isSolarWindBzDialAutoDesktop = !SOLAR_WIND_BZ_DIAL_SIZE_DESKTOP || SOLAR_WIND_BZ_DIAL_SIZE_DESKTOP === 'auto';
+    const isSolarWindBzDialAutoMobile = !SOLAR_WIND_BZ_DIAL_SIZE_MOBILE || SOLAR_WIND_BZ_DIAL_SIZE_MOBILE === 'auto';
+    const solarWindBzDialSizeDesktop = isSolarWindBzDialAutoDesktop ? 'var(--celestial-dial-size-desktop, var(--world-clock-size-desktop))' : SOLAR_WIND_BZ_DIAL_SIZE_DESKTOP;
+    const solarWindBzDialSizeMobile = isSolarWindBzDialAutoMobile ? 'var(--celestial-dial-size-mobile, var(--world-clock-size-mobile))' : SOLAR_WIND_BZ_DIAL_SIZE_MOBILE;
+    const solarWindBzDialSize = (isMobile ? isSolarWindBzDialAutoMobile : isSolarWindBzDialAutoDesktop) ? 'var(--celestial-dial-size, var(--world-clock-size))' : (isMobile ? SOLAR_WIND_BZ_DIAL_SIZE_MOBILE : SOLAR_WIND_BZ_DIAL_SIZE_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-wind-bz-dial-size-desktop', solarWindBzDialSizeDesktop);
+    document.documentElement.style.setProperty('--solar-wind-bz-dial-size-mobile', solarWindBzDialSizeMobile);
+    document.documentElement.style.setProperty('--solar-wind-bz-dial-size', solarWindBzDialSize);
+
+    document.documentElement.style.setProperty('--solar-wind-bz-margin-top-desktop', SOLAR_WIND_BZ_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-margin-top-mobile', SOLAR_WIND_BZ_MARGIN_TOP_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-bz-margin-top', isMobile ? SOLAR_WIND_BZ_MARGIN_TOP_MOBILE : SOLAR_WIND_BZ_MARGIN_TOP_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-wind-bz-offset-x-desktop', SOLAR_WIND_BZ_OFFSET_X_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-offset-x-mobile', SOLAR_WIND_BZ_OFFSET_X_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-bz-offset-x', isMobile ? SOLAR_WIND_BZ_OFFSET_X_MOBILE : SOLAR_WIND_BZ_OFFSET_X_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-wind-bz-offset-y-desktop', SOLAR_WIND_BZ_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-offset-y-mobile', SOLAR_WIND_BZ_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-bz-offset-y', isMobile ? SOLAR_WIND_BZ_OFFSET_Y_MOBILE : SOLAR_WIND_BZ_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-wind-bz-start-angle', `${isMobile ? SOLAR_WIND_BZ_START_ANGLE_DEG_MOBILE : SOLAR_WIND_BZ_START_ANGLE_DEG_DESKTOP}deg`);
+    document.documentElement.style.setProperty('--solar-wind-bz-track-color', SOLAR_WIND_BZ_TRACK_COLOR);
+    document.documentElement.style.setProperty('--solar-wind-bz-track-stroke-width', String(isMobile ? SOLAR_WIND_BZ_TRACK_STROKE_WIDTH_MOBILE : SOLAR_WIND_BZ_TRACK_STROKE_WIDTH_DESKTOP));
+    document.documentElement.style.setProperty('--solar-wind-bz-progress-stroke-width', String(isMobile ? SOLAR_WIND_BZ_PROGRESS_STROKE_WIDTH_MOBILE : SOLAR_WIND_BZ_PROGRESS_STROKE_WIDTH_DESKTOP));
+    document.documentElement.style.setProperty('--solar-wind-bz-peak-track-stroke-width', String(isMobile ? SOLAR_WIND_BZ_PEAK_TRACK_STROKE_WIDTH_MOBILE : SOLAR_WIND_BZ_PEAK_TRACK_STROKE_WIDTH_DESKTOP));
+    document.documentElement.style.setProperty('--solar-wind-bz-peak-progress-stroke-width', String(isMobile ? SOLAR_WIND_BZ_PEAK_PROGRESS_STROKE_WIDTH_MOBILE : SOLAR_WIND_BZ_PEAK_PROGRESS_STROKE_WIDTH_DESKTOP));
+    document.documentElement.style.setProperty('--solar-wind-bz-stroke-linecap', SOLAR_WIND_BZ_STROKE_LINECAP);
+    document.documentElement.style.setProperty('--solar-wind-bz-anim-duration', `${isMobile ? SOLAR_WIND_BZ_ANIM_DURATION_S_MOBILE : SOLAR_WIND_BZ_ANIM_DURATION_S_DESKTOP}s`);
+
+    document.documentElement.style.setProperty('--solar-wind-bz-dial-bg-color', SOLAR_WIND_BZ_DIAL_BG_COLOR);
+    document.documentElement.style.setProperty('--solar-wind-bz-dial-inner-shadow', SOLAR_WIND_BZ_DIAL_INNER_SHADOW);
+
+    document.documentElement.style.setProperty('--solar-wind-bz-content-offset-y-desktop', SOLAR_WIND_BZ_CONTENT_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-content-offset-y-mobile', SOLAR_WIND_BZ_CONTENT_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-bz-content-offset-y', isMobile ? SOLAR_WIND_BZ_CONTENT_OFFSET_Y_MOBILE : SOLAR_WIND_BZ_CONTENT_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-wind-bz-label-font-family', SOLAR_WIND_BZ_LABEL_FONT_FAMILY);
+    document.documentElement.style.setProperty('--solar-wind-bz-label-font-size-desktop', SOLAR_WIND_BZ_LABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-label-font-size-mobile', SOLAR_WIND_BZ_LABEL_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-bz-label-font-size', isMobile ? SOLAR_WIND_BZ_LABEL_FONT_SIZE_MOBILE : SOLAR_WIND_BZ_LABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-label-line-height', String(isMobile ? SOLAR_WIND_BZ_LABEL_LINE_HEIGHT_MOBILE : SOLAR_WIND_BZ_LABEL_LINE_HEIGHT_DESKTOP));
+    document.documentElement.style.setProperty('--solar-wind-bz-label-letter-spacing-desktop', SOLAR_WIND_BZ_LABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-label-letter-spacing-mobile', SOLAR_WIND_BZ_LABEL_LETTER_SPACING_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-bz-label-letter-spacing', isMobile ? SOLAR_WIND_BZ_LABEL_LETTER_SPACING_MOBILE : SOLAR_WIND_BZ_LABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-label-offset-y-desktop', SOLAR_WIND_BZ_LABEL_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-label-offset-y-mobile', SOLAR_WIND_BZ_LABEL_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-bz-label-offset-y', isMobile ? SOLAR_WIND_BZ_LABEL_OFFSET_Y_MOBILE : SOLAR_WIND_BZ_LABEL_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-wind-bz-gap-label-to-class-desktop', SOLAR_WIND_BZ_GAP_LABEL_TO_CLASS_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-gap-label-to-class-mobile', SOLAR_WIND_BZ_GAP_LABEL_TO_CLASS_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-bz-gap-label-to-class', isMobile ? SOLAR_WIND_BZ_GAP_LABEL_TO_CLASS_MOBILE : SOLAR_WIND_BZ_GAP_LABEL_TO_CLASS_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-wind-bz-class-font-family', SOLAR_WIND_BZ_CLASS_FONT_FAMILY);
+    document.documentElement.style.setProperty('--solar-wind-bz-class-font-size-desktop', SOLAR_WIND_BZ_CLASS_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-class-font-size-mobile', SOLAR_WIND_BZ_CLASS_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-bz-class-font-size', isMobile ? SOLAR_WIND_BZ_CLASS_FONT_SIZE_MOBILE : SOLAR_WIND_BZ_CLASS_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-class-line-height', String(isMobile ? SOLAR_WIND_BZ_CLASS_LINE_HEIGHT_MOBILE : SOLAR_WIND_BZ_CLASS_LINE_HEIGHT_DESKTOP));
+    document.documentElement.style.setProperty('--solar-wind-bz-class-offset-y-desktop', SOLAR_WIND_BZ_CLASS_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-class-offset-y-mobile', SOLAR_WIND_BZ_CLASS_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-bz-class-offset-y', isMobile ? SOLAR_WIND_BZ_CLASS_OFFSET_Y_MOBILE : SOLAR_WIND_BZ_CLASS_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-wind-bz-gap-class-to-value-desktop', SOLAR_WIND_BZ_GAP_CLASS_TO_VALUE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-gap-class-to-value-mobile', SOLAR_WIND_BZ_GAP_CLASS_TO_VALUE_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-bz-gap-class-to-value', isMobile ? SOLAR_WIND_BZ_GAP_CLASS_TO_VALUE_MOBILE : SOLAR_WIND_BZ_GAP_CLASS_TO_VALUE_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-wind-bz-value-font-family', SOLAR_WIND_BZ_VALUE_FONT_FAMILY);
+    document.documentElement.style.setProperty('--solar-wind-bz-value-font-size-desktop', SOLAR_WIND_BZ_VALUE_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-value-font-size-mobile', SOLAR_WIND_BZ_VALUE_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-bz-value-font-size', isMobile ? SOLAR_WIND_BZ_VALUE_FONT_SIZE_MOBILE : SOLAR_WIND_BZ_VALUE_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-value-line-height', String(isMobile ? SOLAR_WIND_BZ_VALUE_LINE_HEIGHT_MOBILE : SOLAR_WIND_BZ_VALUE_LINE_HEIGHT_DESKTOP));
+    document.documentElement.style.setProperty('--solar-wind-bz-value-letter-spacing-desktop', SOLAR_WIND_BZ_VALUE_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-value-letter-spacing-mobile', SOLAR_WIND_BZ_VALUE_LETTER_SPACING_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-bz-value-letter-spacing', isMobile ? SOLAR_WIND_BZ_VALUE_LETTER_SPACING_MOBILE : SOLAR_WIND_BZ_VALUE_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-value-offset-y-desktop', SOLAR_WIND_BZ_VALUE_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-value-offset-y-mobile', SOLAR_WIND_BZ_VALUE_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-bz-value-offset-y', isMobile ? SOLAR_WIND_BZ_VALUE_OFFSET_Y_MOBILE : SOLAR_WIND_BZ_VALUE_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-wind-bz-sublabel-font-family', SOLAR_WIND_BZ_SUBLABEL_FONT_FAMILY);
+    document.documentElement.style.setProperty('--solar-wind-bz-sublabel-font-size-desktop', SOLAR_WIND_BZ_SUBLABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-sublabel-font-size-mobile', SOLAR_WIND_BZ_SUBLABEL_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-bz-sublabel-font-size', isMobile ? SOLAR_WIND_BZ_SUBLABEL_FONT_SIZE_MOBILE : SOLAR_WIND_BZ_SUBLABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-sublabel-line-height-desktop', String(SOLAR_WIND_BZ_SUBLABEL_LINE_HEIGHT_DESKTOP));
+    document.documentElement.style.setProperty('--solar-wind-bz-sublabel-line-height-mobile', String(SOLAR_WIND_BZ_SUBLABEL_LINE_HEIGHT_MOBILE));
+    document.documentElement.style.setProperty('--solar-wind-bz-sublabel-line-height', String(isMobile ? SOLAR_WIND_BZ_SUBLABEL_LINE_HEIGHT_MOBILE : SOLAR_WIND_BZ_SUBLABEL_LINE_HEIGHT_DESKTOP));
+    document.documentElement.style.setProperty('--solar-wind-bz-sublabel-letter-spacing-desktop', SOLAR_WIND_BZ_SUBLABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-sublabel-letter-spacing-mobile', SOLAR_WIND_BZ_SUBLABEL_LETTER_SPACING_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-bz-sublabel-letter-spacing', isMobile ? SOLAR_WIND_BZ_SUBLABEL_LETTER_SPACING_MOBILE : SOLAR_WIND_BZ_SUBLABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-sublabel-margin-top-desktop', SOLAR_WIND_BZ_SUBLABEL_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-sublabel-margin-top-mobile', SOLAR_WIND_BZ_SUBLABEL_MARGIN_TOP_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-bz-sublabel-margin-top', isMobile ? SOLAR_WIND_BZ_SUBLABEL_MARGIN_TOP_MOBILE : SOLAR_WIND_BZ_SUBLABEL_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-sublabel-peak-margin-top', isMobile ? SOLAR_WIND_BZ_SUBLABEL_PEAK_MARGIN_TOP_MOBILE : SOLAR_WIND_BZ_SUBLABEL_PEAK_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-sublabel-peak-value-margin-top', isMobile ? SOLAR_WIND_BZ_SUBLABEL_PEAK_VALUE_MARGIN_TOP_MOBILE : SOLAR_WIND_BZ_SUBLABEL_PEAK_VALUE_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-sublabel-offset-y-desktop', SOLAR_WIND_BZ_SUBLABEL_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-sublabel-offset-y-mobile', SOLAR_WIND_BZ_SUBLABEL_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-bz-sublabel-offset-y', isMobile ? SOLAR_WIND_BZ_SUBLABEL_OFFSET_Y_MOBILE : SOLAR_WIND_BZ_SUBLABEL_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-sublabel-width-desktop', SOLAR_WIND_BZ_SUBLABEL_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-sublabel-width-mobile', SOLAR_WIND_BZ_SUBLABEL_WIDTH_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-bz-sublabel-width', isMobile ? SOLAR_WIND_BZ_SUBLABEL_WIDTH_MOBILE : SOLAR_WIND_BZ_SUBLABEL_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-sublabel-max-width-desktop', SOLAR_WIND_BZ_SUBLABEL_MAX_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-bz-sublabel-max-width-mobile', SOLAR_WIND_BZ_SUBLABEL_MAX_WIDTH_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-bz-sublabel-max-width', isMobile ? SOLAR_WIND_BZ_SUBLABEL_MAX_WIDTH_MOBILE : SOLAR_WIND_BZ_SUBLABEL_MAX_WIDTH_DESKTOP);
+
+    if (typeof updateSolarWindBzDial === 'function') {
+      updateSolarWindBzDial();
+    }
+
+    // --- Solar Wind Speed (W-Scale) Dial Variables (JCV) ---
+    const isSolarWindSpeedDialAutoDesktop = !SOLAR_WIND_SPEED_DIAL_SIZE_DESKTOP || SOLAR_WIND_SPEED_DIAL_SIZE_DESKTOP === 'auto';
+    const isSolarWindSpeedDialAutoMobile = !SOLAR_WIND_SPEED_DIAL_SIZE_MOBILE || SOLAR_WIND_SPEED_DIAL_SIZE_MOBILE === 'auto';
+    const solarWindSpeedDialSizeDesktop = isSolarWindSpeedDialAutoDesktop ? 'var(--celestial-dial-size-desktop, var(--world-clock-size-desktop))' : SOLAR_WIND_SPEED_DIAL_SIZE_DESKTOP;
+    const solarWindSpeedDialSizeMobile = isSolarWindSpeedDialAutoMobile ? 'var(--celestial-dial-size-mobile, var(--world-clock-size-mobile))' : SOLAR_WIND_SPEED_DIAL_SIZE_MOBILE;
+    const solarWindSpeedDialSize = (isMobile ? isSolarWindSpeedDialAutoMobile : isSolarWindSpeedDialAutoDesktop) ? 'var(--celestial-dial-size, var(--world-clock-size))' : (isMobile ? SOLAR_WIND_SPEED_DIAL_SIZE_MOBILE : SOLAR_WIND_SPEED_DIAL_SIZE_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-wind-speed-dial-size-desktop', solarWindSpeedDialSizeDesktop);
+    document.documentElement.style.setProperty('--solar-wind-speed-dial-size-mobile', solarWindSpeedDialSizeMobile);
+    document.documentElement.style.setProperty('--solar-wind-speed-dial-size', solarWindSpeedDialSize);
+
+    document.documentElement.style.setProperty('--solar-wind-speed-margin-top-desktop', SOLAR_WIND_SPEED_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-margin-top-mobile', SOLAR_WIND_SPEED_MARGIN_TOP_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-speed-margin-top', isMobile ? SOLAR_WIND_SPEED_MARGIN_TOP_MOBILE : SOLAR_WIND_SPEED_MARGIN_TOP_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-wind-speed-offset-x-desktop', SOLAR_WIND_SPEED_OFFSET_X_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-offset-x-mobile', SOLAR_WIND_SPEED_OFFSET_X_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-speed-offset-x', isMobile ? SOLAR_WIND_SPEED_OFFSET_X_MOBILE : SOLAR_WIND_SPEED_OFFSET_X_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-wind-speed-offset-y-desktop', SOLAR_WIND_SPEED_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-offset-y-mobile', SOLAR_WIND_SPEED_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-speed-offset-y', isMobile ? SOLAR_WIND_SPEED_OFFSET_Y_MOBILE : SOLAR_WIND_SPEED_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-wind-speed-start-angle', `${isMobile ? SOLAR_WIND_SPEED_START_ANGLE_DEG_MOBILE : SOLAR_WIND_SPEED_START_ANGLE_DEG_DESKTOP}deg`);
+    document.documentElement.style.setProperty('--solar-wind-speed-track-color', SOLAR_WIND_SPEED_TRACK_COLOR);
+    document.documentElement.style.setProperty('--solar-wind-speed-track-stroke-width', String(isMobile ? SOLAR_WIND_SPEED_TRACK_STROKE_WIDTH_MOBILE : SOLAR_WIND_SPEED_TRACK_STROKE_WIDTH_DESKTOP));
+    document.documentElement.style.setProperty('--solar-wind-speed-progress-stroke-width', String(isMobile ? SOLAR_WIND_SPEED_PROGRESS_STROKE_WIDTH_MOBILE : SOLAR_WIND_SPEED_PROGRESS_STROKE_WIDTH_DESKTOP));
+    document.documentElement.style.setProperty('--solar-wind-speed-peak-track-stroke-width', String(isMobile ? SOLAR_WIND_SPEED_PEAK_TRACK_STROKE_WIDTH_MOBILE : SOLAR_WIND_SPEED_PEAK_TRACK_STROKE_WIDTH_DESKTOP));
+    document.documentElement.style.setProperty('--solar-wind-speed-peak-progress-stroke-width', String(isMobile ? SOLAR_WIND_SPEED_PEAK_PROGRESS_STROKE_WIDTH_MOBILE : SOLAR_WIND_SPEED_PEAK_PROGRESS_STROKE_WIDTH_DESKTOP));
+    document.documentElement.style.setProperty('--solar-wind-speed-stroke-linecap', SOLAR_WIND_SPEED_STROKE_LINECAP);
+    document.documentElement.style.setProperty('--solar-wind-speed-anim-duration', `${isMobile ? SOLAR_WIND_SPEED_ANIM_DURATION_S_MOBILE : SOLAR_WIND_SPEED_ANIM_DURATION_S_DESKTOP}s`);
+
+    document.documentElement.style.setProperty('--solar-wind-speed-dial-bg-color', SOLAR_WIND_SPEED_DIAL_BG_COLOR);
+    document.documentElement.style.setProperty('--solar-wind-speed-dial-inner-shadow', SOLAR_WIND_SPEED_DIAL_INNER_SHADOW);
+
+    document.documentElement.style.setProperty('--solar-wind-speed-content-offset-y-desktop', SOLAR_WIND_SPEED_CONTENT_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-content-offset-y-mobile', SOLAR_WIND_SPEED_CONTENT_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-speed-content-offset-y', isMobile ? SOLAR_WIND_SPEED_CONTENT_OFFSET_Y_MOBILE : SOLAR_WIND_SPEED_CONTENT_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-wind-speed-label-font-family', SOLAR_WIND_SPEED_LABEL_FONT_FAMILY);
+    document.documentElement.style.setProperty('--solar-wind-speed-label-font-size-desktop', SOLAR_WIND_SPEED_LABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-label-font-size-mobile', SOLAR_WIND_SPEED_LABEL_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-speed-label-font-size', isMobile ? SOLAR_WIND_SPEED_LABEL_FONT_SIZE_MOBILE : SOLAR_WIND_SPEED_LABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-label-line-height', String(isMobile ? SOLAR_WIND_SPEED_LABEL_LINE_HEIGHT_MOBILE : SOLAR_WIND_SPEED_LABEL_LINE_HEIGHT_DESKTOP));
+    document.documentElement.style.setProperty('--solar-wind-speed-label-letter-spacing-desktop', SOLAR_WIND_SPEED_LABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-label-letter-spacing-mobile', SOLAR_WIND_SPEED_LABEL_LETTER_SPACING_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-speed-label-letter-spacing', isMobile ? SOLAR_WIND_SPEED_LABEL_LETTER_SPACING_MOBILE : SOLAR_WIND_SPEED_LABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-label-offset-y-desktop', SOLAR_WIND_SPEED_LABEL_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-label-offset-y-mobile', SOLAR_WIND_SPEED_LABEL_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-speed-label-offset-y', isMobile ? SOLAR_WIND_SPEED_LABEL_OFFSET_Y_MOBILE : SOLAR_WIND_SPEED_LABEL_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-wind-speed-gap-label-to-class-desktop', SOLAR_WIND_SPEED_GAP_LABEL_TO_CLASS_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-gap-label-to-class-mobile', SOLAR_WIND_SPEED_GAP_LABEL_TO_CLASS_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-speed-gap-label-to-class', isMobile ? SOLAR_WIND_SPEED_GAP_LABEL_TO_CLASS_MOBILE : SOLAR_WIND_SPEED_GAP_LABEL_TO_CLASS_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-wind-speed-class-font-family', SOLAR_WIND_SPEED_CLASS_FONT_FAMILY);
+    document.documentElement.style.setProperty('--solar-wind-speed-class-font-size-desktop', SOLAR_WIND_SPEED_CLASS_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-class-font-size-mobile', SOLAR_WIND_SPEED_CLASS_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-speed-class-font-size', isMobile ? SOLAR_WIND_SPEED_CLASS_FONT_SIZE_MOBILE : SOLAR_WIND_SPEED_CLASS_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-class-line-height', String(isMobile ? SOLAR_WIND_SPEED_CLASS_LINE_HEIGHT_MOBILE : SOLAR_WIND_SPEED_CLASS_LINE_HEIGHT_DESKTOP));
+    document.documentElement.style.setProperty('--solar-wind-speed-class-offset-y-desktop', SOLAR_WIND_SPEED_CLASS_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-class-offset-y-mobile', SOLAR_WIND_SPEED_CLASS_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-speed-class-offset-y', isMobile ? SOLAR_WIND_SPEED_CLASS_OFFSET_Y_MOBILE : SOLAR_WIND_SPEED_CLASS_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-wind-speed-gap-class-to-value-desktop', SOLAR_WIND_SPEED_GAP_CLASS_TO_VALUE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-gap-class-to-value-mobile', SOLAR_WIND_SPEED_GAP_CLASS_TO_VALUE_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-speed-gap-class-to-value', isMobile ? SOLAR_WIND_SPEED_GAP_CLASS_TO_VALUE_MOBILE : SOLAR_WIND_SPEED_GAP_CLASS_TO_VALUE_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-wind-speed-value-font-family', SOLAR_WIND_SPEED_VALUE_FONT_FAMILY);
+    document.documentElement.style.setProperty('--solar-wind-speed-value-font-size-desktop', SOLAR_WIND_SPEED_VALUE_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-value-font-size-mobile', SOLAR_WIND_SPEED_VALUE_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-speed-value-font-size', isMobile ? SOLAR_WIND_SPEED_VALUE_FONT_SIZE_MOBILE : SOLAR_WIND_SPEED_VALUE_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-value-line-height', String(isMobile ? SOLAR_WIND_SPEED_VALUE_LINE_HEIGHT_MOBILE : SOLAR_WIND_SPEED_VALUE_LINE_HEIGHT_DESKTOP));
+    document.documentElement.style.setProperty('--solar-wind-speed-value-letter-spacing-desktop', SOLAR_WIND_SPEED_VALUE_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-value-letter-spacing-mobile', SOLAR_WIND_SPEED_VALUE_LETTER_SPACING_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-speed-value-letter-spacing', isMobile ? SOLAR_WIND_SPEED_VALUE_LETTER_SPACING_MOBILE : SOLAR_WIND_SPEED_VALUE_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-value-offset-y-desktop', SOLAR_WIND_SPEED_VALUE_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-value-offset-y-mobile', SOLAR_WIND_SPEED_VALUE_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-speed-value-offset-y', isMobile ? SOLAR_WIND_SPEED_VALUE_OFFSET_Y_MOBILE : SOLAR_WIND_SPEED_VALUE_OFFSET_Y_DESKTOP);
+
+    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-font-family', SOLAR_WIND_SPEED_SUBLABEL_FONT_FAMILY);
+    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-font-size-desktop', SOLAR_WIND_SPEED_SUBLABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-font-size-mobile', SOLAR_WIND_SPEED_SUBLABEL_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-font-size', isMobile ? SOLAR_WIND_SPEED_SUBLABEL_FONT_SIZE_MOBILE : SOLAR_WIND_SPEED_LABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-line-height-desktop', String(SOLAR_WIND_SPEED_SUBLABEL_LINE_HEIGHT_DESKTOP));
+    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-line-height-mobile', String(SOLAR_WIND_SPEED_SUBLABEL_LINE_HEIGHT_MOBILE));
+    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-line-height', String(isMobile ? SOLAR_WIND_SPEED_SUBLABEL_LINE_HEIGHT_MOBILE : SOLAR_WIND_SPEED_SUBLABEL_LINE_HEIGHT_DESKTOP));
+    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-letter-spacing-desktop', SOLAR_WIND_SPEED_SUBLABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-letter-spacing-mobile', SOLAR_WIND_SPEED_SUBLABEL_LETTER_SPACING_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-letter-spacing', isMobile ? SOLAR_WIND_SPEED_SUBLABEL_LETTER_SPACING_MOBILE : SOLAR_WIND_SPEED_SUBLABEL_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-margin-top-desktop', SOLAR_WIND_SPEED_SUBLABEL_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-margin-top-mobile', SOLAR_WIND_SPEED_SUBLABEL_MARGIN_TOP_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-margin-top', isMobile ? SOLAR_WIND_SPEED_SUBLABEL_MARGIN_TOP_MOBILE : SOLAR_WIND_SPEED_SUBLABEL_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-peak-margin-top', isMobile ? SOLAR_WIND_SPEED_SUBLABEL_PEAK_MARGIN_TOP_MOBILE : SOLAR_WIND_SPEED_SUBLABEL_PEAK_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-peak-value-margin-top', isMobile ? SOLAR_WIND_SPEED_SUBLABEL_PEAK_VALUE_MARGIN_TOP_MOBILE : SOLAR_WIND_SPEED_SUBLABEL_PEAK_VALUE_MARGIN_TOP_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-offset-y-desktop', SOLAR_WIND_SPEED_SUBLABEL_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-offset-y-mobile', SOLAR_WIND_SPEED_SUBLABEL_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-offset-y', isMobile ? SOLAR_WIND_SPEED_SUBLABEL_OFFSET_Y_MOBILE : SOLAR_WIND_SPEED_SUBLABEL_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-width-desktop', SOLAR_WIND_SPEED_SUBLABEL_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-width-mobile', SOLAR_WIND_SPEED_SUBLABEL_WIDTH_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-width', isMobile ? SOLAR_WIND_SPEED_SUBLABEL_WIDTH_MOBILE : SOLAR_WIND_SPEED_SUBLABEL_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-max-width-desktop', SOLAR_WIND_SPEED_SUBLABEL_MAX_WIDTH_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-max-width-mobile', SOLAR_WIND_SPEED_SUBLABEL_MAX_WIDTH_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-max-width', isMobile ? SOLAR_WIND_SPEED_SUBLABEL_MAX_WIDTH_MOBILE : SOLAR_WIND_SPEED_SUBLABEL_MAX_WIDTH_DESKTOP);
+
+    if (typeof updateSolarWindSpeedDial === 'function') {
+      updateSolarWindSpeedDial();
+    }
+
     // Common margins & settings
     document.documentElement.style.setProperty('--sun-image-margin-top-desktop', SUN_IMAGE_MARGIN_TOP_DESKTOP);
     document.documentElement.style.setProperty('--sun-image-margin-top-mobile', SUN_IMAGE_MARGIN_TOP_MOBILE);
@@ -10965,7 +11466,7 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1485';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1489';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -16262,13 +16763,86 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
       col.appendChild(sublabel);
     }
 
+    if (SOLAR_WIND_SPEED_DIAL_ENABLED) {
+      const dialSpeed = document.createElement('div');
+      dialSpeed.className = 'world-clock-dial celestial-clock-dial solar-wind-speed-dial';
+      dialSpeed.id = 'solar-wind-speed-dial';
+      const titleTextSpeed = (SOLAR_WIND_SPEED_MODE === 'live') ? 'Live Solar Wind Speed (NOAA DSCOVR/ACE)' : 'Solar Wind Speed (Click to test levels)';
+      dialSpeed.setAttribute('title', titleTextSpeed);
+
+      const initialClassSpeed = (SOLAR_WIND_SPEED_MODE === 'live' && liveSolarWindSpeedData)
+        ? liveSolarWindSpeedData.class
+        : (activeSolarWindSpeedState?.class || SOLAR_WIND_SPEED_CLASS_MANUAL);
+      const initialValSpeed = (SOLAR_WIND_SPEED_MODE === 'live' && liveSolarWindSpeedData)
+        ? liveSolarWindSpeedData.value
+        : (activeSolarWindSpeedState?.value || SOLAR_WIND_SPEED_VALUE_MANUAL);
+      const labelsSpeed = getSolarWindSpeedLabels(initialClassSpeed);
+      const displayValSpeed = formatSolarWindSpeedValue(initialValSpeed);
+
+      dialSpeed.innerHTML = `
+        <svg class="solar-wind-speed-svg clock-timer-svg" viewBox="-5 -5 110 110">
+          <!-- Main Dial (Current) -->
+          <circle class="solar-wind-speed-track countdown-track" cx="50" cy="50" r="46" fill="none" />
+          <circle class="solar-wind-speed-progress countdown-progress" cx="50" cy="50" r="46" fill="none" />
+          
+          <!-- Peak Dial (Outer) -->
+          <circle class="solar-wind-speed-peak-track countdown-track" cx="50" cy="50" r="51" fill="none" style="stroke-opacity: 0.2; stroke-width: var(--clock-grid-stroke-width, 4);" />
+          <circle class="solar-wind-speed-peak-progress countdown-progress" cx="50" cy="50" r="51" fill="none" style="stroke-dasharray: 320.442;" />
+        </svg>
+        <div class="solar-wind-speed-content">
+          <div class="solar-wind-speed-label">
+            <span class="solar-wind-speed-label-line1">${labelsSpeed.line1}</span>
+            <span class="solar-wind-speed-label-line2">${labelsSpeed.line2}</span>
+          </div>
+          <div class="solar-wind-speed-class">${initialClassSpeed}</div>
+          <div class="solar-wind-speed-value">${displayValSpeed}</div>
+        </div>
+      `;
+
+      if (SOLAR_WIND_SPEED_CLICK_CYCLES_CLASSES) {
+        dialSpeed.addEventListener('click', handleSolarWindSpeedDialClick);
+      }
+
+      col.appendChild(dialSpeed);
+
+      if (SOLAR_WIND_SPEED_SUBLABEL_ENABLED) {
+        const sublabelSpeed = document.createElement('div');
+        sublabelSpeed.className = 'world-clock-label celestial-clock-label solar-wind-speed-sublabel';
+        sublabelSpeed.id = 'solar-wind-speed-sublabel';
+        const impactSpeed = getSolarWindSpeedImpact(initialClassSpeed, currentSolarWindSpeedTrend);
+        let innerContentSpeed = '';
+        if (SOLAR_WIND_SPEED_SUBLABEL_MODE === 'dynamic') {
+          const baseHtmlSpeed = formatImpactSublabelHtml(impactSpeed.arrow, impactSpeed.text);
+          const initialColorSpeed = getSolarWindSpeedLevelColor(initialClassSpeed);
+          const formattedPeakVal = formatSolarWindSpeedValue(SOLAR_WIND_SPEED_PEAK_VALUE_MANUAL);
+          const line2TextSpeed = `PEAK ${initialClassSpeed}<br><span style="display:inline-block; margin-top: var(--solar-wind-speed-sublabel-peak-value-margin-top, 0vw);">${formattedPeakVal}</span>`;
+          innerContentSpeed = `<br>${baseHtmlSpeed}<br><span style="display: inline-block; margin-top: var(--solar-wind-speed-sublabel-peak-margin-top, 0vw); font-family: 'euro-bold', sans-serif; color: ${initialColorSpeed};">${line2TextSpeed}</span>`;
+        } else {
+          innerContentSpeed = (isMobile ? SOLAR_WIND_SPEED_SUBLABEL_TEXT_MOBILE : SOLAR_WIND_SPEED_SUBLABEL_TEXT_DESKTOP);
+        }
+        sublabelSpeed.innerHTML = innerContentSpeed;
+        if (SOLAR_WIND_SPEED_SUBLABEL_COLOR === 'auto') {
+          sublabelSpeed.style.color = getSolarWindSpeedLevelColor(initialClassSpeed);
+        }
+        col.appendChild(sublabelSpeed);
+      }
+    }
+
     if (RADIO_BLACKOUT_MODE === 'live' && !radioBlackoutLiveTimer) {
       fetchLiveRadioBlackoutData();
       radioBlackoutLiveTimer = setInterval(fetchLiveRadioBlackoutData, RADIO_BLACKOUT_AUTO_REFRESH_MS);
     }
 
+    if (SOLAR_WIND_SPEED_MODE === 'live' && !solarWindSpeedLiveTimer) {
+      fetchLiveSolarWindSpeedData();
+      solarWindSpeedLiveTimer = setInterval(fetchLiveSolarWindSpeedData, SOLAR_WIND_SPEED_AUTO_REFRESH_MS);
+    }
+
     requestAnimationFrame(() => {
       updateRadioBlackoutDial();
+      if (SOLAR_WIND_SPEED_DIAL_ENABLED) {
+        updateSolarWindSpeedDial();
+      }
     });
 
     return col;
@@ -16675,17 +17249,646 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
       col.appendChild(sublabel);
     }
 
+    if (SOLAR_WIND_BZ_DIAL_ENABLED) {
+      const dialBz = document.createElement('div');
+      dialBz.className = 'world-clock-dial celestial-clock-dial solar-wind-bz-dial';
+      dialBz.id = 'solar-wind-bz-dial';
+      const titleTextBz = (SOLAR_WIND_BZ_MODE === 'live') ? 'Live IMF Bz Gatekeeper Scale (NOAA SWPC)' : 'IMF Bz Scale (Click to test levels)';
+      dialBz.setAttribute('title', titleTextBz);
+
+      const initialClassBz = (SOLAR_WIND_BZ_MODE === 'live' && liveSolarWindBzData)
+        ? liveSolarWindBzData.class
+        : (activeSolarWindBzState?.class || SOLAR_WIND_BZ_CLASS_MANUAL);
+      const initialValBz = (SOLAR_WIND_BZ_MODE === 'live' && liveSolarWindBzData)
+        ? liveSolarWindBzData.value
+        : (activeSolarWindBzState?.value || SOLAR_WIND_BZ_VALUE_MANUAL);
+      const labelsBz = getSolarWindBzLabels(initialClassBz);
+      const displayValBz = formatSolarWindBzValue(initialValBz);
+
+      dialBz.innerHTML = `
+        <svg class="solar-wind-bz-svg clock-timer-svg" viewBox="-5 -5 110 110">
+          <!-- Main Dial (Current) -->
+          <circle class="solar-wind-bz-track countdown-track" cx="50" cy="50" r="46" fill="none" />
+          <circle class="solar-wind-bz-progress countdown-progress" cx="50" cy="50" r="46" fill="none" />
+          
+          <!-- Peak Dial (Outer) -->
+          <circle class="solar-wind-bz-peak-track countdown-track" cx="50" cy="50" r="51" fill="none" style="stroke-opacity: 0.2; stroke-width: var(--clock-grid-stroke-width, 4);" />
+          <circle class="solar-wind-bz-peak-progress countdown-progress" cx="50" cy="50" r="51" fill="none" style="stroke-dasharray: 320.442;" />
+        </svg>
+        <div class="solar-wind-bz-content">
+          <div class="solar-wind-bz-label">
+            <span class="solar-wind-bz-label-line1">${labelsBz.line1}</span>
+            <span class="solar-wind-bz-label-line2">${labelsBz.line2}</span>
+          </div>
+          <div class="solar-wind-bz-class">${initialClassBz}</div>
+          <div class="solar-wind-bz-value">${displayValBz}</div>
+        </div>
+      `;
+
+      if (SOLAR_WIND_BZ_CLICK_CYCLES_CLASSES) {
+        dialBz.addEventListener('click', handleSolarWindBzDialClick);
+      }
+
+      col.appendChild(dialBz);
+
+      if (SOLAR_WIND_BZ_SUBLABEL_ENABLED) {
+        const sublabelBz = document.createElement('div');
+        sublabelBz.className = 'world-clock-label celestial-clock-label solar-wind-bz-sublabel';
+        sublabelBz.id = 'solar-wind-bz-sublabel';
+        const impactBz = getSolarWindBzImpact(initialClassBz, currentSolarWindBzTrend);
+        let innerContentBz = '';
+        if (SOLAR_WIND_BZ_SUBLABEL_MODE === 'dynamic') {
+          const baseHtmlBz = formatImpactSublabelHtml(impactBz.arrow, impactBz.text);
+          const initialColorBz = getSolarWindBzLevelColor(initialClassBz);
+          const formattedPeakVal = formatSolarWindBzValue(SOLAR_WIND_BZ_PEAK_VALUE_MANUAL);
+          const line2TextBz = `PEAK ${initialClassBz}<br><span style="display:inline-block; margin-top: var(--solar-wind-bz-sublabel-peak-value-margin-top, 0vw);">${formattedPeakVal}</span>`;
+          innerContentBz = `<br>${baseHtmlBz}<br><span style="display: inline-block; margin-top: var(--solar-wind-bz-sublabel-peak-margin-top, 0vw); font-family: 'euro-bold', sans-serif; color: ${initialColorBz};">${line2TextBz}</span>`;
+        } else {
+          innerContentBz = (isMobile ? SOLAR_WIND_BZ_SUBLABEL_TEXT_MOBILE : SOLAR_WIND_BZ_SUBLABEL_TEXT_DESKTOP);
+        }
+        sublabelBz.innerHTML = innerContentBz;
+        if (SOLAR_WIND_BZ_SUBLABEL_COLOR === 'auto') {
+          sublabelBz.style.color = getSolarWindBzLevelColor(initialClassBz);
+        }
+        col.appendChild(sublabelBz);
+      }
+    }
+
     if (GEOMAGNETIC_STORM_MODE === 'live' && !geomagneticStormLiveTimer) {
       fetchLiveGeomagneticStormData();
       geomagneticStormLiveTimer = setInterval(fetchLiveGeomagneticStormData, GEOMAGNETIC_STORM_AUTO_REFRESH_MS);
     }
 
+    if (SOLAR_WIND_BZ_MODE === 'live' && !solarWindBzLiveTimer) {
+      fetchLiveSolarWindBzData();
+      solarWindBzLiveTimer = setInterval(fetchLiveSolarWindBzData, SOLAR_WIND_BZ_AUTO_REFRESH_MS);
+    }
+
     requestAnimationFrame(() => {
       updateGeomagneticStormDial();
+      if (SOLAR_WIND_BZ_DIAL_ENABLED) {
+        updateSolarWindBzDial();
+      }
     });
 
     return col;
   }
+
+  /* --- Solar Wind Bz (IMF Gatekeeper) Component --- */
+  const SOLAR_WIND_BZ_TEST_LEVELS = [
+    { class: 'BZ0', value: 1.2, peakClass: 'BZ0', peakValue: 1.2 },
+    { class: 'BZ1', value: -3.5, peakClass: 'BZ1', peakValue: -4.0 },
+    { class: 'BZ2', value: -7.8, peakClass: 'BZ2', peakValue: -8.5 },
+    { class: 'BZ3', value: -12.4, peakClass: 'BZ3', peakValue: -14.0 },
+    { class: 'BZ4', value: -18.2, peakClass: 'BZ4', peakValue: -19.5 },
+    { class: 'BZ5', value: -26.0, peakClass: 'BZ5', peakValue: -28.0 }
+  ];
+  let currentSolarWindBzTestIndex = 0;
+  let activeSolarWindBzState = (SOLAR_WIND_BZ_MODE === 'live') ? null : { class: SOLAR_WIND_BZ_CLASS_MANUAL, value: SOLAR_WIND_BZ_VALUE_MANUAL, peakClass: SOLAR_WIND_BZ_PEAK_CLASS_MANUAL, peakValue: SOLAR_WIND_BZ_PEAK_VALUE_MANUAL };
+  let liveSolarWindBzData = null;
+  let currentSolarWindBzTrend = 'up';
+  let solarWindBzLiveTimer = null;
+
+  function getSolarWindBzImpact(bzClass, trendDir) {
+    const upper = String(bzClass || 'BZ0').toUpperCase();
+    let defaultArrow = 'up';
+    let text = 'Shield Closed';
+    switch (upper) {
+      case 'BZ0': defaultArrow = SOLAR_WIND_BZ_IMPACT_LEVEL_BZ0_ARROW; text = SOLAR_WIND_BZ_IMPACT_LEVEL_BZ0_TEXT; break;
+      case 'BZ1': defaultArrow = SOLAR_WIND_BZ_IMPACT_LEVEL_BZ1_ARROW; text = SOLAR_WIND_BZ_IMPACT_LEVEL_BZ1_TEXT; break;
+      case 'BZ2': defaultArrow = SOLAR_WIND_BZ_IMPACT_LEVEL_BZ2_ARROW; text = SOLAR_WIND_BZ_IMPACT_LEVEL_BZ2_TEXT; break;
+      case 'BZ3': defaultArrow = SOLAR_WIND_BZ_IMPACT_LEVEL_BZ3_ARROW; text = SOLAR_WIND_BZ_IMPACT_LEVEL_BZ3_TEXT; break;
+      case 'BZ4': defaultArrow = SOLAR_WIND_BZ_IMPACT_LEVEL_BZ4_ARROW; text = SOLAR_WIND_BZ_IMPACT_LEVEL_BZ4_TEXT; break;
+      case 'BZ5': defaultArrow = SOLAR_WIND_BZ_IMPACT_LEVEL_BZ5_ARROW; text = SOLAR_WIND_BZ_IMPACT_LEVEL_BZ5_TEXT; break;
+      default:  defaultArrow = 'up'; text = 'Shield Closed'; break;
+    }
+    const arrow = (SOLAR_WIND_BZ_ARROW_MODE === 'trend')
+      ? (trendDir || currentSolarWindBzTrend || defaultArrow)
+      : defaultArrow;
+    return { arrow, text };
+  }
+
+  function getSolarWindBzLabels(bzClass) {
+    const upper = String(bzClass || 'BZ0').toUpperCase();
+    switch (upper) {
+      case 'BZ0': return { line1: SOLAR_WIND_BZ_LABEL_BZ0_LINE1, line2: SOLAR_WIND_BZ_LABEL_BZ0_LINE2 };
+      case 'BZ1': return { line1: SOLAR_WIND_BZ_LABEL_BZ1_LINE1, line2: SOLAR_WIND_BZ_LABEL_BZ1_LINE2 };
+      case 'BZ2': return { line1: SOLAR_WIND_BZ_LABEL_BZ2_LINE1, line2: SOLAR_WIND_BZ_LABEL_BZ2_LINE2 };
+      case 'BZ3': return { line1: SOLAR_WIND_BZ_LABEL_BZ3_LINE1, line2: SOLAR_WIND_BZ_LABEL_BZ3_LINE2 };
+      case 'BZ4': return { line1: SOLAR_WIND_BZ_LABEL_BZ4_LINE1, line2: SOLAR_WIND_BZ_LABEL_BZ4_LINE2 };
+      case 'BZ5': return { line1: SOLAR_WIND_BZ_LABEL_BZ5_LINE1, line2: SOLAR_WIND_BZ_LABEL_BZ5_LINE2 };
+      default:  return { line1: 'IMF BZ', line2: 'NORTH' };
+    }
+  }
+
+  function getSolarWindBzLevelColor(bzClass) {
+    if (SOLAR_WIND_BZ_COLOR_OVERRIDE !== null && SOLAR_WIND_BZ_COLOR_OVERRIDE !== undefined) {
+      if (typeof SOLAR_WIND_BZ_COLOR_OVERRIDE === 'number') {
+        return tempToColor(SOLAR_WIND_BZ_COLOR_OVERRIDE) || 'hsl(120, 100%, 50%)';
+      }
+      return SOLAR_WIND_BZ_COLOR_OVERRIDE;
+    }
+    const upper = String(bzClass || 'BZ0').toUpperCase();
+    let setting;
+    switch (upper) {
+      case 'BZ0': setting = SOLAR_WIND_BZ_COLOR_LEVEL_BZ0; break;
+      case 'BZ1': setting = SOLAR_WIND_BZ_COLOR_LEVEL_BZ1; break;
+      case 'BZ2': setting = SOLAR_WIND_BZ_COLOR_LEVEL_BZ2; break;
+      case 'BZ3': setting = SOLAR_WIND_BZ_COLOR_LEVEL_BZ3; break;
+      case 'BZ4': setting = SOLAR_WIND_BZ_COLOR_LEVEL_BZ4; break;
+      case 'BZ5': setting = SOLAR_WIND_BZ_COLOR_LEVEL_BZ5; break;
+      default:  setting = SOLAR_WIND_BZ_COLOR_LEVEL_BZ0; break;
+    }
+    if (typeof setting === 'number') {
+      return tempToColor(setting) || 'hsl(120, 100%, 50%)';
+    }
+    return setting || 'hsl(120, 100%, 50%)';
+  }
+
+  function formatSolarWindBzValue(val) {
+    const num = parseFloat(val) || 0.0;
+    const sign = num > 0 ? '+' : (num < 0 ? '-' : '');
+    const absStr = Math.abs(num).toFixed(1);
+    return `${sign}${absStr}${SOLAR_WIND_BZ_UNIT}`;
+  }
+
+  function calculateSolarWindBzFraction(bzClass, bzVal) {
+    const cls = String(bzClass || 'BZ0').toUpperCase();
+    const val = parseFloat(bzVal) || 0.0;
+    if (cls === 'BZ0' || val >= 0) {
+      return 0.025;
+    }
+    const mag = Math.abs(val);
+    const ranges = {
+      BZ1: { min: 0.16, max: 0.33, valMin: 0.0, valMax: 5.0 },
+      BZ2: { min: 0.33, max: 0.50, valMin: 5.0, valMax: 10.0 },
+      BZ3: { min: 0.50, max: 0.67, valMin: 10.0, valMax: 15.0 },
+      BZ4: { min: 0.67, max: 0.84, valMin: 15.0, valMax: 20.0 },
+      BZ5: { min: 0.84, max: 1.00, valMin: 20.0, valMax: 30.0 }
+    };
+    const range = ranges[cls] || ranges['BZ1'];
+    const span = range.valMax - range.valMin;
+    const normalized = span > 0 ? Math.max(0, Math.min(1.0, (mag - range.valMin) / span)) : 0.0;
+    return range.min + (normalized * (range.max - range.min));
+  }
+
+  async function updateSolarWindBzDial() {
+    const dial = document.getElementById('solar-wind-bz-dial');
+    if (!dial) return;
+
+    let bzClass = 'BZ0';
+    let bzValue = 1.2;
+    let dailyPeakClass = 'BZ0';
+    let dailyPeakValue = 1.2;
+
+    if (activeSolarWindBzState) {
+      bzClass = activeSolarWindBzState.class;
+      bzValue = activeSolarWindBzState.value;
+      dailyPeakClass = activeSolarWindBzState.peakClass || SOLAR_WIND_BZ_PEAK_CLASS_MANUAL;
+      dailyPeakValue = activeSolarWindBzState.peakValue || SOLAR_WIND_BZ_PEAK_VALUE_MANUAL;
+    } else if (SOLAR_WIND_BZ_MODE === 'live' && liveSolarWindBzData) {
+      bzClass = liveSolarWindBzData.class;
+      bzValue = liveSolarWindBzData.value;
+      dailyPeakClass = liveSolarWindBzData.peakClass || bzClass;
+      dailyPeakValue = liveSolarWindBzData.peakValue || bzValue;
+    } else {
+      bzClass = SOLAR_WIND_BZ_CLASS_MANUAL;
+      bzValue = SOLAR_WIND_BZ_VALUE_MANUAL;
+      dailyPeakClass = SOLAR_WIND_BZ_PEAK_CLASS_MANUAL;
+      dailyPeakValue = SOLAR_WIND_BZ_PEAK_VALUE_MANUAL;
+    }
+
+    const labels = getSolarWindBzLabels(bzClass);
+    const color = getSolarWindBzLevelColor(bzClass);
+    const fraction = calculateSolarWindBzFraction(bzClass, bzValue);
+
+    let dailyPeakColor = getSolarWindBzLevelColor(dailyPeakClass);
+    let dailyPeakFraction = calculateSolarWindBzFraction(dailyPeakClass, dailyPeakValue);
+    const isLive = SOLAR_WIND_BZ_MODE === 'live' && !activeSolarWindBzState;
+
+    if (isLive) {
+      try {
+        if (window.todaySkyRecord && window.todaySkyRecord.pk_bz_cls) {
+          dailyPeakClass = String(window.todaySkyRecord.pk_bz_cls).trim();
+          dailyPeakValue = (typeof window.todaySkyRecord.pk_bz_val !== 'undefined') ? window.todaySkyRecord.pk_bz_val : 1.2;
+          dailyPeakColor = getSolarWindBzLevelColor(dailyPeakClass);
+          dailyPeakFraction = calculateSolarWindBzFraction(dailyPeakClass, dailyPeakValue);
+
+          if (liveSolarWindBzData && fraction > dailyPeakFraction) {
+            dailyPeakFraction = fraction;
+            dailyPeakColor = color;
+            dailyPeakClass = bzClass;
+            dailyPeakValue = bzValue;
+            window.todaySkyRecord.pk_bz_cls = bzClass;
+            window.todaySkyRecord.pk_bz_val = bzValue;
+          }
+        } else if (liveSolarWindBzData) {
+          if (!window.todaySkyRecord) window.todaySkyRecord = {};
+          window.todaySkyRecord.pk_bz_cls = bzClass;
+          window.todaySkyRecord.pk_bz_val = bzValue;
+        }
+      } catch (e) {
+        console.log("Failed to parse Bz Peak from Sky DB", e);
+      }
+    }
+
+    const circumference = 289.027;
+    const strokeOffset = circumference * (1 - fraction);
+    const peakCircumference = 320.442;
+    const peakStrokeOffset = peakCircumference * (1 - dailyPeakFraction);
+
+    const line1El = dial.querySelector('.solar-wind-bz-label-line1');
+    const line2El = dial.querySelector('.solar-wind-bz-label-line2');
+    const classEl = dial.querySelector('.solar-wind-bz-class');
+    const valueEl = dial.querySelector('.solar-wind-bz-value');
+
+    if (line1El && line1El.textContent !== labels.line1) line1El.textContent = labels.line1;
+    if (line2El && line2El.textContent !== labels.line2) line2El.textContent = labels.line2;
+    if (classEl && classEl.textContent !== bzClass) classEl.textContent = bzClass;
+    const displayVal = formatSolarWindBzValue(bzValue);
+    if (valueEl && valueEl.textContent !== displayVal) valueEl.textContent = displayVal;
+
+    dial.style.setProperty('--solar-wind-bz-current-color', color);
+    dial.style.setProperty('--solar-wind-bz-peak-color', dailyPeakColor);
+    dial.style.setProperty('--solar-wind-bz-stroke-offset', strokeOffset.toFixed(2));
+    dial.style.setProperty('--solar-wind-bz-peak-stroke-offset', peakStrokeOffset.toFixed(2));
+
+    if (SOLAR_WIND_BZ_SUBLABEL_ENABLED) {
+      const sublabelEl = document.getElementById('solar-wind-bz-sublabel');
+      if (sublabelEl) {
+        if (SOLAR_WIND_BZ_SUBLABEL_MODE === 'dynamic') {
+          const impact = getSolarWindBzImpact(bzClass, currentSolarWindBzTrend);
+          let baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
+          if (SOLAR_WIND_BZ_SUBLABEL_COLOR === 'auto') {
+            baseHtml = `<span style="color: ${color};">${baseHtml}</span>`;
+          }
+          const formattedPeakVal = formatSolarWindBzValue(dailyPeakValue);
+          const line2Text = `PEAK ${dailyPeakClass}<br><span style="display:inline-block; margin-top: var(--solar-wind-bz-sublabel-peak-value-margin-top, 0vw);">${formattedPeakVal}</span>`;
+          sublabelEl.innerHTML = `<br>${baseHtml}<br><span style="display: inline-block; margin-top: var(--solar-wind-bz-sublabel-peak-margin-top, 0vw); font-family: 'euro-bold', sans-serif; color: ${dailyPeakColor};">${line2Text}</span>`;
+        }
+        if (SOLAR_WIND_BZ_SUBLABEL_COLOR === 'auto') {
+          sublabelEl.style.color = color;
+        }
+        sublabelEl.style.opacity = '1';
+      }
+    }
+  }
+
+  function handleSolarWindBzDialClick(e) {
+    if (e) e.stopPropagation();
+    if (SOLAR_WIND_BZ_MODE === 'live') {
+      if (!SOLAR_WIND_BZ_CLICK_CYCLES_CLASSES) {
+        fetchLiveSolarWindBzData();
+        return;
+      }
+      currentSolarWindBzTestIndex = (currentSolarWindBzTestIndex + 1) % (SOLAR_WIND_BZ_TEST_LEVELS.length + 1);
+      if (currentSolarWindBzTestIndex === SOLAR_WIND_BZ_TEST_LEVELS.length) {
+        activeSolarWindBzState = null;
+        if (liveSolarWindBzData) {
+          currentSolarWindBzTrend = liveSolarWindBzData.trend || 'up';
+          updateSolarWindBzDial();
+        }
+        fetchLiveSolarWindBzData();
+      } else {
+        activeSolarWindBzState = SOLAR_WIND_BZ_TEST_LEVELS[currentSolarWindBzTestIndex];
+        updateSolarWindBzDial();
+      }
+      return;
+    }
+    currentSolarWindBzTestIndex = (currentSolarWindBzTestIndex + 1) % SOLAR_WIND_BZ_TEST_LEVELS.length;
+    activeSolarWindBzState = SOLAR_WIND_BZ_TEST_LEVELS[currentSolarWindBzTestIndex];
+    updateSolarWindBzDial();
+  }
+
+  async function fetchLiveSolarWindBzData() {
+    if (SOLAR_WIND_BZ_MODE !== 'live') return;
+    try {
+      const response = await fetch('https://services.swpc.noaa.gov/products/summary/solar-wind-mag-field.json', { cache: 'no-store' });
+      if (!response.ok) return;
+      const data = await response.json();
+      if (!Array.isArray(data) || data.length === 0) return;
+      const latest = data[0];
+      if (!latest || typeof latest.bz_gsm === 'undefined') return;
+
+      const bzVal = parseFloat(latest.bz_gsm);
+      let cls = 'BZ0';
+      if (bzVal >= 0) {
+        cls = 'BZ0';
+      } else if (bzVal >= -5) {
+        cls = 'BZ1';
+      } else if (bzVal >= -10) {
+        cls = 'BZ2';
+      } else if (bzVal >= -15) {
+        cls = 'BZ3';
+      } else if (bzVal >= -20) {
+        cls = 'BZ4';
+      } else {
+        cls = 'BZ5';
+      }
+
+      const trend = bzVal >= 0 ? 'up' : 'down';
+      currentSolarWindBzTrend = trend;
+
+      liveSolarWindBzData = {
+        class: cls,
+        value: parseFloat(bzVal.toFixed(1)),
+        trend: trend
+      };
+      updateSolarWindBzDial();
+    } catch (err) {
+      console.warn('Unable to fetch live solar wind Bz data from NOAA SWPC:', err);
+    }
+  }
+
+  window.updateSolarWindBzDial = updateSolarWindBzDial;
+  window.updateSolarWindBzData = function(data) {
+    if (!data) return;
+    activeSolarWindBzState = {
+      class: data.class || (activeSolarWindBzState ? activeSolarWindBzState.class : SOLAR_WIND_BZ_CLASS_MANUAL),
+      value: (typeof data.value !== 'undefined') ? data.value : (activeSolarWindBzState ? activeSolarWindBzState.value : SOLAR_WIND_BZ_VALUE_MANUAL),
+      peakClass: data.peakClass || (activeSolarWindBzState ? activeSolarWindBzState.peakClass : SOLAR_WIND_BZ_PEAK_CLASS_MANUAL),
+      peakValue: (typeof data.peakValue !== 'undefined') ? data.peakValue : (activeSolarWindBzState ? activeSolarWindBzState.peakValue : SOLAR_WIND_BZ_PEAK_VALUE_MANUAL)
+    };
+    if (data.trend) currentSolarWindBzTrend = data.trend;
+    updateSolarWindBzDial();
+  };
+
+  /* --- Solar Wind Speed (W-Scale / The Energy Level) Component --- */
+  const SOLAR_WIND_SPEED_TEST_LEVELS = [
+    { class: 'W0', value: 360, peakClass: 'W0', peakValue: 380 },
+    { class: 'W1', value: 474, peakClass: 'W1', peakValue: 490 },
+    { class: 'W2', value: 550, peakClass: 'W2', peakValue: 580 },
+    { class: 'W3', value: 650, peakClass: 'W3', peakValue: 680 },
+    { class: 'W4', value: 740, peakClass: 'W4', peakValue: 770 },
+    { class: 'W5', value: 860, peakClass: 'W5', peakValue: 920 }
+  ];
+  let currentSolarWindSpeedTestIndex = 1; // Default W1 474 km/s
+  let activeSolarWindSpeedState = (SOLAR_WIND_SPEED_MODE === 'live') ? null : { class: SOLAR_WIND_SPEED_CLASS_MANUAL, value: SOLAR_WIND_SPEED_VALUE_MANUAL, peakClass: SOLAR_WIND_SPEED_PEAK_CLASS_MANUAL, peakValue: SOLAR_WIND_SPEED_PEAK_VALUE_MANUAL };
+  let liveSolarWindSpeedData = null;
+  let currentSolarWindSpeedTrend = 'up';
+  let solarWindSpeedLiveTimer = null;
+
+  function getSolarWindSpeedImpact(wClass, trendDir) {
+    const upper = String(wClass || 'W1').toUpperCase();
+    let defaultArrow = 'up';
+    let text = 'Elevated Flow';
+    switch (upper) {
+      case 'W0': defaultArrow = SOLAR_WIND_SPEED_IMPACT_LEVEL_W0_ARROW; text = SOLAR_WIND_SPEED_IMPACT_LEVEL_W0_TEXT; break;
+      case 'W1': defaultArrow = SOLAR_WIND_SPEED_IMPACT_LEVEL_W1_ARROW; text = SOLAR_WIND_SPEED_IMPACT_LEVEL_W1_TEXT; break;
+      case 'W2': defaultArrow = SOLAR_WIND_SPEED_IMPACT_LEVEL_W2_ARROW; text = SOLAR_WIND_SPEED_IMPACT_LEVEL_W2_TEXT; break;
+      case 'W3': defaultArrow = SOLAR_WIND_SPEED_IMPACT_LEVEL_W3_ARROW; text = SOLAR_WIND_SPEED_IMPACT_LEVEL_W3_TEXT; break;
+      case 'W4': defaultArrow = SOLAR_WIND_SPEED_IMPACT_LEVEL_W4_ARROW; text = SOLAR_WIND_SPEED_IMPACT_LEVEL_W4_TEXT; break;
+      case 'W5': defaultArrow = SOLAR_WIND_SPEED_IMPACT_LEVEL_W5_ARROW; text = SOLAR_WIND_SPEED_IMPACT_LEVEL_W5_TEXT; break;
+      default:  defaultArrow = 'up'; text = 'Elevated Flow'; break;
+    }
+    const arrow = (SOLAR_WIND_SPEED_ARROW_MODE === 'trend')
+      ? (trendDir || currentSolarWindSpeedTrend || defaultArrow)
+      : defaultArrow;
+    return { arrow, text };
+  }
+
+  function getSolarWindSpeedLabels(wClass) {
+    const upper = String(wClass || 'W1').toUpperCase();
+    switch (upper) {
+      case 'W0': return { line1: SOLAR_WIND_SPEED_LABEL_W0_LINE1, line2: SOLAR_WIND_SPEED_LABEL_W0_LINE2 };
+      case 'W1': return { line1: SOLAR_WIND_SPEED_LABEL_W1_LINE1, line2: SOLAR_WIND_SPEED_LABEL_W1_LINE2 };
+      case 'W2': return { line1: SOLAR_WIND_SPEED_LABEL_W2_LINE1, line2: SOLAR_WIND_SPEED_LABEL_W2_LINE2 };
+      case 'W3': return { line1: SOLAR_WIND_SPEED_LABEL_W3_LINE1, line2: SOLAR_WIND_SPEED_LABEL_W3_LINE2 };
+      case 'W4': return { line1: SOLAR_WIND_SPEED_LABEL_W4_LINE1, line2: SOLAR_WIND_SPEED_LABEL_W4_LINE2 };
+      case 'W5': return { line1: SOLAR_WIND_SPEED_LABEL_W5_LINE1, line2: SOLAR_WIND_SPEED_LABEL_W5_LINE2 };
+      default:  return { line1: 'SOLAR', line2: 'WIND' };
+    }
+  }
+
+  function getSolarWindSpeedLevelColor(wClass) {
+    if (SOLAR_WIND_SPEED_COLOR_OVERRIDE !== null && SOLAR_WIND_SPEED_COLOR_OVERRIDE !== undefined) {
+      if (typeof SOLAR_WIND_SPEED_COLOR_OVERRIDE === 'number') {
+        return tempToColor(SOLAR_WIND_SPEED_COLOR_OVERRIDE) || 'hsl(120, 100%, 50%)';
+      }
+      return SOLAR_WIND_SPEED_COLOR_OVERRIDE;
+    }
+    const upper = String(wClass || 'W1').toUpperCase();
+    let setting;
+    switch (upper) {
+      case 'W0': setting = SOLAR_WIND_SPEED_COLOR_LEVEL_W0; break;
+      case 'W1': setting = SOLAR_WIND_SPEED_COLOR_LEVEL_W1; break;
+      case 'W2': setting = SOLAR_WIND_SPEED_COLOR_LEVEL_W2; break;
+      case 'W3': setting = SOLAR_WIND_SPEED_COLOR_LEVEL_W3; break;
+      case 'W4': setting = SOLAR_WIND_SPEED_COLOR_LEVEL_W4; break;
+      case 'W5': setting = SOLAR_WIND_SPEED_COLOR_LEVEL_W5; break;
+      default:  setting = SOLAR_WIND_SPEED_COLOR_LEVEL_W1; break;
+    }
+    if (typeof setting === 'number') {
+      return tempToColor(setting) || 'hsl(120, 100%, 50%)';
+    }
+    return setting || 'hsl(120, 100%, 50%)';
+  }
+
+  function formatSolarWindSpeedValue(val) {
+    const num = Math.round(parseFloat(val) || 0);
+    return `${num}${SOLAR_WIND_SPEED_UNIT}`;
+  }
+
+  function calculateSolarWindSpeedFraction(wClass, wVal) {
+    const cls = String(wClass || 'W0').toUpperCase();
+    const val = parseFloat(wVal) || 350.0;
+    if (cls === 'W0' || val < 400) {
+      const norm = Math.max(0, Math.min(1.0, (val - 250) / 150));
+      return Math.max(0.025, norm * 0.16);
+    }
+    const ranges = {
+      W1: { min: 0.16, max: 0.33, valMin: 400.0, valMax: 500.0 },
+      W2: { min: 0.33, max: 0.50, valMin: 500.0, valMax: 600.0 },
+      W3: { min: 0.50, max: 0.67, valMin: 600.0, valMax: 700.0 },
+      W4: { min: 0.67, max: 0.84, valMin: 700.0, valMax: 800.0 },
+      W5: { min: 0.84, max: 1.00, valMin: 800.0, valMax: 1000.0 }
+    };
+    const range = ranges[cls] || ranges['W1'];
+    const span = range.valMax - range.valMin;
+    const normalized = span > 0 ? Math.max(0, Math.min(1.0, (val - range.valMin) / span)) : 0.0;
+    return range.min + (normalized * (range.max - range.min));
+  }
+
+  async function updateSolarWindSpeedDial() {
+    const dial = document.getElementById('solar-wind-speed-dial');
+    if (!dial) return;
+
+    let wClass = 'W1';
+    let wValue = 474;
+    let dailyPeakClass = 'W1';
+    let dailyPeakValue = 474;
+
+    if (activeSolarWindSpeedState) {
+      wClass = activeSolarWindSpeedState.class;
+      wValue = activeSolarWindSpeedState.value;
+      dailyPeakClass = activeSolarWindSpeedState.peakClass || SOLAR_WIND_SPEED_PEAK_CLASS_MANUAL;
+      dailyPeakValue = activeSolarWindSpeedState.peakValue || SOLAR_WIND_SPEED_PEAK_VALUE_MANUAL;
+    } else if (SOLAR_WIND_SPEED_MODE === 'live' && liveSolarWindSpeedData) {
+      wClass = liveSolarWindSpeedData.class;
+      wValue = liveSolarWindSpeedData.value;
+      dailyPeakClass = liveSolarWindSpeedData.peakClass || wClass;
+      dailyPeakValue = liveSolarWindSpeedData.peakValue || wValue;
+    } else {
+      wClass = SOLAR_WIND_SPEED_CLASS_MANUAL;
+      wValue = SOLAR_WIND_SPEED_VALUE_MANUAL;
+      dailyPeakClass = SOLAR_WIND_SPEED_PEAK_CLASS_MANUAL;
+      dailyPeakValue = SOLAR_WIND_SPEED_PEAK_VALUE_MANUAL;
+    }
+
+    const labels = getSolarWindSpeedLabels(wClass);
+    const color = getSolarWindSpeedLevelColor(wClass);
+    const fraction = calculateSolarWindSpeedFraction(wClass, wValue);
+
+    let dailyPeakColor = getSolarWindSpeedLevelColor(dailyPeakClass);
+    let dailyPeakFraction = calculateSolarWindSpeedFraction(dailyPeakClass, dailyPeakValue);
+    const isLive = SOLAR_WIND_SPEED_MODE === 'live' && !activeSolarWindSpeedState;
+
+    if (isLive) {
+      try {
+        if (window.todaySkyRecord && window.todaySkyRecord.pk_w_cls) {
+          dailyPeakClass = String(window.todaySkyRecord.pk_w_cls).trim();
+          dailyPeakValue = (typeof window.todaySkyRecord.pk_w_val !== 'undefined') ? window.todaySkyRecord.pk_w_val : 474;
+          dailyPeakColor = getSolarWindSpeedLevelColor(dailyPeakClass);
+          dailyPeakFraction = calculateSolarWindSpeedFraction(dailyPeakClass, dailyPeakValue);
+
+          if (liveSolarWindSpeedData && fraction > dailyPeakFraction) {
+            dailyPeakFraction = fraction;
+            dailyPeakColor = color;
+            dailyPeakClass = wClass;
+            dailyPeakValue = wValue;
+            window.todaySkyRecord.pk_w_cls = wClass;
+            window.todaySkyRecord.pk_w_val = wValue;
+          }
+        } else if (liveSolarWindSpeedData) {
+          if (!window.todaySkyRecord) window.todaySkyRecord = {};
+          window.todaySkyRecord.pk_w_cls = wClass;
+          window.todaySkyRecord.pk_w_val = wValue;
+        }
+      } catch (e) {
+        console.log("Failed to parse Wind Speed Peak from Sky DB", e);
+      }
+    }
+
+    const circumference = 289.027;
+    const strokeOffset = circumference * (1 - fraction);
+    const peakCircumference = 320.442;
+    const peakStrokeOffset = peakCircumference * (1 - dailyPeakFraction);
+
+    const line1El = dial.querySelector('.solar-wind-speed-label-line1');
+    const line2El = dial.querySelector('.solar-wind-speed-label-line2');
+    const classEl = dial.querySelector('.solar-wind-speed-class');
+    const valueEl = dial.querySelector('.solar-wind-speed-value');
+
+    if (line1El && line1El.textContent !== labels.line1) line1El.textContent = labels.line1;
+    if (line2El && line2El.textContent !== labels.line2) line2El.textContent = labels.line2;
+    if (classEl && classEl.textContent !== wClass) classEl.textContent = wClass;
+    const displayVal = formatSolarWindSpeedValue(wValue);
+    if (valueEl && valueEl.textContent !== displayVal) valueEl.textContent = displayVal;
+
+    dial.style.setProperty('--solar-wind-speed-current-color', color);
+    dial.style.setProperty('--solar-wind-speed-peak-color', dailyPeakColor);
+    dial.style.setProperty('--solar-wind-speed-stroke-offset', strokeOffset.toFixed(2));
+    dial.style.setProperty('--solar-wind-speed-peak-stroke-offset', peakStrokeOffset.toFixed(2));
+
+    if (SOLAR_WIND_SPEED_SUBLABEL_ENABLED) {
+      const sublabelEl = document.getElementById('solar-wind-speed-sublabel');
+      if (sublabelEl) {
+        if (SOLAR_WIND_SPEED_SUBLABEL_MODE === 'dynamic') {
+          const impact = getSolarWindSpeedImpact(wClass, currentSolarWindSpeedTrend);
+          let baseHtml = formatImpactSublabelHtml(impact.arrow, impact.text);
+          if (SOLAR_WIND_SPEED_SUBLABEL_COLOR === 'auto') {
+            baseHtml = `<span style="color: ${color};">${baseHtml}</span>`;
+          }
+          const formattedPeakVal = formatSolarWindSpeedValue(dailyPeakValue);
+          const line2Text = `PEAK ${dailyPeakClass}<br><span style="display:inline-block; margin-top: var(--solar-wind-speed-sublabel-peak-value-margin-top, 0vw);">${formattedPeakVal}</span>`;
+          sublabelEl.innerHTML = `<br>${baseHtml}<br><span style="display: inline-block; margin-top: var(--solar-wind-speed-sublabel-peak-margin-top, 0vw); font-family: 'euro-bold', sans-serif; color: ${dailyPeakColor};">${line2Text}</span>`;
+        }
+        if (SOLAR_WIND_SPEED_SUBLABEL_COLOR === 'auto') {
+          sublabelEl.style.color = color;
+        }
+        sublabelEl.style.opacity = '1';
+      }
+    }
+  }
+
+  function handleSolarWindSpeedDialClick(e) {
+    if (e) e.stopPropagation();
+    if (SOLAR_WIND_SPEED_MODE === 'live') {
+      if (!SOLAR_WIND_SPEED_CLICK_CYCLES_CLASSES) {
+        fetchLiveSolarWindSpeedData();
+        return;
+      }
+      currentSolarWindSpeedTestIndex = (currentSolarWindSpeedTestIndex + 1) % (SOLAR_WIND_SPEED_TEST_LEVELS.length + 1);
+      if (currentSolarWindSpeedTestIndex === SOLAR_WIND_SPEED_TEST_LEVELS.length) {
+        activeSolarWindSpeedState = null;
+        if (liveSolarWindSpeedData) {
+          currentSolarWindSpeedTrend = liveSolarWindSpeedData.trend || 'up';
+          updateSolarWindSpeedDial();
+        }
+        fetchLiveSolarWindSpeedData();
+      } else {
+        activeSolarWindSpeedState = SOLAR_WIND_SPEED_TEST_LEVELS[currentSolarWindSpeedTestIndex];
+        updateSolarWindSpeedDial();
+      }
+      return;
+    }
+    currentSolarWindSpeedTestIndex = (currentSolarWindSpeedTestIndex + 1) % SOLAR_WIND_SPEED_TEST_LEVELS.length;
+    activeSolarWindSpeedState = SOLAR_WIND_SPEED_TEST_LEVELS[currentSolarWindSpeedTestIndex];
+    updateSolarWindSpeedDial();
+  }
+
+  async function fetchLiveSolarWindSpeedData() {
+    if (SOLAR_WIND_SPEED_MODE !== 'live') return;
+    try {
+      const response = await fetch('https://services.swpc.noaa.gov/products/summary/solar-wind-speed.json', { cache: 'no-store' });
+      if (!response.ok) return;
+      const data = await response.json();
+      if (!Array.isArray(data) || data.length === 0) return;
+      const latest = data[0];
+      if (!latest || typeof latest.proton_speed === 'undefined') return;
+
+      const speedVal = parseFloat(latest.proton_speed);
+      let cls = 'W1';
+      if (speedVal < 400) {
+        cls = 'W0';
+      } else if (speedVal < 500) {
+        cls = 'W1';
+      } else if (speedVal < 600) {
+        cls = 'W2';
+      } else if (speedVal < 700) {
+        cls = 'W3';
+      } else if (speedVal < 800) {
+        cls = 'W4';
+      } else {
+        cls = 'W5';
+      }
+
+      const trend = speedVal >= 450 ? 'up' : 'down';
+      currentSolarWindSpeedTrend = trend;
+
+      liveSolarWindSpeedData = {
+        class: cls,
+        value: Math.round(speedVal),
+        trend: trend
+      };
+      updateSolarWindSpeedDial();
+    } catch (err) {
+      console.warn('Unable to fetch live solar wind speed data from NOAA SWPC:', err);
+    }
+  }
+
+  window.updateSolarWindSpeedDial = updateSolarWindSpeedDial;
+  window.updateSolarWindSpeedData = function(data) {
+    if (!data) return;
+    activeSolarWindSpeedState = {
+      class: data.class || (activeSolarWindSpeedState ? activeSolarWindSpeedState.class : SOLAR_WIND_SPEED_CLASS_MANUAL),
+      value: (typeof data.value !== 'undefined') ? data.value : (activeSolarWindSpeedState ? activeSolarWindSpeedState.value : SOLAR_WIND_SPEED_VALUE_MANUAL),
+      peakClass: data.peakClass || (activeSolarWindSpeedState ? activeSolarWindSpeedState.peakClass : SOLAR_WIND_SPEED_PEAK_CLASS_MANUAL),
+      peakValue: (typeof data.peakValue !== 'undefined') ? data.peakValue : (activeSolarWindSpeedState ? activeSolarWindSpeedState.peakValue : SOLAR_WIND_SPEED_PEAK_VALUE_MANUAL)
+    };
+    if (data.trend) currentSolarWindSpeedTrend = data.trend;
+    updateSolarWindSpeedDial();
+  };
 
   function buildWorldClockColumn(zoneConfig) {
     const {

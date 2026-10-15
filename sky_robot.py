@@ -7,6 +7,7 @@ Description:
 Fetches weather, UV, and solar flare data to maintain the db.json database.
 
 Changelog / Metadata:
+- 2026-10-15: Added NOAA GOES >=10 MeV Proton Flux integration for Solar Radiation Storms (S-Scale: S0-S5).
 - 2026-10-09: Added 30-day passive auto-backup feature for db.json.
 - [Prior]: Initial script creation; OpenWeather & NOAA API integrations.
 =============================================================================
@@ -125,6 +126,97 @@ try:
 except Exception as e:
     print(f"🤖 SKY ROBOT: Failed to fetch from NOAA (Kp-index): {e}")
 
+# Fetch NOAA Solar Radiation Storms (>=10 MeV Protons, S-Scale)
+print("🤖 SKY ROBOT: Reaching out to NOAA SWPC for Solar Radiation Storms (Protons)...")
+NOAA_PROTON_URL = "https://services.swpc.noaa.gov/json/goes/primary/integral-protons-plot-6-hour.json"
+real_proton_flux = 0.0
+s_cls = "S0"
+s_val = 0.2
+
+try:
+    req_proton = urllib.request.urlopen(NOAA_PROTON_URL)
+    proton_data = json.loads(req_proton.read())
+    proton_readings = [d for d in proton_data if d.get("energy") == ">=10 MeV" and isinstance(d.get("flux"), (int, float))]
+    if proton_readings:
+        real_proton_flux = float(proton_readings[-1]["flux"])
+        s_val = round(real_proton_flux, 1)
+
+        # Calculate Solar Radiation Storm Class (S0 - S5)
+        if real_proton_flux >= 100000:
+            s_cls = "S5"
+        elif real_proton_flux >= 10000:
+            s_cls = "S4"
+        elif real_proton_flux >= 1000:
+            s_cls = "S3"
+        elif real_proton_flux >= 100:
+            s_cls = "S2"
+        elif real_proton_flux >= 10:
+            s_cls = "S1"
+        else:
+            s_cls = "S0"
+
+        print(f"🤖 SKY ROBOT: Current Proton Flux is {real_proton_flux:.3f} pfu. Solar Radiation Storm: {s_cls} ({s_val:.1f} pfu)")
+except Exception as e:
+    print(f"🤖 SKY ROBOT: Failed to fetch from NOAA (Protons): {e}")
+
+# Fetch NOAA Solar Wind Bz (IMF Magnetic Gatekeeper)
+print("🤖 SKY ROBOT: Reaching out to NOAA SWPC for Solar Wind Bz (IMF)...")
+NOAA_BZ_URL = "https://services.swpc.noaa.gov/products/summary/solar-wind-mag-field.json"
+real_bz = 1.2
+bz_cls = "BZ0"
+
+try:
+    req_bz = urllib.request.urlopen(NOAA_BZ_URL)
+    bz_data = json.loads(req_bz.read())
+    if isinstance(bz_data, list) and len(bz_data) > 0:
+        latest_bz = bz_data[0]
+        if "bz_gsm" in latest_bz and latest_bz["bz_gsm"] is not None:
+            real_bz = float(latest_bz["bz_gsm"])
+            if real_bz >= 0:
+                bz_cls = "BZ0"
+            elif real_bz >= -5:
+                bz_cls = "BZ1"
+            elif real_bz >= -10:
+                bz_cls = "BZ2"
+            elif real_bz >= -15:
+                bz_cls = "BZ3"
+            elif real_bz >= -20:
+                bz_cls = "BZ4"
+            else:
+                bz_cls = "BZ5"
+            print(f"🤖 SKY ROBOT: Current IMF Bz is {real_bz:+.1f} nT. Magnetic Gatekeeper: {bz_cls}")
+except Exception as e:
+    print(f"🤖 SKY ROBOT: Failed to fetch from NOAA (Bz): {e}")
+
+# Fetch NOAA Solar Wind Speed (The Energy Level)
+print("🤖 SKY ROBOT: Reaching out to NOAA SWPC for Solar Wind Speed...")
+NOAA_SPEED_URL = "https://services.swpc.noaa.gov/products/summary/solar-wind-speed.json"
+real_speed = 474.0
+w_cls = "W1"
+
+try:
+    req_speed = urllib.request.urlopen(NOAA_SPEED_URL)
+    speed_data = json.loads(req_speed.read())
+    if isinstance(speed_data, list) and len(speed_data) > 0:
+        latest_speed = speed_data[0]
+        if "proton_speed" in latest_speed and latest_speed["proton_speed"] is not None:
+            real_speed = float(latest_speed["proton_speed"])
+            if real_speed < 400:
+                w_cls = "W0"
+            elif real_speed < 500:
+                w_cls = "W1"
+            elif real_speed < 600:
+                w_cls = "W2"
+            elif real_speed < 700:
+                w_cls = "W3"
+            elif real_speed < 800:
+                w_cls = "W4"
+            else:
+                w_cls = "W5"
+            print(f"🤖 SKY ROBOT: Current Solar Wind Speed is {real_speed:.0f} km/s. Energy Level: {w_cls}")
+except Exception as e:
+    print(f"🤖 SKY ROBOT: Failed to fetch from NOAA (Wind Speed): {e}")
+
 # 2. Open our Database (or create it if it doesn't exist yet!)
 script_dir = os.path.dirname(os.path.abspath(__file__))
 db_path = os.path.join(script_dir, "data", "db.json")
@@ -162,12 +254,31 @@ if not today_record:
         "pk_r_val": 0.1,
         "pk_g_cls": "G0",
         "pk_g_val": 0.0,
+        "pk_s_cls": "S0",
+        "pk_s_val": 0.2,
+        "pk_bz_cls": "BZ0",
+        "pk_bz_val": 1.2,
+        "pk_w_cls": "W1",
+        "pk_w_val": 474,
         "pk_xray_flux": 0.0,
         "pk_kp_index": 0.0,
+        "pk_proton_flux": 0.0,
         "av_wnd_mph": 0.0,
         "is_rain_day": False
     }
     database["data_records"].append(today_record)
+else:
+    # Ensure backward compatibility for today's record if created earlier
+    if "pk_s_cls" not in today_record:
+        today_record["pk_s_cls"] = "S0"
+        today_record["pk_s_val"] = 0.2
+        today_record["pk_proton_flux"] = 0.0
+    if "pk_bz_cls" not in today_record:
+        today_record["pk_bz_cls"] = "BZ0"
+        today_record["pk_bz_val"] = 1.2
+    if "pk_w_cls" not in today_record:
+        today_record["pk_w_cls"] = "W1"
+        today_record["pk_w_val"] = 474
 
 # 5. Check if the current UV broke the daily record!
 if real_uv > today_record.get("pk_uv_val", 0.0):
@@ -194,6 +305,32 @@ if real_kp > today_record.get("pk_kp_index", 0.0):
     today_record["pk_g_val"] = round(real_kp, 1)
 else:
     print(f"🤖 SKY ROBOT: Geomagnetic Peak remains at {today_record.get('pk_g_cls', 'G0')} ({today_record.get('pk_kp_index', 0.0):.1f} Kp)")
+
+# 5d. Check if the current proton flux broke the daily record!
+if real_proton_flux > today_record.get("pk_proton_flux", 0.0):
+    print(f"🤖 SKY ROBOT: New Solar Radiation Storm Peak! {s_cls} ({s_val:.1f} pfu) broke the old record.")
+    today_record["pk_proton_flux"] = real_proton_flux
+    today_record["pk_s_cls"] = s_cls
+    today_record["pk_s_val"] = s_val
+else:
+    print(f"🤖 SKY ROBOT: Solar Radiation Storm Peak remains at {today_record.get('pk_s_cls', 'S0')} ({today_record.get('pk_s_val', 0.2):.1f} pfu)")
+
+# 5e. Check if the current IMF Bz broke the daily peak Southward record!
+# In space weather, more negative Bz (Southward) represents the stronger event.
+if real_bz < today_record.get("pk_bz_val", 1.2):
+    print(f"🤖 SKY ROBOT: New IMF Bz Peak! {bz_cls} ({real_bz:+.1f} nT) is more Southward than old peak.")
+    today_record["pk_bz_val"] = round(real_bz, 1)
+    today_record["pk_bz_cls"] = bz_cls
+else:
+    print(f"🤖 SKY ROBOT: IMF Bz Peak remains at {today_record.get('pk_bz_cls', 'BZ0')} ({today_record.get('pk_bz_val', 1.2):+.1f} nT)")
+
+# 5f. Check if the current Solar Wind Speed broke the daily record!
+if real_speed > today_record.get("pk_w_val", 0):
+    print(f"🤖 SKY ROBOT: New Solar Wind Speed Peak! {w_cls} ({real_speed:.0f} km/s) broke the old record.")
+    today_record["pk_w_val"] = round(real_speed)
+    today_record["pk_w_cls"] = w_cls
+else:
+    print(f"🤖 SKY ROBOT: Solar Wind Speed Peak remains at {today_record.get('pk_w_cls', 'W1')} ({today_record.get('pk_w_val', 474):.0f} km/s)")
 
 # 6. Update the system timestamp and save it perfectly formatted for Earth
 database["sys_last_upd"] = get_central_now().strftime("%Y-%m-%d %I:%M %p")

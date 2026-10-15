@@ -23,7 +23,27 @@
          "pk_xray_flux": 1.0685413371902541e-06,
          "av_wnd_mph": 0.0,
          "is_rain_day": false
+      },
+      {
+         "dt_record": "2026-10-15",
+         "pk_uv_val": 1.35,
+         "pk_flr_cls": "C1.0",
+         "pk_r_cls": "R0",
+         "pk_r_val": 0.2,
+         "pk_g_cls": "G0",
+         "pk_g_val": 2.3,
+         "pk_s_cls": "S0",
+         "pk_s_val": 0.3,
+         "pk_xray_flux": 1.038596792568569e-06,
+         "pk_kp_index": 2.33,
+         "pk_proton_flux": 0.2624869644641876,
+         "av_wnd_mph": 0.0,
+         "is_rain_day": false,
+         "pk_bz_cls": "BZ0",
+         "pk_bz_val": 0.0,
+         "pk_w_cls": "W1",
+         "pk_w_val": 474
       }
    ],
-   "sys_last_upd": "2026-10-09 10:18 AM"
+   "sys_last_upd": "2026-10-15 04:39 PM"
 }
