@@ -2742,6 +2742,10 @@ import weatherConditions from '../data/weather-conditions.json';
   const ALERT_AIR_QUALITY_DISTORTION_DESKTOP = 3.0;               // EDITABLE Desktop: Degree of SVG distortion (1.5 is subtle, 5 is heavy)
   const ALERT_AIR_QUALITY_DISTORTION_MOBILE = 2.0;                // EDITABLE Mobile: Degree of SVG distortion
 
+  // --- EDITABLE: Flood Alert Symbol Warp / Distortion (JCV) ---
+  const ALERT_FLOOD_DISTORTION_DESKTOP = 3.5;                     // EDITABLE Desktop: Degree of SVG distortion on Flood SVG symbol (1.5 subtle, 3.5 standard, 6 heavy)
+  const ALERT_FLOOD_DISTORTION_MOBILE = 2.5;                      // EDITABLE Mobile: Degree of SVG distortion on Flood SVG symbol
+
   document.documentElement.style.setProperty('--alert-banner-line-height', ALERT_BANNER_LINE_HEIGHT);
 
   document.documentElement.style.setProperty('--alert-modal-line-height', window.innerWidth <= 767 ? ALERT_MODAL_LINE_HEIGHT_MOBILE : ALERT_MODAL_LINE_HEIGHT_DESKTOP);
@@ -2766,6 +2770,19 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--alert-air-quality-blur-desktop', ALERT_AIR_QUALITY_BLUR_DESKTOP);
   document.documentElement.style.setProperty('--alert-air-quality-blur-mobile', ALERT_AIR_QUALITY_BLUR_MOBILE);
   document.documentElement.style.setProperty('--alert-air-quality-blur', window.innerWidth <= 767 ? ALERT_AIR_QUALITY_BLUR_MOBILE : ALERT_AIR_QUALITY_BLUR_DESKTOP);
+
+  document.documentElement.style.setProperty('--alert-flood-distortion-desktop', String(ALERT_FLOOD_DISTORTION_DESKTOP));
+  document.documentElement.style.setProperty('--alert-flood-distortion-mobile', String(ALERT_FLOOD_DISTORTION_MOBILE));
+  document.documentElement.style.setProperty('--alert-flood-distortion', String(window.innerWidth <= 767 ? ALERT_FLOOD_DISTORTION_MOBILE : ALERT_FLOOD_DISTORTION_DESKTOP));
+
+  function updateFloodDistortionScale() {
+    const isMobile = window.innerWidth <= 767;
+    const scale = isMobile ? ALERT_FLOOD_DISTORTION_MOBILE : ALERT_FLOOD_DISTORTION_DESKTOP;
+    const displacementMap = document.getElementById('flood-displacement-map');
+    if (displacementMap) displacementMap.setAttribute('scale', String(scale));
+    document.documentElement.style.setProperty('--alert-flood-distortion', String(scale));
+  }
+  updateFloodDistortionScale();
 
   const ALERT_COLORS = {
     "DEFAULT": "rgba(0,0,0, 0.75)", // Default translucent red for anything else
@@ -4024,6 +4041,15 @@ import weatherConditions from '../data/weather-conditions.json';
         width: 100%;
         height: 100%;
         pointer-events: none;
+      }
+      .alert-banner-icon {
+        flex-shrink: 0;
+        display: inline-block;
+      }
+      .alert-flood-icon {
+        filter: url(#flood-distortion) !important;
+        -webkit-filter: url(#flood-distortion) !important;
+        will-change: filter;
       }
       .alert-banner-top-shadow {
         position: absolute;
@@ -5788,6 +5814,26 @@ Plan ahead for significantly warmer conditions tomorrow!`
     
 
     
+    // EDITABLE preview mode: set to true to force-show FLOOD WATCH banner for preview/testing
+    const TEST_SHOW_FLOOD_WATCH_PREVIEW = false; // Set to false for normal live operation
+    const showFloodWatchPreview = (TEST_SHOW_FLOOD_WATCH_PREVIEW || urlParams.get('flood_watch') === 'true' || urlParams.get('test_flood') === 'true')
+      && !alerts.some(a => (a.event || '').toUpperCase().includes('FLOOD'));
+    if (showFloodWatchPreview) {
+      alerts.push({
+        event: "FLOOD WATCH",
+        sender_name: "National Weather Service",
+        start: now,
+        end: now + 36000,
+        countdown: "expires 6:00 pm",
+        description: `Flash flooding caused by excessive rainfall continues to be possible across the area.
+
+• Flooding of rivers, creeks, streams, and other low-lying and flood-prone locations is possible.
+• Streams may rise rapidly with heavy downpours.
+
+Monitor local forecasts and be prepared to take action should Flash Flood Warnings be issued.`
+      });
+    }
+
     const container = document.getElementById('alerts-container');
     
     // Console logging to debug tornado watch
@@ -5885,16 +5931,23 @@ Plan ahead for significantly warmer conditions tomorrow!`
       }
       const bannerIconTransform = iconTransform ? ` ${iconTransform}` : '';
       
+      const isFlood = eventName.includes('FLOOD');
+      let iconFilterStyle = '';
+      if (isFlood) {
+        updateFloodDistortionScale();
+        iconFilterStyle = 'filter: url(#flood-distortion); -webkit-filter: url(#flood-distortion); will-change: filter;';
+      }
+
       let svgIcon = '';
       if (bannerIcon.startsWith('fa-')) {
         svgIcon = `
-          <div style="width: ${svgSize}; height: ${svgSize}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;${bannerIconTransform}">
+          <div class="alert-banner-icon${isFlood ? ' alert-flood-icon' : ''}" style="width: ${svgSize}; height: ${svgSize}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;${iconFilterStyle ? ' ' + iconFilterStyle : ''}${bannerIconTransform}">
             <i class="${bannerIcon}" style="font-size: calc(${svgSize} * 0.9); color: white;"></i>
           </div>
         `;
       } else {
         svgIcon = `
-          <img src="${bannerIcon}" style="width: ${svgSize}; height: ${svgSize}; flex-shrink: 0;${bannerIconTransform}" alt="Alert">
+          <img class="alert-banner-icon${isFlood ? ' alert-flood-icon' : ''}" src="${bannerIcon}" style="width: ${svgSize}; height: ${svgSize}; flex-shrink: 0; display: block;${iconFilterStyle ? ' ' + iconFilterStyle : ''}${bannerIconTransform}" alt="Alert">
         `;
       }
       
@@ -10598,6 +10651,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
       applySunImageConfig();
       applyOrreryConfig();
       applyOdometerConfig();
+      updateFloodDistortionScale();
     }, HEAVY_CONFIG_DEBOUNCE_MS);
   });
 
@@ -10626,7 +10680,7 @@ Plan ahead for significantly warmer conditions tomorrow!`
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1474';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1479';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
