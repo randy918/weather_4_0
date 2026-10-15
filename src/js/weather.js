@@ -8910,7 +8910,7 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
   const SOLAR_WIND_SPEED_GAP_CLASS_TO_VALUE_DESKTOP = 'calc(var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.017)'; // EDITABLE Desktop
   const SOLAR_WIND_SPEED_GAP_CLASS_TO_VALUE_MOBILE = 'calc(var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.017)';  // EDITABLE Mobile
 
-  const SOLAR_WIND_SPEED_UNIT = ' km/s';                   // EDITABLE: Unit
+  const SOLAR_WIND_SPEED_UNIT_TEXT = 'km/s';               // EDITABLE: Unit text
   const SOLAR_WIND_SPEED_VALUE_FONT_FAMILY = "'euro-bold', sans-serif"; // EDITABLE
   const SOLAR_WIND_SPEED_VALUE_FONT_SIZE_DESKTOP = 'calc(var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1262)'; // EDITABLE Desktop
   const SOLAR_WIND_SPEED_VALUE_FONT_SIZE_MOBILE = 'calc(var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.1262)';  // EDITABLE Mobile
@@ -8918,11 +8918,25 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
   const SOLAR_WIND_SPEED_VALUE_LINE_HEIGHT_MOBILE = 0.92;  // EDITABLE Mobile
   const SOLAR_WIND_SPEED_VALUE_LETTER_SPACING_DESKTOP = '-0.02vw'; // EDITABLE Desktop
   const SOLAR_WIND_SPEED_VALUE_LETTER_SPACING_MOBILE = '-0.04vw';  // EDITABLE Mobile
-  const SOLAR_WIND_SPEED_VALUE_OFFSET_Y_DESKTOP = '-.5vw'; // EDITABLE Desktop
-  const SOLAR_WIND_SPEED_VALUE_OFFSET_Y_MOBILE = '-.5vw';  // EDITABLE Mobile
+  const SOLAR_WIND_SPEED_VALUE_OFFSET_Y_DESKTOP = '-0.15vw'; // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_VALUE_OFFSET_Y_MOBILE = '-0.15vw';  // EDITABLE Mobile
 
-  const SOLAR_WIND_SPEED_CONTENT_OFFSET_Y_DESKTOP = '0vw'; // EDITABLE Desktop
-  const SOLAR_WIND_SPEED_CONTENT_OFFSET_Y_MOBILE = '0vw';  // EDITABLE Mobile
+  // Unit (Placed on line below value in same style as ELEVATED WIND)
+  const SOLAR_WIND_SPEED_UNIT_FONT_FAMILY = "'euro', sans-serif"; // EDITABLE: Font family (same style as ELEVATED WIND)
+  const SOLAR_WIND_SPEED_UNIT_FONT_SIZE_DESKTOP = 'calc(var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.0748)'; // EDITABLE Desktop: Same size as label
+  const SOLAR_WIND_SPEED_UNIT_FONT_SIZE_MOBILE = 'calc(var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.0748)';  // EDITABLE Mobile: Same size as label
+  const SOLAR_WIND_SPEED_UNIT_LINE_HEIGHT_DESKTOP = 1.0;   // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_UNIT_LINE_HEIGHT_MOBILE = 1.0;    // EDITABLE Mobile
+  const SOLAR_WIND_SPEED_UNIT_LETTER_SPACING_DESKTOP = '0.05vw'; // EDITABLE Desktop: Same as label
+  const SOLAR_WIND_SPEED_UNIT_LETTER_SPACING_MOBILE = '0.05vw';  // EDITABLE Mobile: Same as label
+  const SOLAR_WIND_SPEED_UNIT_TEXT_TRANSFORM = 'uppercase'; // EDITABLE: 'uppercase', 'lowercase', etc.
+  const SOLAR_WIND_SPEED_UNIT_OFFSET_Y_DESKTOP = '0vw';    // EDITABLE Desktop
+  const SOLAR_WIND_SPEED_UNIT_OFFSET_Y_MOBILE = '0vw';     // EDITABLE Mobile
+  const SOLAR_WIND_SPEED_GAP_VALUE_TO_UNIT_DESKTOP = 'calc(var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.015 - 0.25vw)'; // EDITABLE Desktop: Gap above KM/S (decreased by .25vw)
+  const SOLAR_WIND_SPEED_GAP_VALUE_TO_UNIT_MOBILE = 'calc(var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.015 - 0.25vw)';  // EDITABLE Mobile: Gap above KM/S (decreased by .25vw)
+
+  const SOLAR_WIND_SPEED_CONTENT_OFFSET_Y_DESKTOP = '0.87vw'; // EDITABLE Desktop: Fine vertical nudge to align with BZ dial
+  const SOLAR_WIND_SPEED_CONTENT_OFFSET_Y_MOBILE = '0.87vw';  // EDITABLE Mobile: Fine vertical nudge to align with BZ dial
 
   // Sublabel Below Speed Dial
   const SOLAR_WIND_SPEED_SUBLABEL_ENABLED = true;          // EDITABLE: Enable/disable sublabel
@@ -10408,10 +10422,26 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
     document.documentElement.style.setProperty('--solar-wind-speed-value-offset-y-mobile', SOLAR_WIND_SPEED_VALUE_OFFSET_Y_MOBILE);
     document.documentElement.style.setProperty('--solar-wind-speed-value-offset-y', isMobile ? SOLAR_WIND_SPEED_VALUE_OFFSET_Y_MOBILE : SOLAR_WIND_SPEED_VALUE_OFFSET_Y_DESKTOP);
 
+    document.documentElement.style.setProperty('--solar-wind-speed-unit-font-family', SOLAR_WIND_SPEED_UNIT_FONT_FAMILY);
+    document.documentElement.style.setProperty('--solar-wind-speed-unit-font-size-desktop', SOLAR_WIND_SPEED_UNIT_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-unit-font-size-mobile', SOLAR_WIND_SPEED_UNIT_FONT_SIZE_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-speed-unit-font-size', isMobile ? SOLAR_WIND_SPEED_UNIT_FONT_SIZE_MOBILE : SOLAR_WIND_SPEED_UNIT_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-unit-line-height', String(isMobile ? SOLAR_WIND_SPEED_UNIT_LINE_HEIGHT_MOBILE : SOLAR_WIND_SPEED_UNIT_LINE_HEIGHT_DESKTOP));
+    document.documentElement.style.setProperty('--solar-wind-speed-unit-letter-spacing-desktop', SOLAR_WIND_SPEED_UNIT_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-unit-letter-spacing-mobile', SOLAR_WIND_SPEED_UNIT_LETTER_SPACING_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-speed-unit-letter-spacing', isMobile ? SOLAR_WIND_SPEED_UNIT_LETTER_SPACING_MOBILE : SOLAR_WIND_SPEED_UNIT_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-unit-text-transform', SOLAR_WIND_SPEED_UNIT_TEXT_TRANSFORM);
+    document.documentElement.style.setProperty('--solar-wind-speed-unit-offset-y-desktop', SOLAR_WIND_SPEED_UNIT_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-unit-offset-y-mobile', SOLAR_WIND_SPEED_UNIT_OFFSET_Y_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-speed-unit-offset-y', isMobile ? SOLAR_WIND_SPEED_UNIT_OFFSET_Y_MOBILE : SOLAR_WIND_SPEED_UNIT_OFFSET_Y_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-gap-value-to-unit-desktop', SOLAR_WIND_SPEED_GAP_VALUE_TO_UNIT_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-gap-value-to-unit-mobile', SOLAR_WIND_SPEED_GAP_VALUE_TO_UNIT_MOBILE);
+    document.documentElement.style.setProperty('--solar-wind-speed-gap-value-to-unit', isMobile ? SOLAR_WIND_SPEED_GAP_VALUE_TO_UNIT_MOBILE : SOLAR_WIND_SPEED_GAP_VALUE_TO_UNIT_DESKTOP);
+
     document.documentElement.style.setProperty('--solar-wind-speed-sublabel-font-family', SOLAR_WIND_SPEED_SUBLABEL_FONT_FAMILY);
     document.documentElement.style.setProperty('--solar-wind-speed-sublabel-font-size-desktop', SOLAR_WIND_SPEED_SUBLABEL_FONT_SIZE_DESKTOP);
     document.documentElement.style.setProperty('--solar-wind-speed-sublabel-font-size-mobile', SOLAR_WIND_SPEED_SUBLABEL_FONT_SIZE_MOBILE);
-    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-font-size', isMobile ? SOLAR_WIND_SPEED_SUBLABEL_FONT_SIZE_MOBILE : SOLAR_WIND_SPEED_LABEL_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--solar-wind-speed-sublabel-font-size', isMobile ? SOLAR_WIND_SPEED_SUBLABEL_FONT_SIZE_MOBILE : SOLAR_WIND_SPEED_SUBLABEL_FONT_SIZE_DESKTOP);
     document.documentElement.style.setProperty('--solar-wind-speed-sublabel-line-height-desktop', String(SOLAR_WIND_SPEED_SUBLABEL_LINE_HEIGHT_DESKTOP));
     document.documentElement.style.setProperty('--solar-wind-speed-sublabel-line-height-mobile', String(SOLAR_WIND_SPEED_SUBLABEL_LINE_HEIGHT_MOBILE));
     document.documentElement.style.setProperty('--solar-wind-speed-sublabel-line-height', String(isMobile ? SOLAR_WIND_SPEED_SUBLABEL_LINE_HEIGHT_MOBILE : SOLAR_WIND_SPEED_SUBLABEL_LINE_HEIGHT_DESKTOP));
@@ -11466,7 +11496,7 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1489';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1499';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -16777,7 +16807,7 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
         ? liveSolarWindSpeedData.value
         : (activeSolarWindSpeedState?.value || SOLAR_WIND_SPEED_VALUE_MANUAL);
       const labelsSpeed = getSolarWindSpeedLabels(initialClassSpeed);
-      const displayValSpeed = formatSolarWindSpeedValue(initialValSpeed);
+      const displayValSpeed = formatSolarWindSpeedDialValue(initialValSpeed);
 
       dialSpeed.innerHTML = `
         <svg class="solar-wind-speed-svg clock-timer-svg" viewBox="-5 -5 110 110">
@@ -16796,6 +16826,7 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
           </div>
           <div class="solar-wind-speed-class">${initialClassSpeed}</div>
           <div class="solar-wind-speed-value">${displayValSpeed}</div>
+          <div class="solar-wind-speed-unit">${SOLAR_WIND_SPEED_UNIT_TEXT}</div>
         </div>
       `;
 
@@ -17406,8 +17437,10 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
   }
 
   function formatSolarWindBzValue(val) {
+    const str = String(val != null ? val : '').trim();
+    const isNeg = str.startsWith('-') || str.startsWith('–') || Object.is(val, -0) || (parseFloat(val) < 0);
     const num = parseFloat(val) || 0.0;
-    const sign = num > 0 ? '+' : (num < 0 ? '-' : '');
+    const sign = isNeg ? '–' : (num > 0 ? '+' : '');
     const absStr = Math.abs(num).toFixed(1);
     return `${sign}${absStr}${SOLAR_WIND_BZ_UNIT}`;
   }
@@ -17686,7 +17719,12 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
 
   function formatSolarWindSpeedValue(val) {
     const num = Math.round(parseFloat(val) || 0);
-    return `${num}${SOLAR_WIND_SPEED_UNIT}`;
+    return `${num}${SOLAR_WIND_SPEED_UNIT_TEXT}`;
+  }
+
+  function formatSolarWindSpeedDialValue(val) {
+    const num = Math.round(parseFloat(val) || 0);
+    return `${num}`;
   }
 
   function calculateSolarWindSpeedFraction(wClass, wVal) {
@@ -17778,12 +17816,14 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
     const line2El = dial.querySelector('.solar-wind-speed-label-line2');
     const classEl = dial.querySelector('.solar-wind-speed-class');
     const valueEl = dial.querySelector('.solar-wind-speed-value');
+    const unitEl = dial.querySelector('.solar-wind-speed-unit');
 
     if (line1El && line1El.textContent !== labels.line1) line1El.textContent = labels.line1;
     if (line2El && line2El.textContent !== labels.line2) line2El.textContent = labels.line2;
     if (classEl && classEl.textContent !== wClass) classEl.textContent = wClass;
-    const displayVal = formatSolarWindSpeedValue(wValue);
+    const displayVal = formatSolarWindSpeedDialValue(wValue);
     if (valueEl && valueEl.textContent !== displayVal) valueEl.textContent = displayVal;
+    if (unitEl && unitEl.textContent !== SOLAR_WIND_SPEED_UNIT_TEXT) unitEl.textContent = SOLAR_WIND_SPEED_UNIT_TEXT;
 
     dial.style.setProperty('--solar-wind-speed-current-color', color);
     dial.style.setProperty('--solar-wind-speed-peak-color', dailyPeakColor);

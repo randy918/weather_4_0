@@ -4036,7 +4036,18 @@ main {
         line-height: var(--solar-wind-speed-value-line-height, 0.92);
         letter-spacing: var(--solar-wind-speed-value-letter-spacing, -0.02vw);
         color: inherit;
-        transform: translateY(var(--solar-wind-speed-value-offset-y, -0.5vw));
+        transform: translateY(var(--solar-wind-speed-value-offset-y, -0.15vw));
+    }
+
+    .solar-wind-speed-unit {
+        font-family: var(--solar-wind-speed-unit-font-family, var(--solar-wind-speed-label-font-family, "euro", sans-serif));
+        font-size: var(--solar-wind-speed-unit-font-size, var(--solar-wind-speed-label-font-size, calc(var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.0748)));
+        line-height: var(--solar-wind-speed-unit-line-height, 1.0);
+        letter-spacing: var(--solar-wind-speed-unit-letter-spacing, 0.05vw);
+        text-transform: var(--solar-wind-speed-unit-text-transform, uppercase);
+        color: inherit;
+        transform: translateY(var(--solar-wind-speed-unit-offset-y, 0vw));
+        margin-top: var(--solar-wind-speed-gap-value-to-unit, calc(var(--solar-wind-speed-dial-size, var(--celestial-dial-size, 13.5vw)) * 0.015 - 0.25vw));
     }
 }
 
