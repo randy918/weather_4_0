@@ -3913,7 +3913,7 @@ main {
 
 .solar-wind-bz-sublabel {
     margin-top: var(--solar-wind-bz-sublabel-margin-top, 0.6vw);
-    transform: translateY(var(--solar-wind-bz-sublabel-offset-y, 0vw));
+    transform: translate(var(--solar-wind-bz-offset-x, 0vw), var(--solar-wind-bz-sublabel-offset-y, 0vw));
     font-family: var(--solar-wind-bz-sublabel-font-family, var(--sun-label-font-family, 'light', sans-serif));
     font-size: var(--solar-wind-bz-sublabel-font-size, 1.35vw);
     line-height: var(--solar-wind-bz-sublabel-line-height, 1.05);
@@ -4053,7 +4053,7 @@ main {
 
 .solar-wind-speed-sublabel {
     margin-top: var(--solar-wind-speed-sublabel-margin-top, 0.6vw);
-    transform: translateY(var(--solar-wind-speed-sublabel-offset-y, 0vw));
+    transform: translate(var(--solar-wind-speed-offset-x, 0vw), var(--solar-wind-speed-sublabel-offset-y, 0vw));
     font-family: var(--solar-wind-speed-sublabel-font-family, var(--sun-label-font-family, 'light', sans-serif));
     font-size: var(--solar-wind-speed-sublabel-font-size, 1.35vw);
     line-height: var(--solar-wind-speed-sublabel-line-height, 1.05);

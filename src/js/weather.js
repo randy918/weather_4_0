@@ -8738,8 +8738,8 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
   const SOLAR_WIND_BZ_MARGIN_TOP_MOBILE = '4.0vw';         // EDITABLE Mobile: Gap between upper G dial label and Bz dial
   const SOLAR_WIND_BZ_DIAL_SIZE_DESKTOP = 'auto';          // EDITABLE Desktop: 'auto' or custom vw
   const SOLAR_WIND_BZ_DIAL_SIZE_MOBILE = 'auto';           // EDITABLE Mobile: 'auto' or custom vw
-  const SOLAR_WIND_BZ_OFFSET_X_DESKTOP = '0vw';            // EDITABLE Desktop: Fine horizontal nudge
-  const SOLAR_WIND_BZ_OFFSET_X_MOBILE = '0vw';             // EDITABLE Mobile: Fine horizontal nudge
+  const SOLAR_WIND_BZ_OFFSET_X_DESKTOP = '-1.5vw';         // EDITABLE Desktop: Fine horizontal nudge (matches G0 cluster)
+  const SOLAR_WIND_BZ_OFFSET_X_MOBILE = '-3vw';            // EDITABLE Mobile: Fine horizontal nudge (matches G0 cluster)
   const SOLAR_WIND_BZ_OFFSET_Y_DESKTOP = '0vw';            // EDITABLE Desktop: Fine vertical nudge
   const SOLAR_WIND_BZ_OFFSET_Y_MOBILE = '0vw';             // EDITABLE Mobile: Fine vertical nudge
   const SOLAR_WIND_BZ_DIAL_BG_COLOR = 'transparent';       // EDITABLE: Dial background
@@ -8880,8 +8880,8 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
   const SOLAR_WIND_SPEED_MARGIN_TOP_MOBILE = '4.0vw';      // EDITABLE Mobile: Gap between upper R dial label and Speed dial
   const SOLAR_WIND_SPEED_DIAL_SIZE_DESKTOP = 'auto';       // EDITABLE Desktop: 'auto' or custom vw
   const SOLAR_WIND_SPEED_DIAL_SIZE_MOBILE = 'auto';        // EDITABLE Mobile: 'auto' or custom vw
-  const SOLAR_WIND_SPEED_OFFSET_X_DESKTOP = '0vw';         // EDITABLE Desktop: Fine horizontal nudge
-  const SOLAR_WIND_SPEED_OFFSET_X_MOBILE = '0vw';          // EDITABLE Mobile: Fine horizontal nudge
+  const SOLAR_WIND_SPEED_OFFSET_X_DESKTOP = '-1.5vw';      // EDITABLE Desktop: Fine horizontal nudge (matches R0 cluster)
+  const SOLAR_WIND_SPEED_OFFSET_X_MOBILE = '-3vw';         // EDITABLE Mobile: Fine horizontal nudge (matches R0 cluster)
   const SOLAR_WIND_SPEED_OFFSET_Y_DESKTOP = '0vw';         // EDITABLE Desktop: Fine vertical nudge
   const SOLAR_WIND_SPEED_OFFSET_Y_MOBILE = '0vw';          // EDITABLE Mobile: Fine vertical nudge
   const SOLAR_WIND_SPEED_DIAL_BG_COLOR = 'transparent';    // EDITABLE: Dial background
@@ -11496,7 +11496,7 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1499';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1501';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
