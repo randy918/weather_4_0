@@ -4074,3 +4074,114 @@ main {
         margin-right: 0.35vw;
     }
 }
+
+// =========================================================================
+// --- SDO / HMI Far Side Helioseismology Card Under Central Sun (JCV) ---
+// =========================================================================
+.sdo-hmi-container {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-top: var(--sdo-hmi-margin-top, 1.0vw);
+    transform: translate(var(--sdo-hmi-offset-x, 0vw), var(--sdo-hmi-offset-y, 0vw));
+    pointer-events: auto;
+}
+
+.sdo-hmi-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: var(--sdo-hmi-width, 22.0vw);
+    max-width: 90vw;
+    background-color: var(--sdo-hmi-bg-color, rgba(10, 6, 18, 0.75));
+    border: var(--sdo-hmi-border-width, 0.08vw) solid var(--sdo-hmi-border-color, rgba(255, 255, 255, 0.22));
+    border-radius: var(--sdo-hmi-border-radius, 0.8vw);
+    box-shadow: var(--sdo-hmi-box-shadow, 0 0.4vw 1.2vw rgba(0, 0, 0, 0.55), inset 0 0 0.8vw rgba(255, 180, 50, 0.08));
+    padding: var(--sdo-hmi-padding, 0.4vw 0.55vw 0.5vw 0.55vw);
+    box-sizing: border-box;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    mix-blend-mode: var(--sdo-hmi-blend-mode, normal);
+    isolation: isolate;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    animation: sdoHmiSway var(--sdo-hmi-sway-period, 7.0s) ease-in-out infinite;
+
+    &:hover {
+        border-color: rgba(255, 255, 255, 0.45);
+        box-shadow: 0 0.6vw 1.8vw rgba(0, 0, 0, 0.65), inset 0 0 1vw rgba(255, 180, 50, 0.16);
+    }
+}
+
+@keyframes sdoHmiSway {
+    0% {
+        transform: rotate(calc(-1 * var(--sdo-hmi-sway-angle, 1.0deg))) translateY(0);
+    }
+    50% {
+        transform: rotate(var(--sdo-hmi-sway-angle, 1.0deg)) translateY(calc(-0.1 * var(--sdo-hmi-sway-angle, 1.0deg)));
+    }
+    100% {
+        transform: rotate(calc(-1 * var(--sdo-hmi-sway-angle, 1.0deg))) translateY(0);
+    }
+}
+
+.sdo-hmi-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: var(--sdo-hmi-gap-header-to-map, 0.35vw);
+    padding: 0 0.2vw;
+    box-sizing: border-box;
+}
+
+.sdo-hmi-title {
+    font-family: var(--sdo-hmi-title-font-family, var(--sun-label-font-family, "euro", sans-serif));
+    font-size: var(--sdo-hmi-title-font-size, 0.95vw);
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: var(--sdo-hmi-title-letter-spacing, 0.05vw);
+    color: var(--sdo-hmi-title-color, rgba(255, 255, 255, 0.90));
+    text-transform: none;
+}
+
+.sdo-hmi-status-pill {
+    font-family: var(--sdo-hmi-pill-font-family, "euro-bold", sans-serif);
+    font-size: var(--sdo-hmi-pill-font-size, 0.60vw);
+    letter-spacing: 0.04vw;
+    color: var(--sdo-hmi-pill-color, #ffaa33);
+    background: rgba(255, 170, 50, 0.15);
+    border: 0.04vw solid rgba(255, 170, 50, 0.4);
+    border-radius: 0.35vw;
+    padding: 0.1vw 0.35vw;
+    line-height: 1.0;
+    text-transform: uppercase;
+    transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+}
+
+.sdo-hmi-map-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: var(--sdo-hmi-aspect-ratio, 2.57);
+    border-radius: calc(var(--sdo-hmi-border-radius, 0.8vw) * 0.65);
+    overflow: hidden;
+    background-color: #05020a;
+}
+
+.sdo-hmi-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    transition: opacity var(--sdo-hmi-crossfade-ms, 70ms) ease-in-out;
+}
