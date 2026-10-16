@@ -163,8 +163,8 @@ import weatherConditions from '../data/weather-conditions.json';
   const ALERT_SPACE_BANNER_MAX_WIDTH_RATIO_MOBILE = 0.94;  // EDITABLE: Max screen width fraction on mobile (94vw)
 
   // Preview Mode for visual demonstration ('examples', 'all', 'extreme', 'severe', or specific gauge like 'flare', or 'none')
-  // Defaulting to 'examples' displays 2 live banner examples immediately so the user can see them without waiting for a real solar event!
-  let TEST_SHOW_SPACE_WEATHER_ALERTS_PREVIEW = 'examples';
+  // Set to 'none' for normal live operation (only triggers on actual live Level 4/5 space weather events)
+  let TEST_SHOW_SPACE_WEATHER_ALERTS_PREVIEW = 'none';
 
   document.documentElement.style.setProperty('--alert-color-solar-flare-m', ALERT_COLOR_SPACE_WEATHER_SEVERE_DEFAULT);
   document.documentElement.style.setProperty('--alert-color-solar-flare-x', ALERT_COLOR_SPACE_WEATHER_EXTREME_DEFAULT);
@@ -12495,7 +12495,7 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1520';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1521';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
