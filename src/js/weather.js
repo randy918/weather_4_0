@@ -8979,62 +8979,6 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
   const SOLAR_WIND_SPEED_IMPACT_LEVEL_W5_ARROW = 'up';     // EDITABLE
   const SOLAR_WIND_SPEED_IMPACT_LEVEL_W5_TEXT = 'Extreme Solar Gale'; // EDITABLE
 
-  // =========================================================================
-  // --- EDITABLE: SDO / HMI Far Side Helioseismic Map Config (JCV) ---
-  // Positioned directly underneath the central Sun in Celestial Row
-  // =========================================================================
-  const SDO_HMI_ENABLED = true;                             // EDITABLE: Enable/disable SDO/HMI far side card
-  const SDO_HMI_TITLE_TEXT = 'SDO/HMI Far Side';            // EDITABLE: Card header title
-  const SDO_HMI_WIDTH_DESKTOP = '22.0vw';                   // EDITABLE Desktop: Card width (fits between S0 & BZ0)
-  const SDO_HMI_WIDTH_MOBILE = '52.0vw';                    // EDITABLE Mobile: Card width
-  const SDO_HMI_MARGIN_TOP_DESKTOP = '1.0vw';               // EDITABLE Desktop: Spacing below Sun circle
-  const SDO_HMI_MARGIN_TOP_MOBILE = '2.0vw';                // EDITABLE Mobile: Spacing below Sun circle
-  const SDO_HMI_OFFSET_X_DESKTOP = '0vw';                   // EDITABLE Desktop: Fine horizontal nudge
-  const SDO_HMI_OFFSET_X_MOBILE = '0vw';                    // EDITABLE Mobile: Fine horizontal nudge
-  const SDO_HMI_OFFSET_Y_DESKTOP = '0vw';                   // EDITABLE Desktop: Fine vertical nudge
-  const SDO_HMI_OFFSET_Y_MOBILE = '0vw';                    // EDITABLE Mobile: Fine vertical nudge
-  const SDO_HMI_PADDING_DESKTOP = '0.4vw 0.55vw 0.5vw 0.55vw'; // EDITABLE Desktop: Card internal padding
-  const SDO_HMI_PADDING_MOBILE = '0.9vw 1.2vw 1.1vw 1.2vw';  // EDITABLE Mobile: Card internal padding
-  const SDO_HMI_BG_COLOR = 'rgba(10, 6, 18, 0.75)';        // EDITABLE: Card background color
-  const SDO_HMI_BLEND_MODE = 'normal';                      // EDITABLE: Card blend mode ('normal', 'screen', 'lighten')
-  const SDO_HMI_BORDER_COLOR = 'rgba(255, 255, 255, 0.22)';// EDITABLE: Border track color (matches gauge rings)
-  const SDO_HMI_BORDER_WIDTH_DESKTOP = '0.08vw';            // EDITABLE Desktop: Border stroke width (matches gauges)
-  const SDO_HMI_BORDER_WIDTH_MOBILE = '0.15vw';             // EDITABLE Mobile: Border stroke width
-  const SDO_HMI_BORDER_RADIUS_DESKTOP = '0.8vw';            // EDITABLE Desktop: Rounded corner amount (JCV)
-  const SDO_HMI_BORDER_RADIUS_MOBILE = '1.6vw';             // EDITABLE Mobile: Rounded corner amount (JCV)
-  const SDO_HMI_BOX_SHADOW_DESKTOP = '0 0.4vw 1.2vw rgba(0, 0, 0, 0.55), inset 0 0 0.8vw rgba(255, 180, 50, 0.08)'; // EDITABLE Desktop
-  const SDO_HMI_BOX_SHADOW_MOBILE = '0 0.6vw 1.8vw rgba(0, 0, 0, 0.55), inset 0 0 1.2vw rgba(255, 180, 50, 0.08)';  // EDITABLE Mobile
-
-  // Typography (JCV)
-  const SDO_HMI_TITLE_FONT_FAMILY = "'euro', sans-serif";   // EDITABLE: Header font family
-  const SDO_HMI_TITLE_FONT_SIZE_DESKTOP = '0.95vw';         // EDITABLE Desktop: Header font size
-  const SDO_HMI_TITLE_FONT_SIZE_MOBILE = '1.8vw';           // EDITABLE Mobile: Header font size
-  const SDO_HMI_TITLE_COLOR = 'rgba(255, 255, 255, 0.90)';  // EDITABLE: Header font color
-  const SDO_HMI_TITLE_LETTER_SPACING_DESKTOP = '0.05vw';    // EDITABLE Desktop: Title letter spacing
-  const SDO_HMI_TITLE_LETTER_SPACING_MOBILE = '0.05vw';     // EDITABLE Mobile: Title letter spacing
-  const SDO_HMI_PILL_FONT_FAMILY = "'euro-bold', sans-serif"; // EDITABLE: Pill font family
-  const SDO_HMI_PILL_FONT_SIZE_DESKTOP = '0.60vw';          // EDITABLE Desktop: Pill font size
-  const SDO_HMI_PILL_FONT_SIZE_MOBILE = '1.1vw';            // EDITABLE Mobile: Pill font size
-  const SDO_HMI_GAP_HEADER_TO_MAP_DESKTOP = '0.35vw';       // EDITABLE Desktop: Gap between header and map
-  const SDO_HMI_GAP_HEADER_TO_MAP_MOBILE = '0.70vw';        // EDITABLE Mobile: Gap between header and map
-  const SDO_HMI_ASPECT_RATIO = '2.57';                      // EDITABLE: Map aspect ratio (900x350)
-
-  // Rocking / Sway Animation (JCV)
-  const SDO_HMI_SWAY_ENABLED = true;                        // EDITABLE: Toggle rhythmic rocking back and forth
-  const SDO_HMI_SWAY_ANGLE_DESKTOP = '1.0deg';              // EDITABLE Desktop: Sway rotation angle
-  const SDO_HMI_SWAY_ANGLE_MOBILE = '1.2deg';               // EDITABLE Mobile: Sway rotation angle
-  const SDO_HMI_SWAY_PERIOD_DESKTOP = '7.0s';               // EDITABLE Desktop: Sway period matching sizzle loop
-  const SDO_HMI_SWAY_PERIOD_MOBILE = '7.0s';                // EDITABLE Mobile: Sway period matching sizzle loop
-
-  // Progressive Time-Lapse Loop (JCV)
-  const SDO_HMI_LOOP_ENABLED = true;                        // EDITABLE: Toggle progressive time-lapse frame loop
-  const SDO_HMI_FPS_DESKTOP = 6;                            // EDITABLE Desktop: Playback speed in FPS
-  const SDO_HMI_FPS_MOBILE = 6;                             // EDITABLE Mobile: Playback speed in FPS
-  const SDO_HMI_PLAYBACK_MODE = 'pingpong';                 // EDITABLE: 'pingpong' (rocking back and forth) or 'forward'
-  const SDO_HMI_CROSSFADE_MS_DESKTOP = 70;                  // EDITABLE Desktop: Dual-buffer crossfade ms
-  const SDO_HMI_CROSSFADE_MS_MOBILE = 70;                   // EDITABLE Mobile: Dual-buffer crossfade ms
-  const SDO_HMI_PAUSE_END_MS = 250;                         // EDITABLE: Pause in ms at turnaround ends before reversing
-  
   // --- Flanking Duplicate Timezone Dials Config (JCV) ---
   // Duplicates the 1st (Pacific) and 5th (UK) dials down to the Sun/Earth row: [Pacific, Big Sun, Big Earth, UK]
   const CELESTIAL_DIALS_ENABLED = true;                         // EDITABLE: Enable/disable flanking dials in celestial row
@@ -10518,31 +10462,6 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
     document.documentElement.style.setProperty('--solar-wind-speed-sublabel-max-width-desktop', SOLAR_WIND_SPEED_SUBLABEL_MAX_WIDTH_DESKTOP);
     document.documentElement.style.setProperty('--solar-wind-speed-sublabel-max-width-mobile', SOLAR_WIND_SPEED_SUBLABEL_MAX_WIDTH_MOBILE);
     document.documentElement.style.setProperty('--solar-wind-speed-sublabel-max-width', isMobile ? SOLAR_WIND_SPEED_SUBLABEL_MAX_WIDTH_MOBILE : SOLAR_WIND_SPEED_SUBLABEL_MAX_WIDTH_DESKTOP);
-
-    // SDO / HMI Far Side Helioseismology Card Config Injection (JCV)
-    document.documentElement.style.setProperty('--sdo-hmi-width', isMobile ? SDO_HMI_WIDTH_MOBILE : SDO_HMI_WIDTH_DESKTOP);
-    document.documentElement.style.setProperty('--sdo-hmi-margin-top', isMobile ? SDO_HMI_MARGIN_TOP_MOBILE : SDO_HMI_MARGIN_TOP_DESKTOP);
-    document.documentElement.style.setProperty('--sdo-hmi-offset-x', isMobile ? SDO_HMI_OFFSET_X_MOBILE : SDO_HMI_OFFSET_X_DESKTOP);
-    document.documentElement.style.setProperty('--sdo-hmi-offset-y', isMobile ? SDO_HMI_OFFSET_Y_MOBILE : SDO_HMI_OFFSET_Y_DESKTOP);
-    document.documentElement.style.setProperty('--sdo-hmi-padding', isMobile ? SDO_HMI_PADDING_MOBILE : SDO_HMI_PADDING_DESKTOP);
-    document.documentElement.style.setProperty('--sdo-hmi-bg-color', SDO_HMI_BG_COLOR);
-    document.documentElement.style.setProperty('--sdo-hmi-blend-mode', SDO_HMI_BLEND_MODE);
-    document.documentElement.style.setProperty('--sdo-hmi-border-color', SDO_HMI_BORDER_COLOR);
-    document.documentElement.style.setProperty('--sdo-hmi-border-width', isMobile ? SDO_HMI_BORDER_WIDTH_MOBILE : SDO_HMI_BORDER_WIDTH_DESKTOP);
-    document.documentElement.style.setProperty('--sdo-hmi-border-radius', isMobile ? SDO_HMI_BORDER_RADIUS_MOBILE : SDO_HMI_BORDER_RADIUS_DESKTOP);
-    document.documentElement.style.setProperty('--sdo-hmi-box-shadow', isMobile ? SDO_HMI_BOX_SHADOW_MOBILE : SDO_HMI_BOX_SHADOW_DESKTOP);
-    document.documentElement.style.setProperty('--sdo-hmi-title-font-family', SDO_HMI_TITLE_FONT_FAMILY);
-    document.documentElement.style.setProperty('--sdo-hmi-title-font-size', isMobile ? SDO_HMI_TITLE_FONT_SIZE_MOBILE : SDO_HMI_TITLE_FONT_SIZE_DESKTOP);
-    document.documentElement.style.setProperty('--sdo-hmi-title-color', SDO_HMI_TITLE_COLOR);
-    document.documentElement.style.setProperty('--sdo-hmi-title-letter-spacing', isMobile ? SDO_HMI_TITLE_LETTER_SPACING_MOBILE : SDO_HMI_TITLE_LETTER_SPACING_DESKTOP);
-    document.documentElement.style.setProperty('--sdo-hmi-pill-font-family', SDO_HMI_PILL_FONT_FAMILY);
-    document.documentElement.style.setProperty('--sdo-hmi-pill-font-size', isMobile ? SDO_HMI_PILL_FONT_SIZE_MOBILE : SDO_HMI_PILL_FONT_SIZE_DESKTOP);
-    document.documentElement.style.setProperty('--sdo-hmi-gap-header-to-map', isMobile ? SDO_HMI_GAP_HEADER_TO_MAP_MOBILE : SDO_HMI_GAP_HEADER_TO_MAP_DESKTOP);
-    document.documentElement.style.setProperty('--sdo-hmi-aspect-ratio', SDO_HMI_ASPECT_RATIO);
-    document.documentElement.style.setProperty('--sdo-hmi-sway-angle', SDO_HMI_SWAY_ENABLED ? (isMobile ? SDO_HMI_SWAY_ANGLE_MOBILE : SDO_HMI_SWAY_ANGLE_DESKTOP) : '0deg');
-    document.documentElement.style.setProperty('--sdo-hmi-sway-period', isMobile ? SDO_HMI_SWAY_PERIOD_MOBILE : SDO_HMI_SWAY_PERIOD_DESKTOP);
-    document.documentElement.style.setProperty('--sdo-hmi-crossfade-ms', `${isMobile ? SDO_HMI_CROSSFADE_MS_MOBILE : SDO_HMI_CROSSFADE_MS_DESKTOP}ms`);
-
     if (typeof updateSolarWindSpeedDial === 'function') {
       updateSolarWindSpeedDial();
     }
@@ -11576,7 +11495,7 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1504';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1510';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -18010,161 +17929,6 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
     updateSolarWindSpeedDial();
   };
 
-  /* --- SDO / HMI Far Side Helioseismology Component --- */
-  const SDO_HMI_FRAMES = Array.from({ length: 21 }, (_, i) => `img/sdo_hmi/frame_${i}.png`);
-  const SDO_HMI_EUV_MAP = 'img/sdo_hmi/euv_map.png';
-  let sdoHmiMode = 'timelapse'; // 'timelapse' or 'euv'
-  let sdoHmiIndex = 0;
-  let sdoHmiDirection = 1;
-  let sdoHmiActiveLayer = 'a';
-  let sdoHmiTimeoutId = null;
-  let preloadedSdoHmiImages = [];
-
-  function preloadSdoHmiImages() {
-    preloadedSdoHmiImages = SDO_HMI_FRAMES.map(url => {
-      const img = new Image();
-      img.src = url;
-      return img;
-    });
-    const euvImg = new Image();
-    euvImg.src = SDO_HMI_EUV_MAP;
-  }
-
-  function runSdoHmiStep() {
-    if (!SDO_HMI_ENABLED || !SDO_HMI_LOOP_ENABLED || sdoHmiMode !== 'timelapse') return;
-    const total = preloadedSdoHmiImages.length;
-    if (total <= 1) return;
-
-    let nextIdx = sdoHmiIndex;
-    let isEnd = false;
-    if (SDO_HMI_PLAYBACK_MODE === 'pingpong') {
-      if (sdoHmiDirection === 1) {
-        if (sdoHmiIndex >= total - 1) {
-          sdoHmiDirection = -1;
-          nextIdx = total - 2;
-          isEnd = true;
-        } else {
-          nextIdx = sdoHmiIndex + 1;
-        }
-      } else {
-        if (sdoHmiIndex <= 0) {
-          sdoHmiDirection = 1;
-          nextIdx = 1;
-          isEnd = true;
-        } else {
-          nextIdx = sdoHmiIndex - 1;
-        }
-      }
-    } else {
-      nextIdx = (sdoHmiIndex + 1) % total;
-      isEnd = (sdoHmiIndex >= total - 1);
-    }
-    sdoHmiIndex = Math.max(0, Math.min(total - 1, nextIdx));
-
-    const imgA = document.getElementById('sdo-hmi-img-a');
-    const imgB = document.getElementById('sdo-hmi-img-b');
-    const nextImgObj = preloadedSdoHmiImages[sdoHmiIndex];
-    if (imgA && imgB && nextImgObj && nextImgObj.src) {
-      if (sdoHmiActiveLayer === 'a') {
-        imgB.src = nextImgObj.src;
-        imgB.style.opacity = '1';
-        imgA.style.opacity = '0';
-        sdoHmiActiveLayer = 'b';
-      } else {
-        imgA.src = nextImgObj.src;
-        imgA.style.opacity = '1';
-        imgB.style.opacity = '0';
-        sdoHmiActiveLayer = 'a';
-      }
-    }
-
-    const isMobile = window.innerWidth <= 767;
-    const fps = isMobile ? SDO_HMI_FPS_MOBILE : SDO_HMI_FPS_DESKTOP;
-    let delay = Math.max(40, Math.round(1000 / Math.max(1, fps)));
-    if (isEnd && SDO_HMI_PAUSE_END_MS > 0) delay += SDO_HMI_PAUSE_END_MS;
-
-    sdoHmiTimeoutId = setTimeout(runSdoHmiStep, delay);
-  }
-
-  function handleSdoHmiCardClick(e) {
-    if (e) e.stopPropagation();
-    const pill = document.getElementById('sdo-hmi-status-pill');
-    const imgA = document.getElementById('sdo-hmi-img-a');
-    const imgB = document.getElementById('sdo-hmi-img-b');
-    if (!pill || !imgA || !imgB) return;
-
-    if (sdoHmiMode === 'timelapse') {
-      sdoHmiMode = 'euv';
-      if (sdoHmiTimeoutId) clearTimeout(sdoHmiTimeoutId);
-      pill.textContent = 'ACTIVE REGIONS';
-      pill.style.color = '#ff6644';
-      pill.style.borderColor = 'rgba(255, 100, 70, 0.4)';
-      pill.style.background = 'rgba(255, 100, 70, 0.15)';
-      imgA.src = SDO_HMI_EUV_MAP;
-      imgA.style.opacity = '1';
-      imgB.style.opacity = '0';
-    } else {
-      sdoHmiMode = 'timelapse';
-      pill.textContent = '27D ACOUSTIC';
-      pill.style.color = '#ffaa33';
-      pill.style.borderColor = 'rgba(255, 170, 50, 0.4)';
-      pill.style.background = 'rgba(255, 170, 50, 0.15)';
-      runSdoHmiStep();
-    }
-  }
-
-  function buildSdoHmiCard() {
-    const container = document.createElement('div');
-    container.className = 'sdo-hmi-container';
-    container.id = 'sdo-hmi-container';
-
-    const card = document.createElement('div');
-    card.className = 'sdo-hmi-card';
-    card.id = 'sdo-hmi-card';
-    card.setAttribute('title', 'SDO/HMI Helioseismic Far Side Map (Click to toggle Active Regions / 27D Acoustic Time-Lapse)');
-
-    const header = document.createElement('div');
-    header.className = 'sdo-hmi-header';
-
-    const title = document.createElement('span');
-    title.className = 'sdo-hmi-title';
-    title.textContent = SDO_HMI_TITLE_TEXT;
-
-    const pill = document.createElement('span');
-    pill.className = 'sdo-hmi-status-pill';
-    pill.id = 'sdo-hmi-status-pill';
-    pill.textContent = '27D ACOUSTIC';
-
-    header.appendChild(title);
-    header.appendChild(pill);
-    card.appendChild(header);
-
-    const mapFrame = document.createElement('div');
-    mapFrame.className = 'sdo-hmi-map-frame';
-    mapFrame.id = 'sdo-hmi-map-frame';
-
-    const imgA = document.createElement('img');
-    imgA.className = 'sdo-hmi-img sdo-hmi-img-a';
-    imgA.id = 'sdo-hmi-img-a';
-    imgA.src = SDO_HMI_FRAMES[0];
-    imgA.alt = 'SDO/HMI Far Side Acoustic Map';
-
-    const imgB = document.createElement('img');
-    imgB.className = 'sdo-hmi-img sdo-hmi-img-b';
-    imgB.id = 'sdo-hmi-img-b';
-    imgB.src = SDO_HMI_FRAMES[1];
-    imgB.alt = 'SDO/HMI Far Side Acoustic Map';
-    imgB.style.opacity = '0';
-
-    mapFrame.appendChild(imgA);
-    mapFrame.appendChild(imgB);
-    card.appendChild(mapFrame);
-
-    card.addEventListener('click', handleSdoHmiCardClick);
-
-    container.appendChild(card);
-    return container;
-  }
 
   function buildWorldClockColumn(zoneConfig) {
     const {
@@ -18879,12 +18643,8 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
       'Live Sunspot & Coronal 27-Day Rotation Animation from GOES-19 SUVI Fe195'
     );
     const leftCol = buildCelestialColumn('sun-col-left', leftSun, SUN_LABEL_LEFT_TEXT, 'sun-label-left');
-    if (SDO_HMI_ENABLED) {
-      const sdoHmiCard = buildSdoHmiCard();
-      leftCol.appendChild(sdoHmiCard);
-      preloadSdoHmiImages();
-      setTimeout(runSdoHmiStep, 150);
-    }
+    const existingSdo = document.getElementById('sdo-hmi-container');
+    if (existingSdo) existingSdo.remove();
 
     // Right Circle: Earth Live (NOAA GOES-19 GeoColor Full Disk)
     const rightEarth = buildEarthCircle(
