@@ -124,9 +124,9 @@ import weatherConditions from '../data/weather-conditions.json';
   const ALERT_TITLE_GEOMAGNETIC_STORM_G5 = "EXTREME GEOMAGNETIC STORM";
   const ALERT_BADGE_GEOMAGNETIC_STORM_G5 = "extreme grid danger";
 
-  const ALERT_TITLE_IMF_BZ_BZ4 = "SEVERE SOUTH IMF BZ";
+  const ALERT_TITLE_IMF_BZ_BZ4 = "SEVERE SOUTH IMF Bz";
   const ALERT_BADGE_IMF_BZ_BZ4 = "storm influx";
-  const ALERT_TITLE_IMF_BZ_BZ5 = "EXTREME SOUTH IMF BZ";
+  const ALERT_TITLE_IMF_BZ_BZ5 = "EXTREME SOUTH IMF Bz";
   const ALERT_BADGE_IMF_BZ_BZ5 = "severe disruption";
 
   const ALERT_TITLE_RADIO_BLACKOUT_R4 = "SEVERE RADIO BLACKOUT";
@@ -2969,6 +2969,8 @@ import weatherConditions from '../data/weather-conditions.json';
     "EXTREME SOLAR RADIATION STORM": ALERT_COLOR_SOLAR_RADIATION_STORM_S5,
     "SEVERE GEOMAGNETIC STORM": ALERT_COLOR_GEOMAGNETIC_STORM_G4,
     "EXTREME GEOMAGNETIC STORM": ALERT_COLOR_GEOMAGNETIC_STORM_G5,
+    "SEVERE SOUTH IMF Bz": ALERT_COLOR_IMF_BZ_BZ4,
+    "EXTREME SOUTH IMF Bz": ALERT_COLOR_IMF_BZ_BZ5,
     "SEVERE SOUTH IMF BZ": ALERT_COLOR_IMF_BZ_BZ4,
     "EXTREME SOUTH IMF BZ": ALERT_COLOR_IMF_BZ_BZ5,
     "SEVERE RADIO BLACKOUT": ALERT_COLOR_RADIO_BLACKOUT_R4,
@@ -3009,6 +3011,7 @@ import weatherConditions from '../data/weather-conditions.json';
     "SOLAR FLARE": ALERT_ICON_SOLAR_FLARE,
     "SOLAR RADIATION STORM": ALERT_ICON_SOLAR_RADIATION_STORM,
     "GEOMAGNETIC STORM": ALERT_ICON_GEOMAGNETIC_STORM,
+    "IMF Bz": ALERT_ICON_IMF_BZ,
     "IMF BZ": ALERT_ICON_IMF_BZ,
     "RADIO BLACKOUT": ALERT_ICON_RADIO_BLACKOUT,
     "SOLAR WIND GALE": ALERT_ICON_SOLAR_WIND_SPEED,
@@ -4270,6 +4273,7 @@ import weatherConditions from '../data/weather-conditions.json';
         display: inline-block;
         transform: translateY(var(--alert-space-class-vertical-offset, 0vw));
         vertical-align: baseline;
+        text-transform: none;
       }
       .alert-expires {
         font-family: 'FiraSans', 'Fira Sans', sans-serif;
@@ -5152,7 +5156,7 @@ import weatherConditions from '../data/weather-conditions.json';
       // Acronyms & Weather Terms
       "NWS", "CDT", "CST", "Doppler", "National Weather Service", "OK",
       // Space Weather & Scientific Acronyms
-      "NOAA", "SWPC", "GOES", "DSCOVR", "ACE", "NASA", "LEO", "HF", "VHF", "UHF", "GPS", "GNSS", "AU", "CME", "IMF", "Bz", "Kp", "R5", "R4", "R3", "R2", "R1", "W5", "W4", "W3", "W2", "W1", "G5", "G4", "G3", "G2", "G1", "S5", "S4", "S3", "S2", "S1", "BZ5", "BZ4", "BZ3", "BZ2", "BZ1", "MHz", "GHz", "nT", "pfu", "dB", "EVA",
+      "NOAA", "SWPC", "GOES", "DSCOVR", "ACE", "NASA", "LEO", "HF", "VHF", "UHF", "GPS", "GNSS", "AU", "CME", "IMF", "Bz", "Kp", "R5", "R4", "R3", "R2", "R1", "W5", "W4", "W3", "W2", "W1", "G5", "G4", "G3", "G2", "G1", "S5", "S4", "S3", "S2", "S1", "Bz5", "Bz4", "Bz3", "Bz2", "Bz1", "MHz", "GHz", "nT", "pfu", "dB", "EVA",
       // Days & Months
       "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday",
       "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
@@ -5280,7 +5284,7 @@ import weatherConditions from '../data/weather-conditions.json';
     const title = alert.event || 'Weather Alert';
     
     // Format title: place a non-breaking space after word 2 in a typical advisory
-    let titleArr = title.toUpperCase().split(' ');
+    let titleArr = title.toUpperCase().replace(/\bBZ\b/g, 'Bz').split(' ');
     if (titleArr.length > 2) {
       titleArr[1] = titleArr[1] + '&nbsp;' + titleArr[2];
       titleArr.splice(2, 1);
@@ -5809,12 +5813,12 @@ Critical space weather emergency requiring continuous planetary infrastructure m
           icon: ALERT_ICON_IMF_BZ,
           sender_name: "NOAA Space Weather Prediction Center",
           isSpaceWeather: true,
-          spaceClass: "BZ4",
+          spaceClass: "Bz4",
           modalHtml: `
             <p style="margin-top: 0 !important;">The Interplanetary Magnetic Field (IMF) Bz is strongly oriented southward between -15 nT and -20 nT.</p>
             ${buildSpaceWeatherSectionHeader('Current Observations &amp; Readings:')}
-            ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ4, 'Current IMF Bz', (currentBzClass === 'BZ4' ? currentBzValDisplay : '-16.0 nT'))}
-            ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ4, 'Peak Daily Southward Bz', 'PEAK ' + (currentBzClass === 'BZ4' ? peakBzValDisplay : '-18.0 nT'))}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ4, 'Current IMF Bz', (String(currentBzClass).toUpperCase() === 'BZ4' ? currentBzValDisplay : '-16.0 nT'))}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ4, 'Peak Daily Southward Bz', 'PEAK ' + (String(currentBzClass).toUpperCase() === 'BZ4' ? peakBzValDisplay : '-18.0 nT'))}
             ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ4, 'Orientation', 'Strong Southward Magnetic Reconnection (-15 to -20 nT)')}
             ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ4, 'Magnetosphere State', 'Magnetic gate open: direct solar plasma injection')}
             ${buildSpaceWeatherSectionHeader('Key Operational &amp; Infrastructure Impacts:')}
@@ -5825,7 +5829,7 @@ Critical space weather emergency requiring continuous planetary infrastructure m
           `,
           description: `Interplanetary Magnetic Field (IMF) Bz is strongly oriented southward between -15 nT and -20 nT.
 
-• Current IMF Bz: ${(currentBzClass === 'BZ4' ? currentBzValDisplay : '-16.0 nT')} (Peak: ${(currentBzClass === 'BZ4' ? peakBzValDisplay : '-18.0 nT')})
+• Current IMF Bz: ${(String(currentBzClass).toUpperCase() === 'BZ4' ? currentBzValDisplay : '-16.0 nT')} (Peak: ${(String(currentBzClass).toUpperCase() === 'BZ4' ? peakBzValDisplay : '-18.0 nT')})
 • Magnetosphere Coupling: Earth's magnetic shield is opened, allowing massive direct solar wind plasma injection.
 • Magnetospheric Substorms: Frequent high-energy substorms and intensified particle precipitation into upper atmosphere.
 • Geomagnetic Stress: Rapid energy accumulation inside Earth's magnetotail leading toward severe storming.
@@ -5840,12 +5844,12 @@ Continuous solar wind monitoring active via DSCOVR and ACE spacecraft at the L1 
           icon: ALERT_ICON_IMF_BZ,
           sender_name: "NOAA Space Weather Prediction Center",
           isSpaceWeather: true,
-          spaceClass: "BZ5",
+          spaceClass: "Bz5",
           modalHtml: `
             <p style="margin-top: 0 !important;">Critical southward orientation of the Interplanetary Magnetic Field with Bz plunging below -20 nT.</p>
             ${buildSpaceWeatherSectionHeader('Current Observations &amp; Readings:')}
-            ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ5, 'Current IMF Bz', (currentBzClass === 'BZ5' ? currentBzValDisplay : '-26.0 nT'))}
-            ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ5, 'Peak Daily Southward Bz', 'PEAK ' + (currentBzClass === 'BZ5' ? peakBzValDisplay : '-28.0 nT'))}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ5, 'Current IMF Bz', (String(currentBzClass).toUpperCase() === 'BZ5' ? currentBzValDisplay : '-26.0 nT'))}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ5, 'Peak Daily Southward Bz', 'PEAK ' + (String(currentBzClass).toUpperCase() === 'BZ5' ? peakBzValDisplay : '-28.0 nT'))}
             ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ5, 'Orientation', 'Critical Extreme Southward Orientation (&lt;= -20 nT)')}
             ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ5, 'Reconnection Gate', 'Maximum magnetic reconnection between interplanetary field and Earth')}
             ${buildSpaceWeatherSectionHeader('Key Operational &amp; Infrastructure Impacts:')}
@@ -5856,7 +5860,7 @@ Continuous solar wind monitoring active via DSCOVR and ACE spacecraft at the L1 
           `,
           description: `Critical southward orientation of the Interplanetary Magnetic Field with Bz plunging below -20 nT.
 
-• Current IMF Bz: ${(currentBzClass === 'BZ5' ? currentBzValDisplay : '-26.0 nT')} (Peak: ${(currentBzClass === 'BZ5' ? peakBzValDisplay : '-28.0 nT')})
+• Current IMF Bz: ${(String(currentBzClass).toUpperCase() === 'BZ5' ? currentBzValDisplay : '-26.0 nT')} (Peak: ${(String(currentBzClass).toUpperCase() === 'BZ5' ? peakBzValDisplay : '-28.0 nT')})
 • Magnetic Gate Open: Maximum magnetic reconnection between interplanetary field and Earth's terrestrial field lines.
 • Severe Disruption: Intense ring current amplification and high ground-induced current (GIC) hazard.
 • Rapid Escalation: Extremely favorable conditions for severe to extreme geomagnetic disturbance within hours.
@@ -6090,9 +6094,10 @@ Extreme solar wind event posing significant hazards to satellite operations and 
 
     // IMF Bz dial:
     const bzClass = activeSolarWindBzState?.class || (SOLAR_WIND_BZ_MODE === 'live' && liveSolarWindBzData ? liveSolarWindBzData.class : SOLAR_WIND_BZ_CLASS_MANUAL);
-    if (bzClass === 'BZ5') {
+    const bzClassUpper = String(bzClass).toUpperCase();
+    if (bzClassUpper === 'BZ5') {
       addAlert(defs.bz.extreme);
-    } else if (bzClass === 'BZ4') {
+    } else if (bzClassUpper === 'BZ4') {
       addAlert(defs.bz.severe);
     }
 
@@ -6969,7 +6974,7 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
       if (alert.spaceClass) {
         alertText += `<span class="alert-space-class">${alert.spaceClass}</span>`;
       }
-      let eventTitle = alert.event.toUpperCase();
+      let eventTitle = alert.event.toUpperCase().replace(/\bBZ\b/g, '<span style="text-transform: none;">Bz</span>');
       if (alert.spaceClass) {
         const clsUpper = alert.spaceClass.toUpperCase();
         if (eventTitle.startsWith(clsUpper + ' ') || eventTitle.startsWith(clsUpper + '&NBSP;')) {
@@ -9687,35 +9692,35 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
   // =========================================================================
   const SOLAR_WIND_BZ_DIAL_ENABLED = true;                 // EDITABLE: Enable/disable Solar Wind Bz dial
   const SOLAR_WIND_BZ_MODE = 'live';                       // EDITABLE: 'live' (NOAA SWPC real-time Bz) or 'manual'
-  const SOLAR_WIND_BZ_CLASS_MANUAL = 'BZ0';                // EDITABLE: Manual test class: 'BZ0', 'BZ1', 'BZ2', 'BZ3', 'BZ4', 'BZ5'
+  const SOLAR_WIND_BZ_CLASS_MANUAL = 'Bz0';                // EDITABLE: Manual test class: 'Bz0', 'Bz1', 'Bz2', 'Bz3', 'Bz4', 'Bz5'
   const SOLAR_WIND_BZ_VALUE_MANUAL = 1.2;                  // EDITABLE: Manual test value in nT
-  const SOLAR_WIND_BZ_PEAK_CLASS_MANUAL = 'BZ0';           // EDITABLE: Manual test peak class
+  const SOLAR_WIND_BZ_PEAK_CLASS_MANUAL = 'Bz0';           // EDITABLE: Manual test peak class
   const SOLAR_WIND_BZ_PEAK_VALUE_MANUAL = 1.2;            // EDITABLE: Manual test peak value in nT
   const SOLAR_WIND_BZ_CLICK_CYCLES_CLASSES = true;        // EDITABLE: Click/tap dial to cycle test levels
   const SOLAR_WIND_BZ_AUTO_REFRESH_MS = 60000;            // EDITABLE: Polling interval in ms
 
   // Temperature Colors per Bz Level (JCV)
-  const SOLAR_WIND_BZ_COLOR_LEVEL_BZ0 = 55;                // EDITABLE: Level BZ0 (North / Quiet / Shield Closed) green
-  const SOLAR_WIND_BZ_COLOR_LEVEL_BZ1 = 75;                // EDITABLE: Level BZ1 (0 to -5 nT / Weak South) yellow-gold
-  const SOLAR_WIND_BZ_COLOR_LEVEL_BZ2 = 85;                // EDITABLE: Level BZ2 (-5 to -10 nT / Moderate South) orange
-  const SOLAR_WIND_BZ_COLOR_LEVEL_BZ3 = 95;                // EDITABLE: Level BZ3 (-10 to -15 nT / Strong South) tomato coral/red
-  const SOLAR_WIND_BZ_COLOR_LEVEL_BZ4 = 105;               // EDITABLE: Level BZ4 (-15 to -20 nT / Severe South) vibrant red
-  const SOLAR_WIND_BZ_COLOR_LEVEL_BZ5 = -5;                // EDITABLE: Level BZ5 (< -20 nT / Extreme South) shocking magenta
+  const SOLAR_WIND_BZ_COLOR_LEVEL_BZ0 = 55;                // EDITABLE: Level Bz0 (North / Quiet / Shield Closed) green
+  const SOLAR_WIND_BZ_COLOR_LEVEL_BZ1 = 75;                // EDITABLE: Level Bz1 (0 to -5 nT / Weak South) yellow-gold
+  const SOLAR_WIND_BZ_COLOR_LEVEL_BZ2 = 85;                // EDITABLE: Level Bz2 (-5 to -10 nT / Moderate South) orange
+  const SOLAR_WIND_BZ_COLOR_LEVEL_BZ3 = 95;                // EDITABLE: Level Bz3 (-10 to -15 nT / Strong South) tomato coral/red
+  const SOLAR_WIND_BZ_COLOR_LEVEL_BZ4 = 105;               // EDITABLE: Level Bz4 (-15 to -20 nT / Severe South) vibrant red
+  const SOLAR_WIND_BZ_COLOR_LEVEL_BZ5 = -5;                // EDITABLE: Level Bz5 (< -20 nT / Extreme South) shocking magenta
   const SOLAR_WIND_BZ_COLOR_OVERRIDE = null;               // EDITABLE: Universal color override
 
   // Level Descriptive Labels (JCV)
-  const SOLAR_WIND_BZ_LABEL_BZ0_LINE1 = 'IMF BZ';          // EDITABLE: Line 1 label for BZ0
-  const SOLAR_WIND_BZ_LABEL_BZ0_LINE2 = 'NORTH';           // EDITABLE: Line 2 label for BZ0
-  const SOLAR_WIND_BZ_LABEL_BZ1_LINE1 = 'IMF BZ';          // EDITABLE: Line 1 label for BZ1
-  const SOLAR_WIND_BZ_LABEL_BZ1_LINE2 = 'SOUTH';           // EDITABLE: Line 2 label for BZ1
-  const SOLAR_WIND_BZ_LABEL_BZ2_LINE1 = 'IMF BZ';          // EDITABLE: Line 1 label for BZ2
-  const SOLAR_WIND_BZ_LABEL_BZ2_LINE2 = 'SOUTH';           // EDITABLE: Line 2 label for BZ2
-  const SOLAR_WIND_BZ_LABEL_BZ3_LINE1 = 'IMF BZ';          // EDITABLE: Line 1 label for BZ3
-  const SOLAR_WIND_BZ_LABEL_BZ3_LINE2 = 'SOUTH';           // EDITABLE: Line 2 label for BZ3
-  const SOLAR_WIND_BZ_LABEL_BZ4_LINE1 = 'IMF BZ';          // EDITABLE: Line 1 label for BZ4
-  const SOLAR_WIND_BZ_LABEL_BZ4_LINE2 = 'SOUTH';           // EDITABLE: Line 2 label for BZ4
-  const SOLAR_WIND_BZ_LABEL_BZ5_LINE1 = 'IMF BZ';          // EDITABLE: Line 1 label for BZ5
-  const SOLAR_WIND_BZ_LABEL_BZ5_LINE2 = 'SOUTH';           // EDITABLE: Line 2 label for BZ5
+  const SOLAR_WIND_BZ_LABEL_BZ0_LINE1 = 'IMF Bz';          // EDITABLE: Line 1 label for Bz0
+  const SOLAR_WIND_BZ_LABEL_BZ0_LINE2 = 'NORTH';           // EDITABLE: Line 2 label for Bz0
+  const SOLAR_WIND_BZ_LABEL_BZ1_LINE1 = 'IMF Bz';          // EDITABLE: Line 1 label for Bz1
+  const SOLAR_WIND_BZ_LABEL_BZ1_LINE2 = 'SOUTH';           // EDITABLE: Line 2 label for Bz1
+  const SOLAR_WIND_BZ_LABEL_BZ2_LINE1 = 'IMF Bz';          // EDITABLE: Line 1 label for Bz2
+  const SOLAR_WIND_BZ_LABEL_BZ2_LINE2 = 'SOUTH';           // EDITABLE: Line 2 label for Bz2
+  const SOLAR_WIND_BZ_LABEL_BZ3_LINE1 = 'IMF Bz';          // EDITABLE: Line 1 label for Bz3
+  const SOLAR_WIND_BZ_LABEL_BZ3_LINE2 = 'SOUTH';           // EDITABLE: Line 2 label for Bz3
+  const SOLAR_WIND_BZ_LABEL_BZ4_LINE1 = 'IMF Bz';          // EDITABLE: Line 1 label for Bz4
+  const SOLAR_WIND_BZ_LABEL_BZ4_LINE2 = 'SOUTH';           // EDITABLE: Line 2 label for Bz4
+  const SOLAR_WIND_BZ_LABEL_BZ5_LINE1 = 'IMF Bz';          // EDITABLE: Line 1 label for Bz5
+  const SOLAR_WIND_BZ_LABEL_BZ5_LINE2 = 'SOUTH';           // EDITABLE: Line 2 label for Bz5
 
   // Circular Progress Ring & Track (JCV)
   const SOLAR_WIND_BZ_START_ANGLE_DEG_DESKTOP = 90;        // EDITABLE Desktop: Arc start angle
@@ -12495,7 +12500,7 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1521';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1523';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -18318,7 +18323,7 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
             <span class="solar-wind-bz-label-line1">${labelsBz.line1}</span>
             <span class="solar-wind-bz-label-line2">${labelsBz.line2}</span>
           </div>
-          <div class="solar-wind-bz-class">${initialClassBz}</div>
+          <div class="solar-wind-bz-class">${String(initialClassBz).replace(/^BZ/i, 'Bz')}</div>
           <div class="solar-wind-bz-value">${displayValBz}</div>
         </div>
       `;
@@ -18339,7 +18344,8 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
           const baseHtmlBz = formatImpactSublabelHtml(impactBz.arrow, impactBz.text);
           const initialColorBz = getSolarWindBzLevelColor(initialClassBz);
           const formattedPeakVal = formatSolarWindBzValue(SOLAR_WIND_BZ_PEAK_VALUE_MANUAL);
-          const line2TextBz = `PEAK ${initialClassBz}<br><span style="display:inline-block; margin-top: var(--solar-wind-bz-sublabel-peak-value-margin-top, 0vw);">${formattedPeakVal}</span>`;
+          const formattedPeakClassBz = String(initialClassBz).replace(/^BZ/i, 'Bz');
+          const line2TextBz = `PEAK ${formattedPeakClassBz}<br><span style="display:inline-block; margin-top: var(--solar-wind-bz-sublabel-peak-value-margin-top, 0vw);">${formattedPeakVal}</span>`;
           innerContentBz = `<br>${baseHtmlBz}<br><span style="display: inline-block; margin-top: var(--solar-wind-bz-sublabel-peak-margin-top, 0vw); font-family: 'euro-bold', sans-serif; color: ${initialColorBz};">${line2TextBz}</span>`;
         } else {
           innerContentBz = (isMobile ? SOLAR_WIND_BZ_SUBLABEL_TEXT_MOBILE : SOLAR_WIND_BZ_SUBLABEL_TEXT_DESKTOP);
@@ -18374,12 +18380,12 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
 
   /* --- Solar Wind Bz (IMF Gatekeeper) Component --- */
   const SOLAR_WIND_BZ_TEST_LEVELS = [
-    { class: 'BZ0', value: 1.2, peakClass: 'BZ0', peakValue: 1.2 },
-    { class: 'BZ1', value: -3.5, peakClass: 'BZ1', peakValue: -4.0 },
-    { class: 'BZ2', value: -7.8, peakClass: 'BZ2', peakValue: -8.5 },
-    { class: 'BZ3', value: -12.4, peakClass: 'BZ3', peakValue: -14.0 },
-    { class: 'BZ4', value: -18.2, peakClass: 'BZ4', peakValue: -19.5 },
-    { class: 'BZ5', value: -26.0, peakClass: 'BZ5', peakValue: -28.0 }
+    { class: 'Bz0', value: 1.2, peakClass: 'Bz0', peakValue: 1.2 },
+    { class: 'Bz1', value: -3.5, peakClass: 'Bz1', peakValue: -4.0 },
+    { class: 'Bz2', value: -7.8, peakClass: 'Bz2', peakValue: -8.5 },
+    { class: 'Bz3', value: -12.4, peakClass: 'Bz3', peakValue: -14.0 },
+    { class: 'Bz4', value: -18.2, peakClass: 'Bz4', peakValue: -19.5 },
+    { class: 'Bz5', value: -26.0, peakClass: 'Bz5', peakValue: -28.0 }
   ];
   let currentSolarWindBzTestIndex = 0;
   activeSolarWindBzState = (SOLAR_WIND_BZ_MODE === 'live') ? null : { class: SOLAR_WIND_BZ_CLASS_MANUAL, value: SOLAR_WIND_BZ_VALUE_MANUAL, peakClass: SOLAR_WIND_BZ_PEAK_CLASS_MANUAL, peakValue: SOLAR_WIND_BZ_PEAK_VALUE_MANUAL };
@@ -18415,7 +18421,7 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
       case 'BZ3': return { line1: SOLAR_WIND_BZ_LABEL_BZ3_LINE1, line2: SOLAR_WIND_BZ_LABEL_BZ3_LINE2 };
       case 'BZ4': return { line1: SOLAR_WIND_BZ_LABEL_BZ4_LINE1, line2: SOLAR_WIND_BZ_LABEL_BZ4_LINE2 };
       case 'BZ5': return { line1: SOLAR_WIND_BZ_LABEL_BZ5_LINE1, line2: SOLAR_WIND_BZ_LABEL_BZ5_LINE2 };
-      default:  return { line1: 'IMF BZ', line2: 'NORTH' };
+      default:  return { line1: 'IMF Bz', line2: 'NORTH' };
     }
   }
 
@@ -18476,9 +18482,9 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
     const dial = document.getElementById('solar-wind-bz-dial');
     if (!dial) return;
 
-    let bzClass = 'BZ0';
+    let bzClass = 'Bz0';
     let bzValue = 1.2;
-    let dailyPeakClass = 'BZ0';
+    let dailyPeakClass = 'Bz0';
     let dailyPeakValue = 1.2;
 
     if (activeSolarWindBzState) {
@@ -18544,7 +18550,8 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
 
     if (line1El && line1El.textContent !== labels.line1) line1El.textContent = labels.line1;
     if (line2El && line2El.textContent !== labels.line2) line2El.textContent = labels.line2;
-    if (classEl && classEl.textContent !== bzClass) classEl.textContent = bzClass;
+    const displayClass = String(bzClass).replace(/^BZ/i, 'Bz');
+    if (classEl && classEl.textContent !== displayClass) classEl.textContent = displayClass;
     const displayVal = formatSolarWindBzValue(bzValue);
     if (valueEl && valueEl.textContent !== displayVal) valueEl.textContent = displayVal;
 
@@ -18563,7 +18570,8 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
             baseHtml = `<span style="color: ${color};">${baseHtml}</span>`;
           }
           const formattedPeakVal = formatSolarWindBzValue(dailyPeakValue);
-          const line2Text = `PEAK ${dailyPeakClass}<br><span style="display:inline-block; margin-top: var(--solar-wind-bz-sublabel-peak-value-margin-top, 0vw);">${formattedPeakVal}</span>`;
+          const displayPeakClass = String(dailyPeakClass).replace(/^BZ/i, 'Bz');
+          const line2Text = `PEAK ${displayPeakClass}<br><span style="display:inline-block; margin-top: var(--solar-wind-bz-sublabel-peak-value-margin-top, 0vw);">${formattedPeakVal}</span>`;
           sublabelEl.innerHTML = `<br>${baseHtml}<br><span style="display: inline-block; margin-top: var(--solar-wind-bz-sublabel-peak-margin-top, 0vw); font-family: 'euro-bold', sans-serif; color: ${dailyPeakColor};">${line2Text}</span>`;
         }
         if (SOLAR_WIND_BZ_SUBLABEL_COLOR === 'auto') {
@@ -18613,19 +18621,19 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
       if (!latest || typeof latest.bz_gsm === 'undefined') return;
 
       const bzVal = parseFloat(latest.bz_gsm);
-      let cls = 'BZ0';
+      let cls = 'Bz0';
       if (bzVal >= 0) {
-        cls = 'BZ0';
+        cls = 'Bz0';
       } else if (bzVal >= -5) {
-        cls = 'BZ1';
+        cls = 'Bz1';
       } else if (bzVal >= -10) {
-        cls = 'BZ2';
+        cls = 'Bz2';
       } else if (bzVal >= -15) {
-        cls = 'BZ3';
+        cls = 'Bz3';
       } else if (bzVal >= -20) {
-        cls = 'BZ4';
+        cls = 'Bz4';
       } else {
-        cls = 'BZ5';
+        cls = 'Bz5';
       }
 
       const trend = bzVal >= 0 ? 'up' : 'down';

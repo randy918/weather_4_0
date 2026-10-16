@@ -4095,6 +4095,7 @@ main {
     display: inline-block;
     transform: translateY(var(--alert-space-class-vertical-offset, 0vw));
     vertical-align: baseline;
+    text-transform: none;
 }
 
 #alerts-container {
