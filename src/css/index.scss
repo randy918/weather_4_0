@@ -1521,6 +1521,12 @@ main {
     --alert-temp-drop-icon-y-offset: var(--alert-temp-drop-icon-y-offset-desktop, 0.4vw);
     --alert-temp-rise-type-y-offset: var(--alert-temp-rise-type-y-offset-desktop, 0.3vw);
     --alert-temp-rise-icon-y-offset: var(--alert-temp-rise-icon-y-offset-desktop, -0.15vw);
+    --alert-space-weather-type-y-offset: var(--alert-space-weather-type-y-offset-desktop, 0.3vw);
+    --alert-space-weather-icon-y-offset: var(--alert-space-weather-icon-y-offset-desktop, 0vw);
+    --alert-space-class-font-size: var(--alert-space-class-font-size-desktop, 3.5vw);
+    --alert-space-class-letter-spacing: var(--alert-space-class-letter-spacing-desktop, 0.04vw);
+    --alert-space-class-margin-right: var(--alert-space-class-margin-right-desktop, 0.8vw);
+    --alert-space-class-vertical-offset: var(--alert-space-class-vertical-offset-desktop, 0vw);
     --lo-bar-z-index: var(--lo-bar-z-index-desktop, 2);
     --hi-bar-z-index: var(--hi-bar-z-index-desktop, 1);
     --lo-bar-close-z-index: var(--lo-bar-close-z-index-desktop, 30);
@@ -1659,6 +1665,12 @@ main {
         --alert-temp-drop-icon-y-offset: var(--alert-temp-drop-icon-y-offset-mobile, 0.4vw);
         --alert-temp-rise-type-y-offset: var(--alert-temp-rise-type-y-offset-mobile, 0.3vw);
         --alert-temp-rise-icon-y-offset: var(--alert-temp-rise-icon-y-offset-mobile, -0.15vw);
+        --alert-space-weather-type-y-offset: var(--alert-space-weather-type-y-offset-mobile, 0.3vw);
+        --alert-space-weather-icon-y-offset: var(--alert-space-weather-icon-y-offset-mobile, 0vw);
+        --alert-space-class-font-size: var(--alert-space-class-font-size-mobile, 3.5vw);
+        --alert-space-class-letter-spacing: var(--alert-space-class-letter-spacing-mobile, 0.04vw);
+        --alert-space-class-margin-right: var(--alert-space-class-margin-right-mobile, 0.8vw);
+        --alert-space-class-vertical-offset: var(--alert-space-class-vertical-offset-mobile, 0vw);
         --lo-bar-z-index: var(--lo-bar-z-index-mobile, 2);
         --hi-bar-z-index: var(--hi-bar-z-index-mobile, 1);
         --lo-bar-close-z-index: var(--lo-bar-close-z-index-mobile, 30);
@@ -4074,4 +4086,68 @@ main {
         margin-right: 0.35vw;
     }
 }
+
+.alert-space-class {
+    font-family: var(--alert-space-class-font-family, "euro-bold", sans-serif);
+    font-size: var(--alert-space-class-font-size, 3.5vw);
+    letter-spacing: var(--alert-space-class-letter-spacing, 0.04vw);
+    margin-right: var(--alert-space-class-margin-right, 0.8vw);
+    display: inline-block;
+    transform: translateY(var(--alert-space-class-vertical-offset, 0vw));
+    vertical-align: baseline;
+}
+
+#alerts-container {
+    position: relative !important;
+    z-index: 1000 !important;
+}
+
+.alert-banner {
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0.2);
+}
+
+.alert-banner * {
+    pointer-events: none !important;
+}
+
+.alert-banner-top-shadow,
+.alert-banner-bottom-shadow {
+    pointer-events: none !important;
+}
+
+.alert-space-weather-banner .alert-text,
+.alert-space-weather-banner .alert-banner-content {
+    white-space: nowrap !important;
+    flex-wrap: nowrap !important;
+}
+
+#alert-modal-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background-color: rgba(0, 0, 0, 0.85) !important;
+    z-index: 100000 !important;
+    display: none !important;
+    visibility: hidden !important;
+    justify-content: center !important;
+    align-items: center !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 0.3s ease, visibility 0.3s ease !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+    &.active {
+        display: flex !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        visibility: visible !important;
+    }
+}
+
+
 

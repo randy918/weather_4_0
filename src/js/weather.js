@@ -72,6 +72,148 @@ import weatherConditions from '../data/weather-conditions.json';
   document.documentElement.style.setProperty('--dst-begins-color', DST_BEGINS_COLOR);
   document.documentElement.style.setProperty('--dst-ends-color', DST_ENDS_COLOR);
 
+  // =========================================================================
+  // --- CONFIG: Space Weather Alert Banners (JCV) ---
+  // Automatic alert banners for the worst two alert levels of each of the 6 dials:
+  // 1. Solar Flare: Level M (Severe Red) & Level X (Extreme Magenta)
+  // 2. Solar Radiation Storm: Level S4 (Severe Red) & Level S5 (Extreme Magenta)
+  // 3. Geomagnetic Storm: Level G4 (Severe Red) & Level G5 (Extreme Magenta)
+  // 4. IMF Bz: Level BZ4 (Severe Red) & Level BZ5 (Extreme Magenta)
+  // 5. Radio Blackout: Level R4 (Severe Red) & Level R5 (Extreme Magenta)
+  // 6. Solar Wind Speed: Level W4 (Severe Red) & Level W5 (Extreme Magenta)
+  // =========================================================================
+
+  // Temporary sun icon for each of the six dials (individually editable for future replacement)
+  const ALERT_ICON_SOLAR_FLARE = "img/sun-wat.svg";
+  const ALERT_ICON_SOLAR_RADIATION_STORM = "img/sun-wat.svg";
+  const ALERT_ICON_GEOMAGNETIC_STORM = "img/sun-wat.svg";
+  const ALERT_ICON_IMF_BZ = "img/sun-wat.svg";
+  const ALERT_ICON_RADIO_BLACKOUT = "img/sun-wat.svg";
+  const ALERT_ICON_SOLAR_WIND_SPEED = "img/sun-wat.svg";
+
+  // Worst Two Colors: Level 4 (Severe) = Vibrant Red; Level 5 (Extreme) = Shocking Magenta
+  const ALERT_COLOR_SPACE_WEATHER_SEVERE_DEFAULT = "hsl(0, 100%, 37%)";  // 100s vibrant red
+  const ALERT_COLOR_SPACE_WEATHER_EXTREME_DEFAULT = "hsl(315, 100%, 50%)"; // Below 0 shocking magenta
+
+  const ALERT_COLOR_SOLAR_FLARE_M = "var(--alert-color-solar-flare-m, hsl(0, 100%, 37%))";
+  const ALERT_COLOR_SOLAR_FLARE_X = "var(--alert-color-solar-flare-x, hsl(315, 100%, 50%))";
+  const ALERT_COLOR_SOLAR_RADIATION_STORM_S4 = "var(--alert-color-solar-radiation-storm-s4, hsl(0, 100%, 37%))";
+  const ALERT_COLOR_SOLAR_RADIATION_STORM_S5 = "var(--alert-color-solar-radiation-storm-s5, hsl(315, 100%, 50%))";
+  const ALERT_COLOR_GEOMAGNETIC_STORM_G4 = "var(--alert-color-geomagnetic-storm-g4, hsl(0, 100%, 37%))";
+  const ALERT_COLOR_GEOMAGNETIC_STORM_G5 = "var(--alert-color-geomagnetic-storm-g5, hsl(315, 100%, 50%))";
+  const ALERT_COLOR_IMF_BZ_BZ4 = "var(--alert-color-imf-bz-bz4, hsl(0, 100%, 37%))";
+  const ALERT_COLOR_IMF_BZ_BZ5 = "var(--alert-color-imf-bz-bz5, hsl(315, 100%, 50%))";
+  const ALERT_COLOR_RADIO_BLACKOUT_R4 = "var(--alert-color-radio-blackout-r4, hsl(0, 100%, 37%))";
+  const ALERT_COLOR_RADIO_BLACKOUT_R5 = "var(--alert-color-radio-blackout-r5, hsl(315, 100%, 50%))";
+  const ALERT_COLOR_SOLAR_WIND_SPEED_W4 = "var(--alert-color-solar-wind-speed-w4, hsl(0, 100%, 37%))";
+  const ALERT_COLOR_SOLAR_WIND_SPEED_W5 = "var(--alert-color-solar-wind-speed-w5, hsl(315, 100%, 50%))";
+
+  // Event titles and concise badges
+  const ALERT_TITLE_SOLAR_FLARE_M = "M-CLASS SOLAR FLARE";
+  const ALERT_BADGE_SOLAR_FLARE_M = "radio comm advisory";
+  const ALERT_TITLE_SOLAR_FLARE_X = "X-CLASS SOLAR FLARE";
+  const ALERT_BADGE_SOLAR_FLARE_X = "radiation hazard";
+
+  const ALERT_TITLE_SOLAR_RADIATION_STORM_S4 = "SEVERE SOLAR RADIATION STORM";
+  const ALERT_BADGE_SOLAR_RADIATION_STORM_S4 = "space biological hazard";
+  const ALERT_TITLE_SOLAR_RADIATION_STORM_S5 = "EXTREME SOLAR RADIATION STORM";
+  const ALERT_BADGE_SOLAR_RADIATION_STORM_S5 = "extreme radiation danger";
+
+  const ALERT_TITLE_GEOMAGNETIC_STORM_G4 = "SEVERE GEOMAGNETIC STORM";
+  const ALERT_BADGE_GEOMAGNETIC_STORM_G4 = "severe grid issues";
+  const ALERT_TITLE_GEOMAGNETIC_STORM_G5 = "EXTREME GEOMAGNETIC STORM";
+  const ALERT_BADGE_GEOMAGNETIC_STORM_G5 = "extreme grid danger";
+
+  const ALERT_TITLE_IMF_BZ_BZ4 = "SEVERE SOUTH IMF BZ";
+  const ALERT_BADGE_IMF_BZ_BZ4 = "storm influx";
+  const ALERT_TITLE_IMF_BZ_BZ5 = "EXTREME SOUTH IMF BZ";
+  const ALERT_BADGE_IMF_BZ_BZ5 = "severe disruption";
+
+  const ALERT_TITLE_RADIO_BLACKOUT_R4 = "SEVERE RADIO BLACKOUT";
+  const ALERT_BADGE_RADIO_BLACKOUT_R4 = "major dayside outage";
+  const ALERT_TITLE_RADIO_BLACKOUT_R5 = "EXTREME RADIO BLACKOUT";
+  const ALERT_BADGE_RADIO_BLACKOUT_R5 = "total dayside blackout";
+
+  const ALERT_TITLE_SOLAR_WIND_SPEED_W4 = "SEVERE SOLAR WIND GALE";
+  const ALERT_BADGE_SOLAR_WIND_SPEED_W4 = "700-800 km/s stream";
+  const ALERT_TITLE_SOLAR_WIND_SPEED_W5 = "EXTREME SOLAR WIND GALE";
+  const ALERT_BADGE_SOLAR_WIND_SPEED_W5 = "extreme storm stream";
+
+  // Layout & Alignment (JCV Dual Desktop & Mobile - Rules 8 & 9)
+  const ALERT_SPACE_WEATHER_TYPE_Y_OFFSET_DESKTOP = '0.3vw';
+  const ALERT_SPACE_WEATHER_TYPE_Y_OFFSET_MOBILE = '0.3vw';
+  const ALERT_SPACE_WEATHER_ICON_Y_OFFSET_DESKTOP = '0vw';
+  const ALERT_SPACE_WEATHER_ICON_Y_OFFSET_MOBILE = '0vw';
+
+  // Space Weather Alert Class Prefix Typography (JCV Dual Desktop & Mobile - Rules 8 & 9)
+  const ALERT_SPACE_CLASS_FONT_FAMILY = "'euro-bold', sans-serif";
+  const ALERT_SPACE_CLASS_FONT_SIZE_DESKTOP = '3.5vw';
+  const ALERT_SPACE_CLASS_FONT_SIZE_MOBILE = '3.5vw';
+  const ALERT_SPACE_CLASS_LETTER_SPACING_DESKTOP = '0.04vw';
+  const ALERT_SPACE_CLASS_LETTER_SPACING_MOBILE = '0.04vw';
+  const ALERT_SPACE_CLASS_MARGIN_RIGHT_DESKTOP = '0.8vw';
+  const ALERT_SPACE_CLASS_MARGIN_RIGHT_MOBILE = '0.8vw';
+  const ALERT_SPACE_CLASS_VERTICAL_OFFSET_DESKTOP = '0vw';
+  const ALERT_SPACE_CLASS_VERTICAL_OFFSET_MOBILE = '0vw';
+
+  // Space Weather Alert Banner 1-Line Progressive Auto-Shrink (JCV Dual Desktop & Mobile - Rules 8 & 9)
+  const ALERT_SPACE_BANNER_SHRINK_FACTOR = 0.90; // EDITABLE: Shrink progressively by 10% (0.90) per step until it fits 1 line
+  const ALERT_SPACE_BANNER_MIN_SCALE = 0.35;     // EDITABLE: Floor for progressive shrink
+  const ALERT_SPACE_BANNER_MAX_WIDTH_RATIO_DESKTOP = 0.94; // EDITABLE: Max screen width fraction on desktop (94vw)
+  const ALERT_SPACE_BANNER_MAX_WIDTH_RATIO_MOBILE = 0.94;  // EDITABLE: Max screen width fraction on mobile (94vw)
+
+  // Preview Mode for visual demonstration ('examples', 'all', 'extreme', 'severe', or specific gauge like 'flare', or 'none')
+  // Defaulting to 'examples' displays 2 live banner examples immediately so the user can see them without waiting for a real solar event!
+  let TEST_SHOW_SPACE_WEATHER_ALERTS_PREVIEW = 'examples';
+
+  document.documentElement.style.setProperty('--alert-color-solar-flare-m', ALERT_COLOR_SPACE_WEATHER_SEVERE_DEFAULT);
+  document.documentElement.style.setProperty('--alert-color-solar-flare-x', ALERT_COLOR_SPACE_WEATHER_EXTREME_DEFAULT);
+  document.documentElement.style.setProperty('--alert-color-solar-radiation-storm-s4', ALERT_COLOR_SPACE_WEATHER_SEVERE_DEFAULT);
+  document.documentElement.style.setProperty('--alert-color-solar-radiation-storm-s5', ALERT_COLOR_SPACE_WEATHER_EXTREME_DEFAULT);
+  document.documentElement.style.setProperty('--alert-color-geomagnetic-storm-g4', ALERT_COLOR_SPACE_WEATHER_SEVERE_DEFAULT);
+  document.documentElement.style.setProperty('--alert-color-geomagnetic-storm-g5', ALERT_COLOR_SPACE_WEATHER_EXTREME_DEFAULT);
+  document.documentElement.style.setProperty('--alert-color-imf-bz-bz4', ALERT_COLOR_SPACE_WEATHER_SEVERE_DEFAULT);
+  document.documentElement.style.setProperty('--alert-color-imf-bz-bz5', ALERT_COLOR_SPACE_WEATHER_EXTREME_DEFAULT);
+  document.documentElement.style.setProperty('--alert-color-radio-blackout-r4', ALERT_COLOR_SPACE_WEATHER_SEVERE_DEFAULT);
+  document.documentElement.style.setProperty('--alert-color-radio-blackout-r5', ALERT_COLOR_SPACE_WEATHER_EXTREME_DEFAULT);
+  document.documentElement.style.setProperty('--alert-color-solar-wind-speed-w4', ALERT_COLOR_SPACE_WEATHER_SEVERE_DEFAULT);
+  document.documentElement.style.setProperty('--alert-color-solar-wind-speed-w5', ALERT_COLOR_SPACE_WEATHER_EXTREME_DEFAULT);
+
+  document.documentElement.style.setProperty('--alert-space-weather-type-y-offset-desktop', ALERT_SPACE_WEATHER_TYPE_Y_OFFSET_DESKTOP);
+  document.documentElement.style.setProperty('--alert-space-weather-type-y-offset-mobile', ALERT_SPACE_WEATHER_TYPE_Y_OFFSET_MOBILE);
+  document.documentElement.style.setProperty('--alert-space-weather-icon-y-offset-desktop', ALERT_SPACE_WEATHER_ICON_Y_OFFSET_DESKTOP);
+  document.documentElement.style.setProperty('--alert-space-weather-icon-y-offset-mobile', ALERT_SPACE_WEATHER_ICON_Y_OFFSET_MOBILE);
+  document.documentElement.style.setProperty('--alert-space-weather-type-y-offset', window.innerWidth <= 767 ? ALERT_SPACE_WEATHER_TYPE_Y_OFFSET_MOBILE : ALERT_SPACE_WEATHER_TYPE_Y_OFFSET_DESKTOP);
+  document.documentElement.style.setProperty('--alert-space-weather-icon-y-offset', window.innerWidth <= 767 ? ALERT_SPACE_WEATHER_ICON_Y_OFFSET_MOBILE : ALERT_SPACE_WEATHER_ICON_Y_OFFSET_DESKTOP);
+
+  document.documentElement.style.setProperty('--alert-space-class-font-family', ALERT_SPACE_CLASS_FONT_FAMILY);
+  document.documentElement.style.setProperty('--alert-space-class-font-size-desktop', ALERT_SPACE_CLASS_FONT_SIZE_DESKTOP);
+  document.documentElement.style.setProperty('--alert-space-class-font-size-mobile', ALERT_SPACE_CLASS_FONT_SIZE_MOBILE);
+  document.documentElement.style.setProperty('--alert-space-class-letter-spacing-desktop', ALERT_SPACE_CLASS_LETTER_SPACING_DESKTOP);
+  document.documentElement.style.setProperty('--alert-space-class-letter-spacing-mobile', ALERT_SPACE_CLASS_LETTER_SPACING_MOBILE);
+  document.documentElement.style.setProperty('--alert-space-class-margin-right-desktop', ALERT_SPACE_CLASS_MARGIN_RIGHT_DESKTOP);
+  document.documentElement.style.setProperty('--alert-space-class-margin-right-mobile', ALERT_SPACE_CLASS_MARGIN_RIGHT_MOBILE);
+  document.documentElement.style.setProperty('--alert-space-class-vertical-offset-desktop', ALERT_SPACE_CLASS_VERTICAL_OFFSET_DESKTOP);
+  document.documentElement.style.setProperty('--alert-space-class-vertical-offset-mobile', ALERT_SPACE_CLASS_VERTICAL_OFFSET_MOBILE);
+  document.documentElement.style.setProperty('--alert-space-class-font-size', window.innerWidth <= 767 ? ALERT_SPACE_CLASS_FONT_SIZE_MOBILE : ALERT_SPACE_CLASS_FONT_SIZE_DESKTOP);
+  document.documentElement.style.setProperty('--alert-space-class-letter-spacing', window.innerWidth <= 767 ? ALERT_SPACE_CLASS_LETTER_SPACING_MOBILE : ALERT_SPACE_CLASS_LETTER_SPACING_DESKTOP);
+  document.documentElement.style.setProperty('--alert-space-class-margin-right', window.innerWidth <= 767 ? ALERT_SPACE_CLASS_MARGIN_RIGHT_MOBILE : ALERT_SPACE_CLASS_MARGIN_RIGHT_DESKTOP);
+  document.documentElement.style.setProperty('--alert-space-class-vertical-offset', window.innerWidth <= 767 ? ALERT_SPACE_CLASS_VERTICAL_OFFSET_MOBILE : ALERT_SPACE_CLASS_VERTICAL_OFFSET_DESKTOP);
+
+  // Forward declarations for 6 Space Weather dial states (allows early alert evaluation)
+  let activeSolarFlareState = null;
+  let liveSolarFlareData = null;
+  let activeSolarRadiationStormState = null;
+  let liveSolarRadiationStormData = null;
+  let activeRadioBlackoutState = null;
+  let liveRadioBlackoutData = null;
+  let activeGeomagneticStormState = null;
+  let liveGeomagneticStormData = null;
+  let activeSolarWindBzState = null;
+  let liveSolarWindBzData = null;
+  let activeSolarWindSpeedState = null;
+  let liveSolarWindSpeedData = null;
+
   // --- CONFIG: Clock Hands Spin Animation ---
   const CLOCK_SPIN_DURATION_MS = 1200; // EDITABLE: Reset animation spin duration in milliseconds
   let isClockSpinning = false;
@@ -332,6 +474,15 @@ import weatherConditions from '../data/weather-conditions.json';
     document.documentElement.style.setProperty('--spaceship-width', isMobile ? SPACESHIP_WIDTH_MOBILE : SPACESHIP_WIDTH_DESKTOP);
     document.documentElement.style.setProperty('--spaceship-bottom', isMobile ? SPACESHIP_BOTTOM_MOBILE : SPACESHIP_BOTTOM_DESKTOP);
     document.documentElement.style.setProperty('--spaceship-left', isMobile ? SPACESHIP_LEFT_MOBILE : SPACESHIP_LEFT_DESKTOP);
+    document.documentElement.style.setProperty('--alert-space-weather-type-y-offset', isMobile ? ALERT_SPACE_WEATHER_TYPE_Y_OFFSET_MOBILE : ALERT_SPACE_WEATHER_TYPE_Y_OFFSET_DESKTOP);
+    document.documentElement.style.setProperty('--alert-space-weather-icon-y-offset', isMobile ? ALERT_SPACE_WEATHER_ICON_Y_OFFSET_MOBILE : ALERT_SPACE_WEATHER_ICON_Y_OFFSET_DESKTOP);
+    document.documentElement.style.setProperty('--alert-space-class-font-size', isMobile ? ALERT_SPACE_CLASS_FONT_SIZE_MOBILE : ALERT_SPACE_CLASS_FONT_SIZE_DESKTOP);
+    document.documentElement.style.setProperty('--alert-space-class-letter-spacing', isMobile ? ALERT_SPACE_CLASS_LETTER_SPACING_MOBILE : ALERT_SPACE_CLASS_LETTER_SPACING_DESKTOP);
+    document.documentElement.style.setProperty('--alert-space-class-margin-right', isMobile ? ALERT_SPACE_CLASS_MARGIN_RIGHT_MOBILE : ALERT_SPACE_CLASS_MARGIN_RIGHT_DESKTOP);
+    document.documentElement.style.setProperty('--alert-space-class-vertical-offset', isMobile ? ALERT_SPACE_CLASS_VERTICAL_OFFSET_MOBILE : ALERT_SPACE_CLASS_VERTICAL_OFFSET_DESKTOP);
+    if (typeof fitAllSpaceWeatherBanners === 'function') {
+      fitAllSpaceWeatherBanners();
+    }
   });
 
   // --- CONFIG: Snow Flake Animation ---
@@ -2812,6 +2963,18 @@ import weatherConditions from '../data/weather-conditions.json';
     "METEOR SHOWER": "var(--meteor-shower-banner-color)",
     "DST BEGINS": "var(--dst-begins-color)",
     "DST ENDS": "var(--dst-ends-color)",
+    "M-CLASS SOLAR FLARE": ALERT_COLOR_SOLAR_FLARE_M,
+    "X-CLASS SOLAR FLARE": ALERT_COLOR_SOLAR_FLARE_X,
+    "SEVERE SOLAR RADIATION STORM": ALERT_COLOR_SOLAR_RADIATION_STORM_S4,
+    "EXTREME SOLAR RADIATION STORM": ALERT_COLOR_SOLAR_RADIATION_STORM_S5,
+    "SEVERE GEOMAGNETIC STORM": ALERT_COLOR_GEOMAGNETIC_STORM_G4,
+    "EXTREME GEOMAGNETIC STORM": ALERT_COLOR_GEOMAGNETIC_STORM_G5,
+    "SEVERE SOUTH IMF BZ": ALERT_COLOR_IMF_BZ_BZ4,
+    "EXTREME SOUTH IMF BZ": ALERT_COLOR_IMF_BZ_BZ5,
+    "SEVERE RADIO BLACKOUT": ALERT_COLOR_RADIO_BLACKOUT_R4,
+    "EXTREME RADIO BLACKOUT": ALERT_COLOR_RADIO_BLACKOUT_R5,
+    "SEVERE SOLAR WIND GALE": ALERT_COLOR_SOLAR_WIND_SPEED_W4,
+    "EXTREME SOLAR WIND GALE": ALERT_COLOR_SOLAR_WIND_SPEED_W5,
   };
 
   // EDITABLE: Alert Banner Icons
@@ -2843,6 +3006,12 @@ import weatherConditions from '../data/weather-conditions.json';
     "METEOR SHOWER": METEOR_SHOWER_BANNER_ICON,
     "DST BEGINS": DST_BEGINS_ICON,
     "DST ENDS": DST_ENDS_ICON,
+    "SOLAR FLARE": ALERT_ICON_SOLAR_FLARE,
+    "SOLAR RADIATION STORM": ALERT_ICON_SOLAR_RADIATION_STORM,
+    "GEOMAGNETIC STORM": ALERT_ICON_GEOMAGNETIC_STORM,
+    "IMF BZ": ALERT_ICON_IMF_BZ,
+    "RADIO BLACKOUT": ALERT_ICON_RADIO_BLACKOUT,
+    "SOLAR WIND GALE": ALERT_ICON_SOLAR_WIND_SPEED,
   };
 
   // Dynamic temperature range based on actual week's data
@@ -4020,6 +4189,8 @@ import weatherConditions from '../data/weather-conditions.json';
         flex-shrink: 0;
         position: relative; /* Position context for children shadows */
         background-color: transparent;
+        cursor: pointer !important;
+        pointer-events: auto !important;
       }
       .alert-banner-bg {
         position: absolute;
@@ -4028,6 +4199,8 @@ import weatherConditions from '../data/weather-conditions.json';
         -webkit-backdrop-filter: blur(8px);
         border-bottom: 0.2vw solid rgba(255, 255, 255, 0.2);
         z-index: 1;
+        cursor: pointer !important;
+        pointer-events: auto !important;
       }
 
 
@@ -4040,7 +4213,15 @@ import weatherConditions from '../data/weather-conditions.json';
         gap: 3vw;
         width: 100%;
         height: 100%;
-        pointer-events: none;
+        pointer-events: auto !important;
+        cursor: pointer !important;
+        white-space: nowrap;
+        flex-wrap: nowrap;
+      }
+      .alert-space-weather-banner .alert-text,
+      .alert-space-weather-banner .alert-banner-content {
+        white-space: nowrap !important;
+        flex-wrap: nowrap !important;
       }
       .alert-banner-icon {
         flex-shrink: 0;
@@ -4080,6 +4261,15 @@ import weatherConditions from '../data/weather-conditions.json';
         letter-spacing: 0.18vw;
         line-height: var(--alert-banner-line-height, 1.1);
         color: #ffffff;
+      }
+      .alert-space-class {
+        font-family: var(--alert-space-class-font-family, 'euro-bold', sans-serif);
+        font-size: var(--alert-space-class-font-size, 3.5vw);
+        letter-spacing: var(--alert-space-class-letter-spacing, 0.04vw);
+        margin-right: var(--alert-space-class-margin-right, 0.8vw);
+        display: inline-block;
+        transform: translateY(var(--alert-space-class-vertical-offset, 0vw));
+        vertical-align: baseline;
       }
       .alert-expires {
         font-family: 'FiraSans', 'Fira Sans', sans-serif;
@@ -4302,22 +4492,25 @@ import weatherConditions from '../data/weather-conditions.json';
         transition: transform ${ALERT_ANIMATION_MS}ms ease !important;
       }
       #alert-modal-overlay {
-        position: fixed;
-        top: 0; left: 0; width: 100vw; height: 100vh;
-        background-color: rgba(0, 0, 0, 0.85);
-        z-index: 9999;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s ease;
+        position: fixed !important;
+        top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important;
+        background-color: rgba(0, 0, 0, 0.85) !important;
+        z-index: 100000 !important;
+        display: none !important;
+        visibility: hidden !important;
+        justify-content: center !important;
+        align-items: center !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        transition: opacity 0.3s ease, visibility 0.3s ease !important;
         backdrop-filter: blur(8px);
         -webkit-backdrop-filter: blur(8px);
       }
       #alert-modal-overlay.active {
-        opacity: 1;
-        pointer-events: auto;
+        display: flex !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        visibility: visible !important;
       }
       .alert-modal-content {
         position: relative;
@@ -4935,8 +5128,8 @@ import weatherConditions from '../data/weather-conditions.json';
     
     // Replace actual double line breaks with a temporary marker to save paragraphs
     let processed = text.replace(/\n{2,}/g, ' @@@ ');
-    // Ensure any NWS bullet points (asterisks) force a paragraph break before them
-    processed = processed.replace(/(?:\s|\n)*\*\s+/g, ' @@@ * ');
+    // Ensure any bullet points (asterisks or unicode bullet dots) force a paragraph break before them
+    processed = processed.replace(/(?:\s|\n)*[•*]\s+/g, ' @@@ * ');
     // Replace single line breaks with spaces so sentences don't arbitrarily wrap mid-screen
     processed = processed.replace(/\n/g, ' ');
     // Make everything lowercase
@@ -4958,6 +5151,8 @@ import weatherConditions from '../data/weather-conditions.json';
       "Broken Arrow", "Owasso", "Bixby", "Jenks", "Sand Springs", "Sapulpa", "Claremore", "Jenks Riverside Airport", "Bentonville", "Berryville", "Eufaula", "Tulsa International Airport", "Eureka Springs", "Fayetteville", "Grove", "Huntsville", "Okemah", "Springdale", "Stilwell", "Pittsburg", "Bartlesville", "McAlester", "Tahlequah", "Miami", "Vinita", "Pryor", "Jay", "Pawhuska", 
       // Acronyms & Weather Terms
       "NWS", "CDT", "CST", "Doppler", "National Weather Service", "OK",
+      // Space Weather & Scientific Acronyms
+      "NOAA", "SWPC", "GOES", "DSCOVR", "ACE", "NASA", "LEO", "HF", "VHF", "UHF", "GPS", "GNSS", "AU", "CME", "IMF", "Bz", "Kp", "R5", "R4", "R3", "R2", "R1", "W5", "W4", "W3", "W2", "W1", "G5", "G4", "G3", "G2", "G1", "S5", "S4", "S3", "S2", "S1", "BZ5", "BZ4", "BZ3", "BZ2", "BZ1", "MHz", "GHz", "nT", "pfu", "dB", "EVA",
       // Days & Months
       "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday",
       "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
@@ -4986,9 +5181,9 @@ import weatherConditions from '../data/weather-conditions.json';
       // Ensure the first letter of every paragraph is capitalized, ignoring leading punctuation (e.g., "...")
       processed = processed.replace(/<p>([^a-zA-Z]*)([a-z])/g, (match, nonLetters, letter) => '<p>' + nonLetters + letter.toUpperCase());
     
-      // Convert NWS asterisks at the start of paragraphs into styled bullet points
+      // Convert asterisks or bullet markers at the start of paragraphs into styled bullet points
       const bulletColorAttr = alertColor ? ` style="color: ${alertColor};"` : '';
-      processed = processed.replace(/<p>\s*\*\s+/gi, `<p class="alert-bullet"><span class="heavy-bullet"${bulletColorAttr}>&bull;</span>&nbsp;&nbsp;`);
+      processed = processed.replace(/<p>\s*[•*]+\s+/gi, `<p class="alert-bullet"><span class="heavy-bullet"${bulletColorAttr}>&bull;</span>&nbsp;&nbsp;`);
 
       // Add colons to squished NWS times (e.g. "1115 am" -> "11:15 am")
       processed = processed.replace(/\b([1-9]|1[0-2])([0-5][0-9])\s*(am|pm)\b/gi, '$1:$2 $3');
@@ -5037,16 +5232,50 @@ import weatherConditions from '../data/weather-conditions.json';
 
   // Helper: Opens the full-screen modal showing the verbose alert text
   function openAlertModal(alert, color, icon) {
-    let overlay = document.getElementById('alert-modal-overlay');
+    if (!alert) return;
+    const existingOverlay = document.getElementById('alert-modal-overlay');
+    if (existingOverlay && existingOverlay.classList.contains('active') && existingOverlay.style.display === 'flex') {
+      return;
+    }
+    console.log('🚨 openAlertModal triggered for:', alert.event, alert);
+
+    let overlay = existingOverlay;
     if (!overlay) {
       overlay = document.createElement('div');
       overlay.id = 'alert-modal-overlay';
       document.body.appendChild(overlay);
-      // Close when clicking the dark background
-      overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) overlay.classList.remove('active');
-      });
     }
+    
+    const closeModal = () => {
+      overlay.classList.remove('active');
+      overlay.style.opacity = '0';
+      overlay.style.pointerEvents = 'none';
+      overlay.style.visibility = 'hidden';
+      overlay.style.display = 'none';
+      overlay.innerHTML = '';
+      overlay.onclick = null;
+      overlay.ontouchend = null;
+    };
+
+    // Close when clicking the dark background outside the modal box
+    // Guard against ghost clicks from the opening tap (within 350ms)
+    overlay.onclick = (e) => {
+      if (Date.now() - (overlay._openedAt || 0) < 350) {
+        console.log('🛡️ Ghost click ignored on overlay shortly after open');
+        return;
+      }
+      if (e.target === overlay) closeModal();
+    };
+
+    overlay.ontouchend = (e) => {
+      if (Date.now() - (overlay._openedAt || 0) < 350) {
+        return;
+      }
+      if (e.target === overlay) {
+        if (e.cancelable) e.preventDefault();
+        closeModal();
+      }
+    };
     
     const title = alert.event || 'Weather Alert';
     
@@ -5058,7 +5287,17 @@ import weatherConditions from '../data/weather-conditions.json';
     }
     const displayTitle = titleArr.join(' ');
 
-    const formattedText = formatNwsText(alert.description, color);
+    let modalTitleHtml = displayTitle;
+    if (alert.spaceClass) {
+      const clsUpper = alert.spaceClass.toUpperCase();
+      let cleanDisplay = displayTitle;
+      if (cleanDisplay.startsWith(clsUpper + ' ') || cleanDisplay.startsWith(clsUpper + '&nbsp;')) {
+        cleanDisplay = cleanDisplay.replace(new RegExp(`^${clsUpper}(?:\\s|&nbsp;)+`, 'i'), '').trim();
+      }
+      modalTitleHtml = `<span style="font-family: var(--alert-space-class-font-family, 'euro-bold', sans-serif); margin-right: var(--alert-space-class-margin-right, 0.8vw);">${alert.spaceClass}</span>${cleanDisplay}`;
+    }
+
+    const formattedText = alert.modalHtml || formatNwsText(alert.description, color);
 
     // EDITABLE: Modal icon properties
     const modalIconSize = '10vw';
@@ -5112,17 +5351,48 @@ import weatherConditions from '../data/weather-conditions.json';
     
     overlay.innerHTML = `
       <div class="alert-modal-content" style="border-top: 1.5vw solid ${color};">
-        <div class="alert-modal-close" onclick="document.getElementById('alert-modal-overlay').classList.remove('active')">&times;</div>
+        <div class="alert-modal-close" style="cursor: pointer;">&times;</div>
         ${iconElement}
-        <div class="alert-modal-title" style="color: ${color};">${displayTitle}</div>
+        <div class="alert-modal-title" style="color: ${color};">${modalTitleHtml}</div>
         <div class="alert-modal-body">${formattedText}</div>
       </div>
     `;
+
+    const closeBtn = overlay.querySelector('.alert-modal-close');
+    if (closeBtn) {
+      const handleClose = (e) => {
+        if (e && e.cancelable) e.preventDefault();
+        if (e && e.stopPropagation) e.stopPropagation();
+        closeModal();
+      };
+      closeBtn.onclick = handleClose;
+      closeBtn.ontouchend = handleClose;
+    }
+
+    overlay._closeModalFn = closeModal;
+    if (!overlay._hasEscapeCloseListener) {
+      overlay._hasEscapeCloseListener = true;
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && overlay.classList.contains('active')) {
+          if (typeof overlay._closeModalFn === 'function') {
+            overlay._closeModalFn();
+          }
+        }
+      });
+    }
     
-    // Force browser reflow to guarantee CSS transition plays, then show
+    // Explicitly make visible & active
+    overlay._openedAt = Date.now();
+    overlay.style.display = 'flex';
+    overlay.style.visibility = 'visible';
+    overlay.style.pointerEvents = 'auto';
     void overlay.offsetWidth;
     overlay.classList.add('active');
+    overlay.style.opacity = '1';
   }
+
+  // Expose to window for reliable testing & direct invocation
+  window.openAlertModal = openAlertModal;
 
   // Evaluates whether a popular annual meteor shower is observable and meets moon & cloud requirements
   function checkMeteorShowerConditions(data) {
@@ -5269,9 +5539,641 @@ import weatherConditions from '../data/weather-conditions.json';
     return { active: false, state: null, shower: matchingShower };
   }
 
+  // Helper functions for structured space weather modal styling (Rules 8 & 9)
+  function buildSpaceWeatherBullet(color, label, text) {
+    return `<p class="alert-bullet"><span class="heavy-bullet" style="color: ${color};">&bull;</span>&nbsp;&nbsp;<span style="font-family: 'bold', sans-serif; color: #ffffff;">${label}:</span> ${text}</p>`;
+  }
+
+  function buildSpaceWeatherSectionHeader(title) {
+    return `<p><span style="font-family: 'bold', sans-serif; color: #ffffff; text-transform: uppercase; letter-spacing: 0.05vw;">${title}</span></p>`;
+  }
+
+  // =========================================================================
+  // --- Space Weather Alert Definitions & Dynamic Detection ---
+  // Returns complete alert objects for the two worst levels of each of the 6 dials
+  // =========================================================================
+  function getSpaceWeatherAlertDefinitions() {
+    // Safely retrieve active/live/fallback telemetry across all 6 gauges (immune to TDZ evaluation timing)
+    const getSafe = (fn, fallback) => {
+      try { return fn(); } catch(e) { return fallback; }
+    };
+
+    // 1. Radio Blackout (R)
+    const currentRClass = getSafe(() => activeRadioBlackoutState?.class || (RADIO_BLACKOUT_MODE === 'live' && liveRadioBlackoutData ? liveRadioBlackoutData.class : RADIO_BLACKOUT_CLASS_MANUAL), 'R5');
+    const currentRValRaw = getSafe(() => activeRadioBlackoutState?.value || (RADIO_BLACKOUT_MODE === 'live' && liveRadioBlackoutData ? liveRadioBlackoutData.value : RADIO_BLACKOUT_VALUE_MANUAL), 32.0);
+    const currentRValDisplay = getSafe(() => (typeof formatRadioBlackoutValue === 'function' ? formatRadioBlackoutValue(currentRValRaw) : (currentRValRaw + ' dB')), currentRValRaw + ' dB');
+    const peakRValRaw = getSafe(() => window.todaySkyRecord?.pk_r_val || currentRValRaw, currentRValRaw);
+    const peakRValDisplay = getSafe(() => (typeof formatRadioBlackoutValue === 'function' ? formatRadioBlackoutValue(peakRValRaw) : (peakRValRaw + ' dB')), peakRValRaw + ' dB');
+    const r5ImpactText = getSafe(() => (typeof RADIO_BLACKOUT_IMPACT_LEVEL_R5_TEXT === 'string' ? RADIO_BLACKOUT_IMPACT_LEVEL_R5_TEXT.replace(/<br\s*\/?>/gi, ' ') : 'Total Dayside Blackout'), 'Total Dayside Blackout');
+    const r4ImpactText = getSafe(() => (typeof RADIO_BLACKOUT_IMPACT_LEVEL_R4_TEXT === 'string' ? RADIO_BLACKOUT_IMPACT_LEVEL_R4_TEXT.replace(/<br\s*\/?>/gi, ' ') : 'Major Dayside Outage'), 'Major Dayside Outage');
+
+    // 2. Solar Wind Speed (W)
+    const currentWClass = getSafe(() => activeSolarWindSpeedState?.class || (SOLAR_WIND_SPEED_MODE === 'live' && liveSolarWindSpeedData ? liveSolarWindSpeedData.class : SOLAR_WIND_SPEED_CLASS_MANUAL), 'W4');
+    const currentWValRaw = getSafe(() => activeSolarWindSpeedState?.value || (SOLAR_WIND_SPEED_MODE === 'live' && liveSolarWindSpeedData ? liveSolarWindSpeedData.value : SOLAR_WIND_SPEED_VALUE_MANUAL), 740);
+    const currentWValDisplay = getSafe(() => (typeof formatSolarWindSpeedValue === 'function' ? formatSolarWindSpeedValue(currentWValRaw) : (currentWValRaw + ' km/s')), currentWValRaw + ' km/s');
+    const peakWValRaw = getSafe(() => window.todaySkyRecord?.pk_w_val || currentWValRaw, currentWValRaw);
+    const peakWValDisplay = getSafe(() => (typeof formatSolarWindSpeedValue === 'function' ? formatSolarWindSpeedValue(peakWValRaw) : (peakWValRaw + ' km/s')), peakWValRaw + ' km/s');
+    const w4ImpactText = getSafe(() => (typeof SOLAR_WIND_SPEED_IMPACT_LEVEL_W4_TEXT === 'string' ? SOLAR_WIND_SPEED_IMPACT_LEVEL_W4_TEXT.replace(/<br\s*\/?>/gi, ' ') : 'Severe Gale'), 'Severe Gale');
+    const w5ImpactText = getSafe(() => (typeof SOLAR_WIND_SPEED_IMPACT_LEVEL_W5_TEXT === 'string' ? SOLAR_WIND_SPEED_IMPACT_LEVEL_W5_TEXT.replace(/<br\s*\/?>/gi, ' ') : 'Extreme Gale'), 'Extreme Gale');
+
+    // 3. Solar Flare (X / M)
+    const currentFClass = getSafe(() => activeSolarFlareState?.class || (SOLAR_FLARE_MODE === 'live' && liveSolarFlareData ? liveSolarFlareData.class : SOLAR_FLARE_CLASS_MANUAL), 'X');
+    const currentFValRaw = getSafe(() => activeSolarFlareState?.value || (SOLAR_FLARE_MODE === 'live' && liveSolarFlareData ? liveSolarFlareData.value : SOLAR_FLARE_VALUE_MANUAL), 28.5);
+    const currentFValDisplay = typeof currentFValRaw === 'number' ? currentFValRaw.toFixed(1) : String(currentFValRaw);
+    const peakFClass = getSafe(() => window.todaySkyRecord?.pk_flare_cls || currentFClass || 'X', 'X');
+    const peakFValRaw = getSafe(() => window.todaySkyRecord?.pk_flare_val || currentFValRaw, currentFValRaw);
+    const peakFValDisplay = typeof peakFValRaw === 'number' ? peakFValRaw.toFixed(1) : String(peakFValRaw);
+
+    // 4. Solar Radiation Storm (S)
+    const currentSClass = getSafe(() => activeSolarRadiationStormState?.class || (SOLAR_RADIATION_STORM_MODE === 'live' && liveSolarRadiationStormData ? liveSolarRadiationStormData.class : SOLAR_RADIATION_STORM_CLASS_MANUAL), 'S5');
+    const currentSValRaw = getSafe(() => activeSolarRadiationStormState?.value || (SOLAR_RADIATION_STORM_MODE === 'live' && liveSolarRadiationStormData ? liveSolarRadiationStormData.value : SOLAR_RADIATION_STORM_VALUE_MANUAL), 100000);
+    const currentSValDisplay = getSafe(() => (typeof formatSolarRadiationStormValue === 'function' ? formatSolarRadiationStormValue(currentSValRaw) : (currentSValRaw + ' pfu')), currentSValRaw + ' pfu');
+    const peakSValRaw = getSafe(() => window.todaySkyRecord?.pk_s_val || currentSValRaw, currentSValRaw);
+    const peakSValDisplay = getSafe(() => (typeof formatSolarRadiationStormValue === 'function' ? formatSolarRadiationStormValue(peakSValRaw) : (peakSValRaw + ' pfu')), peakSValRaw + ' pfu');
+
+    // 5. Geomagnetic Storm (G)
+    const currentGClass = getSafe(() => activeGeomagneticStormState?.class || (GEOMAGNETIC_STORM_MODE === 'live' && liveGeomagneticStormData ? liveGeomagneticStormData.class : GEOMAGNETIC_STORM_CLASS_MANUAL), 'G5');
+    const currentGValRaw = getSafe(() => activeGeomagneticStormState?.value || (GEOMAGNETIC_STORM_MODE === 'live' && liveGeomagneticStormData ? liveGeomagneticStormData.value : GEOMAGNETIC_STORM_VALUE_MANUAL), 9);
+    const currentGValDisplay = getSafe(() => (typeof formatGeomagneticStormValue === 'function' ? formatGeomagneticStormValue(currentGValRaw) : ('Kp ' + currentGValRaw)), 'Kp ' + currentGValRaw);
+    const peakGValRaw = getSafe(() => window.todaySkyRecord?.pk_g_val || currentGValRaw, currentGValRaw);
+    const peakGValDisplay = getSafe(() => (typeof formatGeomagneticStormValue === 'function' ? formatGeomagneticStormValue(peakGValRaw) : ('Kp ' + peakGValRaw)), peakGValRaw + ' Kp');
+
+    // 6. IMF Bz (BZ)
+    const currentBzClass = getSafe(() => activeSolarWindBzState?.class || (SOLAR_WIND_BZ_MODE === 'live' && liveSolarWindBzData ? liveSolarWindBzData.class : SOLAR_WIND_BZ_CLASS_MANUAL), 'BZ5');
+    const currentBzValRaw = getSafe(() => activeSolarWindBzState?.value || (SOLAR_WIND_BZ_MODE === 'live' && liveSolarWindBzData ? liveSolarWindBzData.value : SOLAR_WIND_BZ_VALUE_MANUAL), -32);
+    const currentBzValDisplay = getSafe(() => (typeof formatSolarWindBzValue === 'function' ? formatSolarWindBzValue(currentBzValRaw) : (currentBzValRaw + ' nT')), currentBzValRaw + ' nT');
+    const peakBzValRaw = getSafe(() => window.todaySkyRecord?.pk_bz_val || currentBzValRaw, currentBzValRaw);
+    const peakBzValDisplay = getSafe(() => (typeof formatSolarWindBzValue === 'function' ? formatSolarWindBzValue(peakBzValRaw) : (peakBzValRaw + ' nT')), peakBzValRaw + ' nT');
+
+    return {
+      flare: {
+        name: 'solar-flare',
+        severe: {
+          event: ALERT_TITLE_SOLAR_FLARE_M,
+          countdown: ALERT_BADGE_SOLAR_FLARE_M,
+          color: ALERT_COLOR_SOLAR_FLARE_M,
+          icon: ALERT_ICON_SOLAR_FLARE,
+          sender_name: "NOAA Space Weather Prediction Center",
+          isSpaceWeather: true,
+          spaceClass: "M",
+          modalHtml: `
+            <p style="margin-top: 0 !important;">A Strong (M-Class) Solar Flare has erupted from an active sunspot group, detected by NOAA GOES X-ray sensors.</p>
+            ${buildSpaceWeatherSectionHeader('Current Observations &amp; Readings:')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_FLARE_M, 'Current Flare Class', 'M' + currentFValDisplay)}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_FLARE_M, 'Peak Flare Reading', 'PEAK ' + peakFClass + peakFValDisplay)}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_FLARE_M, 'Classification', 'Strong Solar X-Ray Burst (M-Class)')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_FLARE_M, 'Sunlit Coverage', 'Daylight hemisphere High Frequency absorption')}
+            ${buildSpaceWeatherSectionHeader('Key Operational &amp; Infrastructure Impacts:')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_FLARE_M, 'HF Radio Signals', 'Moderate degradation and loss of radio contact on sunlit transoceanic flight corridors.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_FLARE_M, 'Marine &amp; Aviation', 'Brief loss-of-lock possible for low-frequency navigation systems.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_FLARE_M, 'CME Analysis', 'Coronal mass ejection modeling underway to evaluate potential Earthward trajectory.')}
+            <p style="margin-bottom: 0;">Monitored continuously via NOAA Space Weather Prediction Center (SWPC GOES Primary Solar X-Ray Sensor).</p>
+          `,
+          description: `Strong M-Class solar flare erupted from an active sunspot region, detected by NOAA GOES X-ray sensors.
+
+• Current Flare Reading: M${currentFValDisplay} (Peak: ${peakFClass}${peakFValDisplay})
+• Sunlit Hemisphere: Moderate degradation of High Frequency (HF) radio signals.
+• Aviation & Marine: Brief loss of radio contact on sunlit transoceanic flight corridors.
+• Navigation: Minor loss-of-lock possible for low-frequency navigation systems.
+
+Coronal mass ejection (CME) modeling underway to determine potential Earthward trajectory.`
+        },
+        extreme: {
+          event: ALERT_TITLE_SOLAR_FLARE_X,
+          countdown: ALERT_BADGE_SOLAR_FLARE_X,
+          color: ALERT_COLOR_SOLAR_FLARE_X,
+          icon: ALERT_ICON_SOLAR_FLARE,
+          sender_name: "NOAA Space Weather Prediction Center",
+          isSpaceWeather: true,
+          spaceClass: "X",
+          modalHtml: `
+            <p style="margin-top: 0 !important;">A Major (X-Class) Solar Flare has erupted from an active complex region on the solar disk, observed by NOAA GOES satellites.</p>
+            ${buildSpaceWeatherSectionHeader('Current Observations &amp; Readings:')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_FLARE_X, 'Current Flare Class', 'X' + currentFValDisplay)}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_FLARE_X, 'Peak Flare Reading', 'PEAK ' + peakFClass + peakFValDisplay)}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_FLARE_X, 'Classification', 'Extreme Solar X-Ray Burst (X-Class)')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_FLARE_X, 'Sunlit Coverage', 'Global sunlit hemisphere wide-area radio blackout')}
+            ${buildSpaceWeatherSectionHeader('Key Operational &amp; Infrastructure Impacts:')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_FLARE_X, 'HF Communications', 'Wide-area HF radio blackout on the entire sunlit side of Earth lasting up to several hours.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_FLARE_X, 'Aviation Hazards', 'Substantial transpolar aviation communications loss; radiation precautions for high-altitude crews.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_FLARE_X, 'Spacecraft &amp; Satellites', 'Surface charging risks and optical star tracker orientation degradation.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_FLARE_X, 'Energetic Protons', 'Substantial proton flux acceleration observed entering near-Earth space.')}
+            <p style="margin-bottom: 0;">Active CME trajectory analysis in progress to assess geomagnetic storm potential via NOAA SWPC.</p>
+          `,
+          description: `Major X-Class solar flare erupted from a complex sunspot active region, observed by NOAA GOES satellites.
+
+• Current Flare Reading: X${currentFValDisplay} (Peak: ${peakFClass}${peakFValDisplay})
+• Radio Communications: Wide-area HF radio blackout on the entire sunlit side of Earth lasting up to several hours.
+• Aviation: Substantial transpolar aviation communications loss; solar radiation hazard for high-altitude crews.
+• Satellite Systems: Surface charging risks and degraded star tracker tracking accuracy.
+• Solar Energetic Particles: Substantial proton flux acceleration observed entering near-Earth space.
+
+Active CME trajectory analysis in progress to assess geomagnetic storm potential.`
+        }
+      },
+      radiation: {
+        name: 'solar-radiation-storm',
+        severe: {
+          event: ALERT_TITLE_SOLAR_RADIATION_STORM_S4,
+          countdown: ALERT_BADGE_SOLAR_RADIATION_STORM_S4,
+          color: ALERT_COLOR_SOLAR_RADIATION_STORM_S4,
+          icon: ALERT_ICON_SOLAR_RADIATION_STORM,
+          sender_name: "NOAA Space Weather Prediction Center",
+          isSpaceWeather: true,
+          spaceClass: "S4",
+          modalHtml: `
+            <p style="margin-top: 0 !important;">A Severe (S4) Solar Radiation Storm is in progress with energetic proton flux exceeding 10,000 pfu at &gt;=10 MeV.</p>
+            ${buildSpaceWeatherSectionHeader('Current Observations &amp; Readings:')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_RADIATION_STORM_S4, 'Current Proton Flux', (currentSClass === 'S4' ? currentSValDisplay : '15,000 pfu'))}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_RADIATION_STORM_S4, 'Peak Daily Flux', 'PEAK ' + (currentSClass === 'S4' ? peakSValDisplay : '20,000 pfu'))}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_RADIATION_STORM_S4, 'Current Severity', 'Severe (NOAA S-Scale: S4)')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_RADIATION_STORM_S4, 'Threshold', 'Flux &gt;= 10,000 pfu at &gt;= 10 MeV')}
+            ${buildSpaceWeatherSectionHeader('Key Operational &amp; Infrastructure Impacts:')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_RADIATION_STORM_S4, 'Biological Hazard', 'Astronauts on extravehicular activity face unavoidable radiation exposure. Polar route passengers face elevated doses.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_RADIATION_STORM_S4, 'Satellite Operations', 'Elevated single-event upsets (bit flips), solar array degradation, and optical sensor noise.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_RADIATION_STORM_S4, 'Polar Cap Absorption', 'Complete blackout of High Frequency radio communications through both polar regions.')}
+            <p style="margin-bottom: 0;">Satellite operators and polar aviation flights are enacting radiation mitigation protocols via NOAA SWPC.</p>
+          `,
+          description: `Severe Solar Radiation Storm (S4) in progress with energetic proton flux exceeding 10,000 pfu at >=10 MeV.
+
+• Current Proton Flux: ${(currentSClass === 'S4' ? currentSValDisplay : '15,000 pfu')} (Peak: ${(currentSClass === 'S4' ? peakSValDisplay : '20,000 pfu')})
+• Biological Hazard: Astronauts on EVA face unavoidable radiation exposure. Polar aviation passengers face elevated doses.
+• Satellite Operations: Elevated single-event upsets, solar array degradation, and optical sensor noise.
+• Polar Radio: Complete blackout of HF radio communications through both polar regions.
+
+Satellite operators and polar aviation flights are enacting radiation mitigation protocols.`
+        },
+        extreme: {
+          event: ALERT_TITLE_SOLAR_RADIATION_STORM_S5,
+          countdown: ALERT_BADGE_SOLAR_RADIATION_STORM_S5,
+          color: ALERT_COLOR_SOLAR_RADIATION_STORM_S5,
+          icon: ALERT_ICON_SOLAR_RADIATION_STORM,
+          sender_name: "NOAA Space Weather Prediction Center",
+          isSpaceWeather: true,
+          spaceClass: "S5",
+          modalHtml: `
+            <p style="margin-top: 0 !important;">An Extreme (S5) Solar Radiation Storm is underway. Energetic proton flux levels exceed 100,000 pfu at &gt;=10 MeV.</p>
+            ${buildSpaceWeatherSectionHeader('Current Observations &amp; Readings:')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_RADIATION_STORM_S5, 'Current Proton Flux', (currentSClass === 'S5' ? currentSValDisplay : '120,000 pfu'))}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_RADIATION_STORM_S5, 'Peak Daily Flux', 'PEAK ' + (currentSClass === 'S5' ? peakSValDisplay : '150,000 pfu'))}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_RADIATION_STORM_S5, 'Current Severity', 'Extreme (NOAA S-Scale: S5)')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_RADIATION_STORM_S5, 'Threshold', 'Flux &gt;= 100,000 pfu at &gt;= 10 MeV')}
+            ${buildSpaceWeatherSectionHeader('Key Operational &amp; Infrastructure Impacts:')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_RADIATION_STORM_S5, 'Critical Biological Risk', 'Severe radiation danger to human spaceflight. Immediate polar aviation rerouting required away from high latitudes.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_RADIATION_STORM_S5, 'Spacecraft Operations', 'Permanent damage to satellite solar panels, star trackers blinded, memory disruptions, and loss-of-satellite risk.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_RADIATION_STORM_S5, 'Polar Radio Outage', 'Total, multi-day blackout of High Frequency radio communications across polar routes.')}
+            <p style="margin-bottom: 0;">Critical space weather incident—highest alert level on the NOAA Space Weather Scale.</p>
+          `,
+          description: `Extreme Solar Radiation Storm (S5) underway. Proton flux levels exceed 100,000 pfu at >=10 MeV.
+
+• Current Proton Flux: ${(currentSClass === 'S5' ? currentSValDisplay : '120,000 pfu')} (Peak: ${(currentSClass === 'S5' ? peakSValDisplay : '150,000 pfu')})
+• Critical Biological Hazard: Severe radiation danger to human spaceflight. Immediate polar aviation rerouting required.
+• Spacecraft Operations: Permanent damage to satellite solar panels, star trackers blinded, memory system disruptions.
+• Communications: Total, multi-day blackout of High Frequency radio communications in polar regions.
+
+Critical space weather incident—highest alert level on the NOAA Space Weather Scale.`
+        }
+      },
+      geomagnetic: {
+        name: 'geomagnetic-storm',
+        severe: {
+          event: ALERT_TITLE_GEOMAGNETIC_STORM_G4,
+          countdown: ALERT_BADGE_GEOMAGNETIC_STORM_G4,
+          color: ALERT_COLOR_GEOMAGNETIC_STORM_G4,
+          icon: ALERT_ICON_GEOMAGNETIC_STORM,
+          sender_name: "NOAA Space Weather Prediction Center",
+          isSpaceWeather: true,
+          spaceClass: "G4",
+          modalHtml: `
+            <p style="margin-top: 0 !important;">A Severe (G4) Geomagnetic Storm is active with the Planetary K-Index reaching 8 following a coronal mass ejection arrival.</p>
+            ${buildSpaceWeatherSectionHeader('Current Observations &amp; Readings:')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_GEOMAGNETIC_STORM_G4, 'Current Planetary Kp', (currentGClass === 'G4' ? currentGValDisplay : 'Kp 8.0'))}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_GEOMAGNETIC_STORM_G4, 'Peak Daily Kp', 'PEAK ' + (currentGClass === 'G4' ? peakGValDisplay : 'Kp 8.0'))}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_GEOMAGNETIC_STORM_G4, 'Current Severity', 'Severe Storm (NOAA G-Scale: G4)')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_GEOMAGNETIC_STORM_G4, 'Auroral Reach', 'Visible equatorward to Northern California, Oklahoma, and Alabama')}
+            ${buildSpaceWeatherSectionHeader('Key Operational &amp; Infrastructure Impacts:')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_GEOMAGNETIC_STORM_G4, 'Power Grid Systems', 'Possible widespread voltage control problems; protective safety systems may trip out key power assets.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_GEOMAGNETIC_STORM_G4, 'Spacecraft Dynamics', 'Increased atmospheric drag on low-Earth orbit satellites; spacecraft orientation tracking difficulties.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_GEOMAGNETIC_STORM_G4, 'Satellite Navigation', 'Degraded GPS/GNSS satellite navigation accuracy and loss-of-lock for multiple hours.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_GEOMAGNETIC_STORM_G4, 'Pipeline Currents', 'Elevated induced pipeline currents requiring cathodic voltage adjustments.')}
+            <p style="margin-bottom: 0;">Grid operators and satellite operations control centers notified via NOAA Space Weather Prediction Center.</p>
+          `,
+          description: `Severe Geomagnetic Storm (G4) active with the Planetary K-Index reaching 8 or higher following a coronal mass ejection arrival.
+
+• Current Planetary K-Index: ${(currentGClass === 'G4' ? currentGValDisplay : 'Kp 8.0')} (Peak: ${(currentGClass === 'G4' ? peakGValDisplay : 'Kp 8.0')})
+• Power Grids: Possible widespread voltage control problems; protective safety systems may trip out key power assets.
+• Spacecraft: Increased atmospheric drag on low-Earth orbit satellites; orientation tracking difficulties.
+• Satellite Navigation: Degraded GPS/GNSS satellite navigation accuracy and loss-of-lock for multiple hours.
+• Aurora: Spectacular aurora borealis visible across mid-latitudes, reaching southward to Northern California and Oklahoma.
+
+Grid operators and satellite operations control centers have been notified.`
+        },
+        extreme: {
+          event: ALERT_TITLE_GEOMAGNETIC_STORM_G5,
+          countdown: ALERT_BADGE_GEOMAGNETIC_STORM_G5,
+          color: ALERT_COLOR_GEOMAGNETIC_STORM_G5,
+          icon: ALERT_ICON_GEOMAGNETIC_STORM,
+          sender_name: "NOAA Space Weather Prediction Center",
+          isSpaceWeather: true,
+          spaceClass: "G5",
+          modalHtml: `
+            <p style="margin-top: 0 !important;">An Extreme (G5) Geomagnetic Storm has been triggered by a colossal CME impacting Earth's magnetosphere. Planetary K-Index is 9.</p>
+            ${buildSpaceWeatherSectionHeader('Current Observations &amp; Readings:')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_GEOMAGNETIC_STORM_G5, 'Current Planetary Kp', (currentGClass === 'G5' ? currentGValDisplay : 'Kp 9.0'))}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_GEOMAGNETIC_STORM_G5, 'Peak Daily Kp', 'PEAK ' + (currentGClass === 'G5' ? peakGValDisplay : 'Kp 9.0'))}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_GEOMAGNETIC_STORM_G5, 'Current Severity', 'Extreme Storm (NOAA G-Scale: G5)')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_GEOMAGNETIC_STORM_G5, 'Auroral Reach', 'Extraordinary aurora visible deep into southern US, Florida, and Caribbean')}
+            ${buildSpaceWeatherSectionHeader('Key Operational &amp; Infrastructure Impacts:')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_GEOMAGNETIC_STORM_G5, 'Power Grid Collapse Risk', 'Widespread voltage regulation collapse; grid transformer damage risks and localized blackouts.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_GEOMAGNETIC_STORM_G5, 'Spacecraft Operations', 'Extensive spacecraft surface charging, attitude control problems, and severe orbital drag requiring burns.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_GEOMAGNETIC_STORM_G5, 'Radio &amp; Navigation', 'Complete loss of HF radio communications for 1 to 2 days; satellite navigation completely degraded.')}
+            <p style="margin-bottom: 0;">Critical space weather emergency requiring continuous planetary infrastructure monitoring via NOAA SWPC.</p>
+          `,
+          description: `Extreme Geomagnetic Storm (G5) triggered by a colossal coronal mass ejection impacting Earth's magnetosphere. Planetary K-Index is 9.
+
+• Current Planetary K-Index: ${(currentGClass === 'G5' ? currentGValDisplay : 'Kp 9.0')} (Peak: ${(currentGClass === 'G5' ? peakGValDisplay : 'Kp 9.0')})
+• Power Systems: Widespread voltage regulation collapse; grid transformer damage risks and potential localized blackouts.
+• Spacecraft Operations: Extensive surface charging, attitude control problems, and severe orbital drag requiring burns.
+• Navigation & HF Radio: Complete loss of High Frequency radio communications for 1 to 2 days; satellite navigation degraded.
+• Aurora: Extraordinary auroral displays visible into the deep south, southern United States, and the Caribbean.
+
+Critical space weather emergency requiring continuous planetary infrastructure monitoring.`
+        }
+      },
+      bz: {
+        name: 'imf-bz',
+        severe: {
+          event: ALERT_TITLE_IMF_BZ_BZ4,
+          countdown: ALERT_BADGE_IMF_BZ_BZ4,
+          color: ALERT_COLOR_IMF_BZ_BZ4,
+          icon: ALERT_ICON_IMF_BZ,
+          sender_name: "NOAA Space Weather Prediction Center",
+          isSpaceWeather: true,
+          spaceClass: "BZ4",
+          modalHtml: `
+            <p style="margin-top: 0 !important;">The Interplanetary Magnetic Field (IMF) Bz is strongly oriented southward between -15 nT and -20 nT.</p>
+            ${buildSpaceWeatherSectionHeader('Current Observations &amp; Readings:')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ4, 'Current IMF Bz', (currentBzClass === 'BZ4' ? currentBzValDisplay : '-16.0 nT'))}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ4, 'Peak Daily Southward Bz', 'PEAK ' + (currentBzClass === 'BZ4' ? peakBzValDisplay : '-18.0 nT'))}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ4, 'Orientation', 'Strong Southward Magnetic Reconnection (-15 to -20 nT)')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ4, 'Magnetosphere State', 'Magnetic gate open: direct solar plasma injection')}
+            ${buildSpaceWeatherSectionHeader('Key Operational &amp; Infrastructure Impacts:')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ4, 'Substorm Activity', 'Frequent high-energy substorms and intensified particle precipitation into upper atmosphere.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ4, 'Geomagnetic Stress', 'Rapid energy accumulation inside Earth’s magnetotail leading toward severe storming.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ4, 'Auroral Oval', 'Oval significantly expanded toward lower latitudes with enhanced brightness and rapid motion.')}
+            <p style="margin-bottom: 0;">Continuous solar wind monitoring active via DSCOVR and ACE spacecraft at the Sun-Earth L1 Lagrange point.</p>
+          `,
+          description: `Interplanetary Magnetic Field (IMF) Bz is strongly oriented southward between -15 nT and -20 nT.
+
+• Current IMF Bz: ${(currentBzClass === 'BZ4' ? currentBzValDisplay : '-16.0 nT')} (Peak: ${(currentBzClass === 'BZ4' ? peakBzValDisplay : '-18.0 nT')})
+• Magnetosphere Coupling: Earth's magnetic shield is opened, allowing massive direct solar wind plasma injection.
+• Magnetospheric Substorms: Frequent high-energy substorms and intensified particle precipitation into upper atmosphere.
+• Geomagnetic Stress: Rapid energy accumulation inside Earth's magnetotail leading toward severe storming.
+• Auroral Oval: Oval significantly expanded toward lower latitudes with enhanced brightness and motion.
+
+Continuous solar wind monitoring active via DSCOVR and ACE spacecraft at the L1 Lagrange point.`
+        },
+        extreme: {
+          event: ALERT_TITLE_IMF_BZ_BZ5,
+          countdown: ALERT_BADGE_IMF_BZ_BZ5,
+          color: ALERT_COLOR_IMF_BZ_BZ5,
+          icon: ALERT_ICON_IMF_BZ,
+          sender_name: "NOAA Space Weather Prediction Center",
+          isSpaceWeather: true,
+          spaceClass: "BZ5",
+          modalHtml: `
+            <p style="margin-top: 0 !important;">Critical southward orientation of the Interplanetary Magnetic Field with Bz plunging below -20 nT.</p>
+            ${buildSpaceWeatherSectionHeader('Current Observations &amp; Readings:')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ5, 'Current IMF Bz', (currentBzClass === 'BZ5' ? currentBzValDisplay : '-26.0 nT'))}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ5, 'Peak Daily Southward Bz', 'PEAK ' + (currentBzClass === 'BZ5' ? peakBzValDisplay : '-28.0 nT'))}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ5, 'Orientation', 'Critical Extreme Southward Orientation (&lt;= -20 nT)')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ5, 'Reconnection Gate', 'Maximum magnetic reconnection between interplanetary field and Earth')}
+            ${buildSpaceWeatherSectionHeader('Key Operational &amp; Infrastructure Impacts:')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ5, 'Severe Energy Influx', 'Intense ring current amplification and high ground-induced current (GIC) hazard.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ5, 'Storm Escalation', 'Extremely favorable conditions for severe to extreme geomagnetic disturbance within hours.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_IMF_BZ_BZ5, 'Magnetopause Compression', 'Strong compression of the dayside magnetopause pushed inward toward geosynchronous orbit.')}
+            <p style="margin-bottom: 0;">Highest priority gatekeeper warning for power transmission and satellite flight operations via NOAA SWPC.</p>
+          `,
+          description: `Critical southward orientation of the Interplanetary Magnetic Field with Bz plunging below -20 nT.
+
+• Current IMF Bz: ${(currentBzClass === 'BZ5' ? currentBzValDisplay : '-26.0 nT')} (Peak: ${(currentBzClass === 'BZ5' ? peakBzValDisplay : '-28.0 nT')})
+• Magnetic Gate Open: Maximum magnetic reconnection between interplanetary field and Earth's terrestrial field lines.
+• Severe Disruption: Intense ring current amplification and high ground-induced current (GIC) hazard.
+• Rapid Escalation: Extremely favorable conditions for severe to extreme geomagnetic disturbance within hours.
+• Global Magnetosphere: Strong compression of the dayside magnetopause toward geosynchronous orbit.
+
+Highest priority gatekeeper warning for power transmission and satellite flight operations.`
+        }
+      },
+      blackout: {
+        name: 'radio-blackout',
+        severe: {
+          event: ALERT_TITLE_RADIO_BLACKOUT_R4,
+          countdown: ALERT_BADGE_RADIO_BLACKOUT_R4,
+          color: ALERT_COLOR_RADIO_BLACKOUT_R4,
+          icon: ALERT_ICON_RADIO_BLACKOUT,
+          sender_name: "NOAA Space Weather Prediction Center",
+          isSpaceWeather: true,
+          spaceClass: "R4",
+          modalHtml: `
+            <p style="margin-top: 0 !important;">A Severe (R4) Radio Blackout is in progress across the sunlit side of Earth due to high-intensity solar X-ray emissions.</p>
+            ${buildSpaceWeatherSectionHeader('Current Observations &amp; Readings:')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_RADIO_BLACKOUT_R4, 'Current Severity', 'Severe (NOAA R-Scale: R4)')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_RADIO_BLACKOUT_R4, 'Current Radio Absorption', (currentRClass === 'R4' ? currentRValDisplay : '20.0 dB'))}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_RADIO_BLACKOUT_R4, 'Peak Daily Absorption', 'PEAK ' + (currentRClass === 'R4' ? peakRValDisplay : '20.0 dB'))}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_RADIO_BLACKOUT_R4, 'Operational Status', r4ImpactText)}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_RADIO_BLACKOUT_R4, 'Sunlit Coverage', 'Most of the sunlit hemisphere affected')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_RADIO_BLACKOUT_R4, 'Affected Frequencies', 'High Frequency (HF) 3 to 30 MHz unavailable for 1 to 2 hours')}
+            ${buildSpaceWeatherSectionHeader('Key Operational &amp; Infrastructure Impacts:')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_RADIO_BLACKOUT_R4, 'HF Radio Communications', 'HF radio communications unavailable across most of the sunlit hemisphere for one to two hours.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_RADIO_BLACKOUT_R4, 'Marine &amp; Aviation', 'Critical communication disruption on transoceanic flights and maritime routes in daylight hours.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_RADIO_BLACKOUT_R4, 'Navigation Systems', 'Low-frequency radio navigation degraded for multiple hours; maritime positioning outages.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_RADIO_BLACKOUT_R4, 'Ionospheric Impact', 'Extreme ionization in the ionospheric D-region absorbing all high-frequency radio waves.')}
+            <p style="margin-bottom: 0;">Frequencies will restore once solar X-ray flux subsides below threshold levels. Real-time telemetry via NOAA SWPC.</p>
+          `,
+          description: `Severe Radio Blackout (R4) in progress across the sunlit side of the planet due to high-intensity solar X-ray emissions.
+
+• Current Radio Absorption: ${(currentRClass === 'R4' ? currentRValDisplay : '20.0 dB')} (Peak: ${(currentRClass === 'R4' ? peakRValDisplay : '20.0 dB')})
+• High Frequency (HF): HF radio communications unavailable across most of the sunlit hemisphere for one to two hours.
+• Marine & Aviation: Critical communication disruption on transoceanic flights and maritime routes in daylight hours.
+• Navigation: Low-frequency radio navigation degraded for multiple hours; maritime positioning outages.
+• Ionospheric Impact: Extreme ionization in the ionospheric D-region absorbing all high-frequency radio waves.
+
+Frequencies will restore once solar X-ray flux subsides below threshold levels.`
+        },
+        extreme: {
+          event: ALERT_TITLE_RADIO_BLACKOUT_R5,
+          countdown: ALERT_BADGE_RADIO_BLACKOUT_R5,
+          color: ALERT_COLOR_RADIO_BLACKOUT_R5,
+          icon: ALERT_ICON_RADIO_BLACKOUT,
+          sender_name: "NOAA Space Weather Prediction Center",
+          isSpaceWeather: true,
+          spaceClass: "R5",
+          modalHtml: `
+            <p style="margin-top: 0 !important;">An Extreme (R5) Radio Blackout is currently in progress across the sunlit hemisphere of Earth, caused by a colossal solar flare (X-ray flux event).</p>
+            ${buildSpaceWeatherSectionHeader('Current Observations &amp; Readings:')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_RADIO_BLACKOUT_R5, 'Current Severity', 'Extreme (NOAA R-Scale: R5)')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_RADIO_BLACKOUT_R5, 'Current Radio Absorption', (currentRClass === 'R5' ? currentRValDisplay : '32.0 dB'))}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_RADIO_BLACKOUT_R5, 'Peak Daily Absorption', 'PEAK ' + (currentRClass === 'R5' ? peakRValDisplay : '32.0 dB'))}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_RADIO_BLACKOUT_R5, 'Operational Status', r5ImpactText)}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_RADIO_BLACKOUT_R5, 'Sunlit Coverage', '100% of sunlit Earth (Daylight Hemisphere)')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_RADIO_BLACKOUT_R5, 'Affected Frequencies', 'High Frequency (HF) 3 to 30 MHz completely absorbed')}
+            ${buildSpaceWeatherSectionHeader('Key Operational &amp; Infrastructure Impacts:')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_RADIO_BLACKOUT_R5, 'HF Radio Communications', 'Complete, total failure of daylight HF radio communications across the sunlit side of Earth lasting several hours.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_RADIO_BLACKOUT_R5, 'Aviation &amp; Maritime', 'Total loss of transoceanic aviation and maritime voice communication on daylight routes.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_RADIO_BLACKOUT_R5, 'Satellite Signals', 'Extensive satellite-to-ground signal attenuation and significant positioning errors in GPS/GNSS systems.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_RADIO_BLACKOUT_R5, 'Navigation Systems', 'Multi-hour outages of low-frequency radio navigation aids.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_RADIO_BLACKOUT_R5, 'Ionospheric Absorption', 'Complete daytime D-region ionospheric blackout affecting all signals below 30 MHz.')}
+            <p style="margin-bottom: 0;">Active condition on the NOAA Space Weather Scale. Telemetry verified via NOAA Space Weather Prediction Center (SWPC GOES Primary Solar X-Ray Sensor).</p>
+          `,
+          description: `Extreme Radio Blackout (R5) underway caused by a colossal solar flare event.
+
+• Current Radio Absorption: ${(currentRClass === 'R5' ? currentRValDisplay : '32.0 dB')} (Peak: ${(currentRClass === 'R5' ? peakRValDisplay : '32.0 dB')})
+• High Frequency (HF): Complete, total high-frequency radio blackout on the entire sunlit side of the Earth lasting several hours.
+• Voice Communications: Total failure of maritime and transoceanic aviation HF radio contact on daylight routes.
+• Satellite Signals: Extensive satellite-to-ground signal attenuation and severe errors in satellite positioning systems.
+• Ionospheric Disruption: Full daytime ionospheric radio blackout affecting all communications below 30 MHz.
+
+Complete blackout condition on the NOAA Space Weather Scale.`
+        }
+      },
+      wind: {
+        name: 'solar-wind-speed',
+        severe: {
+          event: ALERT_TITLE_SOLAR_WIND_SPEED_W4,
+          countdown: ALERT_BADGE_SOLAR_WIND_SPEED_W4,
+          color: ALERT_COLOR_SOLAR_WIND_SPEED_W4,
+          icon: ALERT_ICON_SOLAR_WIND_SPEED,
+          sender_name: "NOAA Space Weather Prediction Center",
+          isSpaceWeather: true,
+          spaceClass: "W4",
+          modalHtml: `
+            <p style="margin-top: 0 !important;">A Severe (W4) Solar Wind Gale is impacting Earth's magnetosphere with interplanetary plasma velocities surging between 700 and 800 km/s.</p>
+            ${buildSpaceWeatherSectionHeader('Current Observations &amp; Readings:')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_WIND_SPEED_W4, 'Current Solar Wind Velocity', (currentWClass === 'W4' ? currentWValDisplay : '740 km/s'))}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_WIND_SPEED_W4, 'Peak Daily Velocity', 'PEAK ' + (currentWClass === 'W4' ? peakWValDisplay : '770 km/s'))}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_WIND_SPEED_W4, 'Current Wind Class', 'Severe Gale (NOAA W-Scale: W4)')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_WIND_SPEED_W4, 'Operational Status', w4ImpactText)}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_WIND_SPEED_W4, 'Plasma Stream Velocity', '700 – 800 km/s stream at 1 AU')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_WIND_SPEED_W4, 'Origin', 'Trans-equatorial Coronal Hole High Speed Stream (CH HSS) or interplanetary shock wave')}
+            ${buildSpaceWeatherSectionHeader('Key Operational &amp; Infrastructure Impacts:')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_WIND_SPEED_W4, 'Magnetosphere &amp; Bow Shock', 'Severe sunward compression of Earth’s magnetopause boundary toward geosynchronous orbit.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_WIND_SPEED_W4, 'Low Earth Orbit (LEO)', 'Heightened atmospheric density causing increased orbital drag on LEO satellites, requiring orbit-raising maneuvers.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_WIND_SPEED_W4, 'Spacecraft Operations', 'Spacecraft surface charging and disorientation risks for satellite star trackers.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_WIND_SPEED_W4, 'Radiation Belts', 'Substantial acceleration of relativistic outer-belt radiation electrons.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_WIND_SPEED_W4, 'Auroral Oval', 'Heightened auroral activity and expansion of the aurora borealis into mid-latitudes.')}
+            <p style="margin-bottom: 0;">Continuous interplanetary monitoring via DSCOVR and ACE spacecraft situated at the Sun-Earth L1 Lagrange point (~1 million miles sunward).</p>
+          `,
+          description: `Severe Solar Wind Gale detected with interplanetary plasma speeds surging between 700 and 800 km/s.
+
+• Current Solar Wind Speed: ${(currentWClass === 'W4' ? currentWValDisplay : '740 km/s')} (Peak: ${(currentWClass === 'W4' ? peakWValDisplay : '770 km/s')})
+• Solar Wind Velocity: High-speed plasma stream measuring between 700 and 800 km/s at 1 AU.
+• Bow Shock: Severe compression of Earth's sunward magnetopause boundary toward geosynchronous orbit.
+• Low Earth Orbit: Heightened atmospheric density causing increased orbital drag on LEO satellites.
+• Energetic Electrons: Substantial acceleration of relativistic outer-belt radiation electrons.
+
+Origin: Trans-equatorial Coronal Hole High Speed Stream or leading edge of an interplanetary shock wave.`
+        },
+        extreme: {
+          event: ALERT_TITLE_SOLAR_WIND_SPEED_W5,
+          countdown: ALERT_BADGE_SOLAR_WIND_SPEED_W5,
+          color: ALERT_COLOR_SOLAR_WIND_SPEED_W5,
+          icon: ALERT_ICON_SOLAR_WIND_SPEED,
+          sender_name: "NOAA Space Weather Prediction Center",
+          isSpaceWeather: true,
+          spaceClass: "W5",
+          modalHtml: `
+            <p style="margin-top: 0 !important;">An Extreme (W5) Solar Wind Gale is impacting Earth's magnetosphere with ultra-fast solar plasma velocities exceeding 800 km/s.</p>
+            ${buildSpaceWeatherSectionHeader('Current Observations &amp; Readings:')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_WIND_SPEED_W5, 'Current Solar Wind Velocity', (currentWClass === 'W5' ? currentWValDisplay : '860 km/s'))}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_WIND_SPEED_W5, 'Peak Daily Velocity', 'PEAK ' + (currentWClass === 'W5' ? peakWValDisplay : '920 km/s'))}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_WIND_SPEED_W5, 'Current Wind Class', 'Extreme Gale (NOAA W-Scale: W5)')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_WIND_SPEED_W5, 'Operational Status', w5ImpactText)}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_WIND_SPEED_W5, 'Plasma Stream Velocity', 'Ultra-fast stream exceeding 800 km/s at 1 AU')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_WIND_SPEED_W5, 'Origin', 'Fast Coronal Mass Ejection (CME) shock front or extreme coronal hole stream')}
+            ${buildSpaceWeatherSectionHeader('Key Operational &amp; Infrastructure Impacts:')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_WIND_SPEED_W5, 'Dynamic Pressure', 'Tremendous solar wind dynamic pressure forcing magnetopause inside geosynchronous orbit.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_WIND_SPEED_W5, 'Spacecraft &amp; Satellites', 'Severe spacecraft surface charging and intense radiation belt electron enhancement.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_WIND_SPEED_W5, 'Atmospheric Expansion', 'Intense Joule heating and neutral density expansion in upper thermosphere, causing extreme LEO satellite drag.')}
+            ${buildSpaceWeatherBullet(ALERT_COLOR_SOLAR_WIND_SPEED_W5, 'Auroral Activity', 'Extraordinary aurora displays expanding to mid and low latitudes.')}
+            <p style="margin-bottom: 0;">Extreme solar wind event posing significant hazards to satellite operations and power transmission. Monitored via DSCOVR/ACE at L1.</p>
+          `,
+          description: `Extreme Solar Wind Gale detected with interplanetary plasma velocities exceeding 800 km/s.
+
+• Current Solar Wind Speed: ${(currentWClass === 'W5' ? currentWValDisplay : '860 km/s')} (Peak: ${(currentWClass === 'W5' ? peakWValDisplay : '920 km/s')})
+• Solar Wind Velocity: Ultra-fast solar plasma stream surpassing 800 km/s at the DSCOVR satellite.
+• Dynamic Pressure: Tremendous solar wind dynamic pressure forcing magnetopause inside geosynchronous orbit.
+• Space Environment: Severe spacecraft surface charging and intense radiation belt electron enhancement.
+• Polar Atmosphere: Intense Joule heating and neutral density expansion in upper thermosphere.
+
+Extreme solar wind event posing significant hazards to satellite operations and power transmission.`
+        }
+      }
+    };
+  }
+
+  function getSpaceWeatherAlerts() {
+    const defs = getSpaceWeatherAlertDefinitions();
+    const result = [];
+    const addedEvents = new Set();
+
+    function addAlert(alertObj) {
+      if (alertObj && !addedEvents.has(alertObj.event)) {
+        addedEvents.add(alertObj.event);
+        result.push(alertObj);
+      }
+    }
+
+    // 1. Check Preview Mode / URL parameter override
+    let previewMode = TEST_SHOW_SPACE_WEATHER_ALERTS_PREVIEW;
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlParamVal = urlParams.get('test_space_alerts') || urlParams.get('testSpaceAlerts');
+      if (urlParamVal !== null) {
+        previewMode = urlParamVal;
+      }
+    } catch (e) {}
+
+    const modeStr = String(previewMode).toLowerCase().trim();
+
+    if (modeStr === 'all') {
+      // Show all 12 alerts (both worst levels for all 6 gauges)
+      Object.values(defs).forEach(gauge => {
+        addAlert(gauge.extreme);
+        addAlert(gauge.severe);
+      });
+      return result;
+    } else if (modeStr === 'extreme') {
+      // Show the 6 extreme alerts (all 6 gauges at Magenta level)
+      Object.values(defs).forEach(gauge => addAlert(gauge.extreme));
+      return result;
+    } else if (modeStr === 'severe') {
+      // Show the 6 severe alerts (all 6 gauges at Red level)
+      Object.values(defs).forEach(gauge => addAlert(gauge.severe));
+      return result;
+    } else if (modeStr === 'examples') {
+      // Show two live examples: R5 Extreme Radio Blackout (Magenta) and W4 Severe Solar Wind Gale (Red)
+      addAlert(defs.blackout.extreme);
+      addAlert(defs.wind.severe);
+      return result;
+    } else if (defs[modeStr]) {
+      // Specific gauge requested e.g. ?test_space_alerts=flare
+      addAlert(defs[modeStr].extreme);
+      addAlert(defs[modeStr].severe);
+      return result;
+    }
+
+    // 2. Dynamic live / test state from each of the 6 dials
+    // Flare dial:
+    const flareClass = activeSolarFlareState?.class || (SOLAR_FLARE_MODE === 'live' && liveSolarFlareData ? liveSolarFlareData.class : SOLAR_FLARE_CLASS_MANUAL);
+    if (flareClass === 'X') {
+      addAlert(defs.flare.extreme);
+    } else if (flareClass === 'M') {
+      addAlert(defs.flare.severe);
+    }
+
+    // Solar Radiation Storm dial:
+    const sClass = activeSolarRadiationStormState?.class || (SOLAR_RADIATION_STORM_MODE === 'live' && liveSolarRadiationStormData ? liveSolarRadiationStormData.class : SOLAR_RADIATION_STORM_CLASS_MANUAL);
+    if (sClass === 'S5') {
+      addAlert(defs.radiation.extreme);
+    } else if (sClass === 'S4') {
+      addAlert(defs.radiation.severe);
+    }
+
+    // Geomagnetic Storm dial:
+    const gClass = activeGeomagneticStormState?.class || (GEOMAGNETIC_STORM_MODE === 'live' && liveGeomagneticStormData ? liveGeomagneticStormData.class : GEOMAGNETIC_STORM_CLASS_MANUAL);
+    if (gClass === 'G5') {
+      addAlert(defs.geomagnetic.extreme);
+    } else if (gClass === 'G4') {
+      addAlert(defs.geomagnetic.severe);
+    }
+
+    // IMF Bz dial:
+    const bzClass = activeSolarWindBzState?.class || (SOLAR_WIND_BZ_MODE === 'live' && liveSolarWindBzData ? liveSolarWindBzData.class : SOLAR_WIND_BZ_CLASS_MANUAL);
+    if (bzClass === 'BZ5') {
+      addAlert(defs.bz.extreme);
+    } else if (bzClass === 'BZ4') {
+      addAlert(defs.bz.severe);
+    }
+
+    // Radio Blackout dial:
+    const rClass = activeRadioBlackoutState?.class || (RADIO_BLACKOUT_MODE === 'live' && liveRadioBlackoutData ? liveRadioBlackoutData.class : RADIO_BLACKOUT_CLASS_MANUAL);
+    if (rClass === 'R5') {
+      addAlert(defs.blackout.extreme);
+    } else if (rClass === 'R4') {
+      addAlert(defs.blackout.severe);
+    }
+
+    // Solar Wind Speed dial:
+    const wClass = activeSolarWindSpeedState?.class || (SOLAR_WIND_SPEED_MODE === 'live' && liveSolarWindSpeedData ? liveSolarWindSpeedData.class : SOLAR_WIND_SPEED_CLASS_MANUAL);
+    if (wClass === 'W5') {
+      addAlert(defs.wind.extreme);
+    } else if (wClass === 'W4') {
+      addAlert(defs.wind.severe);
+    }
+
+    return result;
+  }
+
+  // Developer / console helper to easily preview space weather alert banners on demand
+  window.testSpaceWeatherAlerts = function(mode = 'examples') {
+    TEST_SHOW_SPACE_WEATHER_ALERTS_PREVIEW = mode;
+    console.log(`🛰️ Space Weather Alerts preview set to: ${mode}`);
+    if (typeof updateAlerts === 'function') {
+      updateAlerts(lastWeatherData || {});
+    }
+  };
+
+  // Helper: Fits space weather banner content to exactly ONE line by progressively shrinking by 10%
+  function fitSpaceWeatherBannerToOneLine(banner, bannerContent, text) {
+    if (!banner || !bannerContent) return;
+
+    // Strict 1-line nowrap constraint
+    bannerContent.style.whiteSpace = 'nowrap';
+    bannerContent.style.flexWrap = 'nowrap';
+    if (text) {
+      text.style.whiteSpace = 'nowrap';
+      text.style.flexShrink = '0';
+    }
+
+    // Reset transform scale to accurately measure natural layout scrollWidth
+    bannerContent.style.transform = 'none';
+    void bannerContent.offsetWidth; // Force layout reflow
+
+    const contentWidth = bannerContent.scrollWidth;
+    const isMobile = window.innerWidth <= 767;
+    const ratio = isMobile ? ALERT_SPACE_BANNER_MAX_WIDTH_RATIO_MOBILE : ALERT_SPACE_BANNER_MAX_WIDTH_RATIO_DESKTOP;
+    const containerWidth = banner.clientWidth || window.innerWidth;
+    const maxAllowedWidth = containerWidth * ratio;
+
+    let scale = 1.0;
+    // Progressively shrink by 10% (scale *= 0.90) until bannerContent fits inside maxAllowedWidth
+    while ((contentWidth * scale) > maxAllowedWidth && scale > ALERT_SPACE_BANNER_MIN_SCALE) {
+      scale *= ALERT_SPACE_BANNER_SHRINK_FACTOR;
+    }
+
+    if (scale < 0.999) {
+      bannerContent.style.transform = `scale(${scale.toFixed(4)})`;
+      bannerContent.style.transformOrigin = 'center center';
+      bannerContent.style.setProperty('--banner-content-scale', scale.toFixed(4));
+    } else {
+      bannerContent.style.transform = '';
+      bannerContent.style.removeProperty('--banner-content-scale');
+    }
+  }
+
+  function fitAllSpaceWeatherBanners() {
+    const banners = document.querySelectorAll('.alert-space-weather-banner');
+    banners.forEach(b => {
+      if (b._bannerContent) {
+        fitSpaceWeatherBannerToOneLine(b, b._bannerContent, b._bannerText);
+      }
+    });
+  }
+
   // Create and update dynamic alert banners from OpenWeather API
-  function updateAlerts(data) {
-    const rawAlerts = data.alerts || [];
+  function updateAlerts(data = {}) {
+    const rawAlerts = (data && data.alerts) ? data.alerts : [];
     const now = Math.floor(Date.now() / 1000);
     
     // Deduplicate alerts by event name to prevent showing the exact same warning twice
@@ -5834,6 +6736,16 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
       });
     }
 
+    // Space Weather Alerts (for the worst two levels of each of the 6 dials: Level 4/M and Level 5/X)
+    if (typeof getSpaceWeatherAlerts === 'function') {
+      const swAlerts = getSpaceWeatherAlerts();
+      swAlerts.forEach(swAlert => {
+        if (!alerts.some(a => (a.event || '').toUpperCase().trim() === (swAlert.event || '').toUpperCase().trim())) {
+          alerts.push(swAlert);
+        }
+      });
+    }
+
     const container = document.getElementById('alerts-container');
     
     // Console logging to debug tornado watch
@@ -5858,6 +6770,7 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
     if (!container) return;
     
     if (alerts.length === 0) {
+      container._lastAlertsSignature = '';
       const isAlreadyCollapsed = !container.style.height || container.style.height === '0vw';
       if (isAlreadyCollapsed) return; // Prevent unnecessary DOM updates
       container.style.overflow = 'hidden';
@@ -5869,9 +6782,35 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
       return;
     }
     
+    // Stable DOM check: If alerts have not changed, SKIP destroying and recreating DOM!
+    // This allows mouse clicks to land cleanly without being cancelled by DOM churn.
+    const alertsSignature = JSON.stringify(alerts.map(a => ({
+      event: a.event,
+      spaceClass: a.spaceClass || '',
+      color: a.color || '',
+      end: a.end || '',
+      countdown: a.countdown || '',
+      desc: (a.description || '').slice(0, 50)
+    })));
+
+    if (container._lastAlertsSignature === alertsSignature && container.children.length === alerts.length) {
+      return;
+    }
+    container._lastAlertsSignature = alertsSignature;
+
     const targetHeight = alerts.length * 10;
     const currentHeight = parseFloat(container.style.height) || 0;
     
+    if (!container._hasDelegatedAlertClick) {
+      container._hasDelegatedAlertClick = true;
+      container.addEventListener('click', (e) => {
+        const b = e.target.closest('.alert-banner');
+        if (!b || !b._alertData) return;
+        console.log('🚨 Delegated container click for:', b._alertData.alert?.event);
+        openAlertModal(b._alertData.alert, b._alertData.color, b._alertData.icon);
+      });
+    }
+
     container.innerHTML = ''; // clear old alerts
     
     let prevBannerColor = null;
@@ -5885,22 +6824,30 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
       
       // Determine background color based on alert name
       const eventName = alert.event.toUpperCase().trim();
+      const isSpaceWeather = alert.isSpaceWeather || false;
       
-      let bannerColor = ALERT_COLORS["DEFAULT"];
-      for (const [key, color] of Object.entries(ALERT_COLORS)) {
-        if (eventName.includes(key)) {
-          bannerColor = color;
-          break;
+      let bannerColor = alert.color || ALERT_COLORS["DEFAULT"];
+      if (!alert.color) {
+        for (const [key, color] of Object.entries(ALERT_COLORS)) {
+          if (eventName.includes(key)) {
+            bannerColor = color;
+            break;
+          }
         }
       }
 
-      let bannerIcon = ALERT_ICONS["DEFAULT"];
-      for (const [key, icon] of Object.entries(ALERT_ICONS)) {
-        if (eventName.includes(key)) {
-          bannerIcon = icon;
-          break;
+      let bannerIcon = alert.icon || ALERT_ICONS["DEFAULT"];
+      if (!alert.icon) {
+        for (const [key, icon] of Object.entries(ALERT_ICONS)) {
+          if (eventName.includes(key)) {
+            bannerIcon = icon;
+            break;
+          }
         }
       }
+
+      // Store alert metadata directly on banner for delegated handler
+      banner._alertData = { alert, color: bannerColor, icon: bannerIcon };
 
       // Create the sibling background layer
       const bannerBg = document.createElement('div');
@@ -5909,8 +6856,30 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
 
       banner.appendChild(bannerBg);
 
+      // Unified direct modal open handler (like Doppler circle)
+      const handleOpenModal = (e) => {
+        if (e && e.type === 'touchend' && e.cancelable) {
+          e.preventDefault();
+        }
+        if (e && e.stopPropagation) {
+          e.stopPropagation();
+        }
+        console.log('🚨 Banner clicked! Opening modal for:', alert.event);
+        openAlertModal(alert, bannerColor, bannerIcon);
+      };
+
+      banner.setAttribute('role', 'button');
+      banner.setAttribute('tabindex', '0');
       banner.style.cursor = 'pointer';
-      banner.addEventListener('click', () => openAlertModal(alert, bannerColor, bannerIcon));
+      banner.style.pointerEvents = 'auto';
+      banner.addEventListener('click', handleOpenModal);
+      banner.addEventListener('touchend', handleOpenModal);
+      banner.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleOpenModal(e);
+        }
+      });
       
       // Use custom SVG icon
       const svgSize = '7vw';
@@ -5928,6 +6897,8 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
         iconTransform = `transform: ${FALL_STARTS_ICON_TRANSFORM};`;
       } else if (isNiceWeather) {
         iconTransform = `transform: translateY(var(--alert-nice-weather-icon-y-offset, 0vw));`;
+      } else if (isSpaceWeather) {
+        iconTransform = `transform: translateY(var(--alert-space-weather-icon-y-offset, 0vw));`;
       }
       const bannerIconTransform = iconTransform ? ` ${iconTransform}` : '';
       
@@ -5980,13 +6951,32 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
         textWrapper.style.transform = 'translateY(var(--alert-temp-rise-type-y-offset, 0vw))';
       } else if (eventName.includes('NICE WEATHER')) {
         textWrapper.style.transform = 'translateY(var(--alert-nice-weather-type-y-offset, 0vw))';
+      } else if (isSpaceWeather) {
+        textWrapper.style.transform = 'translateY(var(--alert-space-weather-type-y-offset, 0vw))';
+        textWrapper.style.whiteSpace = 'nowrap';
+        textWrapper.style.flexShrink = '0';
       }
 
       const text = document.createElement('div');
       text.className = 'alert-text';
+      if (isSpaceWeather) {
+        text.style.whiteSpace = 'nowrap';
+        text.style.flexShrink = '0';
+      }
       
       // Format: "TORNADO WATCH expires 6:15 am" or "TEMPERATURE DROP ADVISORY tomorrow"
-      let alertText = alert.event.toUpperCase();
+      let alertText = '';
+      if (alert.spaceClass) {
+        alertText += `<span class="alert-space-class">${alert.spaceClass}</span>`;
+      }
+      let eventTitle = alert.event.toUpperCase();
+      if (alert.spaceClass) {
+        const clsUpper = alert.spaceClass.toUpperCase();
+        if (eventTitle.startsWith(clsUpper + ' ') || eventTitle.startsWith(clsUpper + '&NBSP;')) {
+          eventTitle = eventTitle.replace(new RegExp(`^${clsUpper}(?:\\s|&nbsp;)+`, 'i'), '').trim();
+        }
+      }
+      alertText += eventTitle;
       if (alert.countdown) {
         alertText += ` <span class="alert-expires">${alert.countdown}</span>`;
       } else if (eventName.includes('TEMPERATURE DROP') || eventName.includes('TEMPERATURE RISE')) {
@@ -6058,6 +7048,16 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
       bannerContent.innerHTML = svgIcon;
       bannerContent.appendChild(textWrapper);
       banner.appendChild(bannerContent);
+
+      if (isSpaceWeather) {
+        banner.classList.add('alert-space-weather-banner');
+        banner._bannerContent = bannerContent;
+        banner._bannerText = text;
+        fitSpaceWeatherBannerToOneLine(banner, bannerContent, text);
+        requestAnimationFrame(() => {
+          fitSpaceWeatherBannerToOneLine(banner, bannerContent, text);
+        });
+      }
 
       // Add top shadow (multiplies previous banner color inside this banner context)
       if (index > 0 && prevBannerColor) {
@@ -11495,7 +12495,7 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
   // ==========================================
   // --- EDITABLE: Passive Versioning Config (JCV) ---
   // ==========================================
-  const VERSION_NUMBER = '1511';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
+  const VERSION_NUMBER = '1520';                  // EDITABLE: Auto-incremented on dist build by passive-versioning plugin
   const VERSION_PREFIX = 'Version ';              // EDITABLE: Prefix text before number (e.g. 'Version ' for 'Version 1000')
 
   // Keep browser tab title synchronized with the current app version
@@ -15519,8 +16519,8 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
     { class: 'X', value: 2.1 }
   ];
   let currentSolarFlareTestIndex = 2; // Default C 2.8 (matches screenshot)
-  let activeSolarFlareState = (SOLAR_FLARE_MODE === 'live') ? null : { class: SOLAR_FLARE_CLASS_MANUAL, value: SOLAR_FLARE_VALUE_MANUAL };
-  let liveSolarFlareData = null;
+  activeSolarFlareState = (SOLAR_FLARE_MODE === 'live') ? null : { class: SOLAR_FLARE_CLASS_MANUAL, value: SOLAR_FLARE_VALUE_MANUAL };
+  liveSolarFlareData = null;
   let solarFlareLiveTimer = null;
 
   function flareToNumericFlux(flareClass, flareValue) {
@@ -15785,6 +16785,8 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
         sublabelEl.style.opacity = '1';
       }
     }
+
+    if (typeof updateAlerts === 'function') updateAlerts(lastWeatherData || {});
   }
 
   function handleSolarFlareDialClick(e) {
@@ -16046,8 +17048,8 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
     { class: 'S5', value: 120000.0, peakClass: 'S5', peakValue: 150000.0 }
   ];
   let currentSolarRadiationStormTestIndex = 0; // Default S0 0.2 pfu (matches prompt)
-  let activeSolarRadiationStormState = (SOLAR_RADIATION_STORM_MODE === 'live') ? null : { class: SOLAR_RADIATION_STORM_CLASS_MANUAL, value: SOLAR_RADIATION_STORM_VALUE_MANUAL, peakClass: SOLAR_RADIATION_STORM_PEAK_CLASS_MANUAL, peakValue: SOLAR_RADIATION_STORM_PEAK_VALUE_MANUAL };
-  let liveSolarRadiationStormData = null;
+  activeSolarRadiationStormState = (SOLAR_RADIATION_STORM_MODE === 'live') ? null : { class: SOLAR_RADIATION_STORM_CLASS_MANUAL, value: SOLAR_RADIATION_STORM_VALUE_MANUAL, peakClass: SOLAR_RADIATION_STORM_PEAK_CLASS_MANUAL, peakValue: SOLAR_RADIATION_STORM_PEAK_VALUE_MANUAL };
+  liveSolarRadiationStormData = null;
   let currentSolarRadiationStormTrend = 'up'; // Default user requested: "↑ Space is Quiet"
   let solarRadiationStormLiveTimer = null;
 
@@ -16288,6 +17290,8 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
         sublabelEl.style.opacity = '1';
       }
     }
+
+    if (typeof updateAlerts === 'function') updateAlerts(lastWeatherData || {});
   }
 
   function handleSolarRadiationStormDialClick(e) {
@@ -16391,8 +17395,8 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
     { class: 'R5', value: 32.0 }
   ];
   let currentRadioBlackoutTestIndex = 2; // Default R2 2.8 (matches mockup)
-  let activeRadioBlackoutState = (RADIO_BLACKOUT_MODE === 'live') ? null : { class: RADIO_BLACKOUT_CLASS_MANUAL, value: RADIO_BLACKOUT_VALUE_MANUAL };
-  let liveRadioBlackoutData = null;
+  activeRadioBlackoutState = (RADIO_BLACKOUT_MODE === 'live') ? null : { class: RADIO_BLACKOUT_CLASS_MANUAL, value: RADIO_BLACKOUT_VALUE_MANUAL };
+  liveRadioBlackoutData = null;
   let radioBlackoutLiveTimer = null;
 
   function getRadioBlackoutImpact(rClass, trendDir) {
@@ -16625,6 +17629,8 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
         sublabelEl.style.opacity = '1';
       }
     }
+
+    if (typeof updateAlerts === 'function') updateAlerts(lastWeatherData || {});
   }
 
   function handleRadioBlackoutDialClick(e) {
@@ -16888,8 +17894,8 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
     { class: 'G5', value: 9.0 }
   ];
   let currentGeomagneticStormTestIndex = 2; // Default G2 2.8 (matches mockup)
-  let activeGeomagneticStormState = (GEOMAGNETIC_STORM_MODE === 'live') ? null : { class: GEOMAGNETIC_STORM_CLASS_MANUAL, value: GEOMAGNETIC_STORM_VALUE_MANUAL };
-  let liveGeomagneticStormData = null;
+  activeGeomagneticStormState = (GEOMAGNETIC_STORM_MODE === 'live') ? null : { class: GEOMAGNETIC_STORM_CLASS_MANUAL, value: GEOMAGNETIC_STORM_VALUE_MANUAL };
+  liveGeomagneticStormData = null;
   let geomagneticStormLiveTimer = null;
 
   function getGeomagneticStormImpact(rClass, trendDir) {
@@ -17122,6 +18128,8 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
         sublabelEl.style.opacity = '1';
       }
     }
+
+    if (typeof updateAlerts === 'function') updateAlerts(lastWeatherData || {});
   }
 
   function handleGeomagneticStormDialClick(e) {
@@ -17374,8 +18382,8 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
     { class: 'BZ5', value: -26.0, peakClass: 'BZ5', peakValue: -28.0 }
   ];
   let currentSolarWindBzTestIndex = 0;
-  let activeSolarWindBzState = (SOLAR_WIND_BZ_MODE === 'live') ? null : { class: SOLAR_WIND_BZ_CLASS_MANUAL, value: SOLAR_WIND_BZ_VALUE_MANUAL, peakClass: SOLAR_WIND_BZ_PEAK_CLASS_MANUAL, peakValue: SOLAR_WIND_BZ_PEAK_VALUE_MANUAL };
-  let liveSolarWindBzData = null;
+  activeSolarWindBzState = (SOLAR_WIND_BZ_MODE === 'live') ? null : { class: SOLAR_WIND_BZ_CLASS_MANUAL, value: SOLAR_WIND_BZ_VALUE_MANUAL, peakClass: SOLAR_WIND_BZ_PEAK_CLASS_MANUAL, peakValue: SOLAR_WIND_BZ_PEAK_VALUE_MANUAL };
+  liveSolarWindBzData = null;
   let currentSolarWindBzTrend = 'up';
   let solarWindBzLiveTimer = null;
 
@@ -17564,6 +18572,8 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
         sublabelEl.style.opacity = '1';
       }
     }
+
+    if (typeof updateAlerts === 'function') updateAlerts(lastWeatherData || {});
   }
 
   function handleSolarWindBzDialClick(e) {
@@ -17655,8 +18665,8 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
     { class: 'W5', value: 860, peakClass: 'W5', peakValue: 920 }
   ];
   let currentSolarWindSpeedTestIndex = 1; // Default W1 474 km/s
-  let activeSolarWindSpeedState = (SOLAR_WIND_SPEED_MODE === 'live') ? null : { class: SOLAR_WIND_SPEED_CLASS_MANUAL, value: SOLAR_WIND_SPEED_VALUE_MANUAL, peakClass: SOLAR_WIND_SPEED_PEAK_CLASS_MANUAL, peakValue: SOLAR_WIND_SPEED_PEAK_VALUE_MANUAL };
-  let liveSolarWindSpeedData = null;
+  activeSolarWindSpeedState = (SOLAR_WIND_SPEED_MODE === 'live') ? null : { class: SOLAR_WIND_SPEED_CLASS_MANUAL, value: SOLAR_WIND_SPEED_VALUE_MANUAL, peakClass: SOLAR_WIND_SPEED_PEAK_CLASS_MANUAL, peakValue: SOLAR_WIND_SPEED_PEAK_VALUE_MANUAL };
+  liveSolarWindSpeedData = null;
   let currentSolarWindSpeedTrend = 'up';
   let solarWindSpeedLiveTimer = null;
 
@@ -17848,6 +18858,8 @@ Monitor local forecasts and be prepared to take action should Flash Flood Warnin
         sublabelEl.style.opacity = '1';
       }
     }
+
+    if (typeof updateAlerts === 'function') updateAlerts(lastWeatherData || {});
   }
 
   function handleSolarWindSpeedDialClick(e) {
